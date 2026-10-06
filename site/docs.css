@@ -161,3 +161,9 @@
 .b-foot{margin-top:70px;padding:30px;background:var(--violet);color:#fff;font:400 12px var(--f-pix);text-transform:uppercase}
 .b-out{border:2px solid var(--ink);border-radius:var(--r-lg);overflow:hidden;background:var(--card)}
 .b-out .seg{padding:12px}
+
+.h-form{position:absolute;left:24px;right:24px;bottom:50px}
+.h-form input{width:100%;font:500 17px/1 var(--f-sans);padding:13px 14px;border:2px solid var(--ink);border-radius:10px;background:var(--card);color:var(--ink)}
+.h-form input:focus{outline:none;box-shadow:0 0 0 3px var(--lime)}
+.h-captcha{position:absolute;left:50%;bottom:44px;transform:translateX(-50%);display:flex;align-items:center;gap:12px;width:270px;padding:16px;border:2px solid var(--ink);border-radius:10px;background:var(--card);font:600 15px var(--f-sans);cursor:pointer}
+.h-captcha input{width:20px;height:20px;accent-color:var(--ink)}

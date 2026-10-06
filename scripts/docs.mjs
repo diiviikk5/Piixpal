@@ -79,6 +79,63 @@ export const PALS = [
     attrs: [['at', 'where it lies, 0–1'], ['edge', '"text" or "box"']],
     hab: '<p class="h-text" id="d-kitty" style="font-size:34px">Nap spot</p><piix-pal pal="kitty" on="#d-kitty"></piix-pal>', code: '<h2>\n  Nap spot\n  <piix-pal pal="kitty"></piix-pal>\n</h2>' },
 
+  { id: 'hiss', does: 'crawl', accent: 'var(--lime)', lives: "the glyph outline of your text, in waves", scared: "cursors (it hurries off)", poke: "flips over",
+    desc: "A long green snake who slithers along your headings and flicks its tongue at the air.",
+    attrs: [["speed","slithering speed"]],
+    hab: "<div class=\"h-text\" id=\"d-hiss\">Hello, world.</div><piix-pal pal=\"hiss\" on=\"#d-hiss\"></piix-pal>", code: "<h1>\n  Hello, world.\n  <piix-pal pal=\"hiss\"></piix-pal>\n</h1>" },
+  { id: 'pinch', does: 'crawl', accent: 'var(--coral)', lives: "your headings, walking sideways", scared: "cursors", poke: "flips onto its back",
+    desc: "A little crab who only knows how to walk sideways, which suits a line of text just fine. Snaps its claws while it thinks.",
+    attrs: [["speed","scuttling speed"]],
+    hab: "<div class=\"h-text\" id=\"d-pinch\">Sideways.</div><piix-pal pal=\"pinch\" on=\"#d-pinch\"></piix-pal>", code: "<h1>\n  Sideways.\n  <piix-pal pal=\"pinch\"></piix-pal>\n</h1>" },
+  { id: 'shibe', does: 'lounge', accent: 'var(--sun)', lives: "your text. Such lounge", scared: "nothing. Very brave", poke: "happy face, tongue out",
+    desc: "A very good shiba lying on your element, tail wagging. Swats at the cursor, naps when ignored.",
+    attrs: [["at","where it lies, 0–1"]],
+    hab: "<p class=\"h-text\" id=\"d-shibe\" style=\"font-size:34px\">Much nap</p><piix-pal pal=\"shibe\" on=\"#d-shibe\"></piix-pal>", code: "<h2>\n  Much nap\n  <piix-pal pal=\"shibe\"></piix-pal>\n</h2>" },
+  { id: 'capy', does: 'mind', accent: 'var(--sun)', lives: "a line of text, unbothered", scared: "absolutely nothing", poke: "calmly turns to face the other way",
+    desc: "A capybara with a yuzu on its head. Blinks slowly, dozes, minds its own business completely.",
+    attrs: [["at","where it sits, 0–1"]],
+    hab: "<p class=\"h-line\" id=\"d-capy\">Some light reading for a slow afternoon.</p><piix-pal pal=\"capy\" on=\"#d-capy\" at=\".95\"></piix-pal>", code: "<p>\n  Unbothered.\n  <piix-pal pal=\"capy\"></piix-pal>\n</p>" },
+  { id: 'peeper', kind: 'play', does: 'guard', accent: 'var(--sky)', where: 'input', lives: "a form field", scared: "seeing your password", poke: "a heart (or a polite \"...\")",
+    desc: "A fluffball that guards your inputs. Its eyes follow the caret as you type, it covers them for password fields, and it cheers or sweats when the field is valid or not.",
+    attrs: [["on","the input (or put it inside the label / wrapper)"]],
+    hab: "<div class=\"h-form\"><input id=\"d-peeper\" type=\"email\" placeholder=\"type an email…\" required></div><piix-pal pal=\"peeper\" on=\"#d-peeper\"></piix-pal>", code: "<label>\n  Email <input type=\"email\" required>\n  <piix-pal pal=\"peeper\"></piix-pal>\n</label>" },
+  { id: 'scrolly', kind: 'play', does: 'progress', accent: 'var(--lime)', where: 'body', lives: "a reading-progress bar at the bottom of the screen", scared: "nothing, it loves a long read", poke: "scrolls you back to the top",
+    desc: "A tiny runner on a reading-progress bar. It keeps pace as you scroll, idles when you stop, and celebrates when you reach the end. It is running along the bottom of this page right now.",
+    attrs: [["side","\"bottom\" or \"top\""],["color","bar colour"]],
+    hab: "<p class=\"h-line\" style=\"bottom:auto;top:40px\">Scroll this page: Scrolly runs along the bar at the bottom of your screen.</p><piix-pal pal=\"scrolly\"></piix-pal>", code: "<piix-pal pal=\"scrolly\"></piix-pal>" },
+  { id: 'echo', kind: 'play', does: 'mimic', accent: 'var(--lime)', where: 'body', lives: "the whole page, half a second behind you", scared: "nothing", poke: "cannot be poked: it never catches clicks",
+    desc: "Your cursor’s little shadow. Replays the exact path your cursor took and clicks wherever you clicked, half a second late. Stop and it catches up and dances.",
+    attrs: [["delay","seconds behind (default 0.5)"]],
+    hab: "<p class=\"h-line\" style=\"bottom:auto;top:40px\">Move around and click anywhere: Echo is following you on this whole page.</p><piix-pal pal=\"echo\"></piix-pal>", code: "<piix-pal pal=\"echo\"></piix-pal>" },
+  { id: 'snip', kind: 'play', does: 'select', accent: 'var(--sun)', where: 'p', lives: "a block of text", scared: "nothing", poke: "a heart",
+    desc: "A highlighter pen with opinions. Select text inside its element and it hops to the end of your selection, nib up. Copy it and it shows you a clipboard.",
+    attrs: [["on","the text to watch (on=\"body\" watches the whole page)"]],
+    hab: "<p class=\"h-line\" id=\"d-snip\" style=\"bottom:70px\">Select a few words in this sentence, then copy them.</p><piix-pal pal=\"snip\" on=\"#d-snip\"></piix-pal>", code: "<article>\n  …\n  <piix-pal pal=\"snip\"></piix-pal>\n</article>" },
+  { id: 'beep', kind: 'play', does: 'captcha', accent: 'var(--coral)', where: 'label', lives: "next to an \"I’m not a robot\" checkbox", scared: "being found out", poke: "a nervous \"?\"",
+    desc: "A small robot with a big secret. Sweats when your cursor comes near the checkbox. Tick it and Beep panics and runs off, then sneaks back, embarrassed.",
+    attrs: [["on","the checkbox or the label that holds it"]],
+    hab: "<label class=\"h-captcha\" id=\"d-beep\"><input type=\"checkbox\"> I’m not a robot<piix-pal pal=\"beep\"></piix-pal></label>", code: "<label>\n  <input type=\"checkbox\"> I’m not a robot\n  <piix-pal pal=\"beep\"></piix-pal>\n</label>" },
+  { id: 'router', kind: 'play', does: 'signal', accent: 'var(--mint)', lives: "the top of an element", scared: "losing signal", poke: "a heart at full bars",
+    desc: "A little Wi-Fi router whose signal is your cursor. The closer you get, the more bars it shows. Wander off and it loses signal and frowns.",
+    attrs: [["at","where it sits, 0–1"]],
+    hab: "<div class=\"h-floor\" id=\"d-router\"><i></i><i></i><i></i></div><piix-pal pal=\"router\" on=\"#d-router\" at=\".5\"></piix-pal>", code: "<piix-pal pal=\"router\"></piix-pal>" },
+  { id: 'termi', kind: 'play', does: 'type', accent: 'var(--lime)', lives: "the top of an element", scared: "nothing, it has root", poke: "skips to the next line",
+    desc: "A tiny terminal who types for you: lines appear in a little terminal bubble, character by character, forever.",
+    attrs: [["lines","what to type, separated by |"],["speed","typing speed"]],
+    hab: "<div class=\"h-floor\" id=\"d-termi\"><i></i><i></i><i></i></div><piix-pal pal=\"termi\" on=\"#d-termi\" lines=\"npm i piixpal|added 1 package|✓ pals deployed\"></piix-pal>", code: "<piix-pal pal=\"termi\"\n  lines=\"git push|deploying…|✓ live\"></piix-pal>" },
+  { id: 'frog', kind: 'play', does: 'snap', accent: 'var(--lime)', lives: "the top of an element", scared: "nothing. It is hungry", poke: "hops along",
+    desc: "A frog convinced your cursor is a fly. Buzz close and its tongue snaps out at you; hold still at the tip and you are caught.",
+    attrs: [["at","where it sits, 0–1"]],
+    hab: "<div class=\"h-floor\" id=\"d-frog\"><i></i><i></i><i></i></div><piix-pal pal=\"frog\" on=\"#d-frog\"></piix-pal>", code: "<piix-pal pal=\"frog\"></piix-pal>" },
+  { id: 'penguin', kind: 'play', does: 'slide', accent: 'var(--sky)', lives: "any long element", scared: "nothing", poke: "slips and spins",
+    desc: "A penguin who has discovered your element is slippery. Waddles, flops onto its belly and slides, gets up and does it again.",
+    attrs: [["edge","\"text\" or \"box\""]],
+    hab: "<div class=\"h-floor\" id=\"d-penguin\"><i></i><i></i><i></i></div><piix-pal pal=\"penguin\" on=\"#d-penguin\" edge=\"box\"></piix-pal>", code: "<piix-pal pal=\"penguin\"></piix-pal>" },
+  { id: 'rocket', kind: 'play', does: 'launch', accent: 'var(--coral)', where: '.btn', lives: "your Deploy button", scared: "nothing. It was born for this", poke: "3, 2, 1, lift-off",
+    desc: "Ship it. Click the rocket: it counts down, blasts off the top of the screen in a trail of smoke, then lands back on its retro-rockets.",
+    attrs: [["at","where it sits, 0–1"]],
+    hab: "<div class=\"h-btns\"><span class=\"h-btn lime\" id=\"d-rocket\">Deploy</span></div><piix-pal pal=\"rocket\" on=\"#d-rocket\"></piix-pal>", code: "<button class=\"deploy\">\n  Deploy\n  <piix-pal pal=\"rocket\"></piix-pal>\n</button>" },
+
   /* ----- the toy box (do="toss") ----- */
   { id: 'ball', kind: 'toy', does: 'toss', accent: 'var(--coral)', lives: 'wherever it lands: headings, paragraphs, buttons, cards', scared: 'nothing', poke: 'a little kick into the air',
     desc: 'A beach ball. Bouncy, rolly, slightly smug. Rolls a long way. Drag and throw it, or bat it with a fast swipe of the cursor.',
@@ -140,7 +197,7 @@ export const PALS = [
     hab: '<div class="h-hive" id="d-bees">hive</div><piix-pal pal="bees" on="#d-bees"></piix-pal>', code: '<div class="hive">\n  <piix-pal pal="bees"></piix-pal>\n</div>' }
 ];
 
-const kinds = { pal: PALS.filter(p => !p.kind), toy: PALS.filter(p => p.kind === 'toy'), group: PALS.filter(p => p.kind === 'group') };
+const kinds = { pal: PALS.filter(p => !p.kind), play: PALS.filter(p => p.kind === 'play'), toy: PALS.filter(p => p.kind === 'toy'), group: PALS.filter(p => p.kind === 'group') };
 
 /* ---------- layout ---------- */
 const GH = `<svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>`;
@@ -164,6 +221,8 @@ const sidebar = active => {
     ${smalls.map(s => `<a href="sprites.html#s-${s.name}" style="--dot:${s.accent}"><i></i>${title(s.name)}</a>`).join('\n    ')}
     <h4>Pals</h4>
     ${kinds.pal.map(p => `<a href="pals.html#${p.id}" style="--dot:${p.accent}"><i></i>${title(p.id)}</a>`).join('\n    ')}
+    <h4>New ways to play</h4>
+    ${kinds.play.map(p => `<a href="pals.html#${p.id}" style="--dot:${p.accent}"><i></i>${title(p.id)}</a>`).join('\n    ')}
     <h4>Toy box</h4>
     ${kinds.toy.map(p => `<a href="pals.html#${p.id}" style="--dot:${p.accent}"><i></i>${title(p.id)}</a>`).join('\n    ')}
     <h4>Groups</h4>
@@ -400,9 +459,10 @@ const palsBody = `<header class="doc-head">
   <div class="crumbs"><a href="./">Components</a><span>/</span><span>Pals</span></div>
   <h1>Pals</h1>
   <p>Pals live <em>on</em> your page. Each one has a job: something it lives on, something that scares it, something that happens when you poke it. Put one inside an element and it figures out the rest. They notice each other, too.</p>
-  <div class="pills"><span class="pill">${kinds.pal.length} characters</span><span class="pill">${kinds.toy.length} toys</span><span class="pill">${kinds.group.length} groups</span><span class="pill">never blocks clicks</span></div>
+  <div class="pills"><span class="pill">${kinds.pal.length} characters</span><span class="pill">${kinds.play.length} interactions</span><span class="pill">${kinds.toy.length} toys</span><span class="pill">${kinds.group.length} groups</span><span class="pill">never blocks clicks</span></div>
 </header>
 ${family('characters', 'Characters', 'One pal, one job. Crawlers, peekers, perchers, sweepers and loungers.', kinds.pal)}
+${family('play', 'New ways to play', 'Pals that react to what people actually do on your site: typing, passwords, selecting and copying text, scrolling, ticking a checkbox, clicking a deploy button.', kinds.play)}
 ${family('toys', 'Toy box', 'Things to throw around the page. They land on real elements, roll off edges onto whatever is below, and can be batted with a fast swipe. Try throwing one onto another pal.', kinds.toy)}
 ${family('groups', 'Groups', 'One tag, a whole crew: families, flocks, lines and choirs that move and react together.', kinds.group)}`;
 
