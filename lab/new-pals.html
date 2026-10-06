@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Piixpal · new pals</title>
+<style>
+  body{margin:0;background:#fff;color:#16111f;font:18px/1.5 system-ui,sans-serif;padding:40px 60px 300px}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:60px 40px;margin-top:80px}
+  .box{height:150px;border:2px solid #16111f;border-radius:14px;display:grid;place-items:center;font-weight:700;position:relative}
+  h2{font-size:40px;margin:0}
+</style>
+</head>
+<body>
+<div class="grid">
+  <div class="box" id="g">gecko <piix-pal pal="gecko"></piix-pal></div>
+  <div class="box" id="m">mole <piix-pal pal="mole"></piix-pal></div>
+  <div class="box" id="b">balloon <piix-pal pal="balloon"></piix-pal></div>
+  <div class="box" id="p"><h2 id="ph">Landing zone</h2><piix-pal pal="para" on="#ph"></piix-pal></div>
+  <div class="box" id="r">roomba <piix-pal pal="roomba"></piix-pal></div>
+  <div class="box" id="k"><h2 id="kh">Cat's spot</h2><piix-pal pal="kitty" on="#kh"></piix-pal></div>
+</div>
+<script src="../piixpal.js"></script>
+</body>
+</html>
