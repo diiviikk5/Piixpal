@@ -151,7 +151,8 @@ const sidebar = active => {
   return `<aside class="side" aria-label="Components">
     <h4>Start</h4>
     ${link('./', 'Overview', 'index')}
-    ${link('../#install', 'Install', '-')}
+    ${link('install.html', 'Install', 'install')}
+    ${link('builder.html', 'Builder', 'builder')}
     <h4>Components</h4>
     ${link('sprites.html', `Sprites <span class="n">${sprites.length}</span>`, 'sprites')}
     ${link('pals.html', `Pals <span class="n">${PALS.length}</span>`, 'pals')}
@@ -226,6 +227,28 @@ const spriteCard = s => `    <article class="scard${s.big ? ' big' : ''}" id="s-
         <div class="s-actions"><button type="button" class="dark" data-copy="${esc(`<piix-sprite name="${s.name}"></piix-sprite>`)}">Copy</button><button type="button" data-pick="${s.name}">Customise</button></div>
       </div>
     </article>`;
+const CDN_ALL = 'https://cdn.jsdelivr.net/gh/diiviikk5/Piixpal@main/piixpal.min.js';
+const CDN_ONE = n => `https://cdn.jsdelivr.net/gh/diiviikk5/Piixpal@main/dist/c/${n}.min.js`;
+/* every way to add one component, as tabs: like a UI library's install box */
+const installTabs = (name, kind, markup, where = 'h1') => {
+  const tag = kind === 'sprite' ? 'piix-sprite' : 'piix-pal', attr = kind === 'sprite' ? 'name' : 'pal';
+  const Comp = kind === 'sprite' ? 'PiixSprite' : 'PiixPal';
+  const tabs = [
+    ['HTML', `<!-- once, anywhere on the page -->\n<script src="${CDN_ALL}"></script>\n\n${markup}`],
+    ['Single file', `<!-- just ${name} (the shared engine loads itself, once) -->\n<script src="${CDN_ONE(name)}"></script>\n\n${markup}`],
+    ['No markup', kind === 'sprite'
+      ? `<script src="${CDN_ONE(name)}"\n  data-pals="${name}@${where}"></script>`
+      : `<!-- attaches itself to the first ${where}: nothing else to add -->\n<script src="${CDN_ONE(name)}"\n  data-pals="${name}@${where}"></script>`],
+    ['JS', `await import("${CDN_ONE(name)}");\nPiixpal.add("${name}", "${where}");`],
+    ['React', `import { ${Comp} } from "piixpal/react"; // or copy wrappers/react.jsx\n\n<h1>\n  Hello\n  <${Comp} ${attr}="${name}" />\n</h1>`],
+    ['Vue', `// main.js: app.use(Piixpal) from "piixpal/vue"\n\n<h1>\n  Hello\n  <${tag} ${attr}="${name}" />\n</h1>`],
+    ['Svelte', `<script>import Piixpal from "piixpal/svelte";</script>\n<Piixpal />\n\n<h1>Hello <${tag} ${attr}="${name}"></${tag}></h1>`]
+  ];
+  return `<div class="tabs" data-tabs>
+  <div class="tab-bar" role="tablist">${tabs.map(([t], i) => `<button type="button" role="tab" aria-selected="${i === 0}">${t}</button>`).join('')}</div>
+  ${tabs.map(([, code], i) => `<pre class="codebox tab-pane"${i ? ' hidden' : ''}><button class="copy" type="button" data-copy="${esc(code)}">Copy</button>${esc(code)}</pre>`).join('\n  ')}
+</div>`;
+};
 const codeBox = code => `<pre class="codebox"><button class="copy" type="button" data-copy="${esc(code)}">Copy</button>${esc(code)}</pre>`;
 const table = (cap, rows) => `<div class="table-wrap"><table><caption>${esc(cap)}</caption><thead><tr><th>Attribute</th><th>What it does</th><th>Default</th></tr></thead><tbody>
 ${rows.map(([a, d, def]) => `<tr><td><code>${a}</code></td><td>${d}</td><td>${def}</td></tr>`).join('\n')}
@@ -364,7 +387,7 @@ const palSection = p => `
         <dt>poke it</dt><dd>${p.poke}</dd>
         ${p.attrs.map(([a, d]) => `<dt>${a}</dt><dd>${d}</dd>`).join('\n        ')}
       </dl>
-      ${codeBox(p.code)}
+      ${installTabs(p.id, 'pal', p.code, p.where || (p.kind === 'group' || p.does === 'bounce' || p.does === 'sweep' || p.does === 'pop' ? 'footer' : p.does === 'perch' ? '.btn' : p.does === 'peek' || p.does === 'climb' ? '.card' : p.does === 'hang' ? 'nav' : 'h1'))}
     </div>
   </div>
 </section>`;
@@ -522,10 +545,87 @@ const indexBody = `<header class="doc-head">
   ${codeBox('<script src="https://cdn.jsdelivr.net/gh/diiviikk5/Piixpal@main/piixpal.min.js"></script>')}
 </section>`;
 
+/* ---------- install ---------- */
+const BOOKMARKLET = `javascript:(()=>{if(window.Piixpal&&Piixpal.add){Piixpal.clear();}const go=()=>{const q=s=>document.querySelector(s);const h=q('h1')||q('h2');if(h)Piixpal.add('bitbug',h);const p=q('main p')||q('p');if(p)Piixpal.add('moss',p);Piixpal.add('pip','a,button');const f=q('footer')||q('nav')||q('header');if(f)Piixpal.add('boing',f);Piixpal.add('bees','body');};if(window.Piixpal&&Piixpal.add)return go();const s=document.createElement('script');s.src='${CDN_ALL}';s.onload=go;s.onerror=()=>alert('This site blocks outside scripts, so the pals cannot visit. Try another site!');document.head.appendChild(s);})();`;
+const installBody = `<header class="doc-head">
+  <div class="crumbs"><a href="./">Components</a><span>/</span><span>Install</span></div>
+  <h1>Install</h1>
+  <p>Pick whatever suits your site. Nothing to download, no build step, no account. Every option below works on its own.</p>
+</header>
+
+<section class="doc-sec" id="cdn" aria-labelledby="i1"><h2 id="i1">1. Everything, one tag</h2>
+  <p>All ${sprites.length + PALS.length + 4} components in one file (about 40 KB gzipped), served free by jsDelivr. Then use any tag from these pages.</p>
+  ${codeBox(`<script src="${CDN_ALL}"></script>\n\n<h1>Hello <piix-pal pal="bitbug"></piix-pal></h1>`)}
+</section>
+
+<section class="doc-sec" id="single" aria-labelledby="i2"><h2 id="i2">2. Just the ones you use</h2>
+  <p>Every pal and sprite has its own tiny file (1–4 KB). The shared engine loads itself the first time, once, however many you add.</p>
+  ${codeBox(`<script src="${CDN_ONE('kitty')}"></script>\n<script src="${CDN_ONE('gloop')}"></script>\n\n<h2>Nap spot <piix-pal pal="kitty"></piix-pal></h2>\n<piix-sprite name="gloop"></piix-sprite>`)}
+</section>
+
+<section class="doc-sec" id="nomarkup" aria-labelledby="i3"><h2 id="i3">3. No markup at all</h2>
+  <p>For Webflow, Framer, WordPress, Shopify, Squarespace, Notion sites: anywhere with a "custom code" box. Say which pal goes where, right on the script tag. Format: <code>name@css-selector</code>, comma separated, optional <code>?attr=value</code>.</p>
+  ${codeBox(`<script src="${CDN_ALL}"\n  data-pals="bitbug@h1, boing@footer, pip@.button, moss@p?at=.9"></script>`)}
+  <p style="margin-top:14px">Not sure what to pick? The <a href="builder.html">Builder</a> writes this line for you.</p>
+</section>
+
+<section class="doc-sec" id="js" aria-labelledby="i4"><h2 id="i4">4. From JavaScript</h2>
+  ${codeBox(`Piixpal.add("bitbug", "h1");                 // a pal on the first h1\nPiixpal.add("pip", ".btn");                  // every .btn is a perch\nPiixpal.add("gloop", "#hero", { size: 220 }); // sprites go inside the element\nPiixpal.add("kitty", someElement);           // or pass an element\n\nPiixpal.list();   // everything registered\nPiixpal.clear();  // remove them all`)}
+</section>
+
+<section class="doc-sec" id="frameworks" aria-labelledby="i5"><h2 id="i5">5. React, Next.js, Vue, Svelte, Astro</h2>
+  <p>Pals are standard web components, so plain tags work everywhere once the script is loaded. The wrappers just load it for you.</p>
+  <div class="tabs" data-tabs>
+    <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">React / Next</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button><button type="button" role="tab" aria-selected="false">Astro</button></div>
+    ${[
+      `// copy wrappers/react.jsx + wrappers/load.js, or (soon) npm i piixpal\nimport { PiixPal, PiixSprite, PiixCrowd } from "piixpal/react";\n\nexport default function Hero() {\n  return (\n    <h1>\n      Hello <PiixPal pal="bitbug" />\n      <PiixSprite name="gloop" size={200} />\n    </h1>\n  );\n}`,
+      `// main.js\nimport Piixpal from "piixpal/vue";\ncreateApp(App).use(Piixpal).mount("#app");\n\n// vite.config.js\nvue({ template: { compilerOptions: { isCustomElement: t => t.startsWith("piix-") } } })\n\n<!-- any template -->\n<h1>Hello <piix-pal pal="bitbug" /></h1>`,
+      `<script>\n  import Piixpal from "piixpal/svelte";\n</script>\n\n<Piixpal />\n<h1>Hello <piix-pal pal="bitbug"></piix-pal></h1>`,
+      `<!-- in your layout's <head> -->\n<script is:inline src="${CDN_ALL}"></script>\n\n<h1>Hello <piix-pal pal="bitbug"></piix-pal></h1>`
+    ].map((code, i) => `<pre class="codebox tab-pane"${i ? ' hidden' : ''}><button class="copy" type="button" data-copy="${esc(code)}">Copy</button>${esc(code)}</pre>`).join('\n    ')}
+  </div>
+</section>
+
+<section class="doc-sec" id="selfhost" aria-labelledby="i6"><h2 id="i6">6. Host it yourself</h2>
+  <p>Download <a href="https://raw.githubusercontent.com/diiviikk5/Piixpal/main/piixpal.min.js" download>piixpal.min.js</a> (or anything in <code>dist/</code>) and point a script tag at your copy. MIT licensed, no tracking, works offline. An npm package is on the way.</p>
+</section>
+
+<section class="doc-sec" id="bookmarklet" aria-labelledby="i7"><h2 id="i7">Try it on any website</h2>
+  <p>Drag this button to your bookmarks bar, open any website, and click it. Pals move in for a visit (only on your screen, nothing is changed). Some sites block outside scripts; they will tell you.</p>
+  <p><a class="btn btn-lime bookmarklet" href="${esc(BOOKMARKLET)}" onclick="event.preventDefault();alert('Drag me to your bookmarks bar, then click me on any website.')">Piixpal visit</a></p>
+</section>`;
+
+/* ---------- builder ---------- */
+const builderBody = `<header class="doc-head">
+  <div class="crumbs"><a href="./">Components</a><span>/</span><span>Builder</span></div>
+  <h1>Builder</h1>
+  <p>Tick the pals you want, choose where each one lives, watch them move in below, then copy one line into your site. No markup needed.</p>
+</header>
+<div class="builder">
+  <div class="b-list" id="b-list" aria-label="Pick pals"></div>
+  <div class="b-right">
+    <div class="b-site" id="b-site">
+      <div class="b-nav" data-where="nav"><b>yoursite</b><span class="b-link">Work</span><span class="b-link">About</span><span class="btn btn-sm b-btn">Contact</span></div>
+      <h1 class="b-h1" data-where="h1">Make something lovely</h1>
+      <p class="b-p" data-where="p">A short paragraph about what you do, where your pals can nap and read.</p>
+      <div class="b-row"><span class="btn btn-lime b-btn">Get started</span><span class="btn b-btn">Learn more</span></div>
+      <div class="b-card" data-where=".card"><b>A card</b><span>Things hide behind cards.</span></div>
+      <div class="b-foot" data-where="footer">footer</div>
+    </div>
+    <div class="b-out">
+      <div class="seg" id="b-mode" role="group" aria-label="Output"><button type="button" data-v="one" aria-pressed="true">One tag, lightest files</button><button type="button" data-v="all" aria-pressed="false">Everything bundle</button></div>
+      <pre class="c-code" id="b-code"></pre>
+    </div>
+  </div>
+</div>
+<script>window.PIIX_BUILDER = ${JSON.stringify(PALS.map(p => ({ id: p.id, kind: p.kind || 'pal', does: p.does })).concat(sprites.map(s => ({ id: s.name, kind: 'sprite', big: s.big }))))};</script>`;
+
 const pages = [
   ['index.html', { key: 'index', title: 'Components', desc: 'Every Piixpal component: sprites, pals and pixel type.', body: indexBody }],
   ['sprites.html', { key: 'sprites', title: 'Sprites', desc: `${sprites.length} inline pixel sprites with cursor-following eyes. Copy a tag, paste it anywhere.`, body: spritesBody }],
   ['pals.html', { key: 'pals', title: 'Pals', desc: 'Pixel characters that live on your page: crawl, bounce, peek, perch, hang, follow, creep.', body: palsBody }],
+  ['install.html', { key: 'install', title: 'Install', desc: 'Every way to add Piixpal to a site: one tag, single files, no-markup, JS, React, Vue, Svelte, bookmarklet.', body: installBody }],
+  ['builder.html', { key: 'builder', title: 'Builder', desc: 'Pick pals, choose where they live, copy one line.', body: builderBody }],
   ['crowd.html', { key: 'crowd', title: 'Crowd', desc: 'A stage of hundreds of tiny agents: crowd, swarm and formation modes.', body: crowdBody }],
   ['type.html', { key: 'type', title: 'Pixel type', desc: 'Chunky extruded pixel lettering that pals can walk on.', body: typeBody, fonts: '<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@800&family=Instrument+Serif&family=Pacifico&display=swap" rel="stylesheet">\n' }]
 ];
