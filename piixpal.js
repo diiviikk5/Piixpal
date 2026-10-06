@@ -153,6 +153,17 @@ const baked = spec => {
   return (spec._baked = out);
 };
 
+/* ---------- every live pal, so they can notice each other ---------- */
+const ACTORS = new Set();
+/* tell nearby pals something happened: their behaviour's hear(type, from, dist) runs */
+const shout = (from, type, radius) => {
+  ACTORS.forEach(o => {
+    if (o === from || !o.ctl || !o.ctl.hear) return;
+    const d = Math.hypot(o.x - from.x, (o.y - o.h / 2) - (from.y - from.h / 2));
+    if (d < radius) o.ctl.hear(type, from, d);
+  });
+};
+
 /* ---------- Actor: one sprite on the layer ---------- */
 class Actor {
   constructor(spec, opts = {}) {
@@ -184,6 +195,7 @@ class Actor {
     n.append(this.bub, cv);
     root.appendChild(n);
     this.play(spec.start || Object.keys(spec.frames)[0]);
+    ACTORS.add(this);
   }
   get w() { return this.spec.w * this.s; }
   get h() { return this.spec.h * this.s; }
@@ -244,7 +256,7 @@ class Actor {
     const cx = this.x + this.ox, cy = this.y - this.h / 2 + this.oy;
     return Math.abs(ptr.x - cx) < this.w / 2 + m && Math.abs(ptr.y - cy) < this.h / 2 + m;
   }
-  destroy() { clearTimeout(this._bt); this.node.remove(); }
+  destroy() { clearTimeout(this._bt); this.node.remove(); ACTORS.delete(this); }
 }
 
 /* ---------- behaviours: (actor, target, host) => { tick(dt,t), poke(e)?, grab(e)?, destroy()? } ---------- */
@@ -417,6 +429,7 @@ defineBehavior('bounce', (a, [el], host) => {
           const impact = vy;
           a.y = floor(r); a.rot = 0; spin = 0;
           if (typeof el.piixImpact === 'function') el.piixImpact(a.x, a.y, clamp(impact / 1200, .3, 1.6));
+          if (impact > 520 * Math.sqrt(S)) shout(a, 'thud', 170 * S * clamp(impact / 1200, .6, 1.8));
           sq = -clamp(impact / 2200, .12, .42); sqv = 0;
           if (impact > 2100 * Math.sqrt(S) || combo > 2) {
             dizzy = 2.2; combo = 0; a.say('star', 1800); a.play('dizzy');
@@ -527,7 +540,7 @@ defineBehavior('crawl', (a, [el], host) => {
   const speed = 30 * S * (+host.getAttribute('speed') || 1);
   const step = 2.5 * a.s;                 /* bigger than this and it hops instead */
   const reach = 34 * a.s;                 /* how far it will hop across a gap */
-  let box = null, state = 'walk', timer = rnd(2, 4), hop = null, placed = false;
+  let box = null, state = 'walk', timer = rnd(2, 4), hop = null, placed = false, fleeX = null, metAt = 0;
   const cache = {};
 
   const lane = () => {
@@ -618,6 +631,14 @@ defineBehavior('crawl', (a, [el], host) => {
         case 'walk':
           a.play('walk', { fps: 10 });
           move(speed);
+          /* two bugs bump into each other: a little moment, then both turn back */
+          if (now() - metAt > 4000) for (const o of ACTORS) {
+            if (o === a || o.spec !== a.spec || Math.abs(o.y - a.y) > a.h || Math.abs(o.x - a.x) > a.w * .85 || (o.x - a.x) * a.face < 0) continue;
+            metAt = now(); a.say('heart', 900); go('idle', .9, 'idle');
+            setTimeout(() => turn(), 700);
+            if (o.ctl && o.ctl.meet) o.ctl.meet(a);
+            break;
+          }
           if (timer <= 0) {
             const r = Math.random();
             if (r < .4) go('sniff', rnd(1, 1.8), 'sniff');
@@ -626,7 +647,7 @@ defineBehavior('crawl', (a, [el], host) => {
           }
           break;
         case 'alarm':
-          if (timer <= 0) { a.face = ptr.x > a.x ? -1 : 1; go('scurry', rnd(.9, 1.4)); }
+          if (timer <= 0) { a.face = (fleeX ?? ptr.x) > a.x ? -1 : 1; fleeX = null; go('scurry', rnd(.9, 1.4)); }
           break;
         case 'scurry':
           a.play('walk', { fps: 20 });
@@ -640,6 +661,15 @@ defineBehavior('crawl', (a, [el], host) => {
         default: /* idle, look, sniff */
           if (timer <= 0) { if (state === 'look' && chance(.4)) turn(); go('walk', rnd(3, 7), 'walk'); }
       }
+    },
+    meet(other) {
+      if (now() - metAt < 1500 || hop || state === 'flip') return;
+      metAt = now(); a.face = other.x > a.x ? 1 : -1;
+      a.say('heart', 900); go('idle', .9, 'idle'); setTimeout(() => turn(), 700);
+    },
+    hear(type, from) {
+      if (type !== 'thud' || hop || state === 'flip' || state === 'alarm' || state === 'scurry') return;
+      fleeX = from.x; go('alarm', .25, 'alarm'); a.say('!', 600);
     },
     poke() {
       if (state === 'flip' || hop) return;
@@ -721,6 +751,10 @@ defineBehavior('hang', (a, [el], host) => {
       silk.style.height = Math.round(L + 2) + 'px';
       silk.style.transform = `translate3d(${Math.round(ax - origin.x)}px,${Math.round(ay - origin.y)}px,0) rotate(${(-th * 57.3).toFixed(2)}deg)`;
     },
+    hear(type) {
+      if (type !== 'thud') return;
+      w += (chance(.5) ? 1 : -1) * rnd(.5, 1); a.say('sweat', 600);
+    },
     poke() {
       Lv += 520 * S; w += rnd(-1.2, 1.2);
       a.say(pick(['!', 'heart', '!?']), 700);
@@ -800,6 +834,12 @@ defineBehavior('mind', (a, [el], host) => {
           if (timer <= 0) { a.say('...', 900); go('read', rnd(4, 8), 'read'); }
           break;
       }
+    },
+    hear(type) {
+      if (type !== 'thud' || hop || state === 'annoyed' || state === 'back' || now() - (this._heard || 0) < 2500) return;
+      this._heard = now();
+      a.hush(); a.say(pick(['grr', 'vein', '!?']), 900);
+      go('annoyed', .8, 'annoyed');
     },
     poke() {
       if (hop) return;
@@ -899,6 +939,11 @@ defineBehavior('peek', (a, [el], host) => {
         else a.play(look());
       }
     },
+    hear(type) {
+      if (type !== 'thud' || state === 'hidden' || state === 'duck') return;
+      eep = .3; if (chance(.5)) a.say('eep', 600);
+      go('duck', rnd(1.5, 3)); goal = H;
+    },
     poke() {
       if (state === 'hidden' || state === 'duck') return;
       eep = .35; a.say('eep', 800);
@@ -993,6 +1038,7 @@ defineBehavior('perch', (a, targets, host) => {
         state = 'sit'; timer = rnd(1, 2.5); a.play('idle', { reset: true });
       }
     },
+    hear(type, from, d) { if (type === 'thud' && state === 'sit' && d < 130 * S) { takeoff(); a.say('!', 500); } },
     poke() { if (state === 'sit') { takeoff(); a.say('!', 600); } }
   };
 });
@@ -1555,7 +1601,7 @@ class PiixPalElement extends HTMLElement {
 
     const actor = this._actor = new Actor(spec, { scale: +this.getAttribute('scale') || 0, hue: this.getAttribute('hue'), fixed: this.hasAttribute('fixed-scale') });
     actor.host = this;
-    const ctl = this._ctl = make(actor, targets, this) || {};
+    const ctl = this._ctl = actor.ctl = make(actor, targets, this) || {};
     if (!ctl.grab) actor.node.classList.add('nograb');
 
     this._pd = e => {
