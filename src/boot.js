@@ -28,15 +28,21 @@ class PiixPalElement extends HTMLElement {
   _mount() {
     if (!this.isConnected || this._mounted) return;
     const name = (this.getAttribute('pal') || '').toLowerCase();
-    const spec = SPRITES[name] || SPRITES[Object.keys(SPRITES)[0]];
-    if (!spec) return;
     const sel = this.getAttribute('on');
     let targets;
     try { targets = sel ? [...document.querySelectorAll(sel)] : [this.parentElement]; } catch (e) { targets = []; }
     targets = targets.filter(el => el && el !== document.documentElement);
-    if (!targets.length) { console.warn('[piixpal] nothing to live on for', this); return; }
-    const make = BEHAVIORS[this.getAttribute('do')] || BEHAVIORS[spec.does];
-    if (!make) { console.warn('[piixpal] unknown behaviour', this.getAttribute('do') || spec.does); return; }
+    const spec = SPRITES[name] || (!name && SPRITES[Object.keys(SPRITES)[0]]);
+    const make = spec && (BEHAVIORS[this.getAttribute('do')] || BEHAVIORS[spec.does]);
+    /* the pal's own file, or the element it lives on, may simply not be here yet
+       (a second script still loading, a framework still rendering): try again shortly */
+    if (!spec || !make || !targets.length) {
+      this._tries = (this._tries || 0) + 1;
+      if (this._tries < 80) { clearTimeout(this._retry); this._retry = setTimeout(() => this._mount(), 125); }
+      else console.warn('[piixpal]', !spec ? `no pal called "${name}"` : !make ? `unknown behaviour "${this.getAttribute('do') || spec.does}"` : 'nothing to live on', this);
+      return;
+    }
+    this._tries = 0;
 
     const actor = this._actor = new Actor(spec, { scale: +this.getAttribute('scale') || 0, hue: this.getAttribute('hue'), fixed: this.hasAttribute('fixed-scale') });
     actor.host = this;
@@ -90,7 +96,54 @@ class PiixPalElement extends HTMLElement {
 }
 
 const define = (n, c) => { if (!customElements.get(n)) customElements.define(n, c); };
-define('piix-pal', PiixPalElement);
-if (typeof PiixTypeElement !== 'undefined') define('piix-type', PiixTypeElement);
-if (typeof PiixSpriteElement !== 'undefined') define('piix-sprite', PiixSpriteElement);
-if (typeof PiixCrowdElement !== 'undefined') define('piix-crowd', PiixCrowdElement);
+
+/* ---------- JS API: add pals without writing any markup ---------- */
+/* Piixpal.add('bitbug', 'h1')                      a pal living on the first h1
+ * Piixpal.add('pip', '.btn')                       one bird, every .btn a perch
+ * Piixpal.add('mochi', '#card', { size: 120 })     sprites go inside the element
+ * Piixpal.add('kitty', someElement)                or pass an element directly */
+const add = (name, where = 'body', attrs = {}) => {
+  name = String(name).toLowerCase();
+  const isSprite = attrs.type === 'sprite' || (!SPRITES[name] && !!FIGURES[name]);
+  const target = typeof where === 'string' ? null : where;
+  const el = document.createElement(isSprite ? 'piix-sprite' : 'piix-pal');
+  attrs = { ...attrs }; delete attrs.type;
+  el.setAttribute(el.tagName === 'PIIX-SPRITE' ? 'name' : 'pal', name);
+  for (const k in attrs) if (attrs[k] !== false && attrs[k] != null) el.setAttribute(k, attrs[k] === true ? '' : attrs[k]);
+  if (el.tagName === 'PIIX-SPRITE') {
+    const host = target || document.querySelector(where);
+    if (host) host.appendChild(el);
+  } else {
+    if (target) target.appendChild(el);
+    else { el.setAttribute('on', where); document.body.appendChild(el); }
+  }
+  return el;
+};
+/* data-pals="bitbug@h1, boing@footer, pip@.btn?scale=3" on the script tag itself */
+const autoAttach = script => {
+  const list = script && script.getAttribute('data-pals');
+  if (!list) return;
+  const run = () => list.split(',').map(s => s.trim()).filter(Boolean).forEach(item => {
+    const [head, query = ''] = item.split('?');
+    const [name, where = 'body'] = head.split('@').map(s => s.trim());
+    const attrs = Object.fromEntries(new URLSearchParams(query));
+    add(name, where, attrs);
+  });
+  if (document.readyState === 'loading') addEventListener('DOMContentLoaded', run, { once: true }); else run();
+};
+const SCRIPT = document.currentScript;
+
+/* define the elements once every component in this file has registered */
+const start = (script = SCRIPT) => {
+  define('piix-pal', PiixPalElement);
+  define('piix-type', PiixTypeElement);
+  define('piix-sprite', PiixSpriteElement);
+  define('piix-crowd', PiixCrowdElement);
+  if (script && !script._piix) { script._piix = true; autoAttach(script); }
+};
+Object.assign(Piixpal, {
+  add,
+  /* every pal, sprite and behaviour currently registered */
+  list: () => ({ pals: Object.keys(SPRITES), sprites: Object.keys(FIGURES), behaviors: Object.keys(BEHAVIORS) }),
+  clear: () => document.querySelectorAll('piix-pal,piix-sprite').forEach(e => e.remove())
+});
