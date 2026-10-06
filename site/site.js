@@ -55,3 +55,59 @@ document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click'
   clearTimeout(b._t);
   b._t = setTimeout(() => { b.textContent = was; b.classList.remove('copied'); }, 1400);
 }));
+
+/* ---------- sandbox: retype the headline, swap the pal, recolour it ---------- */
+(() => {
+  const title = document.getElementById('sb-title');
+  if (!title) return;
+  const input = document.getElementById('sb-text');
+  const hue = document.getElementById('sb-hue');
+  const hueOut = document.getElementById('sb-hue-o');
+  const code = document.getElementById('sb-code');
+  const seg = document.getElementById('sb-pal');
+  const st = { pal: 'bitbug', hue: 0, text: input.value };
+  let pal = null;
+
+  const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const mount = () => {
+    if (pal) pal.remove();
+    pal = document.createElement('piix-pal');
+    pal.setAttribute('pal', st.pal);
+    if (st.hue) pal.setAttribute('hue', st.hue);
+    if (st.pal === 'boing' || st.pal === 'lurk') pal.setAttribute('edge', 'box');
+    title.appendChild(pal);
+    render();
+  };
+  const render = () => {
+    const attrs = `pal="${st.pal}"` + (st.hue ? ` hue="${st.hue}"` : '');
+    code.innerHTML = `<button class="copy" type="button">Copy</button>` +
+      esc(`<h1>\n  ${st.text || ' '}\n  <piix-pal ${attrs}></piix-pal>\n</h1>`);
+    code.querySelector('.copy').onclick = async e => {
+      try { await navigator.clipboard.writeText(`<piix-pal ${attrs}></piix-pal>`); } catch (_) { /* ignore */ }
+      e.target.textContent = 'Copied'; e.target.classList.add('copied');
+      setTimeout(() => { e.target.textContent = 'Copy'; e.target.classList.remove('copied'); }, 1300);
+    };
+  };
+
+  input.addEventListener('input', () => {
+    st.text = input.value;
+    /* keep the pal: replace only the text node */
+    [...title.childNodes].forEach(n => { if (n.nodeType === 3) n.remove(); });
+    title.insertBefore(document.createTextNode(st.text || ' '), title.firstChild);
+    render();
+  });
+  seg.addEventListener('click', e => {
+    const b = e.target.closest('button[data-pal]');
+    if (!b) return;
+    seg.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b));
+    st.pal = b.dataset.pal;
+    mount();
+  });
+  hue.addEventListener('input', () => {
+    st.hue = +hue.value;
+    hueOut.textContent = st.hue + '°';
+    if (pal) pal.setAttribute('hue', st.hue);
+    render();
+  });
+  mount();
+})();

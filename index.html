@@ -146,6 +146,41 @@
   </div>
 </section>
 
+<section class="sec" id="how" aria-labelledby="how-h">
+  <div class="wrap">
+    <header class="sec-head">
+      <div><span class="eyebrow rv" style="--accent:var(--sky)">How it works</span><h2 class="rv" id="how-h">Two lines of HTML. Zero lines of config.</h2></div>
+      <p class="rv">A pal lives on whatever element it's inside. It reads the page for itself: letter outlines, edges, buttons, scroll. You never position anything.</p>
+    </header>
+    <div class="how">
+      <ol class="steps">
+        <li class="step rv"><h3>Add the script</h3><p>One file, no build step, no dependencies. Works in plain HTML, React, Vue, Svelte, Astro, Webflow and Framer embeds.</p></li>
+        <li class="step rv"><h3>Drop a pal inside something</h3><p>Put <code>&lt;piix-pal pal="moss"&gt;</code> inside a heading, a card, a footer. Or point it from anywhere with <code>on="#footer"</code>.</p></li>
+        <li class="step rv"><h3>It figures out the rest</h3><p>Bitbug walks the real glyph contours, Lurk finds the card's edge, Pip hops between every match of <code>on=".btn"</code>. They pause off-screen, respect reduced motion and never block a click.</p></li>
+      </ol>
+
+      <div class="sandbox rv" id="sandbox">
+        <div class="sb-stage">
+          <h3 class="sb-title" id="sb-title">Type anything here</h3>
+        </div>
+        <div class="sb-controls">
+          <label class="field"><span>Headline</span><input type="text" id="sb-text" value="Type anything here" maxlength="32" spellcheck="false"></label>
+          <div class="field"><span>Pal</span>
+            <div class="seg" id="sb-pal" role="group" aria-label="Choose a pal">
+              <button type="button" data-pal="bitbug" aria-pressed="true">Bitbug</button>
+              <button type="button" data-pal="moss" aria-pressed="false">Moss</button>
+              <button type="button" data-pal="boing" aria-pressed="false">Boing</button>
+              <button type="button" data-pal="lurk" aria-pressed="false">Lurk</button>
+            </div>
+          </div>
+          <label class="field"><span>Hue <output id="sb-hue-o">0°</output></span><input type="range" id="sb-hue" min="0" max="350" step="10" value="0"></label>
+        </div>
+        <pre class="sb-code" id="sb-code"></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- /sections -->
 </main>
 
