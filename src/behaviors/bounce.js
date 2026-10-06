@@ -42,6 +42,7 @@ defineBehavior('bounce', (a, [el], host) => {
           const impact = vy;
           a.y = floor(r); a.rot = 0; spin = 0;
           if (typeof el.piixImpact === 'function') el.piixImpact(a.x, a.y, clamp(impact / 1200, .3, 1.6));
+          if (impact > 520 * Math.sqrt(S)) shout(a, 'thud', 170 * S * clamp(impact / 1200, .6, 1.8));
           sq = -clamp(impact / 2200, .12, .42); sqv = 0;
           if (impact > 2100 * Math.sqrt(S) || combo > 2) {
             dizzy = 2.2; combo = 0; a.say('star', 1800); a.play('dizzy');
