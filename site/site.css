@@ -280,3 +280,15 @@ code,kbd,pre{font-family:var(--f-mono)}
   background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='16' shape-rendering='crispEdges'%3E%3Cpath fill='%2317121f' d='M0 14h8v-4h8v-4h8v-4h8v4h8v4h8v4h8v2H0z'/%3E%3Cpath fill='%236b4cff' d='M0 16v-0h8v-4h8v-4h8v-4h8v4h8v4h8v4h8v2z' transform='translate(0 2)'/%3E%3C/svg%3E") repeat-x 0 0/56px 16px}
 .foot-in{overflow:hidden}
 .h-hive{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);padding:14px 22px;border:2px solid var(--ink);border-radius:12px;background:var(--sun);font:400 12px/1 var(--f-pix);text-transform:uppercase;box-shadow:0 4px 0 var(--ink)}
+
+/* ---------- sprites shelf on the home page ---------- */
+.more{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:14px;margin-top:30px}
+.inline-tag{font-size:14px;padding:12px 14px;border-radius:10px;background:var(--ink);color:#e8e3f3}
+.shelf{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));border:2px solid var(--ink);border-radius:var(--r-lg);overflow:hidden;background:var(--card);box-shadow:0 4px 0 var(--ink)}
+@media (max-width:900px){.shelf{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:560px){.shelf{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.shelf-item{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:12px;height:180px;padding:18px 8px 14px;text-decoration:none;
+  border-right:1.5px solid var(--line);border-bottom:1.5px solid var(--line);transition:background-color .25s}
+.shelf-item:hover{background:color-mix(in oklab,var(--lime) 30%,var(--card))}
+.shelf-item a{text-decoration:none;font:400 11px/1 var(--f-pix);text-transform:uppercase;color:var(--muted)}
+@media (max-width:560px){.shelf-item{height:150px}.shelf-item piix-sprite{zoom:.8}}
