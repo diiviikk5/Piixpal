@@ -51,15 +51,28 @@ class PiixPalElement extends HTMLElement {
     };
     actor.cv.addEventListener('pointerdown', this._pd);
 
+    /* a behaviour can run a whole crew of extra actors (groups, flocks, families) */
+    const wire = c => {
+      if (c._wired) return;
+      c._wired = true; c.host = this;
+      if (!ctl.grab) c.node.classList.add('nograb');
+      c.cv.addEventListener('pointerdown', e => {
+        if (e.button > 0) return;
+        e.preventDefault();
+        this.dispatchEvent(new CustomEvent('piix:poke', { bubbles: true }));
+        if (ctl.grab) ctl.grab(e, c); else if (ctl.poke) ctl.poke(e, c);
+      });
+    };
     let first = true;
     this._tick = (dt, t) => {
       /* sleep when far off-screen, but always draw the first frame */
-      const awake = first || Math.abs(actor.y - (scrollY + innerHeight / 2)) < innerHeight * 1.5 || actor.held;
+      const awake = first || (ctl.awake ? ctl.awake() : Math.abs(actor.y - (scrollY + innerHeight / 2)) < innerHeight * 1.5) || actor.held;
       if (!awake) return;
       first = false;
       ctl.tick(dt, t);
       actor.step(dt);
       actor.render();
+      if (ctl.crew) for (const c of ctl.crew) { wire(c); c.step(dt); c.render(); }
     };
     sub(this._tick);
     this._mounted = true;
@@ -69,6 +82,7 @@ class PiixPalElement extends HTMLElement {
     if (!this._mounted) return;
     unsub(this._tick);
     if (this._ctl && this._ctl.destroy) this._ctl.destroy();
+    if (this._ctl && this._ctl.crew) this._ctl.crew.forEach(c => c.destroy());
     if (this._actor) { this._actor.cv.removeEventListener('pointerdown', this._pd); this._actor.destroy(); }
     this._actor = this._ctl = null;
     this._mounted = false;

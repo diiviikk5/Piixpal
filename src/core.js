@@ -247,6 +247,9 @@ class Actor {
   destroy() { clearTimeout(this._bt); this.node.remove(); ACTORS.delete(this); }
 }
 
+/* a crew member for group behaviours: same scale as its leader, any registered pal */
+const recruit = (lead, name, opts = {}) => new Actor(SPRITES[name] || lead.spec, { scale: opts.scale || lead.s, hue: opts.hue, fixed: true });
+
 /* ---------- behaviours: (actor, target, host) => { tick(dt,t), poke(e)?, grab(e)?, destroy()? } ---------- */
 const BEHAVIORS = {};
 const defineBehavior = (name, fn) => { BEHAVIORS[name] = fn; };
