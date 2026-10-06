@@ -81,7 +81,14 @@ class PiixSpriteElement extends HTMLElement {
   _on(attr) { return this.hasAttribute(attr) || (!!this._spec[attr] && !this.hasAttribute('no-' + attr)); }
 
   _build() {
-    const spec = this._spec = FIGURES[this.getAttribute('name')] || FIGURES[Object.keys(FIGURES)[0]];
+    const want = this.getAttribute('name');
+    /* its file may still be loading: wait for it rather than showing someone else */
+    if (want && !FIGURES[want]) {
+      this._tries = (this._tries || 0) + 1;
+      if (this._tries < 80) { clearTimeout(this._retry); this._retry = setTimeout(() => this.isConnected && this._build(), 125); }
+      return;
+    }
+    const spec = this._spec = FIGURES[want] || FIGURES[Object.keys(FIGURES)[0]];
     if (!spec) return;
     this._pal = figurePalette(spec, this.getAttribute('color'));
     this._frames = bakeFigure(spec, this._pal);
@@ -123,7 +130,7 @@ canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;margi
   }
 
   _tick(dt, t) {
-    if (!this._vis || !this._cv) return;
+    if (!this._vis || !this._cv || !this._spec) return;
     const spec = this._spec, s = this._s, R = reduced();
     const r = this.getBoundingClientRect();
     const cx = r.left + r.width / 2, cy = r.top + r.height * .45;
