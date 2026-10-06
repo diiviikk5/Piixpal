@@ -1,4 +1,4 @@
-/*! Piixpal v0.1.0 | tiny pixel creatures that live on your website | MIT
+/*! Piixpal v0.2.0 | tiny pixel creatures that live on your website | MIT
  *  https://github.com/diiviikk5/Piixpal
  *
  *    <script src="piixpal.js"></script>
@@ -7,7 +7,7 @@
 (() => {
 'use strict';
 if (window.Piixpal) return;
-const VERSION = '0.1.0';
+const VERSION = '0.2.0';
 
 /* ---- core.js ---- */
 /* The engine: one animation loop, one pointer, one overlay layer, a sprite baker

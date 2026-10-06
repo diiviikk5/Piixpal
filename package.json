@@ -1,6 +1,6 @@
 {
   "name": "piixpal",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Tiny pixel creatures that live on your website. Drop-in web components, zero dependencies.",
   "main": "piixpal.js",
   "files": [
