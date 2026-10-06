@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Piixpal · single-file components</title>
+<style>body{margin:0;background:#fff;color:#16111f;font:18px/1.5 system-ui,sans-serif;padding:60px} h1{font-size:56px;margin:80px 0 20px} footer{margin-top:200px;padding:40px;background:#6b4cff;color:#fff;border-radius:16px} .btn{display:inline-block;padding:10px 16px;border:2px solid #16111f;border-radius:10px;background:#c6f432;margin:40px 12px 0 0}</style>
+</head>
+<body>
+<h1>Only what you need</h1>
+<p>This page loads three single-component files and nothing else. <piix-sprite name="mochi"></piix-sprite></p>
+<h2 id="cat">A cat lives here <piix-pal pal="kitty"></piix-pal></h2>
+<a class="btn">One</a><a class="btn">Two</a>
+<footer>Footer (Boing and Pip were attached with data-pals, no tags)</footer>
+<script src="../dist/c/kitty.min.js"></script>
+<script src="../dist/c/mochi.min.js"></script>
+<script src="../dist/c/boing.min.js" data-pals="boing@footer, pip@.btn"></script>
+<script src="../dist/c/pip.min.js"></script>
+</body>
+</html>
