@@ -34,9 +34,38 @@ Every pal is an original character with a job: something it lives on, something 
 | **Lurk**, big eyes, little hands, zero courage | `peek` | behind a card, peeking over the edge | "eep!" It ducks and pops up somewhere else |
 | **Thread**, a small spider on a long string | `hang` | the bottom edge of a nav or banner. Swings when you scroll | it yo-yos |
 | **Pip**, a round bird who loves a good button | `perch` | your buttons. Hover one and it flies to the next | it takes off |
+| **Bumble**, a fuzzy bee | `follow` | naps on its element, then follows your cursor around the page and flies home when you stop | loop-the-loop |
+| **Shel**, a very slow snail | `creep` | the top of your text, leaving a shimmering slime trail | it hides in its shell |
 
 Pals notice each other, too. A hard landing from Boing makes Moss grumble, Lurk duck, Pip take off
 and Bitbug run. Two Bitbugs that meet share a little heart and turn around.
+
+## Sprites
+
+Sprites are simpler: they sit inline like an image, wherever you paste them.
+
+```html
+<piix-sprite name="mochi"></piix-sprite>
+<piix-sprite name="gloop" size="200" color="#6b4cff"></piix-sprite>
+```
+
+Their eyes follow the cursor, they blink, breathe a pixel, hop when clicked and nap when ignored.
+
+- **12 small sprites:** mochi, toast, robo, cloud, ufo, egg, loaf, onigiri, cactus, planet, candle, pudding
+- **8 big sprites** (ghost-scale, recolourable with `color`): gloop, hops, tofu, inky, mumu, spud, fluff, flick
+
+Every sprite can render three ways with `render`:
+
+| `render` | Look |
+| --- | --- |
+| `pixel` | flat, crisp blocks (small sprites' default) |
+| `dots` | LED dot-matrix |
+| `voxel` | chunky 3D blocks that turn toward the cursor in perspective (big sprites' default) |
+
+Other attributes: `size`, `scale`, `depth` (voxel extrusion), `color`, `eye`, `hue`, `look="mouse|wander|none"`,
+`shy`, `tilt` (`no-shy` / `no-tilt` on big ones), `still`, `sleep-after`.
+
+Browse and customise them all on the components pages (`components/sprites.html`).
 
 ## Usage
 
@@ -61,9 +90,9 @@ All optional.
 
 | Attribute | What it does | Default |
 | --- | --- | --- |
-| `pal` | `bitbug` `boing` `moss` `lurk` `thread` `pip` | `bitbug` |
+| `pal` | `bitbug` `boing` `moss` `lurk` `thread` `pip` `bumble` `shel` | `bitbug` |
 | `on` | CSS selector for what to live on. Several matches give Pip more perches | parent element |
-| `do` | swap the behaviour: `crawl` `bounce` `mind` `peek` `hang` `perch` | the pal's own |
+| `do` | swap the behaviour: `crawl` `bounce` `mind` `peek` `hang` `perch` `follow` `creep` | the pal's own |
 | `at` | where along the element, `0` (left) to `1` (right) | random |
 | `scale` | size of one sprite pixel in CSS pixels | 3 or 4 |
 | `fixed-scale` | don't shrink a notch on phones | off |
@@ -105,6 +134,7 @@ their shadow around the cursor, and ripple when clicked or when a pal lands on t
 | `cell` | size of one block in CSS px | `8` |
 | `fit` | shrink blocks to fit the container width | off |
 | `color` / `shade` | block colour / shadow colour | `currentColor` / none |
+| `shape` | `square` `dot` (dot-matrix) `round` `plus` `diamond` | `square` |
 | `depth` | shadow depth in blocks | `1` |
 | `gap` | gap between blocks, as a fraction of a block | `0.1` |
 | `font` / `weight` | font family / weight to rasterise | inherited / `800` |
@@ -148,13 +178,16 @@ so any pal can borrow any behaviour. `Piixpal.art` has helpers (`compose`, `put`
 
 ```bash
 npm run dev     # http://localhost:5173, rebuilds piixpal.js on every request
-npm run build   # concatenates src/ into piixpal.js
+npm run build   # concatenates src/ into piixpal.js (+ piixpal.min.js)
+npm run docs    # regenerates components/*.html
 ```
 
 - `src/core.js`: loop, pointer, overlay layer, sprite baker, `Actor`
 - `src/pals/*.js`: the characters (art + clips)
 - `src/behaviors/*.js`: what they do
 - `src/elements/type.js`: `<piix-type>`
+- `src/elements/sprite.js`: `<piix-sprite>` (pixel, dots and voxel renderers)
+- `src/sprites/*.js`: the sprites (`big-*` are the big 3D ones)
 - `src/boot.js`: `<piix-pal>`
 - `lab/`: sprite lab and a playground page
 
