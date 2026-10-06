@@ -1772,7 +1772,7 @@ Piixpal.figure = defineFigure;
  * Pixels rain in on load, lift off their shadow around the cursor, and ripple when clicked.
  * Exposes piixSurface(x) so pals can walk on the actual letter tops. */
 class PiixTypeElement extends HTMLElement {
-  static get observedAttributes() { return ['text', 'rows', 'cell', 'font', 'weight', 'color', 'shade', 'depth', 'gap', 'fit', 'align', 'intro']; }
+  static get observedAttributes() { return ['text', 'rows', 'cell', 'font', 'weight', 'color', 'shade', 'depth', 'gap', 'fit', 'align', 'intro', 'shape']; }
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
@@ -1966,22 +1966,34 @@ canvas{display:block;pointer-events:none;image-rendering:pixelated}
     const color = this.getAttribute('color') || 'currentColor';
     const ink = color === 'currentColor' ? getComputedStyle(this).color : color;
     const shade = this.getAttribute('shade');
+    const put = CELL_SHAPES[this.getAttribute('shape')] || CELL_SHAPES.square;
     /* shadow layer stays on the ground */
     if (shade && dep) {
-      g.fillStyle = shade;
+      g.fillStyle = shade; g.beginPath();
       for (const p of this._cells) {
         if (!p.landed && p.oy < -cell) continue;
-        g.fillRect(p.x * cell + dep, head + p.y * cell + dep + Math.round(Math.min(0, p.oy)), s, s);
+        put(g, p.x * cell + dep, head + p.y * cell + dep + Math.round(Math.min(0, p.oy)), s);
       }
+      g.fill();
     }
-    g.fillStyle = ink;
+    g.fillStyle = ink; g.beginPath();
     for (const p of this._cells) {
       const y = head + p.y * cell + Math.round(p.oy - p.lift);
       if (y + s < 0) continue;
-      g.fillRect(p.x * cell, y, s, s);
+      put(g, p.x * cell, y, s);
     }
+    g.fill();
   }
 }
+
+/* how one block is drawn: shape="square|dot|round|plus|diamond" (all added to one path) */
+const CELL_SHAPES = {
+  square: (g, x, y, s) => g.rect(x, y, s, s),
+  dot: (g, x, y, s) => { const r = s * .46; g.moveTo(x + s / 2 + r, y + s / 2); g.arc(x + s / 2, y + s / 2, r, 0, 6.2832); },
+  round: (g, x, y, s) => { if (g.roundRect) g.roundRect(x, y, s, s, s * .32); else g.rect(x, y, s, s); },
+  plus: (g, x, y, s) => { const t = s / 3; g.rect(x + t, y, t, s); g.rect(x, y + t, t, t); g.rect(x + 2 * t, y + t, t, t); },
+  diamond: (g, x, y, s) => { g.moveTo(x + s / 2, y); g.lineTo(x + s, y + s / 2); g.lineTo(x + s / 2, y + s); g.lineTo(x, y + s / 2); g.closePath(); }
+};
 
 /* ---- sprites/cactus.js ---- */
 /* CACTUS: a potted cactus who blooms when it's in a good mood. Do not hug. */
