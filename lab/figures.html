@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Piixpal · sprite figures lab</title>
+<style>
+  body{margin:0;background:#f3eee3;color:#17121f;font:14px/1.5 ui-monospace,Menlo,Consolas,monospace;padding:24px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px}
+  figure{margin:0;padding:18px 12px 12px;background:#fbf8f1;border:2px solid #17121f;border-radius:12px;text-align:center;display:grid;gap:10px;justify-items:center}
+  .bad{color:#d33;font-weight:700}
+</style>
+</head>
+<body>
+<h1>figures: every &lt;piix-sprite&gt;</h1>
+<div class="grid" id="g"></div>
+<script src="../piixpal.js"></script>
+<script>
+for (const [name, f] of Object.entries(Piixpal.figures)) {
+  const bad = f.frames.flatMap((fr, i) => fr.map((r, y) => r.length !== f.w ? `f${i} r${y}: ${r.length}` : null).filter(Boolean));
+  if (f.frames.some(fr => fr.length > f.h)) bad.push('too many rows');
+  const fig = document.createElement('figure');
+  fig.innerHTML = `<piix-sprite name="${name}" scale="6"></piix-sprite><figcaption>${name} ${f.w}x${f.h}${bad.length ? `<br><span class="bad">${bad.join(', ')}</span>` : ''}</figcaption>`;
+  document.getElementById('g').append(fig);
+}
+</script>
+</body>
+</html>
