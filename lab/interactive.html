@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Piixpal · new interactions</title>
+<style>
+  body{margin:0;background:#fff;color:#16111f;font:18px/1.6 system-ui,sans-serif;padding:40px 60px 1400px}
+  .row{display:grid;grid-template-columns:repeat(2,1fr);gap:80px 40px;margin-top:80px}
+  .field{position:relative} input{font:18px system-ui;padding:12px 14px;border:2px solid #16111f;border-radius:10px;width:100%;box-sizing:border-box}
+  .captcha{display:flex;gap:12px;align-items:center;padding:16px;border:2px solid #16111f;border-radius:10px;width:300px}
+  .box{height:120px;border:2px solid #16111f;border-radius:14px;display:grid;place-items:center;font-weight:700}
+  .deploy{display:inline-block;padding:12px 20px;border:2px solid #16111f;border-radius:10px;background:#c6f432;font-weight:700}
+</style>
+</head>
+<body>
+<h1>New ways to play</h1>
+<div class="row">
+  <label class="field">Email <input id="email" type="email" placeholder="you@site.com" required><piix-pal pal="peeper" on="#email"></piix-pal></label>
+  <label class="field">Password <input id="pw" type="password" placeholder="secret"><piix-pal pal="peeper" on="#pw"></piix-pal></label>
+  <label class="captcha" id="cap"><input type="checkbox"> I'm not a robot <piix-pal pal="beep"></piix-pal></label>
+  <div class="box" id="wifi">signal <piix-pal pal="router"></piix-pal></div>
+  <div class="box" id="term">terminal <piix-pal pal="termi" lines="git push|deploying…|✓ live"></piix-pal></div>
+  <div class="box" id="pond">pond <piix-pal pal="frog"></piix-pal></div>
+  <div class="box" id="ice">ice <piix-pal pal="penguin" edge="box"></piix-pal></div>
+  <div><span class="deploy" id="deploy">Deploy</span><piix-pal pal="rocket" on="#deploy"></piix-pal></div>
+</div>
+<p id="sel" style="margin-top:80px;max-width:700px">Select any words in this paragraph and the highlighter hops over to your selection. Copy them and it shows you a clipboard. <piix-pal pal="snip"></piix-pal></p>
+<piix-pal pal="scrolly"></piix-pal>
+<piix-pal pal="echo"></piix-pal>
+<script src="../piixpal.js"></script>
+</body>
+</html>
