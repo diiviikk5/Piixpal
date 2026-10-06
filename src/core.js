@@ -160,7 +160,7 @@ class Actor {
     this.frames = baked(spec);
     /* a little smaller on phones, unless asked not to */
     const base = opts.scale || spec.scale || 4;
-    this.s = Math.max(1, Math.round(innerWidth < 640 && !opts.fixed ? Math.max(2, base * .75) : base));
+    this.s = Math.max(1, Math.round(innerWidth > 0 && innerWidth < 640 && !opts.fixed ? Math.max(2, base * .75) : base));
     this.x = 0; this.y = 0;            /* foot point, document coords */
     this.face = 1;                     /* 1 = right, -1 = left (sprites are drawn facing right) */
     this.sx = 1; this.sy = 1; this.rot = 0; this.ox = 0; this.oy = 0;
