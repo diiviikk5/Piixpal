@@ -5,7 +5,7 @@
 **Tiny pixel creatures that live on your website.**
 
 They crawl on your headings, nap on your paragraphs, perch on your buttons and bounce on your footer.
-95 components: 42 pals (characters, interactions, toys and groups), 49 sprites (39 small, 10 big 3D… and counting), a crowd stage and pixel type.
+95 components: 42 pals (characters, interactions, toys and groups), 49 sprites (30 small, 19 big 3D), a crowd stage and pixel type.
 One script tag. Zero dependencies. Free and open source (MIT).
 
 </div>
