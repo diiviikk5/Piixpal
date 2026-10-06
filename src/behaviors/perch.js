@@ -83,6 +83,7 @@ defineBehavior('perch', (a, targets, host) => {
         state = 'sit'; timer = rnd(1, 2.5); a.play('idle', { reset: true });
       }
     },
+    hear(type, from, d) { if (type === 'thud' && state === 'sit' && d < 130 * S) { takeoff(); a.say('!', 500); } },
     poke() { if (state === 'sit') { takeoff(); a.say('!', 600); } }
   };
 });
