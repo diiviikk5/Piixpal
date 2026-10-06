@@ -362,7 +362,11 @@ const ICONS = {
   vein: ['.r...r.', 'rr...rr', '.......', 'rr...rr', '.r...r.'],
   hi: ['k..k.kk', 'k..k...', 'kkkk.kk', 'k..k.kk', 'k..k.kk'],
   eep: ['kkk.kkk.kkk.', 'k...k...k.k.', 'kk..kk..kkk.', 'k...k...k...', 'kkk.kkk.k...'],
-  leaf: ['....gg', '..gggg', '.gggg.', 'gggg..', 'g.....']
+  leaf: ['....gg', '..gggg', '.gggg.', 'gggg..', 'g.....'],
+  copy: ['.kkkk..', '.k..kkk', '.k..k.k', '.k..k.k', '.kkkk.k', '...k..k', '...kkkk'],
+  check: ['......g', '.....gg', 'g...gg.', 'gg.gg..', '.ggg...', '..g....'],
+  x: ['r...r', '.r.r.', '..r..', '.r.r.', 'r...r'],
+  up: ['..k..', '.kkk.', 'kkkkk', '..k..', '..k..']
 };
 /* 3x5 digits; say('#12') composes a number bubble */
 const DIGITS = ['kkk|k.k|k.k|k.k|kkk', '.k.|kk.|.k.|.k.|kkk', 'kkk|..k|kkk|k..|kkk', 'kkk|..k|.kk|..k|kkk', 'k.k|k.k|kkk|..k|..k',
@@ -1614,6 +1618,51 @@ defineBehavior('bounce', (a, [el], host) => {
   };
 });
 
+/* ---- behaviors/captcha.js ---- */
+/* captcha: guards an "I'm not a robot" checkbox. Sweats when the cursor comes near
+ * the box, panics and flees when it's ticked, and sneaks back a few seconds later.
+ * Put it inside the label/element that holds the checkbox. */
+defineBehavior('captcha', (a, [el], host) => {
+  const S = a.s / 3;
+  const box = el.matches && el.matches('input[type=checkbox]') ? el : el.querySelector('input[type=checkbox]');
+  const anchor = box || el;
+  let state = 'sit', timer = 0, x = null, off = 0;
+  const onChange = () => {
+    if (box.checked) { state = 'flee'; timer = 2.6; a.say('!?', 800); }
+    else { state = 'sit'; a.say('heart', 700); }
+  };
+  if (box) box.addEventListener('change', onChange);
+
+  return {
+    tick(dt) {
+      const r = rectOf(el), b = rectOf(anchor);
+      const home = clamp(b.r + a.w * .7, r.l + a.w / 2, r.r - a.w / 2);
+      if (x == null) x = home;
+      a.y = r.t;
+      if (reduced()) { a.x = home; a.play('idle'); return; }
+      timer -= dt;
+      if (state === 'flee') {
+        /* run off the far end and vanish */
+        off += 160 * S * dt; a.face = 1; a.play('run');
+        a.node.style.opacity = clamp(1 - off / (r.r - home + a.w), 0, 1).toFixed(2);
+        if (timer <= 0) { state = 'return'; a.face = -1; }
+      } else if (state === 'return') {
+        off = Math.max(0, off - 50 * S * dt); a.play('run');
+        a.node.style.opacity = clamp(1 - off / (r.r - home + a.w), 0, 1).toFixed(2);
+        if (off <= 0) { state = 'sit'; a.face = 1; a.say('...', 1200); a.play('shy'); timer = 1.5; }
+      } else {
+        a.node.style.opacity = '1';
+        const near = ptr.seen && ptrDist(b.l + b.w / 2, b.t + b.h / 2) < 70 * S && !(box && box.checked);
+        if (near) { a.play('nervous'); if (chance(dt * 1.5)) a.say('sweat', 500); }
+        else if (timer <= 0) a.play('idle');
+      }
+      a.x = home + off;
+    },
+    poke() { a.say(pick(['?', '...', '!']), 700); },
+    destroy() { if (box) box.removeEventListener('change', onChange); }
+  };
+});
+
 /* ---- behaviors/choir.js ---- */
 /* choir: a row of singers on an element who sway and sing in perfect time.
  * They look at the cursor when it's near. Click one for a solo; click it again and
@@ -2203,6 +2252,58 @@ defineBehavior('glow', (a, [el], host) => {
   };
 });
 
+/* ---- behaviors/guard.js ---- */
+/* guard: sits on a form field and watches you type. Its eyes follow the caret,
+ * it covers its eyes for passwords, cheers for valid input and sweats over invalid.
+ * Put it inside an <input>'s wrapper, a <label> or a <form>; it finds the field. */
+const caretCtx = document.createElement('canvas').getContext('2d');
+defineBehavior('guard', (a, [el], host) => {
+  const S = a.s / 3;
+  const field = el.matches && el.matches('input,textarea') ? el : el.querySelector('input,textarea') || el;
+  const at = host.getAttribute('at') != null ? clamp(+host.getAttribute('at'), 0, 1) : .85;
+  let mood = '', moodT = 0, hop = 0, x = null;
+
+  /* where the caret is, in doc-x */
+  const caretX = r => {
+    if (!field.value || field.selectionStart == null) return r.l + 14;
+    const cs = getComputedStyle(field);
+    caretCtx.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+    const shown = field.type === 'password' ? '•'.repeat(field.selectionStart) : field.value.slice(0, field.selectionStart);
+    return r.l + parseFloat(cs.paddingLeft) + parseFloat(cs.borderLeftWidth) + caretCtx.measureText(shown).width - field.scrollLeft;
+  };
+  const feel = (m, t, icon) => { mood = m; moodT = t; if (icon) a.say(icon, 900); };
+  const onInput = () => { if (chance(.25)) hop = .25; mood = ''; };
+  const onBlur = () => {
+    if (!field.value || !field.checkValidity) return;
+    if (field.checkValidity()) { feel('happy', 1.6, 'check'); hop = .35; }
+    else feel('worried', 2.2, 'sweat');
+  };
+  field.addEventListener('input', onInput);
+  field.addEventListener('blur', onBlur);
+
+  return {
+    tick(dt) {
+      const r = rectOf(field);
+      const focused = document.activeElement === field;
+      const secret = field.type === 'password';
+      const home = r.l + a.w / 2 + (r.w - a.w) * at;
+      const want = focused && !secret ? clamp(caretX(r) + a.w * .6, r.l + a.w / 2, r.r - a.w / 2) : home;
+      x = x == null ? home : lerp(x, want, 1 - Math.exp(-8 * dt));
+      a.x = x; a.y = r.t;
+      moodT -= dt; hop = Math.max(0, hop - dt);
+      a.oy = -Math.sin(Math.PI * hop / .35) * 10 * S * (hop > 0);
+      if (reduced()) { a.play('idle'); return; }
+      if (focused && secret) a.play('cover');
+      else if (moodT > 0) a.play(mood);
+      else if (focused) a.play(caretX(r) < a.x ? 'l' : 'r');
+      else if (ptr.seen && ptrDist(a.x, a.y) < 120 * S) a.play(ptr.x < a.x ? 'l' : 'r');
+      else a.play('idle');
+    },
+    poke() { hop = .35; a.say(field.type === 'password' ? '...' : 'heart', 700); },
+    destroy() { field.removeEventListener('input', onInput); field.removeEventListener('blur', onBlur); }
+  };
+});
+
 /* ---- behaviors/hang.js ---- */
 /* hang: dangles from the bottom edge of an element on a silk thread. Swings when the
  * page scrolls or the cursor brushes past, zips up when you reach for it, then lowers
@@ -2282,6 +2383,63 @@ defineBehavior('hang', (a, [el], host) => {
       a.say(pick(['!', 'heart', '!?']), 700);
     },
     destroy() { silk.remove(); }
+  };
+});
+
+/* ---- behaviors/launch.js ---- */
+/* launch: sits on an element (a deploy button, say). Click it: countdown 3-2-1, it
+ * blasts off the top of the screen trailing smoke, then drops back down on its
+ * retro-rockets and lands where it started. */
+defineBehavior('launch', (a, [el], host) => {
+  const S = a.s / 3;
+  const at = host.getAttribute('at') != null ? clamp(+host.getAttribute('at'), 0, 1) : .85;
+  let state = 'pad', t = 0, alt = 0, v = 0, count = 0;
+  const puffs = [];
+  const spot = () => { const r = rectOf(el); return { x: r.l + a.w / 2 + (r.w - a.w) * at, y: r.t }; };
+  const puff = () => {
+    const p = document.createElement('div');
+    const s = Math.round(a.s * rnd(2, 4));
+    p.style.cssText = `position:absolute;left:0;top:0;width:${s}px;height:${s}px;background:#d9d4e3;border-radius:2px;pointer-events:none`;
+    a.node.parentNode.insertBefore(p, a.node);
+    puffs.push({ el: p, x: a.x + rnd(-4, 4) * S, y: a.y + rnd(0, 6) * S, life: 1, vx: rnd(-30, 30) * S });
+  };
+
+  return {
+    awake: () => true,
+    tick(dt) {
+      const s = spot();
+      a.x = s.x;
+      if (!reduced()) {
+        if (state === 'count') {
+          t -= dt;
+          a.ox = rnd(-1, 1) * S;
+          if (t <= 0) { count--; if (count > 0) { a.say('#' + count, 700); t = .7; } else { state = 'up'; v = 0; a.ox = 0; a.say('up', 600); } }
+        } else if (state === 'up') {
+          v += 1500 * S * dt; alt += v * dt;
+          if (chance(dt * 40)) puff();
+          if (alt > s.y + 300 * S) { state = 'away'; t = 1.2; }
+        } else if (state === 'away') {
+          t -= dt; if (t <= 0) { state = 'down'; v = 420 * S; }
+        } else if (state === 'down') {
+          /* retro-rockets: ease to a gentle touchdown */
+          v = Math.max(60 * S, Math.min(v, alt * 2.2)); alt -= v * dt;
+          if (chance(dt * 18)) puff();
+          if (alt <= 0) { alt = 0; state = 'pad'; a.sy = .82; a.sx = 1.18; shout(a, 'thud', 160 * S); }
+        }
+      }
+      a.y = s.y - alt;
+      a.play(state === 'up' || state === 'down' ? 'burn' : 'idle');
+      a.sx = lerp(a.sx, 1, .2); a.sy = lerp(a.sy, 1, .2);
+      for (let i = puffs.length - 1; i >= 0; i--) {
+        const p = puffs[i];
+        p.life -= dt * 1.4; p.y += 30 * S * dt; p.x += p.vx * dt;
+        p.el.style.opacity = Math.max(0, p.life).toFixed(2);
+        p.el.style.transform = `translate3d(${Math.round(p.x - origin.x)}px,${Math.round(p.y - origin.y)}px,0) scale(${(2 - p.life).toFixed(2)})`;
+        if (p.life <= 0) { p.el.remove(); puffs.splice(i, 1); }
+      }
+    },
+    poke() { if (state === 'pad') { state = 'count'; count = 3; t = .7; a.say('#3', 700); } },
+    destroy() { puffs.forEach(p => p.el.remove()); }
   };
 });
 
@@ -2371,6 +2529,57 @@ defineBehavior('march', (a, [el], host) => {
       });
     },
     poke(e, who) { (who || a).say(pick(['!', 'grr']), 500); st.forEach(s => { s.vy -= rnd(100, 260) * S; }); }
+  };
+});
+
+/* ---- behaviors/mimic.js ---- */
+/* mimic: a copycat cursor. Replays the exact path your cursor took a moment ago and
+ * clicks wherever you clicked. Stop moving and it catches up and dances. It never
+ * catches clicks itself.   delay="0.5" seconds behind */
+defineBehavior('mimic', (a, targets, host) => {
+  const delay = (+host.getAttribute('delay') || .5) * 1000;
+  const path = [], clicks = [];
+  let lx = null, ly = null, ripple = 0;
+  a.node.classList.add('ghost');
+  const ring = document.createElement('div');
+  ring.style.cssText = 'position:absolute;left:0;top:0;width:24px;height:24px;margin:-12px 0 0 -12px;border:3px solid #c6f432;border-radius:50%;pointer-events:none;opacity:0';
+  a.node.parentNode.insertBefore(ring, a.node);
+  const mv = () => { path.push({ t: now(), x: ptr.x, y: ptr.y }); if (path.length > 600) path.shift(); };
+  const dn = e => { if (e.button === 0) clicks.push({ t: now(), x: e.clientX + scrollX, y: e.clientY + scrollY }); };
+  addEventListener('pointermove', mv, { passive: true });
+  addEventListener('pointerdown', dn, { passive: true });
+
+  return {
+    awake: () => true,
+    tick(dt) {
+      const t = now() - delay;
+      /* where was the cursor `delay` ago? */
+      while (path.length > 1 && path[1].t <= t) path.shift();
+      const p = path[0];
+      const idle = now() - ptr.last > delay + 1200;
+      if (p) {
+        const tx = idle ? ptr.x + 18 : p.x, ty = idle ? ptr.y + 18 : p.y;
+        lx = lx == null ? tx : lerp(lx, tx, idle ? 1 - Math.exp(-4 * dt) : 1);
+        ly = ly == null ? ty : lerp(ly, ty, idle ? 1 - Math.exp(-4 * dt) : 1);
+      }
+      if (lx == null) { a.node.style.opacity = '0'; return; }
+      a.node.style.opacity = ptr.seen && ptr.cx > -1e4 ? '1' : '0';
+      /* the arrow's tip is its top-left pixel */
+      a.x = lx + a.w / 2; a.y = ly + a.h;
+      while (clicks.length && clicks[0].t <= t) {
+        const c = clicks.shift();
+        ripple = .45; a.play('click');
+        ring.style.transform = `translate3d(${Math.round(c.x - origin.x)}px,${Math.round(c.y - origin.y)}px,0) scale(.3)`;
+      }
+      if (ripple > 0) {
+        ripple -= dt;
+        const k = 1 - ripple / .45;
+        ring.style.opacity = (1 - k).toFixed(2);
+        ring.style.transform = ring.style.transform.replace(/scale\([^)]*\)/, `scale(${(.3 + k * 1.4).toFixed(2)})`);
+        if (ripple <= 0) a.play('idle');
+      } else a.play(idle && !reduced() ? 'dance' : 'idle');
+    },
+    destroy() { removeEventListener('pointermove', mv); removeEventListener('pointerdown', dn); ring.remove(); }
   };
 });
 
@@ -2766,6 +2975,49 @@ defineBehavior('pop', (a, [el], host) => {
   };
 });
 
+/* ---- behaviors/progress.js ---- */
+/* progress: a reading-progress bar with a runner on it. The bar fills as you scroll;
+ * the runner keeps pace, idles when you stop, and celebrates at the end of the page.
+ *   side="bottom|top"   where the bar sits (default bottom)   color="#c6f432" */
+defineBehavior('progress', (a, targets, host) => {
+  const S = a.s / 3;
+  const side = host.getAttribute('side') === 'top' ? 'top' : 'bottom';
+  const H = Math.max(3, Math.round(a.s * 1.4));
+  const bar = document.createElement('div');
+  bar.setAttribute('aria-hidden', 'true');
+  bar.style.cssText = `position:fixed;left:0;${side}:0;height:${H}px;width:0;z-index:var(--piix-z,2147482000);pointer-events:none;` +
+    `background:${host.getAttribute('color') || '#c6f432'};box-shadow:0 0 0 1px rgba(23,18,31,.25);transition:width .08s linear`;
+  document.body.appendChild(bar);
+  /* the runner rides the fixed bar, so pin it to the viewport too */
+  a.node.style.position = 'fixed';
+  let x = 0, done = false, lastY = scrollY;
+
+  return {
+    awake: () => true,
+    tick(dt) {
+      const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
+      const p = clamp(scrollY / max, 0, 1);
+      bar.style.width = (p * 100).toFixed(2) + '%';
+      const vw = document.documentElement.clientWidth;
+      const want = clamp(p * vw, a.w / 2, vw - a.w / 2);
+      const moving = Math.abs(scrollY - lastY) > .5;
+      if (moving) a.face = scrollY > lastY ? 1 : -1;
+      lastY = scrollY;
+      x = reduced() ? want : lerp(x, want, 1 - Math.exp(-10 * dt));
+      /* viewport coords, offset by the layer origin so render() lands them right */
+      a.x = x + origin.x;
+      a.y = (side === 'top' ? H + a.h : innerHeight - H) + origin.y;
+      if (side === 'top') a.y = H + a.h + origin.y;
+      if (p > .995 && !done) { done = true; a.say('star', 1600); a.play('cheer'); }
+      if (p < .97) done = false;
+      if (done) a.play('cheer');
+      else a.play(moving ? 'run' : 'idle', { fps: moving ? clamp(8 + Math.abs(scroll.v) / 120, 8, 22) : 2 });
+    },
+    poke() { a.say('up', 700); scrollTo({ top: 0, behavior: reduced() ? 'auto' : 'smooth' }); },
+    destroy() { bar.remove(); }
+  };
+});
+
 /* ---- behaviors/school.js ---- */
 /* school: a school of fish swimming inside an element like a tank. They flock (stay
  * close, line up, don't bump), turn at the glass, and flee from the cursor.
@@ -2822,6 +3074,173 @@ defineBehavior('school', (a, [el], host) => {
       const i = Math.max(0, fish.indexOf(who || a));
       b[i].vx *= 3; b[i].vy *= 3; (who || a).say('!', 400);
     }
+  };
+});
+
+/* ---- behaviors/select.js ---- */
+/* select: reacts to text selection. Select something inside its element (or anywhere,
+ * with on="body") and it hops to the end of your selection; copy it and it shows a
+ * clipboard. Clear the selection and it hops home. */
+defineBehavior('select', (a, [el], host) => {
+  const S = a.s / 3;
+  const at = host.getAttribute('at') != null ? clamp(+host.getAttribute('at'), 0, 1) : .9;
+  const cache = {};
+  let goal = null, hop = null, cheer = 0;
+  const home = () => {
+    const tp = textProfile(el, cache);
+    if (tp) { const x = tp.l + (tp.r - tp.l) * at; return { x, y: segAt(tp.segs, x) ?? tp.t }; }
+    const r = rectOf(el); return { x: r.l + r.w * at, y: r.t };
+  };
+  const go = (x, y) => { hop = { x0: a.x, y0: a.y, x1: x, y1: y, p: 0 }; };
+  const onSel = () => {
+    const sel = getSelection();
+    if (!sel || sel.isCollapsed || !sel.rangeCount) { if (goal) { goal = null; const h = home(); go(h.x, h.y); } return; }
+    const range = sel.getRangeAt(0);
+    if (!el.contains(range.commonAncestorContainer) && el !== document.body) return;
+    const rects = [...range.getClientRects()].filter(r => r.width > 0);
+    const last = rects[rects.length - 1];
+    if (!last) return;
+    goal = { x: last.right + scrollX + a.w * .6, y: last.top + scrollY + 2 };
+    go(goal.x, goal.y); a.play('hold'); a.say('!', 500);
+  };
+  const onCopy = () => { if (goal) { cheer = 1.4; a.say('copy', 1200); } };
+  document.addEventListener('selectionchange', onSel);
+  document.addEventListener('copy', onCopy);
+
+  return {
+    tick(dt) {
+      if (hop) {
+        hop.p = Math.min(1, hop.p + dt / .35);
+        const p = hop.p, q = 1 - p, top = Math.min(hop.y0, hop.y1) - 40 * S;
+        a.x = lerp(hop.x0, hop.x1, p); a.y = q * q * hop.y0 + 2 * q * p * top + p * p * hop.y1;
+        if (p >= 1) hop = null;
+        return;
+      }
+      if (goal) { a.x = goal.x; a.y = goal.y; }
+      else { const h = home(); a.x = h.x; a.y = h.y; }
+      cheer -= dt;
+      a.play(cheer > 0 ? 'happy' : goal ? 'hold' : 'idle');
+    },
+    poke() { cheer = .8; a.say('heart', 700); },
+    destroy() { document.removeEventListener('selectionchange', onSel); document.removeEventListener('copy', onCopy); }
+  };
+});
+
+/* ---- behaviors/signal.js ---- */
+/* signal: shows Wi-Fi bars that depend on how close the cursor is. Full bars and a
+ * grin up close, no signal and a frown far away. */
+defineBehavior('signal', (a, [el], host) => {
+  const S = a.s / 3;
+  const at = host.getAttribute('at') != null ? clamp(+host.getAttribute('at'), 0, 1) : .85;
+  let level = 0, shown = 0;
+  return {
+    tick(dt) {
+      const r = rectOf(el);
+      a.x = r.l + a.w / 2 + (r.w - a.w) * at; a.y = r.t;
+      const d = ptr.seen && ptr.cx > -1e4 ? ptrDist(a.x, a.y - a.h / 2) : 1e9;
+      const want = d < 90 * S ? 3 : d < 220 * S ? 2 : d < 420 * S ? 1 : 0;
+      level = lerp(level, want, 1 - Math.exp(-3 * dt));
+      const n = Math.round(level);
+      if (n !== shown) { if (n === 0) a.say('...', 900); if (n === 3 && shown < 3) a.say('heart', 700); shown = n; }
+      a.play('s' + n);
+    },
+    poke() { a.say(shown === 3 ? 'heart' : '?', 700); }
+  };
+});
+
+/* ---- behaviors/slide.js ---- */
+/* slide: waddle a little, flop onto the belly and slide along the element, get up
+ * at the far end, turn round and do it again. Poke it and it slips and spins. */
+defineBehavior('slide', (a, [el], host) => {
+  const S = a.s / 3;
+  let frac = rnd(.1, .4), dir = 1, state = 'walk', v = 0, timer = rnd(1, 2.4), spin = 0;
+  const cache = {};
+  const surf = () => {
+    const tp = host.getAttribute('edge') !== 'box' && textProfile(el, cache);
+    return tp ? { l: tp.l, r: tp.r, t: tp.t } : (r => ({ l: r.l, r: r.r, t: r.t }))(rectOf(el));
+  };
+  return {
+    tick(dt) {
+      const r = surf(), span = Math.max(1, r.r - r.l - a.w);
+      a.y = r.t;
+      if (!reduced()) {
+        timer -= dt;
+        if (state === 'walk') {
+          a.play('walk'); frac += dir * 16 * S * dt / span;
+          if (timer <= 0) { state = 'slide'; v = rnd(170, 240) * S; a.sy = .7; a.sx = 1.3; }
+        } else if (state === 'slide') {
+          a.play('slide'); frac += dir * v * dt / span; v *= Math.exp(-.9 * dt);
+          if (v < 20 * S) { state = 'rest'; timer = .7; a.play('idle'); }
+        } else if (state === 'rest' && timer <= 0) { state = 'walk'; timer = rnd(1, 2.4); }
+        if (frac >= 1 || frac <= 0) { frac = clamp(frac, 0, 1); dir = -dir; if (state === 'slide') { state = 'rest'; timer = .9; a.play('idle'); a.say(pick(['!', 'note']), 600); } }
+        if (spin > 0) { spin -= dt; a.rot = (1 - spin / .7) * 360 * dir; if (spin <= 0) a.rot = 0; }
+      }
+      a.face = dir;
+      a.x = r.l + a.w / 2 + span * frac;
+      a.sx = lerp(a.sx, 1, .15); a.sy = lerp(a.sy, 1, .15);
+    },
+    poke() { spin = .7; a.say('!?', 600); state = 'slide'; v = 120 * S; },
+    hear(type) { if (type === 'thud') { state = 'slide'; v = 150 * S; } }
+  };
+});
+
+/* ---- behaviors/snap.js ---- */
+/* snap: a frog that thinks the cursor is a fly. When it buzzes close, the tongue shoots
+ * out at it; hold still at the tip and you're caught. Click to make it hop along. */
+defineBehavior('snap', (a, [el], host) => {
+  const S = a.s / 4;
+  let frac = host.getAttribute('at') != null ? clamp(+host.getAttribute('at'), 0, 1) : .5;
+  let state = 'sit', t = 0, cool = 1, tx = 0, ty = 0, hop = null, happy = 0;
+  const tongue = document.createElement('div');
+  tongue.style.cssText = `position:absolute;left:0;top:0;height:${Math.max(3, Math.round(a.s * 1.2))}px;border-radius:999px;background:#ff7aa8;box-shadow:0 0 0 ${Math.max(1, a.s >> 2)}px #17121f;transform-origin:0 50%;pointer-events:none;opacity:0`;
+  a.node.parentNode.insertBefore(tongue, a.node);
+  const RANGE = 150 * S;
+
+  return {
+    tick(dt) {
+      const r = rectOf(el);
+      if (hop) {
+        hop.p = Math.min(1, hop.p + dt / .45);
+        const p = hop.p, q = 1 - p, x = lerp(hop.x0, hop.x1, p);
+        frac = (x - r.l - a.w / 2) / Math.max(1, r.w - a.w);
+        a.oy = -(4 * p * q) * 46 * S; a.play('jump');
+        if (p >= 1) { hop = null; a.oy = 0; a.sy = .8; a.sx = 1.2; }
+      }
+      a.x = r.l + a.w / 2 + (r.w - a.w) * clamp(frac, 0, 1); a.y = r.t;
+      a.sx = lerp(a.sx, 1, .2); a.sy = lerp(a.sy, 1, .2);
+      if (reduced() || hop) { tongue.style.opacity = '0'; if (!hop) a.play('sit'); return; }
+      const mx = a.x + a.face * a.w * .1, my = a.y - a.h * .45;
+      cool -= dt; happy -= dt;
+      const d = ptr.seen ? Math.hypot(ptr.x - mx, ptr.y - my) : 1e9;
+      if (state === 'sit') {
+        if (Math.abs(ptr.x - a.x) > 6) a.face = ptr.x > a.x ? 1 : -1;
+        a.play(happy > 0 ? 'happy' : 'sit');
+        if (d < RANGE && cool <= 0) { state = 'aim'; t = .22; }
+      } else if (state === 'aim') {
+        t -= dt;
+        if (t <= 0) { state = 'out'; t = 0; tx = ptr.x; ty = ptr.y; a.play('snap'); }
+      }
+      if (state === 'out' || state === 'back') {
+        t += dt / .14 * (state === 'out' ? 1 : -1);
+        const k = clamp(t, 0, 1), len = Math.hypot(tx - mx, ty - my) * k, ang = Math.atan2(ty - my, tx - mx);
+        tongue.style.opacity = '1';
+        tongue.style.width = Math.round(len) + 'px';
+        tongue.style.transform = `translate3d(${Math.round(mx - origin.x)}px,${Math.round(my - origin.y)}px,0) rotate(${ang}rad)`;
+        if (state === 'out' && k >= 1) {
+          state = 'back';
+          if (Math.hypot(ptr.x - tx, ptr.y - ty) < 14 * S) { happy = 1.6; a.say('heart', 900); }
+        }
+        if (state === 'back' && k <= 0) { state = 'sit'; cool = 1.1; tongue.style.opacity = '0'; }
+      }
+    },
+    poke() {
+      if (hop) return;
+      const r = rectOf(el), x0 = a.x;
+      const x1 = clamp(x0 + (chance(.5) ? 1 : -1) * rnd(60, 140) * S, r.l + a.w / 2, r.r - a.w / 2);
+      a.face = x1 > x0 ? 1 : -1;
+      hop = { x0, x1, p: 0 };
+    },
+    destroy() { tongue.remove(); }
   };
 });
 
@@ -2995,6 +3414,42 @@ defineBehavior('toss', (a, [el], host) => {
   };
 });
 
+/* ---- behaviors/type.js ---- */
+/* type: types lines into a little terminal bubble above the pal, character by
+ * character, pausing between lines.  lines="first|second|third"   speed="1" */
+defineBehavior('type', (a, [el], host) => {
+  const S = a.s / 3;
+  const at = host.getAttribute('at') != null ? clamp(+host.getAttribute('at'), 0, 1) : .5;
+  const lines = (host.getAttribute('lines') || 'npm i piixpal|added 1 package, 0 vulnerabilities|✓ pals deployed').split('|');
+  const cps = 22 * (+host.getAttribute('speed') || 1);
+  const term = document.createElement('div');
+  term.style.cssText = `position:absolute;left:0;top:0;transform-origin:50% 100%;pointer-events:none;white-space:pre;max-width:320px;overflow:hidden;
+    font:600 ${Math.max(11, Math.round(a.s * 4))}px/1.35 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:#c6f432;background:#17121f;
+    padding:${a.s * 2}px ${a.s * 3}px;border-radius:${a.s * 2}px;box-shadow:0 0 0 ${Math.max(2, a.s - 1)}px #17121f,0 ${a.s}px 0 ${Math.max(2, a.s - 1)}px rgba(23,18,31,.35)`;
+  a.node.parentNode.appendChild(term);
+  let li = 0, ci = 0, pause = .6, blinkT = 0;
+
+  return {
+    tick(dt) {
+      const r = rectOf(el);
+      a.x = r.l + a.w / 2 + (r.w - a.w) * at; a.y = r.t;
+      const line = lines[li % lines.length];
+      if (reduced()) ci = line.length;
+      else if (pause > 0) pause -= dt;
+      else if (ci < line.length) { ci = Math.min(line.length, ci + cps * dt * rnd(.4, 1.6)); if (ci >= line.length) pause = 1.6; }
+      else { li++; ci = 0; pause = .35; }
+      blinkT += dt;
+      const caret = Math.floor(blinkT * 2) % 2 ? '█' : ' ';
+      term.textContent = '$ ' + line.slice(0, Math.floor(ci)) + caret;
+      a.play(ci > 0 && ci < line.length ? 'typing' : 'idle');
+      const w = term.offsetWidth, h = term.offsetHeight;
+      term.style.transform = `translate3d(${Math.round(clamp(a.x - w / 2, 4, docW() - w - 4) - origin.x)}px,${Math.round(a.y - a.h - h - 10 * S - origin.y)}px,0)`;
+    },
+    poke() { li++; ci = 0; pause = 0; a.say('!', 400); },
+    destroy() { term.remove(); }
+  };
+});
+
 /* ---- behaviors/wire.js ---- */
 /* wire: a row of birds sitting along an element's top edge like a telephone wire.
  * Run the cursor along the row and they hop up one after another, like a wave.
@@ -3086,6 +3541,39 @@ defineBehavior('wire', (a, [el], host) => {
     w: 10, h: 13, scale: 4, does: 'float',
     palette: { k: '#17121f', b: '#ff5b7f', B: '#ffc2d1', w: '#ffffff', p: '#ff97b0' },
     frames: { idle: [body], blink: [art.compose(body, [3, 4, ['kk']], [6, 4, ['kk']])], pop: [pop] }
+  });
+})();
+
+/* ---- pals/beep.js ---- */
+/* BEEP: a small robot with a big secret, guarding your "I'm not a robot" checkbox.
+ * Job: sweats nervously when your cursor nears the checkbox. Tick it and Beep panics
+ * and runs off; it creeps back a few seconds later, embarrassed. */
+(() => {
+  const body = [
+    '....kk....',
+    '....rk....',
+    '..kkkkkk..',
+    '.kmmmmmmk.',
+    '.kmwkmwkm'.padEnd(10, 'k').slice(0, 10),
+    '.kmmmmmmk.',
+    '.kmmkkmmk.',
+    '..kkkkkk..',
+    '.kmmmmmmk.',
+    '.kmmmmmmk.'
+  ];
+  const legs = { a: ['..k....k..'], b: ['...k..k...'], stand: ['..k....k..'] };
+  const r = (rows, l, light) => art.put(rows, 4, 1, [light ? 'g' : 'r']).concat(legs[l]);
+  const nervous = art.compose(body, [3, 4, ['wwkww'.slice(0, 5)]], [3, 6, ['kmmk'.replace('mm', 'kk')]]);
+  defineSprite('beep', {
+    w: 10, h: 11, scale: 3, does: 'captcha',
+    palette: { k: '#17121f', m: '#c9d3ea', w: '#ffffff', r: '#ff4d6d', g: '#c6f432' },
+    frames: {
+      idle: [r(body, 'stand'), r(body, 'stand', true)],
+      nervous: [r(nervous, 'stand'), r(art.shift(nervous, 1).map(x => x.slice(0, 10)), 'stand')],
+      run: [r(nervous, 'a'), r(nervous, 'b')],
+      shy: [r(art.put(body, 3, 4, ['kmmkm'.replace(/m/g, 'm')]), 'stand')]
+    },
+    fps: { idle: 1.5, nervous: 10, run: 12 }
   });
 })();
 
@@ -3252,6 +3740,65 @@ defineBehavior('wire', (a, [el], host) => {
       perch: [bee(down), bee(down), bee(down), bee(down, 'shut')]
     },
     fps: { fly: 20, happy: 22, sleep: 1, perch: 3 }
+  });
+})();
+
+/* ---- pals/echo.js ---- */
+/* ECHO: your cursor's little shadow.
+ * Job: follows the exact path your cursor took, half a second behind, and clicks
+ * wherever you clicked. Stop moving and it catches up and does a little dance. */
+(() => {
+  const arrow = [
+    'k........',
+    'kk.......',
+    'kwk......',
+    'kwwk.....',
+    'kwwwk....',
+    'kwkwkk...',
+    'kwwwwwk..',
+    'kwkwkwwk.',
+    'kwwwwwwwk',
+    'kwwwkkkkk',
+    'kwkwwk...',
+    'kk.kwwk..',
+    'k...kwwk.',
+    '.....kk..'
+  ].map(r => r.padEnd(9, '.'));
+  /* the arrow's face: two eye pixels and a mouth, swapped for expressions */
+  const press = art.put(arrow, 0, 5, ['kwkwkk']).map((r, i) => i === 7 ? 'kwwwwwwk.' : r);
+  const happy = art.compose(arrow, [1, 5, ['wkwk']], [1, 7, ['wkkw']]);
+  defineSprite('echo', {
+    w: 9, h: 14, scale: 3, does: 'mimic',
+    palette: { k: '#17121f', w: '#c6f432' },
+    frames: { idle: [arrow], click: [press], dance: [happy, art.shift(happy, 1)] },
+    fps: { dance: 5 }
+  });
+})();
+
+/* ---- pals/frog.js ---- */
+/* FROG: a frog who is convinced your cursor is a fly.
+ * Job: sits on your element; when the cursor buzzes close, its tongue snaps out at it.
+ * Keep still at the end of the tongue and it catches you. Click it and it hops. */
+(() => {
+  const sit = [
+    '..kk....kk..',
+    '.kwwk..kwwk.',
+    '.kwkkkkkwkk.'.slice(0, 12),
+    'kgggggggggggk'.slice(0, 12),
+    'kgGgggggggGk',
+    'kgggkkkkgggk',
+    'kgggggggggk.'.padEnd(12, '.'),
+    '.kgg.kk.ggk.',
+    'kkgk....kgkk'
+  ];
+  const blink = art.compose(sit, [2, 1, ['kk']], [8, 1, ['kk']]);
+  const open = art.put(sit, 4, 5, ['kppk']);
+  const jump = art.put(sit, 0, 8, ['.kk......kk.']);
+  defineSprite('frog', {
+    w: 12, h: 9, scale: 4, does: 'snap',
+    palette: { k: '#17121f', g: '#7bd63a', G: '#c8f58a', w: '#ffffff', p: '#ff7aa8' },
+    frames: { sit: [sit, sit, sit, blink], snap: [open], jump: [jump], happy: [art.compose(blink, [4, 5, ['kggk']])] },
+    fps: { sit: 1.4 }
   });
 })();
 
@@ -3614,6 +4161,76 @@ defineBehavior('wire', (a, [el], host) => {
   });
 })();
 
+/* ---- pals/peeper.js ---- */
+/* PEEPER: a fluffball who guards your form fields.
+ * Job: sits on an input and watches you type, eyes following the caret. Covers its eyes
+ * for password fields. Cheers when a field is valid, sweats when it isn't. */
+(() => {
+  const base = [
+    '...kkkkkk...',
+    '..kffffffk..',
+    '.kffffffffk.',
+    'kffwwffwwffk',
+    'kffwwffwwffk',
+    'kffffffffffk',
+    'kfppffffppfk',
+    'kfffffkffffk',
+    '.kffffffffk.',
+    '..kkkkkkkk..',
+    '..k......k..'
+  ];
+  const look = (dx, dy) => art.compose(base, [3 + dx, 3 + dy, ['k']], [7 + dx, 3 + dy, ['k']]);
+  const cover = art.compose(base, [1, 3, ['khhkhhkhhkk'.slice(0, 10)]], [1, 4, ['khhhhkhhhh']], [0, 5, ['kk', 'kh']], [10, 5, ['kk', 'hk']]);
+  const happy = art.compose(base, [3, 3, ['kk', 'ff']], [7, 3, ['kk', 'ff']], [5, 7, ['kffk']]);
+  const worried = art.compose(look(0, 1), [3, 2, ['k']], [8, 2, ['k']], [5, 7, ['_kk_']]);
+  defineSprite('peeper', {
+    w: 12, h: 11, scale: 3, does: 'guard',
+    palette: { k: '#17121f', f: '#f3f0fa', h: '#ffd9b5', w: '#ffffff', p: '#ffb3c7' },
+    frames: { l: [look(0, 1)], r: [look(1, 1)], idle: [look(0, 0), look(1, 0), look(1, 0), look(0, 0)], cover: [cover], happy: [happy], worried: [worried] },
+    fps: { idle: 1 }
+  });
+})();
+
+/* ---- pals/penguin.js ---- */
+/* PENGUIN: a penguin who has discovered that your element is slippery.
+ * Job: waddles along, flops onto its belly and slides, gets up at the far end and
+ * waddles back to do it again. Poke it and it slips over. */
+(() => {
+  const stand = [
+    '...kkkk.....',
+    '..kbbbbk....',
+    '.kbwkbwk....'.replace('wk', 'wk'),
+    '.kbbooobk...'.slice(0, 12),
+    '.kbwwwwbk...',
+    'kbbwwwwbbk..',
+    'kbbwwwwbbk..',
+    'kbbwwwwbbk..',
+    '.kbwwwwbk...',
+    '..kkkkkk....',
+    '..oo..oo....'
+  ];
+  const step = art.put(stand, 0, 10, ['...oo..oo...']);
+  const slide = [
+    '............',
+    '............',
+    '............',
+    '............',
+    '............',
+    '............',
+    '.....kkkkk..',
+    'kkkkkbbbbbk.',
+    'kwwwwwwbwbkk',
+    'kwwwwwwwbbko',
+    '.kkkkkkkkkk.'
+  ];
+  defineSprite('penguin', {
+    w: 12, h: 11, scale: 3, does: 'slide',
+    palette: { k: '#17121f', b: '#2b3a55', w: '#ffffff', o: '#ff9a2f' },
+    frames: { walk: [stand, step], idle: [stand], slide: [slide] },
+    fps: { walk: 6 }
+  });
+})();
+
 /* ---- pals/pip.js ---- */
 /* PIP — a round little bird who loves a good button.
  * Job: perches on top of buttons and links. Hover the button and it flies off,
@@ -3655,6 +4272,39 @@ defineBehavior('wire', (a, [el], host) => {
   });
 })();
 
+/* ---- pals/rocket.js ---- */
+/* ROCKET: a small rocket that lives on your "Deploy" button.
+ * Job: sits there looking keen. Click it and it counts down, launches off the top of
+ * the screen in a trail of smoke, then comes back down and lands. Ship it. */
+(() => {
+  const body = [
+    '....k....',
+    '...krk...',
+    '..krrrk..',
+    '..kwwwk..',
+    '.kwbbbwk.',
+    '.kwbwbwk.',
+    '.kwbbbwk.',
+    '.kwwwwwk.',
+    '.kwwwwwk.',
+    'krkwwwkrk',
+    'krkwwwkrk',
+    'kkkkkkkkk',
+    '...kkk...'
+  ];
+  const flame = [
+    ['..oyyyo..', '...oyo...', '....o....'],
+    ['..yoyoy..', '...yoy...', '...o.o...']
+  ];
+  const pad = ['.........', '.........', '.........'];
+  defineSprite('rocket', {
+    w: 9, h: 16, scale: 3, does: 'launch',
+    palette: { k: '#17121f', r: '#ff4d6d', w: '#f3f0fa', b: '#58c8ff', y: '#ffd23f', o: '#ff7a2f' },
+    frames: { idle: [body.concat(pad)], burn: flame.map(f => body.concat(f)) },
+    fps: { burn: 14 }
+  });
+})();
+
 /* ---- pals/roomba.js ---- */
 /* ROOMBA: a small robot vacuum that takes its job very seriously.
  * Job: sweeps back and forth along an element, bumps the ends, stops and beeps if your
@@ -3676,6 +4326,73 @@ defineBehavior('wire', (a, [el], host) => {
       beep: [art.put(base, 11, 2, ['r']), base]
     },
     fps: { go: 3, beep: 8 }
+  });
+})();
+
+/* ---- pals/router.js ---- */
+/* ROUTER: a little Wi-Fi router whose signal is your cursor.
+ * Job: the closer your cursor, the more bars it shows. Wander off and it loses
+ * signal and gets sad. Hover right on top and it beams. */
+(() => {
+  const base = [
+    '.k......k.',
+    '.k......k.',
+    '.k......k.',
+    'kkkkkkkkkk',
+    'kbbbbbbbbk',
+    'kbwkbbwkbk',
+    'kbbbbbbbbk',
+    'kblbbbbbbk'.replace('l', 'l'),
+    'kkkkkkkkkk',
+    '.k......k.'
+  ];
+  /* signal bars float above: up to three arcs */
+  const bars = n => [
+    n >= 3 ? '..gggggg..' : '..........',
+    n >= 3 ? '.g......g.' : '..........',
+    n >= 2 ? '...gggg...' : '..........',
+    n >= 2 ? '..g....g..' : '..........',
+    n >= 1 ? '....gg....' : '....xx....'
+  ];
+  const sad = art.compose(base, [2, 5, ['bbbbbb']], [2, 6, ['kbbbbk'.replace('bbbb', 'kbbk').slice(0, 6)]]);
+  const glad = art.compose(base, [2, 5, ['kkbbkk']], [3, 6, ['bkkb']]);
+  const f = (n, face) => bars(n).concat(face);
+  defineSprite('router', {
+    w: 10, h: 15, scale: 3, does: 'signal',
+    palette: { k: '#17121f', b: '#6b4cff', w: '#ffffff', l: '#c6f432', g: '#25b89a', x: '#ff4d6d' },
+    frames: { s0: [f(0, sad), f(0, art.put(sad, 2, 7, ['l']))], s1: [f(1, base)], s2: [f(2, base)], s3: [f(3, glad)] },
+    fps: { s0: 2 }
+  });
+})();
+
+/* ---- pals/scrolly.js ---- */
+/* SCROLLY: a tiny runner on a reading-progress bar.
+ * Job: runs along a bar at the bottom of the screen as you scroll, keeping pace with
+ * how far down the page you are. Reaches the end and celebrates. */
+(() => {
+  const head = [
+    '...kkkk...',
+    '..kssssk..',
+    '.krrrrrrk.',
+    '.kswswssk.',
+    '.kssssssk.',
+    '..kkkkkk..',
+    '..kbbbbk..',
+    '.kbbbbbbk.'
+  ];
+  const legs = {
+    a: ['.kbbbbbbk.', '..kk..kk..', '.k.....k..'],
+    b: ['..kbbbbk..', '...k.k....', '...k..k...'],
+    c: ['.kbbbbbbk.', '..kk..kk..', '..k....k..'],
+    stand: ['..kbbbbk..', '..k....k..', '..k....k..'],
+    cheer: ['k.kbbbbk.k', '..k....k..', '.kk....kk.']
+  };
+  const f = (l, armsUp) => (armsUp ? art.compose(head, [0, 6, ['k']], [9, 6, ['k']]) : head).concat(legs[l]);
+  defineSprite('scrolly', {
+    w: 10, h: 11, scale: 3, does: 'progress',
+    palette: { k: '#17121f', s: '#ffd9b5', r: '#ff4d6d', w: '#ffffff', b: '#58c8ff' },
+    frames: { run: [f('a'), f('b'), f('c'), f('b')], idle: [f('stand'), f('stand'), f('stand', true), f('stand')], cheer: [f('cheer', true), f('stand')] },
+    fps: { run: 12, idle: 2, cheer: 6 }
   });
 })();
 
@@ -3722,6 +4439,66 @@ defineBehavior('wire', (a, [el], host) => {
       peek: [peek]
     },
     fps: { walk: 3, idle: 2 }
+  });
+})();
+
+/* ---- pals/snip.js ---- */
+/* SNIP: a highlighter pen with opinions.
+ * Job: when you select text, it hops over to the end of your selection and holds its
+ * nib up proudly. Copy the text and it shows you a clipboard. */
+(() => {
+  const base = [
+    '.kkkkk.',
+    'kcCccck',
+    'kkkkkkk',
+    'kyYyyyk',
+    'kyYyyyk',
+    'kykykyk',
+    'kyyyyyk',
+    'kyykyyk',
+    'kyyyyyk',
+    'kyyyyyk',
+    'kkkkkkk',
+    '.ksssk.',
+    '..kyk..',
+    '...k...'
+  ];
+  const blink = art.put(base, 0, 5, ['kyyyyyk']);
+  const happy = art.compose(base, [0, 4, ['kkYyyyk'.replace('kkY', 'kyk').replace('yyyk', 'ykyk')]], [0, 5, ['kyyyyyk']], [0, 7, ['kykkkyk']]);
+  const wow = art.compose(base, [0, 7, ['kykkkyk']], [0, 8, ['kykkkyk']]);
+  defineSprite('snip', {
+    w: 7, h: 14, scale: 3, does: 'select',
+    palette: { k: '#17121f', y: '#fff36b', Y: '#fffbd0', c: '#ff7aa8', C: '#ffc2d6', s: '#b7b0c4' },
+    frames: { idle: [base, base, base, blink], happy: [happy], hold: [wow, base] },
+    fps: { idle: 1.5, hold: 4 }
+  });
+})();
+
+/* ---- pals/termi.js ---- */
+/* TERMI: a tiny terminal who types for you.
+ * Job: sits on your element and types out lines in a little terminal bubble, one
+ * after another, forever. lines="npm i piixpal|shipped!" */
+(() => {
+  const base = [
+    'kkkkkkkkkkkk',
+    'kmmmmmmmmmmk',
+    'kmssssssssmk',
+    'kmsgsssgssmk',
+    'kmsssssssmmk'.slice(0, 12),
+    'kmssgggsssmk',
+    'kmssssssssmk',
+    'kmmmmmmmmmmk',
+    'kkkkkkkkkkkk',
+    '....kmmk....',
+    '..kkkkkkkk..'
+  ];
+  const blink = art.put(base, 3, 3, ['ssssss'.slice(0, 5)]);
+  const type = art.put(base, 4, 5, ['gsg']);
+  defineSprite('termi', {
+    w: 12, h: 11, scale: 3, does: 'type',
+    palette: { k: '#17121f', m: '#c9c3d6', s: '#17121f', g: '#c6f432' },
+    frames: { idle: [base, base, base, blink], typing: [base, type] },
+    fps: { idle: 1.5, typing: 8 }
   });
 })();
 
