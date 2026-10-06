@@ -93,3 +93,4 @@ const define = (n, c) => { if (!customElements.get(n)) customElements.define(n, 
 define('piix-pal', PiixPalElement);
 if (typeof PiixTypeElement !== 'undefined') define('piix-type', PiixTypeElement);
 if (typeof PiixSpriteElement !== 'undefined') define('piix-sprite', PiixSpriteElement);
+if (typeof PiixCrowdElement !== 'undefined') define('piix-crowd', PiixCrowdElement);
