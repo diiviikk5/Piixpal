@@ -1406,6 +1406,12 @@ const define = (n, c) => { if (!customElements.get(n)) customElements.define(n, 
  * Piixpal.add('kitty', someElement)                or pass an element directly */
 const add = (name, where = 'body', attrs = {}) => {
   name = String(name).toLowerCase();
+  /* not registered yet (its file is still loading)? wait to find out if it's a pal or a sprite */
+  if (!attrs.type && !SPRITES[name] && !FIGURES[name] && (attrs._tries || 0) < 80) {
+    setTimeout(() => add(name, where, { ...attrs, _tries: (attrs._tries || 0) + 1 }), 125);
+    return null;
+  }
+  attrs = { ...attrs }; delete attrs._tries;
   const isSprite = attrs.type === 'sprite' || (!SPRITES[name] && !!FIGURES[name]);
   const target = typeof where === 'string' ? null : where;
   const el = document.createElement(isSprite ? 'piix-sprite' : 'piix-pal');
@@ -1431,7 +1437,7 @@ const autoAttach = script => {
     const attrs = Object.fromEntries(new URLSearchParams(query));
     add(name, where, attrs);
   });
-  if (document.readyState === 'loading') addEventListener('DOMContentLoaded', run, { once: true }); else run();
+  if (document.readyState === 'complete') run(); else addEventListener('load', run, { once: true });
 };
 const SCRIPT = document.currentScript;
 
