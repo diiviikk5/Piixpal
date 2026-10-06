@@ -67,6 +67,10 @@ defineBehavior('hang', (a, [el], host) => {
       silk.style.height = Math.round(L + 2) + 'px';
       silk.style.transform = `translate3d(${Math.round(ax - origin.x)}px,${Math.round(ay - origin.y)}px,0) rotate(${(-th * 57.3).toFixed(2)}deg)`;
     },
+    hear(type) {
+      if (type !== 'thud') return;
+      w += (chance(.5) ? 1 : -1) * rnd(.5, 1); a.say('sweat', 600);
+    },
     poke() {
       Lv += 520 * S; w += rnd(-1.2, 1.2);
       a.say(pick(['!', 'heart', '!?']), 700);
