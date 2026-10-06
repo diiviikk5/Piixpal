@@ -252,3 +252,6 @@ canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;margi
 }
 Piixpal.figures = FIGURES;
 Piixpal.figure = defineFigure;
+
+/* defaults for the big, bold sprites: one recolourable body, chunky 3D blocks, block eyes */
+const BIG = { kind: 'big', scale: 8, render: 'voxel', depth: 2, tilt: true, shy: true, glint: '#ffffff', lid: 'b', recolor: { b: 0, d: -.24, B: .42 } };
