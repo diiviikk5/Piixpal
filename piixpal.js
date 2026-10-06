@@ -1505,6 +1505,8 @@ class PiixPalElement extends HTMLElement {
   }
   attributeChangedCallback(n, a, b) {
     if (a === b || !this._mounted) return;
+    /* recolouring doesn't need a fresh pal */
+    if (n === 'hue') { this._actor.cv.style.filter = b ? `hue-rotate(${+b}deg)` : ''; return; }
     this._unmount(); this._mount();
   }
   get actor() { return this._actor || null; }
