@@ -329,3 +329,10 @@ Object.assign(art, {
     }).join(''));
   }
 });
+
+/* wrap a painted shape in a 1px outline (empty pixels touching the shape become `ink`) */
+art.outline = (rows, ink = 'k') => rows.map((r, y) => [...r].map((c, x) => {
+  if (c !== '.') return c;
+  const at = (xx, yy) => ((rows[yy] || '')[xx] || '.') !== '.';
+  return at(x + 1, y) || at(x - 1, y) || at(x, y + 1) || at(x, y - 1) ? ink : '.';
+}).join(''));
