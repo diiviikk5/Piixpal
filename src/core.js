@@ -246,3 +246,34 @@ const Piixpal = window.Piixpal = {
   behavior: defineBehavior,
   get reducedMotion() { return reduced(); }
 };
+
+/* ---------- art helpers: build frames from parts instead of copy-pasting grids ---------- */
+const art = {
+  /* overlay patch rows onto base at (x, y). '_' in a patch keeps the base pixel, '.' erases it */
+  put(base, x, y, patch) {
+    const out = base.slice();
+    patch.forEach((p, i) => {
+      const ry = y + i;
+      if (ry < 0) return;
+      while (out.length <= ry) out.push('');
+      let row = out[ry].padEnd(x + p.length, '.');
+      for (let j = 0; j < p.length; j++) {
+        if (p[j] === '_' || x + j < 0) continue;
+        row = row.slice(0, x + j) + p[j] + row.slice(x + j + 1);
+      }
+      out[ry] = row;
+    });
+    return out;
+  },
+  /* apply several patches: art.compose(base, [x, y, patch], ...) */
+  compose(base, ...patches) { return patches.reduce((r, [x, y, p]) => art.put(r, x, y, p), base); },
+  flipV(rows) { return rows.slice().reverse(); },
+  flipH(rows) { const w = Math.max(...rows.map(r => r.length)); return rows.map(r => [...r.padEnd(w, '.')].reverse().join('')); },
+  /* drop empty rows from the bottom so the frame sits on the floor again */
+  trim(rows) { const r = rows.slice(); while (r.length && !/[^.]/.test(r[r.length - 1])) r.pop(); return r; },
+  /* shift right by n columns (negative = left) */
+  shift(rows, n) { return rows.map(r => n >= 0 ? '.'.repeat(n) + r : r.slice(-n)); },
+  /* swap palette keys: art.swap(rows, { w: 'k' }) */
+  swap(rows, map) { return rows.map(r => [...r].map(c => map[c] || c).join('')); }
+};
+Piixpal.art = art;
