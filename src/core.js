@@ -304,3 +304,25 @@ Piixpal.advance = (seconds = 1, fps = 60) => {
   }
   lastT = 0;
 };
+
+/* ---------- shape painting, for bigger characters ---------- */
+Object.assign(art, {
+  /* build rows from fn(x, y) -> palette key or falsy */
+  paint(w, h, fn) { return Array.from({ length: h }, (_, y) => Array.from({ length: w }, (_, x) => fn(x, y) || '.').join('')); },
+  ellipse(x, y, cx, cy, rx, ry) { const dx = (x + .5 - cx) / rx, dy = (y + .5 - cy) / ry; return dx * dx + dy * dy <= 1; },
+  rrect(x, y, x0, y0, x1, y1, r) {
+    if (x < x0 || x > x1 || y < y0 || y > y1) return false;
+    const cx = x < x0 + r ? x0 + r : x > x1 - r ? x1 - r : x, cy = y < y0 + r ? y0 + r : y > y1 - r ? y1 - r : y;
+    return (x - cx) ** 2 + (y - cy) ** 2 <= r * r + .5;
+  },
+  /* give a flat body key some volume: shade its bottom-right rim, light its top-left rim */
+  volume(rows, body = 'b', shade = 'd', light = 'B') {
+    const at = (x, y) => (rows[y] || '')[x] || '.';
+    return rows.map((r, y) => [...r].map((c, x) => {
+      if (c !== body) return c;
+      if (at(x + 1, y) === '.' || at(x, y + 1) === '.') return shade;
+      if ((at(x - 1, y) === '.' || at(x, y - 1) === '.') && y < rows.length * .55 && x < r.length * .6) return light;
+      return c;
+    }).join(''));
+  }
+});
