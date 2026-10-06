@@ -23,7 +23,7 @@
   };
   const tagBtn = $('#copy-tag');
   if (tagBtn) tagBtn.addEventListener('click', () => copy(TAG, tagBtn));
-  $('[data-copy-tag]').forEach(b => b.addEventListener('click', () => copy(TAG, b)));
+  $$('[data-copy-tag]').forEach(b => b.addEventListener('click', () => copy(TAG, b)));
 
   /* ---------- nav gets a border once the page moves ---------- */
   const nav = $('#nav');
@@ -111,4 +111,23 @@ document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click'
     render();
   });
   mount();
+})();
+
+/* ---------- release extra pals onto the page ---------- */
+(() => {
+  const spawned = [];
+  const clear = document.querySelector('[data-spawn="clear"]');
+  const homes = { bitbug: ['#mark', '#lede', '#pals-h', '#how-h', '#api-h', '#install-h'], boing: ['#mark'] };
+  document.querySelectorAll('[data-spawn]').forEach(b => b.addEventListener('click', () => {
+    const kind = b.dataset.spawn;
+    if (kind === 'clear') { spawned.splice(0).forEach(p => p.remove()); clear.hidden = true; return; }
+    if (spawned.length >= 24) spawned.shift().remove();
+    const p = document.createElement('piix-pal');
+    p.setAttribute('pal', kind);
+    p.setAttribute('on', kind === 'bitbug' && Math.random() < .6 ? '#mark' : homes[kind][(Math.random() * homes[kind].length) | 0]);
+    p.setAttribute('hue', String(((Math.random() * 12) | 0) * 30));
+    document.body.appendChild(p);
+    spawned.push(p);
+    clear.hidden = false;
+  }));
 })();
