@@ -52,8 +52,95 @@ export const PALS = [
   { id: 'shel', does: 'creep', accent: 'var(--mint)', lives: 'the top of your text, very slowly', scared: 'cursors and loud thuds', poke: 'hides in its shell, then peeks out',
     desc: 'A very slow snail with a very nice shell. Glides along your text leaving a shimmering slime trail that fades behind it. Too close and it hides until you go away.',
     attrs: [['speed', 'creeping speed multiplier'], ['edge', '"text" or "box"']],
-    hab: `<p class="h-text" id="d-shel" style="font-size:34px">Slow and steady.</p><piix-pal pal="shel" on="#d-shel"></piix-pal>`, code: '<h2>\n  Slow and steady.\n  <piix-pal pal="shel"></piix-pal>\n</h2>' }
+    hab: `<p class="h-text" id="d-shel" style="font-size:34px">Slow and steady.</p><piix-pal pal="shel" on="#d-shel"></piix-pal>`, code: '<h2>\n  Slow and steady.\n  <piix-pal pal="shel"></piix-pal>\n</h2>' },
+  /* ----- more characters ----- */
+  { id: 'gecko', does: 'climb', accent: 'var(--lime)', lives: 'the whole border of a box, upside-down underneath included', scared: 'being watched (it freezes)', poke: 'sprints the other way round',
+    desc: 'A tiny lizard with sticky feet. Walks along the top of your card, down the side, upside-down along the bottom and back up the other side.',
+    attrs: [['speed', 'walking speed multiplier'], ['at', 'starting point around the border, 0–1']],
+    hab: '<div class="h-card" id="d-gecko"><i></i><i></i><i></i></div><piix-pal pal="gecko" on="#d-gecko"></piix-pal>', code: '<div class="card">\n  …\n  <piix-pal pal="gecko"></piix-pal>\n</div>' },
+  { id: 'mole', does: 'pop', accent: 'var(--coral)', lives: 'underneath any edge, popping up at random spots', scared: 'nothing, which is its downfall', poke: 'bonk! Stars, then back underground. Fires piix:bonk with a count',
+    desc: 'Whack-a-mole for your website. Pops up through an edge, has a look around and ducks. Click it while it is up.',
+    attrs: [['piix:bonk', 'event with detail.count, for keeping score']],
+    hab: '<div class="h-floor" id="d-mole"><i></i><i></i><i></i></div><piix-pal pal="mole" on="#d-mole"></piix-pal>', code: '<section>\n  …\n  <piix-pal pal="mole"></piix-pal>\n</section>' },
+  { id: 'balloon', does: 'float', accent: 'var(--coral)', lives: 'a string tied to the top of an element', scared: 'sharp clicks', poke: 'pops (and thuds), then slowly re-inflates',
+    desc: 'A balloon with a face, tied to your element. Sways on its string, drifts in the breeze of your cursor and the scroll.',
+    attrs: [['length', 'string length in px'], ['at', 'where it is tied, 0–1'], ['silk', 'string colour']],
+    hab: '<div class="h-floor" id="d-balloon"><i></i><i></i><i></i></div><piix-pal pal="balloon" on="#d-balloon" at=".5" length="110"></piix-pal>', code: '<div class="cta">\n  …\n  <piix-pal pal="balloon"></piix-pal>\n</div>' },
+  { id: 'para', does: 'drop', accent: 'var(--sky)', lives: 'the top of your text, after a parachute jump', scared: 'heights, oddly', poke: 'goes back up for another jump',
+    desc: 'A tiny parachutist who waits until your section scrolls into view, then floats down from the top of the screen, lands, folds the chute and waves.',
+    attrs: [['at', 'landing spot, 0–1']],
+    hab: '<p class="h-text" id="d-para" style="font-size:34px">Landing zone</p><piix-pal pal="para" on="#d-para"></piix-pal>', code: '<h2>\n  Landing zone\n  <piix-pal pal="para"></piix-pal>\n</h2>' },
+  { id: 'roomba', does: 'sweep', accent: 'var(--violet)', lives: 'the top of an element, back and forth', scared: 'cursors in its path (it beeps)', poke: 'spins in confusion',
+    desc: 'A small robot vacuum that takes its job very seriously. Glides, bumps the ends, stops and beeps if your cursor is in the way.',
+    attrs: [['speed', 'cleaning speed multiplier']],
+    hab: '<div class="h-floor" id="d-roomba"><i></i><i></i><i></i></div><piix-pal pal="roomba" on="#d-roomba"></piix-pal>', code: '<footer>\n  …\n  <piix-pal pal="roomba"></piix-pal>\n</footer>' },
+  { id: 'kitty', does: 'lounge', accent: 'var(--violet)', lives: 'your text, like it pays the rent', scared: 'nothing. It swats', poke: 'purrs (hearts)',
+    desc: 'A black cat lounging on your element. Swishes its tail, swats at the cursor when it gets close, dozes off when ignored.',
+    attrs: [['at', 'where it lies, 0–1'], ['edge', '"text" or "box"']],
+    hab: '<p class="h-text" id="d-kitty" style="font-size:34px">Nap spot</p><piix-pal pal="kitty" on="#d-kitty"></piix-pal>', code: '<h2>\n  Nap spot\n  <piix-pal pal="kitty"></piix-pal>\n</h2>' },
+
+  /* ----- the toy box (do="toss") ----- */
+  { id: 'ball', kind: 'toy', does: 'toss', accent: 'var(--coral)', lives: 'wherever it lands: headings, paragraphs, buttons, cards', scared: 'nothing', poke: 'a little kick into the air',
+    desc: 'A beach ball. Bouncy, rolly, slightly smug. Rolls a long way. Drag and throw it, or bat it with a fast swipe of the cursor.',
+    attrs: [['land', 'CSS selector for surfaces it can land on'], ['at', 'starting spot, 0–1']],
+    hab: '<p class="h-text" id="d-ball" style="font-size:30px">Throw me</p><piix-pal pal="ball" on="#d-ball"></piix-pal>', code: '<h2>\n  Throw me\n  <piix-pal pal="ball"></piix-pal>\n</h2>' },
+  { id: 'duck', kind: 'toy', does: 'toss', accent: 'var(--sun)', lives: 'wherever it lands: headings, paragraphs, buttons, cards', scared: 'nothing', poke: 'a little kick into the air',
+    desc: 'A rubber duck. Squeaks when it lands. Drag and throw it, or bat it with a fast swipe of the cursor.',
+    attrs: [['land', 'CSS selector for surfaces it can land on'], ['at', 'starting spot, 0–1']],
+    hab: '<p class="h-text" id="d-duck" style="font-size:30px">Throw me</p><piix-pal pal="duck" on="#d-duck"></piix-pal>', code: '<h2>\n  Throw me\n  <piix-pal pal="duck"></piix-pal>\n</h2>' },
+  { id: 'dice', kind: 'toy', does: 'toss', accent: 'var(--sky)', lives: 'wherever it lands: headings, paragraphs, buttons, cards', scared: 'nothing', poke: 'a little kick into the air',
+    desc: 'Lands on a random face, every time. Every throw is a decision. Drag and throw it, or bat it with a fast swipe of the cursor.',
+    attrs: [['land', 'CSS selector for surfaces it can land on'], ['at', 'starting spot, 0–1']],
+    hab: '<p class="h-text" id="d-dice" style="font-size:30px">Throw me</p><piix-pal pal="dice" on="#d-dice"></piix-pal>', code: '<h2>\n  Throw me\n  <piix-pal pal="dice"></piix-pal>\n</h2>' },
+  { id: 'pebble', kind: 'toy', does: 'toss', accent: 'var(--line-2)', lives: 'wherever it lands: headings, paragraphs, buttons, cards', scared: 'nothing', poke: 'a little kick into the air',
+    desc: 'A heavy little rock. Does not bounce. Lands with a thud every other pal hears. Drag and throw it, or bat it with a fast swipe of the cursor.',
+    attrs: [['land', 'CSS selector for surfaces it can land on'], ['at', 'starting spot, 0–1']],
+    hab: '<p class="h-text" id="d-pebble" style="font-size:30px">Throw me</p><piix-pal pal="pebble" on="#d-pebble"></piix-pal>', code: '<h2>\n  Throw me\n  <piix-pal pal="pebble"></piix-pal>\n</h2>' },
+  { id: 'cube', kind: 'toy', does: 'toss', accent: 'var(--mint)', lives: 'wherever it lands: headings, paragraphs, buttons, cards', scared: 'nothing', poke: 'a little kick into the air',
+    desc: 'A jelly cube. Bounces high and wobbles after every landing. Drag and throw it, or bat it with a fast swipe of the cursor.',
+    attrs: [['land', 'CSS selector for surfaces it can land on'], ['at', 'starting spot, 0–1']],
+    hab: '<p class="h-text" id="d-cube" style="font-size:30px">Throw me</p><piix-pal pal="cube" on="#d-cube"></piix-pal>', code: '<h2>\n  Throw me\n  <piix-pal pal="cube"></piix-pal>\n</h2>' },
+  { id: 'can', kind: 'toy', does: 'toss', accent: 'var(--coral)', lives: 'wherever it lands: headings, paragraphs, buttons, cards', scared: 'nothing', poke: 'a little kick into the air',
+    desc: 'A soda can. Rolls off the edge of everything. Drag and throw it, or bat it with a fast swipe of the cursor.',
+    attrs: [['land', 'CSS selector for surfaces it can land on'], ['at', 'starting spot, 0–1']],
+    hab: '<p class="h-text" id="d-can" style="font-size:30px">Throw me</p><piix-pal pal="can" on="#d-can"></piix-pal>', code: '<h2>\n  Throw me\n  <piix-pal pal="can"></piix-pal>\n</h2>' },
+
+  /* ----- groups: one tag, a whole crew ----- */
+  { id: 'ducks', kind: 'group', does: 'parade', accent: 'var(--sun)', lives: 'the top of an element', scared: 'thuds', poke: 'a duckling hops; the mother starts a quack chorus',
+    desc: 'A mother duck and her ducklings. The little ones follow her exact path, so when she turns round they file back past each other.',
+    attrs: [['count', 'number of ducklings (default 4)']],
+    hab: '<div class="h-floor" id="d-ducks"><i></i><i></i><i></i></div><piix-pal pal="ducks" on="#d-ducks"></piix-pal>', code: '<piix-pal pal="ducks" count="4"></piix-pal>' },
+  { id: 'ants', kind: 'group', does: 'march', accent: 'var(--coral)', lives: 'the top edge of an element', scared: 'the cursor (they scatter)', poke: 'they all jump',
+    desc: 'A marching line of ants, some carrying crumbs. Bring the cursor close and the nearby ones scatter, then hurry back into line.',
+    attrs: [['count', 'number of ants (default 7)'], ['speed', 'marching speed']],
+    hab: '<div class="h-floor" id="d-ants"><i></i><i></i><i></i></div><piix-pal pal="ants" on="#d-ants" count="9"></piix-pal>', code: '<piix-pal pal="ants" count="9"></piix-pal>' },
+  { id: 'fish', kind: 'group', does: 'school', accent: 'var(--sky)', lives: 'inside an element, like a tank', scared: 'the cursor (it is a shark)', poke: 'that fish darts off',
+    desc: 'A school of fish that flock inside any box: they stay close, line up, avoid bumping, turn at the glass and flee your cursor.',
+    attrs: [['count', 'number of fish (default 7)']],
+    hab: '<div class="h-tank" id="d-fish"></div><piix-pal pal="fish" on="#d-fish" count="9"></piix-pal>', code: '<div class="tank">\n  <piix-pal pal="fish" count="9"></piix-pal>\n</div>' },
+  { id: 'sparrows', kind: 'group', does: 'wire', accent: 'var(--sun)', lives: 'an edge, like a telephone wire', scared: 'the cursor brushing past', poke: 'the whole row loops the sky and lands back',
+    desc: 'A row of birds on a wire. Run the cursor along the row and they hop up one after another, like a wave.',
+    attrs: [['count', 'number of birds (default 6)']],
+    hab: '<div class="h-wire" id="d-sparrows"></div><piix-pal pal="sparrows" on="#d-sparrows" count="7"></piix-pal>', code: '<hr>\n<piix-pal pal="sparrows" on="hr" count="7"></piix-pal>' },
+  { id: 'choir', kind: 'group', does: 'choir', accent: 'var(--violet)', lives: 'the top of an element, in a row', scared: 'nothing, they are performers', poke: 'that singer takes a solo; again to rejoin',
+    desc: 'A choir who sway and sing in perfect time from a shared score. They glance at the cursor when it is near.',
+    attrs: [['count', 'number of singers (default 4)'], ['bpm', 'tempo (default 96)']],
+    hab: '<div class="h-floor" id="d-choir"><i></i><i></i><i></i></div><piix-pal pal="choir" on="#d-choir"></piix-pal>', code: '<piix-pal pal="choir" count="4" bpm="96"></piix-pal>' },
+  { id: 'fireflies', kind: 'group', does: 'glow', accent: 'var(--sun)', lives: 'the air around an element', scared: 'clicks (they scatter)', poke: 'they burst away and drift back',
+    desc: 'Soft blinking lights drifting around an element. Hover it and they gather round your cursor. Lovely on dark sections.',
+    attrs: [['count', 'number of fireflies (default 9)']],
+    hab: '<div class="h-night" id="d-fireflies"></div><piix-pal pal="fireflies" on="#d-fireflies" count="12"></piix-pal>', code: '<section class="dark">\n  <piix-pal pal="fireflies" count="12"></piix-pal>\n</section>' },
+  { id: 'sheep', kind: 'group', does: 'count', accent: 'var(--mint)', lives: 'the top of an element, with a fence in the middle', scared: 'nothing, they are sleepy', poke: 'hearts',
+    desc: 'Sheep trot along and jump the fence one at a time, forever. The fence keeps count. Made for loading states.',
+    attrs: [['count', 'number of sheep (default 3)'], ['speed', 'trotting speed']],
+    hab: '<div class="h-floor" id="d-sheep"><i></i><i></i><i></i></div><piix-pal pal="sheep" on="#d-sheep"></piix-pal>', code: '<div class="loading">\n  <piix-pal pal="sheep"></piix-pal>\n</div>' },
+  { id: 'bees', kind: 'group', does: 'beeline', accent: 'var(--sun)', lives: 'around their hive element, then after your cursor', scared: 'nothing', poke: 'toggles the chase',
+    desc: 'Worker bees buzzing round their hive. Come close and they follow your cursor in single file, each chasing the bee in front.',
+    attrs: [['count', 'number of bees (default 6)'], ['at', 'where the hive is, 0–1']],
+    hab: '<div class="h-hive" id="d-bees">hive</div><piix-pal pal="bees" on="#d-bees"></piix-pal>', code: '<div class="hive">\n  <piix-pal pal="bees"></piix-pal>\n</div>' }
 ];
+
+const kinds = { pal: PALS.filter(p => !p.kind), toy: PALS.filter(p => p.kind === 'toy'), group: PALS.filter(p => p.kind === 'group') };
 
 /* ---------- layout ---------- */
 const GH = `<svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>`;
@@ -68,13 +155,18 @@ const sidebar = active => {
     <h4>Components</h4>
     ${link('sprites.html', `Sprites <span class="n">${sprites.length}</span>`, 'sprites')}
     ${link('pals.html', `Pals <span class="n">${PALS.length}</span>`, 'pals')}
+    ${link('crowd.html', 'Crowd <span class="n">3</span>', 'crowd')}
     ${link('type.html', 'Pixel type', 'type')}
     <h4>Big sprites</h4>
     ${bigs.map(s => `<a href="sprites.html#s-${s.name}" style="--dot:${s.accent}"><i></i>${title(s.name)}</a>`).join('\n    ')}
     <h4>Sprites</h4>
     ${smalls.map(s => `<a href="sprites.html#s-${s.name}" style="--dot:${s.accent}"><i></i>${title(s.name)}</a>`).join('\n    ')}
     <h4>Pals</h4>
-    ${PALS.map(p => `<a href="pals.html#${p.id}" style="--dot:${p.accent}"><i></i>${title(p.id)}</a>`).join('\n    ')}
+    ${kinds.pal.map(p => `<a href="pals.html#${p.id}" style="--dot:${p.accent}"><i></i>${title(p.id)}</a>`).join('\n    ')}
+    <h4>Toy box</h4>
+    ${kinds.toy.map(p => `<a href="pals.html#${p.id}" style="--dot:${p.accent}"><i></i>${title(p.id)}</a>`).join('\n    ')}
+    <h4>Groups</h4>
+    ${kinds.group.map(p => `<a href="pals.html#${p.id}" style="--dot:${p.accent}"><i></i>${title(p.id)}</a>`).join('\n    ')}
   </aside>`;
 };
 
@@ -144,7 +236,7 @@ const spritesBody = `<header class="doc-head">
   <div class="crumbs"><a href="./">Components</a><span>/</span><span>Sprites</span></div>
   <h1>Sprites</h1>
   <p>${sprites.length} characters that sit inline, like an image: ${bigs.length} big 3D ones and ${smalls.length} small pixel ones. Their eyes follow the cursor, they blink, breathe a pixel, hop when you click them and nap when nobody's around. Pick one, copy the tag, paste it anywhere.</p>
-  <div class="pills"><span class="pill">${sprites.length} sprites</span><span class="pill">pixel · dots · 3D voxel</span><span class="pill">inline, no positioning</span><span class="pill">eyes follow the cursor</span><span class="pill">one tag</span></div>
+  <div class="pills"><span class="pill">${sprites.length} sprites</span><span class="pill">pixel · dots · halftone · dither · ascii · 3D</span><span class="pill">inline, no positioning</span><span class="pill">eyes follow the cursor</span><span class="pill">one tag</span></div>
 </header>
 
 <section class="doc-sec" id="customise" aria-labelledby="customise-h">
@@ -170,6 +262,9 @@ const spritesBody = `<header class="doc-head">
             <button type="button" data-render="" aria-pressed="true">Default</button>
             <button type="button" data-render="pixel" aria-pressed="false">Pixel</button>
             <button type="button" data-render="dots" aria-pressed="false">Dots</button>
+            <button type="button" data-render="halftone" aria-pressed="false">Halftone</button>
+            <button type="button" data-render="dither" aria-pressed="false">Dither</button>
+            <button type="button" data-render="ascii" aria-pressed="false">ASCII</button>
             <button type="button" data-render="voxel" aria-pressed="false">3D voxel</button>
           </div>
         </div>
@@ -220,7 +315,7 @@ ${smalls.map(spriteCard).join('\n')}
     ['name', `which sprite: ${sprites.map(s => `<code>${s.name}</code>`).join(' ')}`, 'mochi'],
     ['size', 'width in CSS px (rounded to whole sprite pixels)', '5 × width'],
     ['scale', 'or set the size of one sprite pixel directly', '5'],
-    ['render', '<code>pixel</code> flat blocks, <code>dots</code> LED dot-matrix, <code>voxel</code> chunky 3D that turns toward the cursor', 'pixel (big: voxel)'],
+    ['render', '<code>pixel</code> flat blocks, <code>dots</code> LED dot-matrix, <code>halftone</code> shaded sub-dots, <code>dither</code> 1-bit grain, <code>ascii</code> characters, <code>voxel</code> chunky 3D that turns toward the cursor', 'pixel (big: voxel)'],
     ['depth', 'voxel extrusion, in sprite pixels', '3 (big: 2)'],
     ['color', 'body colour for big sprites; shade and highlight are derived from it', 'its own'],
     ['eye', 'pupil colour', 'its own'],
@@ -256,13 +351,7 @@ ${smalls.map(spriteCard).join('\n')}
 </section>`;
 
 /* ---------- pals ---------- */
-const palsBody = `<header class="doc-head">
-  <div class="crumbs"><a href="./">Components</a><span>/</span><span>Pals</span></div>
-  <h1>Pals</h1>
-  <p>Pals live <em>on</em> your page. Each one has a job: something it lives on, something that scares it, something that happens when you poke it. Put one inside an element and it figures out the rest. They notice each other, too.</p>
-  <div class="pills"><span class="pill">${PALS.length} pals</span><span class="pill">reads text outlines</span><span class="pill">never blocks clicks</span><span class="pill">reduced-motion aware</span></div>
-</header>
-${PALS.map(p => `
+const palSection = p => `
 <section class="doc-sec" id="${p.id}" aria-labelledby="${p.id}-h" style="--accent:${p.accent}">
   <h2 id="${p.id}-h">${title(p.id)} <span class="pal-no">do="${p.does}"</span></h2>
   <p>${p.desc}</p>
@@ -278,7 +367,21 @@ ${PALS.map(p => `
       ${codeBox(p.code)}
     </div>
   </div>
-</section>`).join('\n')}`;
+</section>`;
+const family = (id, name, blurb, list) => `
+<section class="doc-sec family" id="${id}" aria-labelledby="${id}-h">
+  <h2 id="${id}-h" class="fam-h">${name} <span class="pill">${list.length}</span></h2>
+  <p>${blurb}</p>
+</section>${list.map(palSection).join('\n')}`;
+const palsBody = `<header class="doc-head">
+  <div class="crumbs"><a href="./">Components</a><span>/</span><span>Pals</span></div>
+  <h1>Pals</h1>
+  <p>Pals live <em>on</em> your page. Each one has a job: something it lives on, something that scares it, something that happens when you poke it. Put one inside an element and it figures out the rest. They notice each other, too.</p>
+  <div class="pills"><span class="pill">${kinds.pal.length} characters</span><span class="pill">${kinds.toy.length} toys</span><span class="pill">${kinds.group.length} groups</span><span class="pill">never blocks clicks</span></div>
+</header>
+${family('characters', 'Characters', 'One pal, one job. Crawlers, peekers, perchers, sweepers and loungers.', kinds.pal)}
+${family('toys', 'Toy box', 'Things to throw around the page. They land on real elements, roll off edges onto whatever is below, and can be batted with a fast swipe. Try throwing one onto another pal.', kinds.toy)}
+${family('groups', 'Groups', 'One tag, a whole crew: families, flocks, lines and choirs that move and react together.', kinds.group)}`;
 
 /* ---------- type ---------- */
 const typeBody = `<header class="doc-head">
@@ -349,20 +452,69 @@ const typeBody = `<header class="doc-head">
   <p style="margin-top:18px">Methods: <code>replay()</code> rains it in again. Pals use <code>piixSurface(x)</code> to find the letter tops and <code>piixImpact(x, y)</code> to send a ripple when they land.</p>
 </section>`;
 
+/* ---------- crowd ---------- */
+const crowdBody = `<header class="doc-head">
+  <div class="crumbs"><a href="./">Components</a><span>/</span><span>Crowd</span></div>
+  <h1>Crowd</h1>
+  <p><code>&lt;piix-crowd&gt;</code> is a stage full of tiny agents, hundreds of them on one canvas. They wander and high-five, flock after your cursor, or walk into place to spell a word. Click the floor to drop one in; grab one and throw it.</p>
+  <div class="pills"><span class="pill">3 modes</span><span class="pill">up to 600 agents</span><span class="pill">one canvas, 60fps</span><span class="pill">drag + throw</span></div>
+</header>
+<section class="doc-sec" id="customise" aria-labelledby="cr-h">
+  <h2 id="cr-h">Play</h2>
+  <p>Switch modes, change the crowd size, type a word for the formation.</p>
+  <div class="crowd-box">
+    <piix-crowd id="cr-demo" mode="crowd" count="90" text="HELLO" height="440"></piix-crowd>
+    <div class="c-controls crowd-ctl">
+      <div class="ctl wide"><span>Mode</span>
+        <div class="seg" id="cr-mode" role="group" aria-label="Mode">
+          <button type="button" data-v="crowd" aria-pressed="true">Crowd</button>
+          <button type="button" data-v="swarm" aria-pressed="false">Swarm</button>
+          <button type="button" data-v="form" aria-pressed="false">Formation</button>
+        </div>
+      </div>
+      <label class="ctl"><span>Count</span><input type="range" id="cr-count" min="10" max="400" step="10" value="90"><output id="cr-count-o">90</output></label>
+      <label class="ctl wide"><span>Word</span><input type="text" id="cr-text" value="HELLO" maxlength="10" spellcheck="false"></label>
+    </div>
+    <pre class="c-code" id="cr-code"></pre>
+  </div>
+</section>
+<section class="doc-sec" id="modes" aria-labelledby="crm-h">
+  <h2 id="crm-h">Modes</h2>
+  <dl class="kv">
+    <dt>crowd</dt><dd>They wander between little waypoints, stop to wave, and high-five when two meet. The cursor parts the crowd.</dd>
+    <dt>swarm</dt><dd>They flock across the floor after your cursor, keeping a little personal space.</dd>
+    <dt>form</dt><dd>They walk into position to spell <code>text</code>. Click the floor to scatter them; they regroup.</dd>
+  </dl>
+</section>
+<section class="doc-sec" id="attributes" aria-labelledby="cra-h">
+  <h2 id="cra-h">Attributes</h2>
+  ${table('<piix-crowd>', [
+    ['mode', '<code>crowd</code> <code>swarm</code> <code>form</code>', 'crowd'],
+    ['count', 'how many agents (up to 600)', '70 (form: 160)'],
+    ['text', 'the word to spell in form mode', 'HELLO'],
+    ['height', 'stage height in px (or size it with CSS)', '420'],
+    ['scale', 'size of one agent pixel', '3']
+  ])}
+  <p style="margin-top:18px">Method: <code>scatter()</code> knocks everyone flying.</p>
+</section>`;
+
 /* ---------- overview ---------- */
 const pick = n => sprites.slice(0, n).map(s => `<piix-sprite name="${s.name}" scale="4"></piix-sprite>`).join('');
 const indexBody = `<header class="doc-head">
   <div class="crumbs"><span>Components</span></div>
   <h1>Components</h1>
-  <p>Everything in Piixpal is a plain web component. One script tag, then copy any tag from these pages into your HTML, React, Vue, Svelte, Astro, Webflow or Framer project.</p>
+  <p>${sprites.length + PALS.length + 4} components, every one a plain web component. One script tag, then copy any tag from these pages into your HTML, React, Vue, Svelte, Astro, Webflow or Framer project.</p>
 </header>
 <section class="doc-sec" aria-label="Component families">
   <div class="ov">
     <a href="sprites.html" style="--accent:var(--lime)"><div class="ov-art">${sprites.slice(0, 3).map(s => `<piix-sprite name="${s.name}" scale="4" look="mouse"></piix-sprite>`).join('')}</div><h3>Sprites <span>${sprites.length}</span></h3><p>Small inline characters. Eyes follow the cursor, they blink, breathe, hop and nap. Paste anywhere, like an image.</p></a>
     <a href="pals.html" style="--accent:var(--coral)"><div class="ov-art" id="ov-pals"><span style="font:780 30px var(--f-sans);letter-spacing:-.03em" id="ov-word">live here</span></div><h3>Pals <span>${PALS.length}</span></h3><p>Characters that live on your page: they crawl on headings, bounce on footers, peek over cards, perch on buttons.</p></a>
+    <a href="crowd.html" style="--accent:var(--sky)"><div class="ov-art"><piix-crowd mode="crowd" count="26" height="140" scale="2" style="width:100%"></piix-crowd></div><h3>Crowd <span>3</span></h3><p>Hundreds of tiny agents on one stage. They wander and high-five, swarm your cursor, or spell a word.</p></a>
+    <a href="pals.html#toys" style="--accent:var(--sun)"><div class="ov-art"><span style="font:780 30px var(--f-sans);letter-spacing:-.03em" id="ov-toys">toy box</span></div><h3>Toys + groups <span>${kinds.toy.length + kinds.group.length}</span></h3><p>Throwable toys that land on your page, and whole crews in one tag: ducks, ants, fish, a choir, fireflies.</p></a>
     <a href="type.html" style="--accent:var(--violet)"><div class="ov-art"><div style="width:80%"><piix-type text="abc" rows="14" cell="6" shade="#c6f432" fit intro="none"></piix-type></div></div><h3>Pixel type <span>1</span></h3><p>Any font as chunky extruded blocks that rain in, lift around the cursor and ripple. Pals can walk on it.</p></a>
   </div>
   <piix-pal pal="bitbug" on="#ov-word" scale="3"></piix-pal>
+  <piix-pal pal="dice" on="#ov-toys"></piix-pal>
 </section>
 <section class="doc-sec" aria-labelledby="ins-h">
   <h2 id="ins-h">Install once</h2>
@@ -374,6 +526,7 @@ const pages = [
   ['index.html', { key: 'index', title: 'Components', desc: 'Every Piixpal component: sprites, pals and pixel type.', body: indexBody }],
   ['sprites.html', { key: 'sprites', title: 'Sprites', desc: `${sprites.length} inline pixel sprites with cursor-following eyes. Copy a tag, paste it anywhere.`, body: spritesBody }],
   ['pals.html', { key: 'pals', title: 'Pals', desc: 'Pixel characters that live on your page: crawl, bounce, peek, perch, hang, follow, creep.', body: palsBody }],
+  ['crowd.html', { key: 'crowd', title: 'Crowd', desc: 'A stage of hundreds of tiny agents: crowd, swarm and formation modes.', body: crowdBody }],
   ['type.html', { key: 'type', title: 'Pixel type', desc: 'Chunky extruded pixel lettering that pals can walk on.', body: typeBody, fonts: '<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@800&family=Instrument+Serif&family=Pacifico&display=swap" rel="stylesheet">\n' }]
 ];
 for (const [file, p] of pages) writeFileSync(join(out, file), page(p));
