@@ -3197,8 +3197,9 @@ canvas.held{cursor:grabbing}
  *   name         which sprite (see Piixpal.figures)
  *   size         width in px (snapped to whole sprite pixels)   default: 5 × sprite width
  *   scale        or give the pixel size directly
- *   render       pixel | dots | voxel                           default: the sprite's own (pixel)
- *                  dots  = LED dot-matrix, voxel = extruded 3D blocks that turn toward you
+ *   render       pixel | dots | halftone | dither | ascii | voxel   default: the sprite's own (pixel)
+ *                  dots = LED dot-matrix, halftone = shaded sub-dots, dither = 1-bit grain,
+ *                  ascii = characters, voxel = extruded 3D blocks that turn toward you
  *   depth        voxel extrusion, in sprite pixels                default: 3
  *   color        body colour (sprites that support it); shade and light are derived
  *   eye          pupil colour
@@ -3278,7 +3279,7 @@ class PiixSpriteElement extends HTMLElement {
     this._frames = bakeFigure(spec, this._pal);
     const size = +this.getAttribute('size');
     const s = this._s = +this.getAttribute('scale') || (size ? Math.max(1, Math.round(size / spec.w)) : (spec.scale || 5));
-    const mode = this._mode = ['dots', 'voxel'].includes(this.getAttribute('render')) ? this.getAttribute('render') : (spec.render || 'pixel');
+    const mode = this._mode = RENDERS.includes(this.getAttribute('render')) ? this.getAttribute('render') : (spec.render || 'pixel');
     const W = spec.w, H = spec.h + HEAD;
     const depth = this._depth = mode === 'voxel' ? Math.max(1, +this.getAttribute('depth') || spec.depth || 3) : 0;
     const pad = this._pad = depth * s;
@@ -3297,7 +3298,7 @@ canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;margi
     /* everything is composed at 1x here, then presented as pixels, dots or voxels */
     const buf = this._buf = document.createElement('canvas');
     buf.width = W; buf.height = H;
-    this._g = buf.getContext('2d', { willReadFrequently: mode === 'dots' });
+    this._g = buf.getContext('2d', { willReadFrequently: mode !== 'pixel' && mode !== 'voxel' });
     if (mode === 'voxel') { this._shade = document.createElement('canvas'); this._shade.width = W; this._shade.height = H; }
     this._key = '';
     this._ox = 0; this._oy = 0; this._tilt = 0; this._rx = 0; this._ry = 0;
@@ -3413,6 +3414,11 @@ canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;margi
     o.setTransform(d, 0, 0, d, 0, 0);
     o.clearRect(0, 0, W * s + pad * 2, H * s + pad * 2);
     o.imageSmoothingEnabled = false;
+    if (TEXTURES[this._mode]) {
+      const data = this._g.getImageData(0, 0, W, H).data;
+      TEXTURES[this._mode](o, data, W, H, s);
+      return;
+    }
     if (this._mode === 'dots') {
       /* one round dot per pixel, batched by colour */
       const data = this._g.getImageData(0, 0, W, H).data, groups = new Map(), rad = s * .44;
@@ -3444,6 +3450,55 @@ canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;margi
 }
 Piixpal.figures = FIGURES;
 Piixpal.figure = defineFigure;
+
+/* ---------- texture renderers: each turns the 1x frame into something with grain ---------- */
+const RENDERS = ['pixel', 'dots', 'voxel', 'halftone', 'dither', 'ascii'];
+const lum = (r, g, b) => (r * .299 + g * .587 + b * .114) / 255;
+const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map(v => (v + .5) / 16);
+const ASCII = ' .:-=+*#%@';
+const TEXTURES = {
+  /* halftone: each pixel is four sub-dots, bigger where the colour is darker */
+  halftone(o, d, W, H, s) {
+    const half = s / 2;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const i = (y * W + x) * 4; if (d[i + 3] < 40) continue;
+      const L = lum(d[i], d[i + 1], d[i + 2]);
+      const rad = half * (.32 + (1 - L) * .5);
+      o.fillStyle = `rgb(${d[i]},${d[i + 1]},${d[i + 2]})`; o.beginPath();
+      for (let k = 0; k < 4; k++) {
+        const cx = x * s + (k & 1) * half + half / 2, cy = y * s + (k >> 1) * half + half / 2;
+        o.moveTo(cx + rad, cy); o.arc(cx, cy, rad, 0, 6.2832);
+      }
+      o.fill();
+    }
+  },
+  /* dither: 1-bit grain. Each pixel becomes a 4x4 patch thresholded by a Bayer matrix,
+   * so light areas thin out into speckle and dark ones stay solid */
+  dither(o, d, W, H, s) {
+    const sub = s / 4;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const i = (y * W + x) * 4; if (d[i + 3] < 40) continue;
+      const L = lum(d[i], d[i + 1], d[i + 2]), dark = 1.12 - L * .95;
+      o.fillStyle = `rgb(${Math.round(d[i] * .82)},${Math.round(d[i + 1] * .82)},${Math.round(d[i + 2] * .82)})`;
+      for (let k = 0; k < 16; k++) {
+        const bx = (x * 4 + (k & 3)) & 3, by = (y * 4 + (k >> 2)) & 3;
+        if (BAYER[by * 4 + bx] < dark) o.fillRect(x * s + (k & 3) * sub, y * s + (k >> 2) * sub, Math.ceil(sub), Math.ceil(sub));
+      }
+    }
+  },
+  /* ascii: one character per pixel, denser glyphs for darker colours */
+  ascii(o, d, W, H, s) {
+    o.font = `800 ${Math.round(s * 1.5)}px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace`;
+    o.textAlign = 'center'; o.textBaseline = 'middle';
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const i = (y * W + x) * 4; if (d[i + 3] < 40) continue;
+      const L = lum(d[i], d[i + 1], d[i + 2]);
+      const ch = ASCII[clamp(Math.round((1 - L) * (ASCII.length - 1)) + 4, 2, ASCII.length - 1)];
+      o.fillStyle = `rgb(${d[i]},${d[i + 1]},${d[i + 2]})`;
+      o.fillText(ch, x * s + s / 2, y * s + s / 2);
+    }
+  }
+};
 
 /* defaults for the big, bold sprites: one recolourable body, chunky 3D blocks, block eyes */
 const BIG = { kind: 'big', scale: 8, render: 'voxel', depth: 2, tilt: true, shy: true, glint: '#ffffff', lid: 'b', recolor: { b: 0, d: -.24, B: .42 } };
