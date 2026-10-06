@@ -19,13 +19,14 @@ const dir = d => existsSync(join(src, d))
   : [];
 const read = f => `/* ---- ${f.split(sep).join('/')} ---- */\n` + readFileSync(join(src, f), 'utf8').trim();
 
-const CORE = ['core.js', 'icons.js', 'text.js', 'drag.js', ...dir('elements'), 'boot.js'].filter(f => existsSync(join(src, f)));
-const COMPONENTS = [...dir('behaviors'), ...dir('pals'), ...dir('sprites')];
+/* listed on every call, so a long-running dev server picks up new files */
+const CORE_LIST = () => ['core.js', 'icons.js', 'text.js', 'drag.js', ...dir('elements'), 'boot.js'].filter(f => existsSync(join(src, f)));
+const COMPONENT_LIST = () => [...dir('behaviors'), ...dir('pals'), ...dir('sprites')];
 
 /* everything the core declares at the top level becomes part of the shared toolkit */
 const coreNames = () => {
   const names = new Set();
-  for (const f of CORE) for (const m of readFileSync(join(src, f), 'utf8').matchAll(/^(?:const|let|var|class|function)\s+([A-Za-z_$][\w$]*)/gm)) names.add(m[1]);
+  for (const f of CORE_LIST()) for (const m of readFileSync(join(src, f), 'utf8').matchAll(/^(?:const|let|var|class|function)\s+([A-Za-z_$][\w$]*)/gm)) names.add(m[1]);
   return [...names];
 };
 
@@ -34,7 +35,7 @@ const header = version => `/*! Piixpal v${version} | tiny pixel creatures that l
  */`;
 
 const coreFn = names => `function piixCore() {
-${CORE.map(read).join('\n\n')}
+${CORE_LIST().map(read).join('\n\n')}
 
 Piixpal._k = { ${names.join(', ')} };
 return Piixpal._k;
@@ -50,12 +51,12 @@ const VERSION = '${pkg.version}';
 const K = (window.Piixpal && window.Piixpal._k) || (${coreFn(names)})();
 const { ${names.join(', ')} } = K;
 
-${COMPONENTS.map(read).join('\n\n')}
+${COMPONENT_LIST().map(read).join('\n\n')}
 
 K.start(document.currentScript);
 })();
 `;
-  return { code, files: CORE.length + COMPONENTS.length, names };
+  return { code, files: CORE_LIST().length + COMPONENT_LIST().length, names };
 }
 
 /* just the engine */
