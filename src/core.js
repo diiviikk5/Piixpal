@@ -277,3 +277,16 @@ const art = {
   swap(rows, map) { return rows.map(r => [...r].map(c => map[c] || c).join('')); }
 };
 Piixpal.art = art;
+
+/* ---------- testing hook: run the simulation forward without waiting for frames ---------- */
+Piixpal.advance = (seconds = 1, fps = 60) => {
+  const dt = 1 / fps;
+  let t = lastT || now();
+  for (let i = 0, n = Math.round(seconds * fps); i < n; i++) {
+    t += dt * 1000;
+    scroll.v = lerp(scroll.v, (scrollY - scroll.y) / dt, .25); scroll.y = scrollY;
+    layerOrigin();
+    subs.forEach(fn => fn(dt, t));
+  }
+  lastT = 0;
+};
