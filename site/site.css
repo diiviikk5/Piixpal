@@ -257,3 +257,9 @@ code,kbd,pre{font-family:var(--f-mono)}
 .foot-bottom a{text-decoration:none;opacity:.85}
 .foot-bottom a:hover{opacity:1;text-decoration:underline;text-underline-offset:3px}
 .foot-small{opacity:.75;font:400 12px/1 var(--f-pix);text-transform:uppercase}
+
+/* release-a-pal buttons */
+.spawn{display:inline-flex;gap:6px;margin-left:6px;vertical-align:middle}
+.spawn button{font:400 11.5px/1 var(--f-pix);text-transform:uppercase;padding:7px 9px;border:2px solid var(--ink);border-radius:8px;background:var(--card);color:var(--ink);cursor:pointer;box-shadow:0 2px 0 var(--ink);transition:transform .18s var(--spring),box-shadow .18s var(--spring),background-color .2s}
+.spawn button:hover{background:var(--lime);transform:translateY(-1px);box-shadow:0 3px 0 var(--ink)}
+.spawn button:active{transform:translateY(2px);box-shadow:0 0 0 var(--ink)}
