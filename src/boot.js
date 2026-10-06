@@ -40,7 +40,7 @@ class PiixPalElement extends HTMLElement {
 
     const actor = this._actor = new Actor(spec, { scale: +this.getAttribute('scale') || 0, hue: this.getAttribute('hue'), fixed: this.hasAttribute('fixed-scale') });
     actor.host = this;
-    const ctl = this._ctl = make(actor, targets, this) || {};
+    const ctl = this._ctl = actor.ctl = make(actor, targets, this) || {};
     if (!ctl.grab) actor.node.classList.add('nograb');
 
     this._pd = e => {

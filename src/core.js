@@ -141,6 +141,17 @@ const baked = spec => {
   return (spec._baked = out);
 };
 
+/* ---------- every live pal, so they can notice each other ---------- */
+const ACTORS = new Set();
+/* tell nearby pals something happened: their behaviour's hear(type, from, dist) runs */
+const shout = (from, type, radius) => {
+  ACTORS.forEach(o => {
+    if (o === from || !o.ctl || !o.ctl.hear) return;
+    const d = Math.hypot(o.x - from.x, (o.y - o.h / 2) - (from.y - from.h / 2));
+    if (d < radius) o.ctl.hear(type, from, d);
+  });
+};
+
 /* ---------- Actor: one sprite on the layer ---------- */
 class Actor {
   constructor(spec, opts = {}) {
@@ -172,6 +183,7 @@ class Actor {
     n.append(this.bub, cv);
     root.appendChild(n);
     this.play(spec.start || Object.keys(spec.frames)[0]);
+    ACTORS.add(this);
   }
   get w() { return this.spec.w * this.s; }
   get h() { return this.spec.h * this.s; }
@@ -232,7 +244,7 @@ class Actor {
     const cx = this.x + this.ox, cy = this.y - this.h / 2 + this.oy;
     return Math.abs(ptr.x - cx) < this.w / 2 + m && Math.abs(ptr.y - cy) < this.h / 2 + m;
   }
-  destroy() { clearTimeout(this._bt); this.node.remove(); }
+  destroy() { clearTimeout(this._bt); this.node.remove(); ACTORS.delete(this); }
 }
 
 /* ---------- behaviours: (actor, target, host) => { tick(dt,t), poke(e)?, grab(e)?, destroy()? } ---------- */
