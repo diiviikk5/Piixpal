@@ -9,7 +9,8 @@ defineBehavior('bounce', (a, [el], host) => {
   let sq = 0, sqv = 0;                      /* squash spring: + is tall, - is flat */
   let dizzy = 0, combo = 0;
 
-  const floor = r => r.t;
+  /* pixel lettering has a real outline; over its gaps you fall to the bottom */
+  const floor = r => typeof el.piixSurface === 'function' ? (el.piixSurface(a.x) ?? r.b) : r.t;
   const jump = (power = 1, toward = null) => {
     vy = -rnd(560, 760) * Math.sqrt(S) * power * energy;
     vx = toward != null ? clamp((toward - a.x) * 1.6, -380 * S, 380 * S) : rnd(-110, 110) * S;
