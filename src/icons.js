@@ -14,7 +14,11 @@ const ICONS = {
   vein: ['.r...r.', 'rr...rr', '.......', 'rr...rr', '.r...r.'],
   hi: ['k..k.kk', 'k..k...', 'kkkk.kk', 'k..k.kk', 'k..k.kk'],
   eep: ['kkk.kkk.kkk.', 'k...k...k.k.', 'kk..kk..kkk.', 'k...k...k...', 'kkk.kkk.k...'],
-  leaf: ['....gg', '..gggg', '.gggg.', 'gggg..', 'g.....']
+  leaf: ['....gg', '..gggg', '.gggg.', 'gggg..', 'g.....'],
+  copy: ['.kkkk..', '.k..kkk', '.k..k.k', '.k..k.k', '.kkkk.k', '...k..k', '...kkkk'],
+  check: ['......g', '.....gg', 'g...gg.', 'gg.gg..', '.ggg...', '..g....'],
+  x: ['r...r', '.r.r.', '..r..', '.r.r.', 'r...r'],
+  up: ['..k..', '.kkk.', 'kkkkk', '..k..', '..k..']
 };
 /* 3x5 digits; say('#12') composes a number bubble */
 const DIGITS = ['kkk|k.k|k.k|k.k|kkk', '.k.|kk.|.k.|.k.|kkk', 'kkk|..k|kkk|k..|kkk', 'kkk|..k|.kk|..k|kkk', 'k.k|k.k|kkk|..k|..k',
