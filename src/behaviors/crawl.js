@@ -54,7 +54,7 @@ defineBehavior('crawl', (a, [el], host) => {
   const speed = 30 * S * (+host.getAttribute('speed') || 1);
   const step = 2.5 * a.s;                 /* bigger than this and it hops instead */
   const reach = 34 * a.s;                 /* how far it will hop across a gap */
-  let box = null, state = 'walk', timer = rnd(2, 4), hop = null, placed = false;
+  let box = null, state = 'walk', timer = rnd(2, 4), hop = null, placed = false, fleeX = null, metAt = 0;
   const cache = {};
 
   const lane = () => {
@@ -145,6 +145,14 @@ defineBehavior('crawl', (a, [el], host) => {
         case 'walk':
           a.play('walk', { fps: 10 });
           move(speed);
+          /* two bugs bump into each other: a little moment, then both turn back */
+          if (now() - metAt > 4000) for (const o of ACTORS) {
+            if (o === a || o.spec !== a.spec || Math.abs(o.y - a.y) > a.h || Math.abs(o.x - a.x) > a.w * .85 || (o.x - a.x) * a.face < 0) continue;
+            metAt = now(); a.say('heart', 900); go('idle', .9, 'idle');
+            setTimeout(() => turn(), 700);
+            if (o.ctl && o.ctl.meet) o.ctl.meet(a);
+            break;
+          }
           if (timer <= 0) {
             const r = Math.random();
             if (r < .4) go('sniff', rnd(1, 1.8), 'sniff');
@@ -153,7 +161,7 @@ defineBehavior('crawl', (a, [el], host) => {
           }
           break;
         case 'alarm':
-          if (timer <= 0) { a.face = ptr.x > a.x ? -1 : 1; go('scurry', rnd(.9, 1.4)); }
+          if (timer <= 0) { a.face = (fleeX ?? ptr.x) > a.x ? -1 : 1; fleeX = null; go('scurry', rnd(.9, 1.4)); }
           break;
         case 'scurry':
           a.play('walk', { fps: 20 });
@@ -167,6 +175,15 @@ defineBehavior('crawl', (a, [el], host) => {
         default: /* idle, look, sniff */
           if (timer <= 0) { if (state === 'look' && chance(.4)) turn(); go('walk', rnd(3, 7), 'walk'); }
       }
+    },
+    meet(other) {
+      if (now() - metAt < 1500 || hop || state === 'flip') return;
+      metAt = now(); a.face = other.x > a.x ? 1 : -1;
+      a.say('heart', 900); go('idle', .9, 'idle'); setTimeout(() => turn(), 700);
+    },
+    hear(type, from) {
+      if (type !== 'thud' || hop || state === 'flip' || state === 'alarm' || state === 'scurry') return;
+      fleeX = from.x; go('alarm', .25, 'alarm'); a.say('!', 600);
     },
     poke() {
       if (state === 'flip' || hop) return;
