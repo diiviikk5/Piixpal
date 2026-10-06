@@ -325,3 +325,8 @@ code,kbd,pre{font-family:var(--f-mono)}
 .h-tank{position:absolute;inset:26px;border:2px solid var(--ink);border-radius:12px;background:linear-gradient(#bfe9ff,#7fd3ff)}
 .h-night{position:absolute;inset:22px;border-radius:12px;background:#17121f}
 .h-wire{position:absolute;left:0;right:0;top:120px;height:2px;background:var(--ink)}
+
+/* ---------- crowd stage on the home page ---------- */
+.crowd-stage{border:2px solid var(--ink);border-radius:var(--r-lg);overflow:hidden;box-shadow:0 4px 0 var(--ink);background:var(--code);color:#fff}
+.crowd-stage piix-crowd{background:radial-gradient(rgba(255,255,255,.12) 1px,transparent 1.4px) 0 0/18px 18px,var(--code)}
+.crowd-stage .bs-bar{border-top:1.5px solid rgba(255,255,255,.14)}

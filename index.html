@@ -46,7 +46,7 @@
 <section class="hero" aria-labelledby="lede">
   <div class="hero-bg" aria-hidden="true"></div>
   <div class="wrap">
-    <a class="chip rv" href="#install"><span class="blip" aria-hidden="true"></span> v0.1 · free &amp; open source <span class="arr" aria-hidden="true">→</span></a>
+    <a class="chip rv" href="#install"><span class="blip" aria-hidden="true"></span> v0.2 · 62 components · free &amp; open source <span class="arr" aria-hidden="true">→</span></a>
 
     <div class="wordmark rv">
       <piix-type id="mark" text="piixpal" rows="22" cell="15" depth="1" gap=".08" shade="#c6f432" fit></piix-type>
@@ -56,7 +56,7 @@
     <div class="hero-grid">
       <div class="hero-copy">
         <h1 class="lede rv" id="lede">Tiny pixel creatures that <em>live</em> on your website.<piix-pal pal="moss" at="1"></piix-pal></h1>
-        <p class="sub rv">They crawl on your headings, nap on your paragraphs, perch on your buttons and bounce on your footer. One script tag, zero dependencies, free forever.</p>
+        <p class="sub rv">They crawl on your headings, nap on your paragraphs, perch on your buttons and bounce on your footer. Throw them around. Line them up. Fill a stage with hundreds. One script tag, zero dependencies, free forever.</p>
         <div class="ctas rv">
           <button class="btn btn-lime perch" id="copy-tag" type="button">
             <svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M5 1h8v2h2v12H5v-2H3V1h2zm0 2v8h8V3H5zm-1 10h9v-1H4z" fill-rule="evenodd"/></svg>
@@ -65,7 +65,7 @@
           <a class="btn btn-ghost perch" href="#pals">Meet the pals <span aria-hidden="true">↓</span></a>
         </div>
         <p class="hint rv"><kbd>poke</kbd> them. <kbd>drag</kbd> the jelly. Hover the buttons and see who flies off.
-          <span class="spawn"><button type="button" data-spawn="bitbug">+ bug</button><button type="button" data-spawn="boing">+ jelly</button><button type="button" data-spawn="clear" hidden>clear</button></span></p>
+          <span class="spawn"><button type="button" data-spawn="bitbug">+ bug</button><button type="button" data-spawn="boing">+ jelly</button><button type="button" data-spawn="toy">+ toy</button><button type="button" data-spawn="clear" hidden>clear</button></span></p>
       </div>
 
       <div class="window rv" id="hero-window">
@@ -190,6 +190,27 @@
       <div class="shelf-item"><piix-sprite name="pudding" scale="5"></piix-sprite><a href="components/sprites.html#s-pudding">pudding</a></div>
     </div>
     <div class="more rv"><code class="inline-tag">&lt;piix-sprite name="mochi"&gt;&lt;/piix-sprite&gt;</code><a class="btn btn-lime" href="components/sprites.html">Browse all sprites <span aria-hidden="true">→</span></a></div>
+  </div>
+</section>
+
+<section class="sec" id="crowd" aria-labelledby="crowd-h">
+  <div class="wrap">
+    <header class="sec-head">
+      <div><span class="eyebrow rv" style="--accent:var(--sky)">Crowd · hundreds on one stage</span><h2 class="rv" id="crowd-h">Or bring the whole crowd.</h2></div>
+      <p class="rv">One tag, a stage full of tiny agents. They wander and high-five, swarm your cursor, or walk into place to spell a word. Click the floor to drop one in. Grab one and throw it.</p>
+    </header>
+    <div class="crowd-stage rv">
+      <piix-crowd id="home-crowd" mode="form" text="PIIXPAL" count="240" height="380"></piix-crowd>
+      <div class="bs-bar">
+        <span class="bs-label">&lt;piix-crowd mode="…"&gt;</span>
+        <div class="seg bs-modes crowd-modes" role="group" aria-label="Crowd mode">
+          <button type="button" data-m="form" aria-pressed="true">Formation</button>
+          <button type="button" data-m="crowd" aria-pressed="false">Crowd</button>
+          <button type="button" data-m="swarm" aria-pressed="false">Swarm</button>
+        </div>
+      </div>
+    </div>
+    <div class="more rv"><a class="btn" href="components/pals.html#groups">Groups: ducks, ants, fish, a choir… <span aria-hidden="true">→</span></a><a class="btn btn-lime" href="components/crowd.html">Play with the crowd <span aria-hidden="true">→</span></a></div>
   </div>
 </section>
 
