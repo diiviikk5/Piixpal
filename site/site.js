@@ -45,3 +45,13 @@
     io.observe(el);
   });
 })();
+
+/* ---------- copy buttons on snippets ---------- */
+document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', async () => {
+  const text = b.getAttribute('data-copy');
+  try { await navigator.clipboard.writeText(text); } catch (_) { /* clipboard blocked: nothing to do */ }
+  const was = b.textContent;
+  b.textContent = 'Copied'; b.classList.add('copied');
+  clearTimeout(b._t);
+  b._t = setTimeout(() => { b.textContent = was; b.classList.remove('copied'); }, 1400);
+}));

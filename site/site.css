@@ -125,3 +125,57 @@ code,kbd,pre{font-family:var(--f-mono)}
 .ticker-track span:nth-child(3n+2){color:var(--lime)}
 @keyframes tick{to{transform:translateX(calc(-50% - var(--gap) / 2))}}
 @media (prefers-reduced-motion:reduce){.ticker-track{animation:none}}
+
+/* ---------- section heads ---------- */
+.sec{padding:clamp(80px,11vw,140px) 0 0}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font:400 13px/1 var(--f-pix);text-transform:uppercase;letter-spacing:.06em;color:var(--ink-2)}
+.eyebrow::before{content:"";width:8px;height:8px;background:var(--accent,var(--coral));box-shadow:0 0 0 2px var(--ink)}
+.sec-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.8fr);gap:32px;align-items:end;margin-bottom:44px}
+.sec-head h2{font:760 clamp(36px,5vw,68px)/.98 var(--f-sans);letter-spacing:-.045em;margin:16px 0 0;text-wrap:balance}
+.sec-head p{margin:0;color:var(--ink-2);font-size:18px;max-width:46ch;text-wrap:pretty}
+@media (max-width:860px){.sec-head{grid-template-columns:minmax(0,1fr)}}
+
+/* ---------- the pals gallery ---------- */
+.pals{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}
+@media (max-width:1040px){.pals{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:680px){.pals{grid-template-columns:minmax(0,1fr)}}
+.pal{--accent:var(--lime);position:relative;display:flex;flex-direction:column;background:var(--card);border:2px solid var(--ink);border-radius:var(--r-lg);
+  box-shadow:0 4px 0 0 var(--ink);transition:transform .35s var(--spring),box-shadow .35s var(--spring)}
+.pal:hover{transform:translateY(-4px);box-shadow:0 8px 0 0 var(--ink)}
+.habitat{position:relative;height:230px;margin:10px 10px 0;border-radius:14px;overflow:hidden;
+  background:
+    radial-gradient(color-mix(in oklab,var(--ink) 14%,transparent) 1px,transparent 1.3px) 0 0/16px 16px,
+    color-mix(in oklab,var(--accent) 22%,var(--paper));
+  border:1.5px solid color-mix(in oklab,var(--ink) 18%,transparent)}
+.pal-body{padding:20px 22px 22px;display:flex;flex-direction:column;gap:12px;flex:1}
+.pal-top{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.pal h3{margin:0;font:760 30px/1 var(--f-sans);letter-spacing:-.04em}
+.pal-no{font:400 12px/1 var(--f-pix);text-transform:uppercase;color:var(--muted)}
+.pal p{margin:0;color:var(--ink-2);font-size:15.5px;line-height:1.5;text-wrap:pretty}
+.traits{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 0;padding:0;list-style:none}
+.traits li{font:550 12.5px/1 var(--f-sans);padding:6px 9px;border-radius:7px;background:color-mix(in oklab,var(--accent) 30%,var(--paper));border:1.5px solid color-mix(in oklab,var(--ink) 14%,transparent)}
+.snip{margin-top:auto;display:flex;align-items:center;gap:8px;padding:6px 6px 6px 14px;border-radius:11px;background:var(--ink);color:#e8e3f3}
+.snip code{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px}
+.snip code b{color:var(--lime);font-weight:600}
+.copy{flex:none;font:600 12.5px/1 var(--f-sans);padding:8px 11px;border-radius:8px;border:0;background:#2e2739;color:#e8e3f3;cursor:pointer;transition:background-color .2s,color .2s}
+.copy:hover,.copy.copied{background:var(--lime);color:var(--ink)}
+
+/* habitat props: tiny fake UI for each pal to live on */
+.h-text{position:absolute;left:0;right:0;bottom:64px;text-align:center;font:760 46px/1 var(--f-sans);letter-spacing:-.04em}
+.h-line{position:absolute;left:24px;right:24px;bottom:56px;margin:0;font:500 17px/1.4 var(--f-sans);color:var(--ink-2)}
+.h-floor{position:absolute;left:18px;right:18px;bottom:18px;height:44px;border-radius:10px;background:var(--ink);display:flex;align-items:center;gap:12px;padding:0 14px}
+.h-floor i{height:6px;border-radius:3px;background:#3a3247;width:40px}
+.h-floor i:first-child{width:70px;background:var(--coral)}
+.h-card{position:absolute;left:50%;bottom:22px;width:68%;height:104px;transform:translateX(-50%);background:var(--card);border:2px solid var(--ink);border-radius:12px;padding:14px;display:grid;gap:8px;align-content:start}
+.h-card i{display:block;height:8px;border-radius:4px;background:var(--paper-3)}
+.h-card i:first-child{width:50%;background:var(--ink)}
+.h-card i:nth-child(3){width:70%}
+.h-nav{position:absolute;left:0;right:0;top:0;height:46px;background:var(--ink);display:flex;align-items:center;gap:10px;padding:0 16px}
+.h-nav i{width:34px;height:6px;border-radius:3px;background:#3a3247}
+.h-nav i:first-child{width:18px;height:18px;border-radius:4px;background:var(--lime);margin-right:auto}
+.h-btns{position:absolute;left:0;right:0;bottom:40px;display:flex;justify-content:center;gap:22px}
+.h-btn{font:650 14px/1 var(--f-sans);padding:12px 16px;border:2px solid var(--ink);border-radius:10px;background:var(--card);box-shadow:0 3px 0 var(--ink);cursor:pointer;transition:transform .2s var(--spring),box-shadow .2s var(--spring)}
+.h-btn:hover{transform:translateY(-2px);box-shadow:0 5px 0 var(--ink)}
+.h-btn.lime{background:var(--lime)}
+.h-tip{position:absolute;right:12px;top:10px;font:400 11px/1 var(--f-pix);text-transform:uppercase;color:color-mix(in oklab,var(--ink) 55%,transparent)}
+.habitat:has(.h-nav) .h-tip{top:auto;bottom:10px}
