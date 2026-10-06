@@ -5,7 +5,10 @@
   "main": "piixpal.js",
   "files": [
     "piixpal.js",
-    "piixpal.min.js"
+    "piixpal.min.js",
+    "dist",
+    "wrappers",
+    "types"
   ],
   "scripts": {
     "build": "node scripts/build.mjs",
@@ -30,5 +33,39 @@
   "homepage": "https://github.com/diiviikk5/Piixpal#readme",
   "devDependencies": {
     "esbuild": "^0.25.12"
+  },
+  "module": "piixpal.js",
+  "unpkg": "piixpal.min.js",
+  "jsdelivr": "piixpal.min.js",
+  "types": "types/piixpal.d.ts",
+  "exports": {
+    ".": {
+      "types": "./types/piixpal.d.ts",
+      "default": "./piixpal.js"
+    },
+    "./min": "./piixpal.min.js",
+    "./core": "./dist/core.min.js",
+    "./c/*": "./dist/c/*.min.js",
+    "./react": "./wrappers/react.jsx",
+    "./vue": "./wrappers/vue.js",
+    "./svelte": "./wrappers/Piixpal.svelte",
+    "./load": "./wrappers/load.js"
+  },
+  "sideEffects": [
+    "piixpal.js",
+    "piixpal.min.js",
+    "dist/**"
+  ],
+  "peerDependencies": {
+    "react": ">=17",
+    "vue": ">=3"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "vue": {
+      "optional": true
+    }
   }
 }
