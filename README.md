@@ -5,7 +5,7 @@
 **Tiny pixel creatures that live on your website.**
 
 They crawl on your headings, nap on your paragraphs, perch on your buttons and bounce on your footer.
-62 components: 14 pals, 6 throwable toys, 8 groups, 30 sprites, a crowd stage and pixel type.
+95 components: 42 pals (characters, interactions, toys and groups), 49 sprites (39 small, 10 big 3D… and counting), a crowd stage and pixel type.
 One script tag. Zero dependencies. Free and open source (MIT).
 
 </div>
@@ -20,6 +20,26 @@ One script tag. Zero dependencies. Free and open source (MIT).
 ```
 
 That's it. The bug finds the outline of your letters and starts walking.
+
+## Install: pick whatever suits your site
+
+No download, no build step, no account.
+
+| Way | Snippet |
+| --- | --- |
+| **Everything, one tag** (~45 KB gzipped) | `<script src="https://cdn.jsdelivr.net/gh/diiviikk5/Piixpal@main/piixpal.min.js"></script>` |
+| **Just one component** (1–4 KB, the shared 16 KB engine loads itself once) | `<script src="https://cdn.jsdelivr.net/gh/diiviikk5/Piixpal@main/dist/c/kitty.min.js"></script>` |
+| **No markup at all** (Webflow, Framer, WordPress, Shopify custom-code boxes) | `<script src="…/piixpal.min.js" data-pals="bitbug@h1, boing@footer, pip@.btn"></script>` |
+| **JavaScript** | `Piixpal.add("kitty", "h1")` |
+| **React / Next** | `import { PiixPal } from "piixpal/react"` → `<PiixPal pal="bitbug" />` (or copy `wrappers/react.jsx`) |
+| **Vue 3** | `app.use(Piixpal)` from `piixpal/vue`, then `<piix-pal pal="bitbug" />` |
+| **Svelte** | `<Piixpal />` from `piixpal/svelte`, then the tags |
+| **Self-host** | download `piixpal.min.js` or anything in `dist/` |
+
+`data-pals` format: `name@css-selector`, comma separated, optional `?attr=value` (e.g. `moss@p?at=.9`).
+The docs site has a **Builder** that writes this line for you, and a **bookmarklet** that drops pals onto any
+website you're looking at. TypeScript types live in `types/piixpal.d.ts`. The npm package is prepared
+(`package.json` exports for the core, single components and wrappers) but not published yet.
 
 ---
 
@@ -69,6 +89,26 @@ sets what counts as a surface.
 | `sheep` | `count` | jump the fence one by one; the fence keeps count |
 | `bees` | `beeline` | follow your cursor in single file |
 
+### New ways to play
+
+Pals that react to what people actually do on your site:
+
+| Pal | Does | |
+| --- | --- | --- |
+| **Peeper** | `guard` | sits on a form field: eyes follow the caret, covers them for passwords, cheers or sweats on validation |
+| **Scrolly** | `progress` | a reading-progress bar with a runner who celebrates at the end of the page |
+| **Echo** | `mimic` | a copycat cursor: replays your path and clicks half a second late |
+| **Snip** | `select` | a highlighter that hops to your text selection and shows a clipboard when you copy |
+| **Beep** | `captcha` | guards an "I'm not a robot" checkbox; panics and flees when you tick it |
+| **Router** | `signal` | Wi-Fi bars that measure how close your cursor is |
+| **Termi** | `type` | a tiny terminal that types out `lines="a|b|c"` |
+| **Frog** | `snap` | tongue snaps at your cursor like it's a fly |
+| **Penguin** | `slide` | waddles, then belly-slides along an element |
+| **Rocket** | `launch` | click: countdown, lift-off with smoke, retro-rocket landing |
+
+Plus **Hiss** (a snake, `crawl`), **Pinch** (a crab that walks sideways, `crawl`), **Shibe** (a shiba, `lounge`)
+and **Capy** (a capybara with a yuzu on its head, `mind`).
+
 Pals notice each other, too. A hard landing from Boing makes Moss grumble, Lurk duck, Pip take off
 and Bitbug run. Two Bitbugs that meet share a little heart and turn around.
 
@@ -83,8 +123,8 @@ Sprites are simpler: they sit inline like an image, wherever you paste them.
 
 Their eyes follow the cursor, they blink, breathe a pixel, hop when clicked and nap when ignored.
 
-- **20 small sprites:** mochi, toast, robo, cloud, ufo, egg, loaf, onigiri, cactus, planet, candle, pudding, coffee, boba, cookie, cherries, donut, avocado, sushi, star
-- **10 big sprites** (ghost-scale, recolourable with `color`): gloop, hops, tofu, inky, mumu, spud, fluff, flick, whale, bolt
+- **30 small sprites:** mochi, toast, robo, cloud, ufo, egg, loaf, onigiri, cactus, planet, candle, pudding, coffee, boba, cookie, cherries, donut, avocado, sushi, star, prompty, floppy, inbox, modem, heart, token, alien, wizard, dragon, battery
+- **19 big 3D sprites** (recolourable with `color`): gloop, hops, tofu, inky, mumu, spud, fluff, flick, whale, bolt, gpu, server, brain, crt, keycap, llama, elephant, astronaut, unicorn
 
 Every sprite can render three ways with `render`:
 
@@ -235,6 +275,12 @@ npm run docs    # regenerates components/*.html
 - `src/sprites/*.js`: the sprites (`big-*` are the big 3D ones)
 - `src/boot.js`: `<piix-pal>`
 - `lab/`: sprite lab and a playground page
+
+## Originals only
+
+Every character here is drawn from scratch. Themes nod to tech, AI and internet culture (a GPU, a server rack, a chat
+bubble that is always thinking, a startup unicorn, a captcha robot), but none copy a company's logo or mascot or any
+copyrighted character, so they're safe to use anywhere.
 
 ## License
 
