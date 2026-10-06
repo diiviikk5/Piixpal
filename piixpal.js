@@ -342,6 +342,13 @@ Object.assign(art, {
   }
 });
 
+/* wrap a painted shape in a 1px outline (empty pixels touching the shape become `ink`) */
+art.outline = (rows, ink = 'k') => rows.map((r, y) => [...r].map((c, x) => {
+  if (c !== '.') return c;
+  const at = (xx, yy) => ((rows[yy] || '')[xx] || '.') !== '.';
+  return at(x + 1, y) || at(x - 1, y) || at(x, y + 1) || at(x, y - 1) ? ink : '.';
+}).join(''));
+
 /* ---- icons.js ---- */
 /* Tiny glyphs for speech bubbles. Drawn, not typed: no fonts are loaded. */
 const ICON_PAL = { k: '#1b1226', r: '#ff4d6d', b: '#3fc8ff', y: '#ffc93f', g: '#7bd63a' };
@@ -3732,6 +3739,54 @@ const CELL_SHAPES = {
   diamond: (g, x, y, s) => { g.moveTo(x + s / 2, y); g.lineTo(x + s, y + s / 2); g.lineTo(x + s / 2, y + s); g.lineTo(x, y + s / 2); g.closePath(); }
 };
 
+/* ---- sprites/avocado.js ---- */
+/* AVOCADO: half an avocado, proudly showing off its pit. Ripe for exactly one day. */
+(() => {
+  const body = art.outline(art.paint(13, 16, (x, y) => {
+    const top = y < 7 ? 1 - (7 - y) * .1 : 1;                 /* a pear shape: narrower on top */
+    if (!art.ellipse(x, y, 6.5, 8.5, 5.8 * top, 7.2)) return null;
+    if (art.ellipse(x, y, 6.5, 10.5, 2.5, 2.5)) return x < 6 && y < 10 ? 'S' : 's';
+    if (art.ellipse(x, y, 6.5, 8.8, 4.6 * top, 6.1)) return 'a';
+    return 'g';
+  }));
+  defineFigure('avocado', {
+    w: 13, h: 16,
+    tag: 'Half an avocado, proudly showing off its pit. Ripe for exactly one day.',
+    palette: { k: '#17121f', g: '#3f7a2a', a: '#d8f08a', s: '#9a5a2e', S: '#c98a4e', w: '#ffffff' },
+    frames: [art.compose(body, [3, 5, ['ww']], [3, 6, ['ww']], [8, 5, ['ww']], [8, 6, ['ww']])],
+    eyes: [{ x: 3, y: 5, w: 2, h: 2 }, { x: 8, y: 5, w: 2, h: 2 }],
+    lid: 'a'
+  });
+})();
+
+/* ---- sprites/big-bolt.js ---- */
+/* BOLT (big): a chunky robot whose face is a little screen. Its eyes glow. */
+(() => {
+  const frame = light => art.volume(art.paint(20, 22, (x, y) => {
+    if (y <= 2 && x >= 9 && x <= 10) return y === 0 || (y === 1 && light) ? 'a' : 'm';
+    if (y === 3 && x >= 8 && x <= 11) return 'm';
+    if ((x <= 1 || x >= 18) && y >= 9 && y <= 12) return 'm';            /* ear bolts */
+    if (art.rrect(x, y, 2, 4, 17, 19, 3)) {
+      if (art.rrect(x, y, 4, 7, 15, 15, 2)) return 's';                   /* the screen */
+      return 'b';
+    }
+    if (y >= 20 && ((x >= 5 && x <= 7) || (x >= 12 && x <= 14))) return 'm';
+    return null;
+  }), 'b', 'd', 'B');
+  const face = rows => art.put(rows, 7, 13, ['gggggg'.slice(0, 6)]);
+  defineFigure('bolt', {
+    ...BIG, w: 20, h: 22, fps: 1.6,
+    tag: 'A chunky robot whose face is a little screen. Its eyes glow.',
+    palette: { b: '#b8c4e0', d: '#8590b0', B: '#eef2ff', m: '#5c5470', s: '#17121f', a: '#ff4d6d', g: '#c6f432', k: '#17121f' },
+    frames: [face(frame(true)), face(frame(false))],
+    eyes: [{ x: 5, y: 8, w: 4, h: 4 }, { x: 11, y: 8, w: 4, h: 4 }],
+    pupil: { w: 2, h: 3 },
+    pupilKey: 'g',
+    glint: '#ffffff',
+    lid: 's'
+  });
+})();
+
 /* ---- sprites/big-flick.js ---- */
 /* FLICK (big): a little flame with big feelings. Never, ever stands still. */
 (() => {
@@ -3922,6 +3977,65 @@ const CELL_SHAPES = {
   });
 })();
 
+/* ---- sprites/big-whale.js ---- */
+/* WHALE (big): a friendly whale who surfaces now and then for a little spout. */
+(() => {
+  const body = art.volume(art.paint(28, 18, (x, y) => {
+    if (y < 4) return null;
+    if (art.ellipse(x, y, 12, 12, 11.6, 6.4)) return y > 13 && x < 18 ? 'B' : 'b';
+    /* the tail rises off to the right and splits into a fluke */
+    if (x >= 20 && x <= 24 && y >= 8 && y <= 13 && art.ellipse(x, y, 22, 12, 3.5, 3.4)) return 'b';
+    if (art.ellipse(x, y, 25, 6.5, 2.4, 2.6) || art.ellipse(x, y, 25.5, 9.5, 2.2, 1.8)) return 'b';
+    return null;
+  }), 'b', 'd', 'L');
+  const mouth = rows => art.put(rows, 3, 13, ['.mmmmmm']);
+  const spouts = [
+    ['................', '................', '................', '................'],
+    ['................', '........w.......', '.......ww.......', '........w.......'],
+    ['......w...w.....', '.......w.w......', '........w.......', '........w.......'],
+    ['.....w.....w....', '......w...w.....', '.......w.w......', '........w.......']
+  ];
+  defineFigure('whale', {
+    ...BIG, w: 28, h: 18, fps: 2, scale: 7,
+    tag: 'A friendly whale who surfaces now and then for a little spout.',
+    palette: { b: '#58c8ff', d: '#2f97d6', L: '#bfeaff', B: '#e8f8ff', w: '#bfeaff', k: '#17121f', m: '#17121f' },
+    frames: [0, 0, 0, 1, 2, 3, 2].map(i => art.compose(mouth(body), [0, 0, spouts[i]])),
+    eyes: [{ x: 5, y: 9, w: 3, h: 3 }],
+    pupil: { w: 2, h: 2 },
+    recolor: { b: 0, d: -.24, L: .45 }
+  });
+})();
+
+/* ---- sprites/boba.js ---- */
+/* BOBA: a cup of milk tea with a straw and a lot of pearls. Chewy personality. */
+(() => {
+  const top = [
+    '........kk..',
+    '.......kk...',
+    '......kk....',
+    '..kkkkkkkk..',
+    '.klllllllk..'.replace('k..', 'lk.'),
+    'kkkkkkkkkkkk',
+    '.kttttttttk.',
+    '.ktwwttwwtk.',
+    '.ktwwttwwtk.',
+    '.ktttkktttk.',
+    '.kttttttttk.'
+  ];
+  const pearls = [
+    ['..kbtbbtbk..', '..kbbtbbbk..', '..kbbbbbbk..', '...kkkkkk...'],
+    ['..kbbtbtbk..', '..kbtbbbbk..', '..kbbbbbbk..', '...kkkkkk...']
+  ];
+  defineFigure('boba', {
+    w: 12, h: 15, fps: 1.5,
+    tag: 'A cup of milk tea with a straw and a lot of pearls. Chewy personality.',
+    palette: { k: '#17121f', l: '#fff7ec', t: '#e8c39e', b: '#4a2a1a', w: '#ffffff' },
+    frames: pearls.map(p => top.concat(p)),
+    eyes: [{ x: 3, y: 7, w: 2, h: 2 }, { x: 7, y: 7, w: 2, h: 2 }],
+    lid: 't'
+  });
+})();
+
 /* ---- sprites/cactus.js ---- */
 /* CACTUS: a potted cactus who blooms when it's in a good mood. Do not hug. */
 (() => {
@@ -3982,6 +4096,27 @@ const CELL_SHAPES = {
   });
 })();
 
+/* ---- sprites/cherries.js ---- */
+/* CHERRIES: two cherries on one stem. Inseparable. Four eyes, one opinion. */
+(() => {
+  const body = art.outline(art.paint(15, 14, (x, y) => {
+    if (art.ellipse(x, y, 4, 9.5, 3.4, 3.4) || art.ellipse(x, y, 11, 9.5, 3.4, 3.4)) return (x === 3 || x === 10) && y === 8 ? 'R' : 'r';
+    /* two stems meeting at the top, plus a leaf */
+    if ((y >= 1 && y <= 5) && (x === Math.round(7 - (y - 1) * .7) || x === Math.round(7 + (y - 1) * .9))) return 'g';
+    if (y >= 0 && y <= 1 && x >= 8 && x <= 10) return 'G';
+    return null;
+  }));
+  defineFigure('cherries', {
+    w: 15, h: 14, fps: 1,
+    tag: 'Two cherries on one stem. Inseparable. Four eyes, one opinion.',
+    palette: { k: '#17121f', r: '#ff3d5a', R: '#ffb3c0', g: '#4a7a2a', G: '#7bd63a', w: '#ffffff' },
+    frames: [body],
+    /* dot eyes, two per cherry; they look up and down */
+    eyes: [{ x: 2, y: 8, w: 1, h: 2 }, { x: 5, y: 8, w: 1, h: 2 }, { x: 9, y: 8, w: 1, h: 2 }, { x: 12, y: 8, w: 1, h: 2 }],
+    lid: 'r'
+  });
+})();
+
 /* ---- sprites/cloud.js ---- */
 /* CLOUD: a little cloud with a light, cheerful drizzle. */
 (() => {
@@ -4008,6 +4143,77 @@ const CELL_SHAPES = {
     ],
     eyes: [{ x: 4, y: 4, w: 2, h: 2 }, { x: 10, y: 4, w: 2, h: 2 }],
     lid: 'c'
+  });
+})();
+
+/* ---- sprites/coffee.js ---- */
+/* COFFEE: a mug of coffee, steaming gently, quietly judging your sleep schedule. */
+(() => {
+  const mug = [
+    '.kkkkkkkkk....',
+    'kcCccccccck...',
+    'kmmmmmmmmmkkkk',
+    'kmwwmmmwwmkmmk',
+    'kmwwmmmwwmkmmk',
+    'kmpmmmmmpmkkkk',
+    'kmmmmkkmmmk...',
+    'kmmmmmmmmmk...',
+    '.kmmmmmmmk....',
+    '..kkkkkkk.....'
+  ];
+  const steam = [
+    ['...s....s.....', '....s..s......', '...s....s.....', '....s..s......'],
+    ['....s..s......', '...s....s.....', '....s..s......', '...s....s.....'],
+    ['..............', '....s...s.....', '...s...s......', '....s...s.....']
+  ];
+  defineFigure('coffee', {
+    w: 14, h: 14, fps: 3,
+    tag: 'A mug of coffee, steaming gently, quietly judging your sleep schedule.',
+    palette: { k: '#17121f', m: '#ff6b4a', c: '#6b3b1f', C: '#9a5a2e', w: '#ffffff', p: '#ffb3a0', s: '#c9c3d6' },
+    frames: steam.map(st => st.concat(mug)),
+    eyes: [{ x: 2, y: 7, w: 2, h: 2 }, { x: 7, y: 7, w: 2, h: 2 }],
+    lid: 'm'
+  });
+})();
+
+/* ---- sprites/cookie.js ---- */
+/* COOKIE: a chocolate chip cookie with one bite missing. It knows who did it. */
+(() => {
+  const chips = [[3, 3], [8, 4], [2, 8], [6, 9], [9, 8], [5, 2]];
+  const body = art.outline(art.paint(13, 13, (x, y) => {
+    if (!art.ellipse(x, y, 6.5, 6.5, 5.6, 5.6)) return null;
+    if (art.ellipse(x, y, 11.5, 1.5, 3.2, 3.2)) return null;      /* the bite */
+    if (chips.some(([cx, cy]) => cx === x && cy === y)) return 'c';
+    return (x + y) % 7 === 0 ? 'C' : 'b';
+  }));
+  defineFigure('cookie', {
+    w: 13, h: 13,
+    tag: 'A chocolate chip cookie with one bite missing. It knows who did it.',
+    palette: { k: '#17121f', b: '#e8a65a', C: '#f6c487', c: '#4a2a1a', w: '#ffffff', m: '#17121f' },
+    frames: [art.compose(body, [3, 5, ['ww']], [3, 6, ['ww']], [7, 5, ['ww']], [7, 6, ['ww']], [5, 8, ['mm']])],
+    eyes: [{ x: 3, y: 5, w: 2, h: 2 }, { x: 7, y: 5, w: 2, h: 2 }],
+    lid: 'b'
+  });
+})();
+
+/* ---- sprites/donut.js ---- */
+/* DONUT: a strawberry donut with sprinkles. Has a hole in its life and is fine with it. */
+(() => {
+  const sprinkles = { '3,2': 'y', '6,1': 'b', '10,2': 'g', '12,4': 'y', '2,5': 'b', '11,6': 'w' };
+  const body = art.outline(art.paint(15, 11, (x, y) => {
+    if (!art.ellipse(x, y, 7.5, 5.5, 7, 5)) return null;
+    if (art.ellipse(x, y, 7.5, 5, 1.9, 1.3)) return null;
+    const frosted = y < 6 || (y === 6 && (x * 3) % 5 < 2);
+    if (frosted) return sprinkles[x + ',' + y] || (x < 6 && y < 3 ? 'P' : 'p');
+    return y > 8 ? 'D' : 'd';
+  }));
+  defineFigure('donut', {
+    w: 15, h: 11,
+    tag: 'A strawberry donut with sprinkles. Has a hole in its life and is fine with it.',
+    palette: { k: '#17121f', p: '#ff9cc2', P: '#ffd1e3', d: '#e8a65a', D: '#c98a4e', y: '#ffd23f', b: '#58c8ff', g: '#7bd63a', w: '#ffffff' },
+    frames: [art.compose(body, [3, 4, ['ww']], [3, 5, ['ww']], [10, 4, ['ww']], [10, 5, ['ww']])],
+    eyes: [{ x: 3, y: 4, w: 2, h: 2 }, { x: 10, y: 4, w: 2, h: 2 }],
+    lid: 'p'
   });
 })();
 
@@ -4190,6 +4396,54 @@ defineFigure('onigiri', {
     eyes: [{ x: 3, y: 5, w: 3, h: 2 }, { x: 8, y: 5, w: 3, h: 2 }],
     pupil: { w: 2, h: 2 },
     lid: 'm'
+  });
+})();
+
+/* ---- sprites/star.js ---- */
+/* STAR: a little star who twinkles on purpose. Main-character energy. */
+(() => {
+  /* a five-pointed star, by point-in-polygon */
+  const pts = Array.from({ length: 10 }, (_, i) => {
+    const r = i % 2 ? 3.1 : 7.2, a = -Math.PI / 2 + i * Math.PI / 5;
+    return [7.5 + Math.cos(a) * r, 8 + Math.sin(a) * r];
+  });
+  const inside = (x, y) => {
+    let c = false;
+    for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+      const [xi, yi] = pts[i], [xj, yj] = pts[j];
+      if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) c = !c;
+    }
+    return c;
+  };
+  const body = art.outline(art.paint(15, 16, (x, y) => inside(x + .5, y + .5) ? (y < 7 && x < 7 ? 'Y' : 'y') : null));
+  const glints = [[], [[1, 1], [13, 3]], [[13, 1], [1, 12], [14, 12]], [[0, 5]]];
+  defineFigure('star', {
+    w: 15, h: 16, fps: 3,
+    tag: 'A little star who twinkles on purpose. Main-character energy.',
+    palette: { k: '#17121f', y: '#ffd23f', Y: '#fff2a8', w: '#ffffff', p: '#ff9a5a' },
+    frames: glints.map(g => g.reduce((rows, [x, y]) => art.put(rows, x, y, ['w']), art.compose(body, [5, 7, ['ww.ww'.replace('.', 'y')]], [5, 8, ['wwyww']], [6, 10, ['pkp'.replace(/p/g, 'y')]]))),
+    eyes: [{ x: 5, y: 7, w: 2, h: 2 }, { x: 8, y: 7, w: 2, h: 2 }],
+    lid: 'y'
+  });
+})();
+
+/* ---- sprites/sushi.js ---- */
+/* SUSHI: a piece of salmon nigiri wearing its fish like a very good blanket. */
+(() => {
+  const body = art.outline(art.paint(17, 11, (x, y) => {
+    /* salmon draped over the top, stripes running across */
+    if (art.rrect(x, y, 1, 1, 15, 4, 2)) return (x + y) % 4 === 0 ? 'O' : 'o';
+    if (art.rrect(x, y, 2, 3, 14, 9, 2)) return 'w';
+    return null;
+  }));
+  defineFigure('sushi', {
+    w: 17, h: 11,
+    tag: 'A piece of salmon nigiri wearing its fish like a very good blanket.',
+    palette: { k: '#17121f', o: '#ff8a5a', O: '#ffd2b8', w: '#ffffff', p: '#ffb3c0' },
+    frames: [art.compose(body, [3, 8, ['p']], [13, 8, ['p']], [8, 8, ['kk']])],
+    eyes: [{ x: 4, y: 5, w: 3, h: 2 }, { x: 10, y: 5, w: 3, h: 2 }],
+    pupil: { w: 2, h: 2 },
+    lid: 'w'
   });
 })();
 
