@@ -118,3 +118,32 @@
     targets.forEach(t => io.observe(t));
   }
 })();
+
+/* ---------- crowd customiser ---------- */
+(() => {
+  const cr = document.getElementById('cr-demo');
+  if (!cr) return;
+  const code = document.getElementById('cr-code');
+  const st = { mode: 'crowd', count: 90, text: 'HELLO' };
+  const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const render = () => {
+    cr.setAttribute('mode', st.mode); cr.setAttribute('count', st.count); cr.setAttribute('text', st.text || 'HI');
+    document.getElementById('cr-text').disabled = st.mode !== 'form';
+    const tag = `<piix-crowd mode="${st.mode}" count="${st.count}"${st.mode === 'form' ? ` text="${st.text}"` : ''}></piix-crowd>`;
+    code.innerHTML = '<button class="copy" type="button">Copy</button>' + esc(tag);
+    code.querySelector('.copy').onclick = async e => {
+      try { await navigator.clipboard.writeText(tag); } catch (_) { /* clipboard blocked */ }
+      e.target.textContent = 'Copied'; setTimeout(() => { e.target.textContent = 'Copy'; }, 1200);
+    };
+  };
+  document.getElementById('cr-mode').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    e.currentTarget.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b));
+    st.mode = b.dataset.v;
+    if (st.mode === 'form' && st.count < 150) { st.count = 180; document.getElementById('cr-count').value = 180; document.getElementById('cr-count-o').value = 180; }
+    render();
+  });
+  document.getElementById('cr-count').addEventListener('input', e => { st.count = +e.target.value; document.getElementById('cr-count-o').value = st.count; render(); });
+  document.getElementById('cr-text').addEventListener('input', e => { st.text = e.target.value.toUpperCase(); render(); });
+  render();
+})();
