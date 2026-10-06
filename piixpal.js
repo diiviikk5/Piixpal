@@ -240,7 +240,7 @@ class Actor {
   }
   /* pixel speech bubble with an icon from ICONS */
   say(icon, ms = 1200) {
-    const ic = ICONS[icon];
+    const ic = ICONS[icon] || (typeof icon === 'string' && icon[0] === '#' && numberIcon(icon));
     clearTimeout(this._bt);
     if (!ic) { this.bub.classList.remove('on'); return; }
     const s = Math.max(2, Math.round(this.s * .75));
@@ -361,6 +361,16 @@ const ICONS = {
   eep: ['kkk.kkk.kkk.', 'k...k...k.k.', 'kk..kk..kkk.', 'k...k...k...', 'kkk.kkk.k...'],
   leaf: ['....gg', '..gggg', '.gggg.', 'gggg..', 'g.....']
 };
+/* 3x5 digits; say('#12') composes a number bubble */
+const DIGITS = ['kkk|k.k|k.k|k.k|kkk', '.k.|kk.|.k.|.k.|kkk', 'kkk|..k|kkk|k..|kkk', 'kkk|..k|.kk|..k|kkk', 'k.k|k.k|kkk|..k|..k',
+  'kkk|k..|kkk|..k|kkk', 'kkk|k..|kkk|k.k|kkk', 'kkk|..k|.k.|.k.|.k.', 'kkk|k.k|kkk|k.k|kkk', 'kkk|k.k|kkk|..k|kkk'].map(d => d.split('|'));
+const numberIcon = name => {
+  if (!ICONS[name] && /^#\d+$/.test(name)) {
+    const ds = name.slice(1).split('').map(Number);
+    ICONS[name] = [0, 1, 2, 3, 4].map(y => ds.map(d => DIGITS[d][y]).join('.'));
+  }
+  return ICONS[name];
+};
 const iconCache = {};
 const iconPal = Object.fromEntries(Object.entries(ICON_PAL).map(([k, v]) => [k, hexRGBA(v)]));
 const bakeIcon = name => {
@@ -408,6 +418,59 @@ const drag = (actor, e, { move, end }) => {
   cv.addEventListener('pointerup', up);
   cv.addEventListener('pointercancel', up);
 };
+
+/* ---- behaviors/beeline.js ---- */
+/* beeline: a little line of worker bees buzzing round their element. Come close and
+ * they follow your cursor in single file, each one chasing the bee in front. Stop
+ * moving and they head home and circle the hive.
+ *   count="6"   number of bees */
+defineBehavior('beeline', (a, [el], host) => {
+  const S = a.s / 3;
+  const n = clamp(+host.getAttribute('count') || 6, 2, 30);
+  const at = host.getAttribute('at') != null ? clamp(+host.getAttribute('at'), 0, 1) : .5;
+  const bees = [a, ...Array.from({ length: n - 1 }, () => recruit(a, 'bees'))];
+  const st = bees.map(() => ({ x: null, y: 0, vx: 0, vy: 0 }));
+  let chasing = false, idleSince = now();
+
+  return {
+    crew: bees.slice(1),
+    awake: () => true,
+    tick(dt, t) {
+      const r = rectOf(el);
+      const hx = r.l + r.w * at, hy = r.t - 26 * S;
+      if (st[0].x == null) st.forEach((s, i) => { s.x = hx + i * 8; s.y = hy; });
+      if (now() - ptr.last < 120) idleSince = now();
+      const idle = now() - idleSince;
+      if (!chasing && ptr.seen && idle < 300 && (ptrDist(hx, hy) < 260 * S || ptrDist(st[0].x, st[0].y) < 160 * S)) chasing = true;
+      if (chasing && idle > 3000) chasing = false;
+
+      bees.forEach((b, i) => {
+        const s = st[i];
+        let gx, gy, k;
+        if (reduced()) { gx = hx + (i - n / 2) * 12 * S; gy = hy; s.x = gx; s.y = gy; }
+        else {
+          if (i === 0) {
+            gx = chasing ? ptr.x - 24 * S : hx + Math.cos(t / 500) * 30 * S;
+            gy = chasing ? ptr.y - 10 * S : hy + Math.sin(t / 350) * 10 * S;
+            k = chasing ? 7 : 3;
+          } else {
+            /* follow the bee in front, a few pixels back */
+            const p = st[i - 1];
+            gx = p.x - Math.sign(p.vx || 1) * 14 * S; gy = p.y + Math.sin(t / 120 + i) * 4 * S; k = 9;
+            if (!chasing) { gx = hx + Math.cos(t / 500 + i * (6.28 / n)) * 34 * S; gy = hy + Math.sin(t / 400 + i * (6.28 / n)) * 14 * S; k = 3; }
+          }
+          s.vx = lerp(s.vx, (gx - s.x) * k, 1 - Math.exp(-8 * dt));
+          s.vy = lerp(s.vy, (gy - s.y) * k, 1 - Math.exp(-8 * dt));
+          s.x += s.vx * dt; s.y += s.vy * dt;
+        }
+        b.x = s.x; b.y = s.y;
+        if (Math.abs(s.vx) > 8) b.face = s.vx > 0 ? 1 : -1;
+        b.play('fly');
+      });
+    },
+    poke(e, who) { (who || a).say('heart', 600); chasing = !chasing; idleSince = now(); }
+  };
+});
 
 /* ---- behaviors/bounce.js ---- */
 /* bounce: hop happily along the top of an element. Leaps at the cursor if it hovers
@@ -509,6 +572,46 @@ defineBehavior('bounce', (a, [el], host) => {
   };
 });
 
+/* ---- behaviors/choir.js ---- */
+/* choir: a row of singers on an element who sway and sing in perfect time.
+ * They look at the cursor when it's near. Click one for a solo; click it again and
+ * everyone joins back in.
+ *   count="4"   number of singers   bpm="96"   tempo */
+defineBehavior('choir', (a, [el], host) => {
+  const S = a.s / 3;
+  const n = clamp(+host.getAttribute('count') || 4, 1, 10);
+  const bpm = +host.getAttribute('bpm') || 96;
+  const singers = [a, ...Array.from({ length: n - 1 }, (_, i) => recruit(a, 'choir', { hue: (i + 1) * 70 }))];
+  /* a little score: which singers open their mouths on which beat */
+  const score = Array.from({ length: 16 }, () => singers.map(() => chance(.65)));
+  let solo = -1, lastBeat = -1;
+
+  return {
+    crew: singers.slice(1),
+    tick(dt, t) {
+      const r = rectOf(el);
+      const beatLen = 60000 / bpm, beat = Math.floor(t / beatLen), phase = (t % beatLen) / beatLen;
+      const near = ptr.seen && ptr.x > r.l - 80 && ptr.x < r.r + 80 && Math.abs(ptr.y - r.t) < 120 * S;
+      singers.forEach((s, i) => {
+        s.x = r.l + r.w * ((i + .5) / n); s.y = r.t;
+        if (reduced()) { s.play('hush'); return; }
+        s.rot = Math.sin((beat + phase) * Math.PI) * 6;
+        s.oy = -Math.abs(Math.sin(phase * Math.PI)) * 3 * S;
+        const singing = solo >= 0 ? i === solo : score[beat % 16][i];
+        if (near && !singing) { s.play('look'); s.face = ptr.x < s.x ? -1 : 1; }
+        else { s.face = 1; s.play(singing ? 'sing' : 'hush'); }
+        if (beat !== lastBeat && singing && chance(solo >= 0 ? .6 : .12)) s.say('note', beatLen * .9);
+      });
+      lastBeat = beat;
+    },
+    poke(e, who) {
+      const i = Math.max(0, singers.indexOf(who || a));
+      solo = solo === i ? -1 : i;
+      singers.forEach(s => s.hush());
+    }
+  };
+});
+
 /* ---- behaviors/climb.js ---- */
 /* climb: walks the full perimeter of an element: top, right side, underneath, left side.
  * Freezes and wags its tail when the cursor comes close. Poke it to make it sprint
@@ -559,6 +662,45 @@ defineBehavior('climb', (a, [el], host) => {
     },
     poke() { dir = -dir; sprint = 1.4; state = 'walk'; a.say('!', 500); },
     hear(type) { if (type === 'thud') { sprint = 1; state = 'walk'; } }
+  };
+});
+
+/* ---- behaviors/count.js ---- */
+/* count: sheep trotting along an element and jumping a fence in the middle, one at a
+ * time, forever. The fence keeps count. Lovely for loading states.
+ *   count="3"   number of sheep   speed="1" */
+defineBehavior('count', (a, [el], host) => {
+  const S = a.s / 3;
+  const n = clamp(+host.getAttribute('count') || 3, 1, 10);
+  const fence = recruit(a, 'fence');
+  const flock = [a, ...Array.from({ length: n - 1 }, () => recruit(a, 'sheep'))];
+  const speed = 46 * S * (+host.getAttribute('speed') || 1);
+  let off = 0, total = 0;
+  const passed = flock.map(() => false);
+  a.node.parentNode.insertBefore(fence.node, a.node);   /* sheep jump in front of the fence */
+
+  return {
+    crew: [fence, ...flock.slice(1)],
+    tick(dt) {
+      const r = rectOf(el);
+      const span = r.w + 60 * S, mid = r.l + r.w / 2;
+      fence.x = mid; fence.y = r.t; fence.play('idle');
+      if (!reduced()) off += speed * dt;
+      flock.forEach((sh, i) => {
+        const pos = ((off + i * span / n) % span + span) % span;
+        const x = r.l - 30 * S + pos;
+        sh.x = x; sh.y = r.t; sh.face = 1;
+        /* the jump: a hop centred on the fence */
+        const d = Math.abs(x - mid), J = 34 * S;
+        if (d < J) { sh.oy = -Math.cos(d / J * Math.PI / 2) * 30 * S; sh.play('jump'); }
+        else { sh.oy = 0; sh.play('walk'); }
+        if (x > mid && !passed[i]) { passed[i] = true; total++; fence.say('#' + total, 0); }
+        if (x < mid) passed[i] = false;
+        const edge = Math.min(pos, span - pos);
+        sh.node.style.opacity = clamp(edge / (30 * S), 0, 1).toFixed(2);
+      });
+    },
+    poke(e, who) { (who || a).say('heart', 700); }
   };
 });
 
@@ -1021,6 +1163,47 @@ defineBehavior('follow', (a, [el], host) => {
   };
 });
 
+/* ---- behaviors/glow.js ---- */
+/* glow: fireflies drifting around an element, blinking softly. Hover the element and
+ * they gather round your cursor. Click one and they all scatter, then drift back.
+ *   count="9"   number of fireflies */
+defineBehavior('glow', (a, [el], host) => {
+  const S = a.s / 3;
+  const n = clamp(+host.getAttribute('count') || 9, 1, 40);
+  const flies = [a, ...Array.from({ length: n - 1 }, () => recruit(a, 'fireflies'))];
+  const st = flies.map(() => ({ x: null, y: 0, vx: 0, vy: 0, ph: rnd(0, 6.28), sp: rnd(.4, .9), rx: rnd(.25, .5), ry: rnd(.2, .45), on: chance(.5), next: rnd(.2, 2) }));
+  const GLOW = 'drop-shadow(0 0 3px #fff36b) drop-shadow(0 0 9px #ffd23f)';
+  flies.forEach(f => f.node.classList.add('nograb'));
+
+  return {
+    crew: flies.slice(1),
+    awake: () => onScreen(rectOf(el)),
+    tick(dt, t) {
+      const r = rectOf(el);
+      const cx = r.l + r.w / 2, cy = r.t + r.h / 2;
+      const hover = ptr.seen && ptr.x > r.l - 40 && ptr.x < r.r + 40 && ptr.y > r.t - 40 && ptr.y < r.b + 40;
+      flies.forEach((f, i) => {
+        const s = st[i];
+        if (s.x == null) { s.x = cx; s.y = cy; }
+        s.ph += dt * s.sp;
+        /* each one traces its own lazy loop, round the element or round the cursor */
+        const gx = hover ? ptr.x + Math.cos(s.ph * 2 + i) * 34 * S : cx + Math.cos(s.ph) * r.w * s.rx;
+        const gy = hover ? ptr.y + Math.sin(s.ph * 3 + i) * 26 * S : cy + Math.sin(s.ph * 1.7) * r.h * s.ry + 10;
+        if (!reduced()) {
+          s.vx += ((gx - s.x) * 2.2 - s.vx * 1.6) * dt; s.vy += ((gy - s.y) * 2.2 - s.vy * 1.6) * dt;
+          s.x += s.vx * dt; s.y += s.vy * dt;
+          s.next -= dt;
+          if (s.next <= 0) { s.on = !s.on; s.next = s.on ? rnd(.6, 2.4) : rnd(.15, .9); }
+        } else { s.x = gx; s.y = gy; s.on = true; }
+        f.x = s.x; f.y = s.y; f.face = s.vx >= 0 ? 1 : -1;
+        f.play(s.on ? 'on' : 'off');
+        f.cv.style.filter = s.on ? GLOW : '';
+      });
+    },
+    poke() { st.forEach(s => { s.vx += rnd(-600, 600); s.vy += rnd(-600, 200); }); }
+  };
+});
+
 /* ---- behaviors/hang.js ---- */
 /* hang: dangles from the bottom edge of an element on a silk thread. Swings when the
  * page scrolls or the cursor brushes past, zips up when you reach for it, then lowers
@@ -1151,6 +1334,47 @@ defineBehavior('lounge', (a, [el], host) => {
   };
 });
 
+/* ---- behaviors/march.js ---- */
+/* march: a line of ants marching along the top of an element, some carrying crumbs.
+ * Bring the cursor close and the nearby ants scatter, then hurry back into line.
+ *   count="7"   number of ants */
+defineBehavior('march', (a, [el], host) => {
+  const S = a.s / 3;
+  const n = clamp(+host.getAttribute('count') || 7, 2, 30);
+  const ants = [a, ...Array.from({ length: n - 1 }, () => recruit(a, 'ants'))];
+  const st = ants.map((_, i) => ({ p: i * 18 * S, ox: 0, oy: 0, vx: 0, vy: 0, carry: i % 3 === 1 }));
+  const speed = 26 * S * (+host.getAttribute('speed') || 1);
+  let off = 0;
+
+  return {
+    crew: ants.slice(1),
+    tick(dt) {
+      const r = rectOf(el);
+      const span = r.w + 40 * S;
+      if (!reduced()) off += speed * dt;
+      ants.forEach((ant, i) => {
+        const s = st[i];
+        const pos = ((s.p - off) % span + span) % span;   /* march right to left along the edge */
+        const x = r.r + 20 * S - pos;
+        /* scatter from the cursor, then spring back into line */
+        if (ptr.seen && !reduced() && ptrDist(x + s.ox, r.t + s.oy - 4) < 55 * S) {
+          const dx = x + s.ox - ptr.x || .1, d = Math.abs(dx);
+          s.vx += Math.sign(dx) * 900 * S * dt / Math.max(d / 40, .4);
+          s.vy -= 260 * S * dt;
+        }
+        s.vx += (-s.ox * 40 - s.vx * 9) * dt; s.vy += (-s.oy * 40 - s.vy * 9) * dt;
+        s.ox += s.vx * dt; s.oy = Math.min(0, s.oy + s.vy * dt);
+        ant.x = x; ant.y = r.t; ant.ox = s.ox; ant.oy = s.oy; ant.face = -1;
+        ant.play(s.carry ? 'carry' : 'walk');
+        /* fade in and out at the ends of the line */
+        const edge = Math.min(pos, span - pos);
+        ant.node.style.opacity = clamp(edge / (24 * S), 0, 1).toFixed(2);
+      });
+    },
+    poke(e, who) { (who || a).say(pick(['!', 'grr']), 500); st.forEach(s => { s.vy -= rnd(100, 260) * S; }); }
+  };
+});
+
 /* ---- behaviors/mind.js ---- */
 /* mind: minds its own business. Sits on an element and reads, flips pages, dozes off.
  * Hover nearby for a while and it glances up at you. Poke it and it turns its back.
@@ -1249,6 +1473,67 @@ defineBehavior('mind', (a, [el], host) => {
       a.say(pokes.length === 1 ? '!?' : 'vein', 900);
       go('annoyed', .7, 'annoyed');
     }
+  };
+});
+
+/* ---- behaviors/parade.js ---- */
+/* parade: a mother duck walks along an element with her ducklings in a line behind her.
+ * The ducklings follow her exact path, so when she turns round they file back past.
+ * Poke a duckling and it hops; poke the mother and the whole family quacks.
+ *   count="4"   number of ducklings */
+defineBehavior('parade', (a, [el], host) => {
+  const S = a.s / 3;
+  const n = clamp(+host.getAttribute('count') || 4, 1, 12);
+  const kids = Array.from({ length: n }, () => recruit(a, 'duckling'));
+  const hops = kids.map(() => 0);
+  const trail = [];
+  let x = null, dir = 1, state = 'walk', timer = rnd(3, 6), quack = 0;
+  const first = 26 * S, gap = 22 * S;
+
+  return {
+    crew: kids,
+    tick(dt) {
+      const r = rectOf(el);
+      const L = r.l + a.w / 2, R = r.r - a.w / 2;
+      if (x == null) {
+        x = L + (R - L) * rnd(.45, .7);
+        /* start with the ducklings already lined up behind her */
+        for (let d = (first + gap * n) * 1.2; d > 0; d -= 1) trail.push({ x: x - r.l - d * dir, face: dir });
+        trail.reverse();
+      }
+      if (!reduced()) {
+        timer -= dt; quack -= dt;
+        if (state === 'walk') {
+          const nx = clamp(x + dir * 22 * S * dt, L, R);
+          if (nx !== x) trail.unshift({ x: nx - r.l, face: dir });
+          x = nx;
+          if (x <= L || x >= R) dir = -dir;
+          if (timer <= 0) { state = 'rest'; timer = rnd(1, 2.2); }
+        } else if (timer <= 0 && quack <= 0) { state = 'walk'; timer = rnd(3, 7); if (chance(.3)) dir = -dir; }
+        if (trail.length > 4000) trail.length = 4000;
+      }
+      a.x = clamp(x, L, R); a.y = r.t; a.face = dir;
+      a.play(quack > 0 ? 'quack' : state === 'walk' ? 'walk' : 'idle');
+
+      /* each duckling sits a fixed walking-distance back along her path */
+      let dist = 0, idx = 0, prev = x - r.l;
+      kids.forEach((k, i) => {
+        const want = first + i * gap;
+        while (idx < trail.length - 1 && dist < want) { dist += Math.abs(trail[idx].x - prev); prev = trail[idx].x; idx++; }
+        const p = trail[idx] || { x: x - r.l - want * dir, face: dir };
+        k.x = clamp(r.l + p.x, r.l + k.w / 2, r.r - k.w / 2); k.y = r.t; k.face = p.face;
+        hops[i] = Math.max(0, hops[i] - dt);
+        k.oy = -Math.sin(Math.PI * hops[i] / .4) * 14 * S * (hops[i] > 0);
+        k.play(state === 'walk' ? 'walk' : 'idle');
+      });
+    },
+    poke(e, who) {
+      const i = kids.indexOf(who);
+      if (i >= 0) { hops[i] = .4; who.say(pick(['!', 'note']), 600); return; }
+      quack = 1.4; state = 'rest'; timer = 1.4; a.say('note', 900);
+      kids.forEach((k, j) => setTimeout(() => { hops[j] = .4; k.say('note', 700); }, 150 + j * 140));
+    },
+    hear(type) { if (type === 'thud') { hops.fill(.4); a.say('!', 500); } }
   };
 });
 
@@ -1482,6 +1767,65 @@ defineBehavior('pop', (a, [el], host) => {
   };
 });
 
+/* ---- behaviors/school.js ---- */
+/* school: a school of fish swimming inside an element like a tank. They flock (stay
+ * close, line up, don't bump), turn at the glass, and flee from the cursor.
+ *   count="7"   number of fish */
+defineBehavior('school', (a, [el], host) => {
+  const S = a.s / 3;
+  const n = clamp(+host.getAttribute('count') || 7, 2, 40);
+  const hues = [0, 25, 330, 190, 60, 290];
+  const fish = [a, ...Array.from({ length: n - 1 }, (_, i) => recruit(a, 'fish', { hue: hues[(i + 1) % hues.length] }))];
+  const b = fish.map(() => ({ x: null, y: 0, vx: rnd(-40, 40), vy: rnd(-20, 20) }));
+  const MAX = 120 * S, MIN = 35 * S;
+
+  return {
+    crew: fish.slice(1),
+    awake: () => onScreen(rectOf(el)),
+    tick(dt) {
+      const r = rectOf(el), pad = 14 * S;
+      const box = { l: r.l + pad + a.w / 2, r: r.r - pad - a.w / 2, t: r.t + pad + a.h, b: r.b - pad };
+      if (b[0].x == null) b.forEach(f => { f.x = rnd(box.l, box.r); f.y = rnd(box.t, box.b); });
+      if (!reduced()) {
+        let cx = 0, cy = 0, ax = 0, ay = 0;
+        b.forEach(f => { cx += f.x; cy += f.y; ax += f.vx; ay += f.vy; });
+        cx /= n; cy /= n; ax /= n; ay /= n;
+        b.forEach((f, i) => {
+          let fx = (cx - f.x) * .6 + (ax - f.vx) * .9, fy = (cy - f.y) * .6 + (ay - f.vy) * .9;
+          b.forEach((o, j) => {
+            if (i === j) return;
+            const dx = f.x - o.x, dy = f.y - o.y, d = Math.hypot(dx, dy) || 1;
+            if (d < 20 * S) { fx += dx / d * 1400 * S / d; fy += dy / d * 1400 * S / d; }
+          });
+          /* the glass */
+          if (f.x < box.l + 20) fx += 300; if (f.x > box.r - 20) fx -= 300;
+          if (f.y < box.t + 10) fy += 300; if (f.y > box.b - 10) fy -= 300;
+          /* the cursor is a shark */
+          if (ptr.seen) {
+            const dx = f.x - ptr.x, dy = f.y - fish[i].h / 2 - ptr.y, d = Math.hypot(dx, dy) || 1;
+            if (d < 90 * S) { fx += dx / d * 3200 * S / Math.max(d / 30, 1); fy += dy / d * 3200 * S / Math.max(d / 30, 1); }
+          }
+          f.vx += fx * dt; f.vy += fy * dt;
+          const sp = Math.hypot(f.vx, f.vy) || 1, k = clamp(sp, MIN, MAX) / sp;
+          f.vx *= k; f.vy *= k;
+          f.x = clamp(f.x + f.vx * dt, box.l, box.r); f.y = clamp(f.y + f.vy * dt, box.t, box.b);
+        });
+      }
+      fish.forEach((fi, i) => {
+        const f = b[i];
+        fi.x = f.x; fi.y = f.y;
+        if (Math.abs(f.vx) > 4) fi.face = f.vx > 0 ? 1 : -1;
+        fi.rot = clamp(f.vy / MAX * 25, -25, 25) * fi.face;
+        fi.play('swim', { fps: 4 + Math.hypot(f.vx, f.vy) / MAX * 10 });
+      });
+    },
+    poke(e, who) {
+      const i = Math.max(0, fish.indexOf(who || a));
+      b[i].vx *= 3; b[i].vy *= 3; (who || a).say('!', 400);
+    }
+  };
+});
+
 /* ---- behaviors/sweep.js ---- */
 /* sweep: a robot vacuum. Glides along the top of an element and back, bumps at the
  * ends, stops and beeps when the cursor blocks the way, spins when poked. */
@@ -1649,6 +1993,58 @@ defineBehavior('toss', (a, [el], host) => {
     },
     poke() { fly(rnd(-160, 160) * S, -600 * Math.sqrt(S)); },
     hear(type, from, d) { if (type === 'thud' && state === 'rest' && !P.heavy) fly((a.x - from.x) * 2, -260 * S); }
+  };
+});
+
+/* ---- behaviors/wire.js ---- */
+/* wire: a row of birds sitting along an element's top edge like a telephone wire.
+ * Run the cursor along the row and they hop up one after another, like a wave.
+ * Click one and the whole row takes off, loops round, and lands back one by one.
+ *   count="6"   number of birds */
+defineBehavior('wire', (a, [el], host) => {
+  const S = a.s / 3;
+  const n = clamp(+host.getAttribute('count') || 6, 2, 20);
+  const birds = [a, ...Array.from({ length: n - 1 }, () => recruit(a, 'sparrows'))];
+  const st = birds.map((_, i) => ({ hop: 0, delay: -1, fly: 0, ang: 0, face: i % 2 ? -1 : 1, next: rnd(1, 5) }));
+
+  const startHop = (i, delay) => { if (st[i].hop <= 0 && st[i].delay < 0) st[i].delay = delay; };
+  return {
+    crew: birds.slice(1),
+    tick(dt) {
+      const r = rectOf(el);
+      birds.forEach((b, i) => {
+        const s = st[i];
+        const home = r.l + r.w * ((i + .5) / n);
+        if (!reduced()) {
+          /* the cursor brushing past sets off a ripple */
+          if (ptr.seen && s.hop <= 0 && s.fly <= 0 && Math.abs(ptr.x - home) < 18 * S && ptr.y < r.t + 10 && ptr.y > r.t - 60 * S) {
+            for (let j = 0; j < n; j++) startHop(j, Math.abs(j - i) * .07);
+          }
+          if (s.delay >= 0) { s.delay -= dt; if (s.delay < 0) s.hop = .55; }
+          s.hop = Math.max(0, s.hop - dt);
+          s.next -= dt;
+          if (s.next <= 0 && s.hop <= 0 && s.fly <= 0) { s.next = rnd(1.5, 5); if (chance(.4)) s.face = -s.face; else b.play('peck', { loop: false, reset: true }); }
+        }
+        if (s.fly > 0) {
+          /* a loop round the sky and back to the same spot on the wire */
+          s.fly = Math.max(0, s.fly - dt);
+          const p = 1 - s.fly / 2.2, ang = p * Math.PI * 2;
+          b.x = home + Math.sin(ang) * 60 * S; b.y = r.t; b.oy = -Math.sin(p * Math.PI) * 110 * S;
+          b.face = Math.cos(ang) >= 0 ? 1 : -1;
+          b.play('fly');
+          return;
+        }
+        b.x = home; b.y = r.t; b.face = s.face;
+        b.oy = -Math.sin(Math.PI * s.hop / .55) * 20 * S;
+        if (s.hop > 0) b.play('fly');
+        else if (b.clip !== 'peck' || b.done) b.play('sit');
+      });
+    },
+    poke() {
+      st.forEach((s, i) => setTimeout(() => { s.fly = 2.2; }, i * 90));
+      a.say('!', 500);
+    },
+    hear(type) { if (type === 'thud') st.forEach((s, i) => { s.delay = i * .05; }); }
   };
 });
 
@@ -1890,6 +2286,127 @@ defineBehavior('toss', (a, [el], host) => {
     palette: { k: '#17121f', g: '#7bd63a', G: '#d2ff8a', w: '#ffffff' },
     frames: { walk: [fix(A), fix(B)], idle: [fix(A)], wag: [fix(A), wag] },
     fps: { walk: 10, wag: 8 }
+  });
+})();
+
+/* ---- pals/group-sprites.js ---- */
+/* Cast for the group pals. Each group is one <piix-pal> that runs a whole crew. */
+(() => {
+  const K = '#17121f';
+
+  /* DUCKS: a mother duck and her ducklings (do="parade") */
+  const mama = [
+    '.....kkk....',
+    '....kwwwk...',
+    '....kwkwkoo.',
+    '....kwwwkoo.',
+    '.k..kwwwk...',
+    'kwk.kwwwwk..',
+    'kwwkwwwwwwk.',
+    'kwwwwWWwwwwk',
+    '.kwwwwwwwwk.',
+    '..kkkkkkkk..'
+  ];
+  defineSprite('ducks', {
+    w: 12, h: 11, scale: 3, does: 'parade',
+    palette: { k: K, w: '#ffffff', W: '#d9dce8', o: '#ff9a2f' },
+    frames: {
+      walk: [mama.concat(['...o..o.....']), mama.concat(['....o.o.....'])],
+      idle: [mama.concat(['...o...o....'])],
+      quack: [art.put(mama, 9, 2, ['ooo']).concat(['...o...o....'])]
+    },
+    fps: { walk: 6 }
+  });
+  const ling = ['..kkk..', '.kyyyk.', '.kykyoo', 'k.kyyk.', 'kykyyyk', 'kyyyyyk', '.kkkkk.'];
+  defineSprite('duckling', {
+    w: 7, h: 8, scale: 3, does: 'parade',
+    palette: { k: K, y: '#ffd23f', o: '#ff9a2f' },
+    frames: { walk: [ling.concat(['..o.o..']), ling.concat(['...oo..'])], idle: [ling.concat(['..o..o.'])] },
+    fps: { walk: 9 }
+  });
+
+  /* ANTS: a marching line, some carrying crumbs (do="march") */
+  const ant = legs => ['.kk.kk..', 'kkkkkkkk', legs];
+  defineSprite('ants', {
+    w: 8, h: 3, scale: 3, does: 'march',
+    palette: { k: K, c: '#ffd9a0' },
+    frames: {
+      walk: [ant('k.k.k.k.'), ant('.k.k.k.k')],
+      carry: [['..cc....', '.kkckk..', 'kkkkkkkk', 'k.k.k.k.'], ['..cc....', '.kkckk..', 'kkkkkkkk', '.k.k.k.k']]
+    },
+    fps: { walk: 12, carry: 12 }
+  });
+
+  /* FISH: a little school (do="school") */
+  const fish = tail => [`.${tail[0]}.kkk..`, `k${tail[1]}kfffk.`, `kfFffwkk`, `k${tail[1]}kfffk.`, `.${tail[0]}.kkk..`];
+  defineSprite('fish', {
+    w: 8, h: 5, scale: 3, does: 'school',
+    palette: { k: K, f: '#ff8a3d', F: '#ffd0a8', w: '#ffffff' },
+    frames: { swim: [fish(['k', 'f']), fish(['.', 'k'])] },
+    fps: { swim: 6 }
+  });
+
+  /* SPARROWS: birds on a wire (do="wire") */
+  const bird = ['..kkk...', '.kbbwk..', '.kbbbkoo', 'kbBBbbk.', 'kbBBBbk.', '.kbbbk..', '..k.k...'];
+  const flap = ['k.....k.', 'kb...bk.', '.kbkbkoo', '..kbbk..', '..kbbk..', '...kk...', '........'];
+  defineSprite('sparrows', {
+    w: 8, h: 7, scale: 3, does: 'wire',
+    palette: { k: K, b: '#9a6b44', B: '#e8c9a4', w: '#ffffff', o: '#ffb020' },
+    frames: { sit: [bird], peck: [art.put(bird, 5, 2, ['k', 'koo']), bird], fly: [flap, art.put(bird, 0, 6, ['........'])] },
+    fps: { peck: 6, fly: 14 }
+  });
+
+  /* CHOIR: four singers who keep perfect time (do="choir") */
+  const singer = (mouth, eyes = 'wk') => [
+    '..kkkkk..',
+    '.kbbbbbk.',
+    'kbbbbbbbk',
+    `kb${eyes}b${eyes}bk`.slice(0, 9).padEnd(9, 'k'),
+    'kbbbbbbbk',
+    mouth,
+    'kbbbbbbbk',
+    'kbbbbbbbk',
+    '.kbbbbbk.',
+    '..kkkkk..'
+  ];
+  defineSprite('choir', {
+    w: 9, h: 10, scale: 3, does: 'choir',
+    palette: { k: K, b: '#6b4cff', w: '#ffffff', m: '#ff7aa8' },
+    frames: {
+      hush: [singer('kbbbkbbbk')],
+      sing: [singer('kbbkmkbbk'), singer('kbbkkkbbk')],
+      look: [singer('kbbbkbbbk', 'kw')]
+    },
+    fps: { sing: 4 }
+  });
+
+  /* FIREFLIES: soft blinking lights (do="glow") */
+  defineSprite('fireflies', {
+    w: 5, h: 4, scale: 3, does: 'glow',
+    palette: { k: K, y: '#fff36b', Y: '#ffd23f', w: '#e8f6ff' },
+    frames: { on: [['w...w', '.kYk.', '.yyy.', '..y..']], off: [['w...w', '.kYk.', '.kkk.', '.....']] }
+  });
+
+  /* SHEEP: jump the fence, one by one, forever (do="count") */
+  const sheep = legs => ['.kkkkk....', 'kwwWwwk...', 'kwWwwwwfff', 'kwwwwwwfwf', 'kwwwwwwfff', '.kkkkkk...', legs];
+  defineSprite('sheep', {
+    w: 10, h: 7, scale: 3, does: 'count',
+    palette: { k: K, w: '#ffffff', W: '#e8e4f0', f: '#3b2a4f' },
+    frames: { walk: [sheep('.f.f..f.f.'), sheep('..f.ff.f..')], jump: [sheep('.ff...ff..')] },
+    fps: { walk: 8 }
+  });
+  defineSprite('fence', {
+    w: 12, h: 9, scale: 3, does: 'count',
+    palette: { k: K, b: '#c98a4e', d: '#8a5a2e' },
+    frames: { idle: [['.k..k..k..k.', 'kbkkbkkbkkbk', 'kbkkbkkbkkbk', 'kbbbbbbbbbbk', 'kddddddddddk', 'kbkkbkkbkkbk', 'kbbbbbbbbbbk', 'kddddddddddk', 'kbkkbkkbkkbk']] }
+  });
+
+  /* BEES: a busy little line of worker bees (do="beeline") */
+  defineSprite('bees', {
+    w: 7, h: 6, scale: 3, does: 'beeline',
+    palette: { k: K, y: '#ffd23f', w: '#e4f6ff' },
+    frames: { fly: [['.ww.ww.', '.wwkww.', 'kyykyyk', 'kkkkykw', 'kyykyyk', '.kkkkk.'], ['.......', '.kwkwk.', 'kyykyyk', 'kkkkykw', 'kyykyyk', '.kkkkk.']] },
+    fps: { fly: 18 }
   });
 })();
 
