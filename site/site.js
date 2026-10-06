@@ -147,3 +147,20 @@ document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click'
   }
   hero.prepend(box);
 })();
+
+/* ---------- theme switcher: white / paper / dark, remembered ---------- */
+(() => {
+  const d = document.documentElement;
+  const sync = () => document.querySelectorAll('[data-theme-set]').forEach(b => b.setAttribute('aria-pressed', b.dataset.themeSet === d.dataset.theme));
+  document.querySelectorAll('[data-theme-set]').forEach(b => b.addEventListener('click', () => {
+    d.classList.add('theming');
+    d.dataset.theme = b.dataset.themeSet;
+    try { localStorage.setItem('piix-theme', b.dataset.themeSet); } catch (_) { /* private mode */ }
+    sync();
+    /* pixel lettering paints with the current text colour: repaint it */
+    const repaint = () => document.querySelectorAll('piix-type').forEach(t => t._render && t._render());
+    repaint(); setTimeout(repaint, 380);
+    setTimeout(() => d.classList.remove('theming'), 400);
+  }));
+  sync();
+})();
