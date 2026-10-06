@@ -42,6 +42,17 @@ canvas{display:block;pointer-events:none;image-rendering:pixelated}
   /* rain the pixels in again */
   replay() { this._seedIntro(); this._wake(); }
 
+  /* true once every pixel has landed (pals wait for this before stepping on) */
+  get piixSettled() { return !!this._cols && this._cells.every(p => p.landed); }
+
+  /* something landed on the letters at doc (x, y): send a small ripple through them */
+  piixImpact(x, y, power = 1) {
+    if (!this._cols || reduced()) return;
+    const r = this._cv.getBoundingClientRect();
+    this._waves.push({ x: (x - scrollX - r.left) / this._cell, y: (y - scrollY - r.top - this._head) / this._cell, r: 0, max: 5 + 5 * power, amp: .5 + .4 * power });
+    this._wake();
+  }
+
   /* doc-y of the top letter pixel at doc-x, or null over a gap */
   piixSurface(x) {
     if (!this._cols) return null;
@@ -132,7 +143,7 @@ canvas{display:block;pointer-events:none;image-rendering:pixelated}
   _pd(e) {
     if (!this._cols || reduced()) return;
     const r = this._cv.getBoundingClientRect();
-    this._waves.push({ x: (e.clientX - r.left) / this._cell, y: (e.clientY - r.top - this._head) / this._cell, r: 0 });
+    this._waves.push({ x: (e.clientX - r.left) / this._cell, y: (e.clientY - r.top - this._head) / this._cell, r: 0, max: this._cols + 20, amp: 1.6 });
     this._wake();
   }
 
@@ -145,7 +156,7 @@ canvas{display:block;pointer-events:none;image-rendering:pixelated}
     const px = (ptr.cx - r.left) / cell, py = (ptr.cy - r.top - this._head) / cell;
     const R = 7, hot = this._hot && ptr.seen;
     this._waves.forEach(w => { w.r += dt * 60; });
-    this._waves = this._waves.filter(w => w.r < this._cols + 20);
+    this._waves = this._waves.filter(w => w.r < w.max);
     if (this._waves.length) busy = true;
     let near = false;
     for (const p of this._cells) {
@@ -167,7 +178,7 @@ canvas{display:block;pointer-events:none;image-rendering:pixelated}
       }
       for (const w of this._waves) {
         const d = Math.hypot(p.x - w.x, p.y - w.y), band = Math.abs(d - w.r);
-        if (band < 2.5) goal = Math.max(goal, (1 - band / 2.5) * cell * 1.6 * Math.max(0, 1 - w.r / (this._cols + 20)));
+        if (band < 2.5) goal = Math.max(goal, (1 - band / 2.5) * cell * w.amp * Math.max(0, 1 - w.r / w.max));
       }
       p.lv += ((goal - p.lift) * 320 - p.lv * 22) * dt;
       p.lift += p.lv * dt;
