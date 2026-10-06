@@ -16,6 +16,16 @@ const ICONS = {
   eep: ['kkk.kkk.kkk.', 'k...k...k.k.', 'kk..kk..kkk.', 'k...k...k...', 'kkk.kkk.k...'],
   leaf: ['....gg', '..gggg', '.gggg.', 'gggg..', 'g.....']
 };
+/* 3x5 digits; say('#12') composes a number bubble */
+const DIGITS = ['kkk|k.k|k.k|k.k|kkk', '.k.|kk.|.k.|.k.|kkk', 'kkk|..k|kkk|k..|kkk', 'kkk|..k|.kk|..k|kkk', 'k.k|k.k|kkk|..k|..k',
+  'kkk|k..|kkk|..k|kkk', 'kkk|k..|kkk|k.k|kkk', 'kkk|..k|.k.|.k.|.k.', 'kkk|k.k|kkk|k.k|kkk', 'kkk|k.k|kkk|..k|kkk'].map(d => d.split('|'));
+const numberIcon = name => {
+  if (!ICONS[name] && /^#\d+$/.test(name)) {
+    const ds = name.slice(1).split('').map(Number);
+    ICONS[name] = [0, 1, 2, 3, 4].map(y => ds.map(d => DIGITS[d][y]).join('.'));
+  }
+  return ICONS[name];
+};
 const iconCache = {};
 const iconPal = Object.fromEntries(Object.entries(ICON_PAL).map(([k, v]) => [k, hexRGBA(v)]));
 const bakeIcon = name => {

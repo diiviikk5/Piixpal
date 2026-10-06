@@ -228,7 +228,7 @@ class Actor {
   }
   /* pixel speech bubble with an icon from ICONS */
   say(icon, ms = 1200) {
-    const ic = ICONS[icon];
+    const ic = ICONS[icon] || (typeof icon === 'string' && icon[0] === '#' && numberIcon(icon));
     clearTimeout(this._bt);
     if (!ic) { this.bub.classList.remove('on'); return; }
     const s = Math.max(2, Math.round(this.s * .75));
