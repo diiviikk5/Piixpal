@@ -317,6 +317,28 @@ Piixpal.advance = (seconds = 1, fps = 60) => {
   lastT = 0;
 };
 
+/* ---------- shape painting, for bigger characters ---------- */
+Object.assign(art, {
+  /* build rows from fn(x, y) -> palette key or falsy */
+  paint(w, h, fn) { return Array.from({ length: h }, (_, y) => Array.from({ length: w }, (_, x) => fn(x, y) || '.').join('')); },
+  ellipse(x, y, cx, cy, rx, ry) { const dx = (x + .5 - cx) / rx, dy = (y + .5 - cy) / ry; return dx * dx + dy * dy <= 1; },
+  rrect(x, y, x0, y0, x1, y1, r) {
+    if (x < x0 || x > x1 || y < y0 || y > y1) return false;
+    const cx = x < x0 + r ? x0 + r : x > x1 - r ? x1 - r : x, cy = y < y0 + r ? y0 + r : y > y1 - r ? y1 - r : y;
+    return (x - cx) ** 2 + (y - cy) ** 2 <= r * r + .5;
+  },
+  /* give a flat body key some volume: shade its bottom-right rim, light its top-left rim */
+  volume(rows, body = 'b', shade = 'd', light = 'B') {
+    const at = (x, y) => (rows[y] || '')[x] || '.';
+    return rows.map((r, y) => [...r].map((c, x) => {
+      if (c !== body) return c;
+      if (at(x + 1, y) === '.' || at(x, y + 1) === '.') return shade;
+      if ((at(x - 1, y) === '.' || at(x, y - 1) === '.') && y < rows.length * .55 && x < r.length * .6) return light;
+      return c;
+    }).join(''));
+  }
+});
+
 /* ---- icons.js ---- */
 /* Tiny glyphs for speech bubbles. Drawn, not typed: no fonts are loaded. */
 const ICON_PAL = { k: '#1b1226', r: '#ff4d6d', b: '#3fc8ff', y: '#ffc93f', g: '#7bd63a' };
@@ -1845,6 +1867,9 @@ canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;margi
 Piixpal.figures = FIGURES;
 Piixpal.figure = defineFigure;
 
+/* defaults for the big, bold sprites: one recolourable body, chunky 3D blocks, block eyes */
+const BIG = { kind: 'big', scale: 8, render: 'voxel', depth: 2, tilt: true, shy: true, glint: '#ffffff', lid: 'b', recolor: { b: 0, d: -.24, B: .42 } };
+
 /* ---- elements/type.js ---- */
 /* <piix-type text="PIIXPAL" rows="18" cell="8" color="#16111f" shade="#c6f432" depth="1" fit>
  * Any font, rasterised into chunky blocks with an extruded shadow.
@@ -2073,6 +2098,196 @@ const CELL_SHAPES = {
   plus: (g, x, y, s) => { const t = s / 3; g.rect(x + t, y, t, s); g.rect(x, y + t, t, t); g.rect(x + 2 * t, y + t, t, t); },
   diamond: (g, x, y, s) => { g.moveTo(x + s / 2, y); g.lineTo(x + s, y + s / 2); g.lineTo(x + s / 2, y + s); g.lineTo(x, y + s / 2); g.closePath(); }
 };
+
+/* ---- sprites/big-flick.js ---- */
+/* FLICK (big): a little flame with big feelings. Never, ever stands still. */
+(() => {
+  const frame = f => {
+    const sway = [-1, 0, 1, 0][f], tip = [0, 1, 0, 2][f];
+    return art.volume(art.paint(18, 24, (x, y) => {
+      if (y < tip) return null;
+      /* a teardrop: narrow swaying tip on a round base */
+      const k = clamp((y - tip) / 14, 0, 1);
+      const cx = 9 + sway * (1 - k) * 2, half = 1 + k * 7;
+      const inBody = y < 15 ? Math.abs(x + .5 - cx) <= half : art.ellipse(x, y, 9, 16, 8.2, 7.6);
+      if (!inBody) return null;
+      const core = y > 9 && art.ellipse(x, y, 9, 18, 4.2, 6.5 - (f % 2));
+      return core ? 'c' : 'b';
+    }));
+  };
+  defineFigure('flick', {
+    ...BIG, w: 18, h: 24, fps: 7,
+    tag: 'A little flame with big feelings. Never, ever stands still.',
+    palette: { b: '#ff8a2a', d: '#e2561a', B: '#ffc06b', c: '#ffe066', k: '#17121f', m: '#17121f' },
+    frames: [0, 1, 2, 3].map(f => art.put(frame(f), 8, 19, ['mm'])),
+    eyes: [{ x: 4, y: 14, w: 3, h: 4 }, { x: 11, y: 14, w: 3, h: 4 }],
+    pupil: { w: 2, h: 3 },
+    lid: 'c',
+    recolor: { b: 0, d: -.2, B: .35 }
+  });
+})();
+
+/* ---- sprites/big-fluff.js ---- */
+/* FLUFF (big): a sheep made almost entirely of cloud. Trots in place, very proudly. */
+(() => {
+  const puffs = [[5, 6], [11, 4], [17, 6], [3, 11], [19, 11], [6, 15], [16, 15], [11, 16]];
+  const frame = step => art.volume(art.paint(22, 22, (x, y) => {
+    if (art.ellipse(x, y, 11, 11, 4.6, 5.2)) return 'F';
+    if (puffs.some(([cx, cy]) => art.ellipse(x, y, cx, cy, 4.4, 4.4)) || art.ellipse(x, y, 11, 10, 8, 7)) return 'b';
+    const legs = [6, 9, 13, 16];
+    for (let i = 0; i < legs.length; i++) {
+      const up = (i % 2) === step ? 1 : 0;
+      if (x === legs[i] && y >= 18 && y <= 21 - up) return 'L';
+    }
+  }));
+  defineFigure('fluff', {
+    ...BIG, w: 22, h: 22, fps: 3,
+    tag: 'A sheep made almost entirely of cloud. Trots in place, very proudly.',
+    palette: { b: '#ff9ec4', d: '#e26f9d', B: '#ffd6e6', F: '#3b2a4f', L: '#3b2a4f', k: '#ffffff', w: '#ffffff' },
+    frames: [0, 1].map(s => art.put(frame(s), 10, 13, ['pp'.replace(/p/g, 'B')])),
+    eyes: [{ x: 7, y: 8, w: 3, h: 3 }, { x: 12, y: 8, w: 3, h: 3 }],
+    pupil: { w: 2, h: 2 },
+    lid: 'F',
+    glint: null,
+    recolor: { b: 0, d: -.2, B: .45 }
+  });
+})();
+
+/* ---- sprites/big-gloop.js ---- */
+/* GLOOP (big): a slow, happy blob that drips a little. Mostly harmless. */
+(() => {
+  const drips = [[3, 2], [4, 3], [9, 1], [10, 2], [15, 3], [16, 2], [17, 1]];
+  const frame = f => art.volume(art.paint(22, 21, (x, y) => {
+    if (y < 11) return art.ellipse(x, y, 11, 10, 10.5, 9.5) && 'b';
+    if (y < 16) return x >= 1 && x <= 20 && 'b';
+    const d = drips.find(([dx]) => dx === x);
+    return d && y < 16 + ((d[1] + f) % 4) + 1 && 'b';
+  }));
+  defineFigure('gloop', {
+    ...BIG, w: 22, h: 21, fps: 2.5,
+    tag: 'A slow, happy blob that drips a little. Mostly harmless.',
+    palette: { b: '#ff6b4a', d: '#c94a2e', B: '#ffb39f', k: '#17121f', m: '#17121f' },
+    frames: [0, 1, 2, 3].map(f => art.put(frame(f), 10, 13, ['mm'])),
+    eyes: [{ x: 5, y: 7, w: 5, h: 5 }, { x: 12, y: 7, w: 5, h: 5 }],
+    pupil: { w: 3, h: 4 }
+  });
+})();
+
+/* ---- sprites/big-hops.js ---- */
+/* HOPS (big): long ears, short attention span. One ear never quite stays up. */
+(() => {
+  const frame = flop => art.volume(art.paint(20, 25, (x, y) => {
+    /* left ear stands, right ear flops over in the second frame */
+    if (art.rrect(x, y, 3, 0, 7, 11, 2)) return x >= 4 && x <= 6 && y >= 2 && y <= 9 ? 'p' : 'b';
+    if (!flop && art.rrect(x, y, 12, 0, 16, 11, 2)) return x >= 13 && x <= 15 && y >= 2 && y <= 9 ? 'p' : 'b';
+    if (flop && art.rrect(x, y, 13, 3, 19, 7, 2)) return 'b';
+    if (flop && art.rrect(x, y, 12, 5, 16, 11, 2)) return 'b';
+    return art.ellipse(x, y, 10, 17, 9.6, 8) && 'b';
+  }));
+  const face = rows => art.compose(rows, [9, 19, ['pp']], [8, 21, ['m..m'.replace(/\./g, '_')]], [9, 22, ['mm']]);
+  defineFigure('hops', {
+    ...BIG, w: 20, h: 25, fps: .8,
+    tag: 'Long ears, short attention span. One ear never quite stays up.',
+    palette: { b: '#b9a4ff', d: '#8d74e6', B: '#e4dbff', p: '#ff9cc2', k: '#17121f', m: '#17121f' },
+    frames: [face(frame(false)), face(frame(false)), face(frame(true))],
+    eyes: [{ x: 4, y: 14, w: 4, h: 4 }, { x: 12, y: 14, w: 4, h: 4 }],
+    pupil: { w: 2, h: 3 }
+  });
+})();
+
+/* ---- sprites/big-inky.js ---- */
+/* INKY (big): a small squid with five wiggly arms and one very big question. */
+(() => {
+  const arms = [2, 6, 10, 14, 18];
+  const frame = f => art.volume(art.paint(22, 22, (x, y) => {
+    if (y < 11) return art.ellipse(x, y, 11, 9, 9.6, 8.6) && 'b';
+    if (y < 14) return x >= 2 && x <= 19 && 'b';
+    /* arms sway: every other arm leans the other way */
+    for (let i = 0; i < arms.length; i++) {
+      const lean = (i + f) % 2 ? 1 : -1, off = y > 17 ? lean : 0;
+      if (x >= arms[i] + off && x <= arms[i] + 1 + off && y <= 20 - (i % 2)) return 'b';
+    }
+  }));
+  defineFigure('inky', {
+    ...BIG, w: 22, h: 22, fps: 3,
+    tag: 'A small squid with five wiggly arms and one very big question.',
+    palette: { b: '#6b4cff', d: '#4a2fd6', B: '#a995ff', k: '#17121f', m: '#17121f', w: '#ffffff' },
+    frames: [0, 1].map(f => art.put(frame(f), 10, 12, ['mm'])),
+    eyes: [{ x: 5, y: 6, w: 5, h: 5 }, { x: 12, y: 6, w: 5, h: 5 }],
+    pupil: { w: 3, h: 3 },
+    pupilKey: 'w',
+    glint: '#17121f'
+  });
+})();
+
+/* ---- sprites/big-mumu.js ---- */
+/* MUMU (big): a round little bear who would like a snack, please. Ears wiggle. */
+(() => {
+  const frame = wig => art.volume(art.paint(22, 21, (x, y) => {
+    const earY = 3 + (wig ? 1 : 0);
+    if (art.ellipse(x, y, 4, earY, 3.4, 3.4)) return art.ellipse(x, y, 4, earY, 1.6, 1.6) ? 'p' : 'b';
+    if (art.ellipse(x, y, 18, 3, 3.4, 3.4)) return art.ellipse(x, y, 18, 3, 1.6, 1.6) ? 'p' : 'b';
+    if (art.ellipse(x, y, 11, 13, 4, 3)) return 's';
+    if (art.ellipse(x, y, 11, 11, 10.5, 9.4)) return 'b';
+    return y >= 19 && ((x >= 4 && x <= 7) || (x >= 14 && x <= 17)) && 'b';
+  }));
+  const face = rows => art.compose(rows, [10, 11, ['kk']], [10, 13, ['_k']], [9, 14, ['k_k']]);
+  defineFigure('mumu', {
+    ...BIG, w: 22, h: 21, fps: .7,
+    tag: 'A round little bear who would like a snack, please. Ears wiggle.',
+    palette: { b: '#e0a46a', d: '#b87a42', B: '#f6d2ad', p: '#ff9cc2', s: '#fff1de', k: '#17121f' },
+    frames: [face(frame(0)), face(frame(0)), face(frame(1))],
+    eyes: [{ x: 5, y: 7, w: 3, h: 3 }, { x: 14, y: 7, w: 3, h: 3 }],
+    pupil: { w: 2, h: 2 }
+  });
+})();
+
+/* ---- sprites/big-spud.js ---- */
+/* SPUD (big): a lumpy potato with a tiny sprout and a lot of potential. */
+(() => {
+  const lump = (x, y) => ((x * 7 + y * 13) % 11) < 2;
+  const body = art.volume(art.paint(20, 20, (x, y) => {
+    if (y < 3) return null;
+    const inside = art.ellipse(x, y, 10, 12, 9.6, 7.6);
+    const edge = inside && !art.ellipse(x, y, 10, 12, 8.6, 6.6);
+    if (!inside || (edge && lump(x, y))) return null;
+    return ((x * 5 + y * 3) % 17 === 0) ? 's' : 'b';
+  }));
+  const sprout = [
+    ['..gg..gg..', '.gGg..gGg.', '..ggggg...', '....g.....'],
+    ['.gg....gg.', 'gGg...gGg.', '.gggggg...', '....g.....']
+  ];
+  defineFigure('spud', {
+    ...BIG, w: 20, h: 20, fps: 1.2,
+    tag: 'A lumpy potato with a tiny sprout and a lot of potential.',
+    palette: { b: '#d9a066', d: '#a9733f', B: '#f2cc9c', s: '#8a5a2e', g: '#4fc46a', G: '#9be57a', k: '#17121f', m: '#17121f' },
+    frames: sprout.map(sp => art.compose(body, [5, 0, sp], [9, 15, ['mm']])),
+    eyes: [{ x: 5, y: 9, w: 3, h: 4 }, { x: 12, y: 9, w: 3, h: 4 }],
+    pupil: { w: 2, h: 3 }
+  });
+})();
+
+/* ---- sprites/big-tofu.js ---- */
+/* TOFU (big): a block of tofu on two stubby legs, marching on the spot. Firm but fair. */
+(() => {
+  const frame = step => art.volume(art.paint(20, 20, (x, y) => {
+    if (art.rrect(x, y, 1, 1, 18, 14, 3)) return 'b';
+    const left = x >= 5 && x <= 6, right = x >= 13 && x <= 14;
+    if ((left || right) && y >= 15) {
+      const lift = (left && step === 1) || (right && step === 3) ? 1 : 0;
+      return y <= 18 - lift && 'b';
+    }
+  }));
+  const face = rows => art.compose(rows, [3, 10, ['p']], [16, 10, ['p']], [9, 10, ['mm']]);
+  defineFigure('tofu', {
+    ...BIG, w: 20, h: 20, fps: 4,
+    tag: 'A block of tofu on two stubby legs, marching on the spot. Firm but fair.',
+    palette: { b: '#c6f432', d: '#93c01a', B: '#ecffb0', p: '#ff9cc2', k: '#17121f', m: '#17121f' },
+    frames: [0, 1, 2, 3].map(s => face(frame(s))),
+    eyes: [{ x: 4, y: 5, w: 4, h: 4 }, { x: 12, y: 5, w: 4, h: 4 }],
+    pupil: { w: 2, h: 3 }
+  });
+})();
 
 /* ---- sprites/cactus.js ---- */
 /* CACTUS: a potted cactus who blooms when it's in a good mood. Do not hug. */
