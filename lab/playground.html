@@ -5,16 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Piixpal · playground</title>
 <style>
-  body{margin:0;background:#f2ecdf;color:#16111f;font:18px/1.5 system-ui,sans-serif;padding:60px 40px 400px}
+  body{margin:0;background:#f2ecdf;color:#16111f;font:18px/1.5 system-ui,sans-serif;padding:0 40px 200px}
+  nav{height:64px;background:#16111f;color:#f2ecdf;display:flex;align-items:center;padding:0 24px;margin:0 -40px}
   h1{font-size:64px;letter-spacing:-.03em;margin:80px 0 40px;max-width:900px}
-  .card{background:#fff;border:2px solid #16111f;border-radius:14px;padding:24px;max-width:520px;margin:120px 0}
-  button{font:600 16px system-ui;padding:12px 18px;border-radius:10px;border:2px solid #16111f;background:#c6f432;margin:80px 12px 0 0}
-  footer{margin-top:300px;background:#6b4cff;color:#fff;padding:60px 40px;border-radius:20px}
+  .row{display:flex;gap:40px;align-items:flex-start;margin-top:140px}
+  .card{background:#fff;border:2px solid #16111f;border-radius:14px;padding:24px;width:360px}
+  .btn{font:600 16px system-ui;padding:12px 18px;border-radius:10px;border:2px solid #16111f;background:#c6f432;margin:60px 24px 0 0;display:inline-block}
+  footer{margin-top:260px;background:#6b4cff;color:#fff;padding:60px 40px;border-radius:20px;height:200px}
 </style>
 </head>
 <body>
+<nav id="nav">piixpal playground <piix-pal pal="thread" at=".7"></piix-pal></nav>
 <h1 id="title">Tiny creatures living on your text <piix-pal pal="bitbug"></piix-pal></h1>
-<p>Move the cursor near the bug. Click it.</p>
+<p id="para">This paragraph has a reader on it. Hover near the mushroom for a bit, or poke it. <piix-pal pal="moss" at=".9"></piix-pal></p>
+<div class="row">
+  <div class="card" id="c1"><b>A card</b><p>Something is hiding behind this card.</p><piix-pal pal="lurk"></piix-pal></div>
+  <div>
+    <a class="btn" href="#">Get started</a><a class="btn" href="#">Docs</a><a class="btn" href="#">GitHub</a>
+    <piix-pal pal="pip" on=".btn"></piix-pal>
+  </div>
+</div>
+<footer id="foot">footer <piix-pal pal="boing"></piix-pal></footer>
 <script src="../piixpal.js"></script>
 </body>
 </html>
