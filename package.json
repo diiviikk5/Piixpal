@@ -9,7 +9,8 @@
   ],
   "scripts": {
     "build": "node scripts/build.mjs",
-    "dev": "node scripts/serve.mjs"
+    "dev": "node scripts/serve.mjs",
+    "docs": "node scripts/docs.mjs"
   },
   "keywords": [
     "pixel",
