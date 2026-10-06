@@ -1,0 +1,32 @@
+/* Piixpal site: warm paper, ink, and a little lime. */
+:root{
+  --paper:#f3eee3; --paper-2:#ebe4d4; --paper-3:#e2d9c6; --card:#fbf8f1;
+  --ink:#17121f; --ink-2:#2b2436; --muted:#6c6477; --line:#d8cfbd; --line-2:#c9bfab;
+  --lime:#c6f432; --lime-2:#a8d81c; --coral:#ff6b4a; --violet:#6b4cff; --sky:#58c8ff; --sun:#ffd23f; --mint:#25b89a;
+  --f-sans:"Bricolage Grotesque",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --f-pix:"Silkscreen",var(--f-mono);
+  --r:14px; --r-lg:22px;
+  --px:3px;                       /* one "pixel" of UI chrome */
+  --shadow:0 var(--px) 0 0 var(--ink);
+  --ease:cubic-bezier(.2,.8,.2,1);
+  --spring:cubic-bezier(.34,1.56,.64,1);
+  --wrap:min(1180px, 100% - 48px);
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{overflow-x:clip;scroll-behavior:smooth;-webkit-text-size-adjust:100%;scroll-padding-top:96px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font:400 17px/1.55 var(--f-sans);font-optical-sizing:auto;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+}
+::selection{background:var(--lime);color:var(--ink)}
+a{color:inherit}
+img,svg,canvas{display:block}
+code,kbd,pre{font-family:var(--f-mono)}
+.wrap{width:var(--wrap);margin-inline:auto}
+.pix{font-family:var(--f-pix);font-weight:400;letter-spacing:.02em;text-transform:uppercase}
+.sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus-visible{outline:var(--px) solid var(--violet);outline-offset:3px;border-radius:6px}
