@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Piixpal · sprite lab</title>
+<style>
+  body{margin:0;background:#0c0a10;color:#f4efe4;font:14px/1.5 ui-monospace,Menlo,Consolas,monospace;padding:24px}
+  h1{font-size:16px;margin:0 0 16px;color:#c8ff2e}
+  h2{font-size:14px;margin:28px 0 10px}
+  .row{display:flex;flex-wrap:wrap;gap:14px}
+  figure{margin:0;padding:12px;background:#17131f;border:1px solid #2a2533;border-radius:10px;text-align:center}
+  figure.light{background:#f4efe4;color:#0c0a10}
+  figure canvas{image-rendering:pixelated;display:block;margin:0 auto 6px}
+  label{display:inline-flex;gap:8px;align-items:center;margin-right:16px}
+</style>
+</head>
+<body>
+<h1>sprite lab: every pal, every clip</h1>
+<label>scale <input id="sc" type="range" min="2" max="12" value="7"></label>
+<label><input id="lt" type="checkbox"> light background</label>
+<div id="out"></div>
+<script src="../piixpal.js"></script>
+<script>
+const out = document.getElementById('out');
+function draw() {
+  const s = +sc.value, light = lt.checked;
+  out.innerHTML = '';
+  for (const [name, spec] of Object.entries(Piixpal.sprites)) {
+    const h = document.createElement('h2');
+    h.textContent = `${name}  ${spec.w}x${spec.h}  does="${spec.does}"`;
+    const row = document.createElement('div'); row.className = 'row';
+    for (const [clip, frames] of Object.entries(spec.frames)) {
+      const fig = document.createElement('figure'); if (light) fig.className = 'light';
+      const c = document.createElement('canvas'); c.width = spec.w; c.height = spec.h;
+      c.style.width = spec.w * s + 'px'; c.style.height = spec.h * s + 'px';
+      const cap = document.createElement('figcaption'); cap.textContent = `${clip} (${frames.length})`;
+      fig.append(c, cap); row.append(fig);
+      const fps = (spec.fps && spec.fps[clip]) || 6;
+      const pal = Object.fromEntries(Object.entries(spec.palette).map(([k, v]) => [k, v]));
+      const g = c.getContext('2d');
+      let i = 0;
+      const paint = () => {
+        g.clearRect(0, 0, spec.w, spec.h);
+        const rows = frames[i % frames.length], pad = spec.h - rows.length;
+        rows.forEach((r, y) => [...r].forEach((ch, x) => { if (pal[ch]) { g.fillStyle = pal[ch]; g.fillRect(x, y + pad, 1, 1); } }));
+        i++;
+      };
+      paint(); setInterval(paint, 1000 / fps);
+    }
+    out.append(h, row);
+  }
+}
+sc.oninput = lt.onchange = draw;
+addEventListener('load', draw);
+</script>
+</body>
+</html>
