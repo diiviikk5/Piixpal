@@ -279,3 +279,4 @@ code,kbd,pre{font-family:var(--f-mono)}
 .foot::after{content:"";position:absolute;left:0;right:0;top:-14px;height:16px;pointer-events:none;
   background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='16' shape-rendering='crispEdges'%3E%3Cpath fill='%2317121f' d='M0 14h8v-4h8v-4h8v-4h8v4h8v4h8v4h8v2H0z'/%3E%3Cpath fill='%236b4cff' d='M0 16v-0h8v-4h8v-4h8v-4h8v4h8v4h8v4h8v2z' transform='translate(0 2)'/%3E%3C/svg%3E") repeat-x 0 0/56px 16px}
 .foot-in{overflow:hidden}
+.h-hive{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);padding:14px 22px;border:2px solid var(--ink);border-radius:12px;background:var(--sun);font:400 12px/1 var(--f-pix);text-transform:uppercase;box-shadow:0 4px 0 var(--ink)}

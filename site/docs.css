@@ -103,3 +103,12 @@
 .ov h3{margin:6px 0 0;font:760 26px/1 var(--f-sans);letter-spacing:-.03em;display:flex;justify-content:space-between;align-items:baseline}
 .ov h3 span{font:400 12px/1 var(--f-pix);color:var(--muted)}
 .ov p{margin:0;color:var(--ink-2);font-size:15.5px}
+
+/* bits used by the generated pages */
+.sel{width:100%;font:600 15px/1 var(--f-sans);padding:10px 12px;border:2px solid var(--ink);border-radius:10px;background:var(--paper);color:var(--ink);cursor:pointer}
+.doc-sec > h2 .pal-no{font-size:12px;vertical-align:middle;margin-left:8px}
+.h-hive{position:absolute;left:50%;bottom:28px;transform:translateX(-50%);padding:16px 26px;border:2px solid var(--ink);border-radius:12px;background:var(--sun);
+  font:400 13px/1 var(--f-pix);text-transform:uppercase;box-shadow:0 4px 0 var(--ink)}
+.doc-head em{font-style:normal;background:linear-gradient(transparent 62%,var(--lime) 62% 92%,transparent 92%)}
+.doc-sec code{font-size:.88em;padding:1px 6px;border-radius:6px;background:var(--paper-2);border:1px solid var(--line)}
+.pal-doc .habitat .h-text{bottom:90px}
