@@ -157,9 +157,24 @@
 <section class="sec" id="sprites" aria-labelledby="sprites-h">
   <div class="wrap">
     <header class="sec-head">
-      <div><span class="eyebrow rv" style="--accent:var(--sun)">Sprites · 12 and counting</span><h2 class="rv" id="sprites-h">Or just paste a little face.</h2></div>
+      <div><span class="eyebrow rv" style="--accent:var(--sun)">Sprites · 20 and counting</span><h2 class="rv" id="sprites-h">Or just paste a little face.</h2></div>
       <p class="rv">Sprites sit inline like an image: no positioning, no setup. Their eyes follow your cursor, they blink, breathe and hop when clicked. Go on, wave at them.</p>
     </header>
+    <div class="bigstage rv" id="bigstage">
+      <div class="bs-grid">
+        <piix-sprite name="gloop" size="210"></piix-sprite>
+        <piix-sprite name="hops" size="200"></piix-sprite>
+        <piix-sprite name="inky" size="210"></piix-sprite>
+      </div>
+      <div class="bs-bar">
+        <span class="bs-label">Big sprites · chunky 3D, turn toward your cursor</span>
+        <div class="seg bs-modes" role="group" aria-label="Render style">
+          <button type="button" data-r="voxel" aria-pressed="true">3D voxel</button>
+          <button type="button" data-r="pixel" aria-pressed="false">Pixel</button>
+          <button type="button" data-r="dots" aria-pressed="false">Dots</button>
+        </div>
+      </div>
+    </div>
     <div class="shelf rv" id="shelf">
       <div class="shelf-item"><piix-sprite name="mochi" scale="5"></piix-sprite><a href="components/sprites.html#s-mochi">mochi</a></div>
       <div class="shelf-item"><piix-sprite name="toast" scale="5"></piix-sprite><a href="components/sprites.html#s-toast">toast</a></div>

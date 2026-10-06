@@ -164,3 +164,15 @@ document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click'
   }));
   sync();
 })();
+
+/* ---------- big sprites: flip between voxel, pixel and dots ---------- */
+(() => {
+  const box = document.querySelector('.bs-modes');
+  if (!box) return;
+  box.addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if (!b) return;
+    box.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b));
+    document.querySelectorAll('#bigstage piix-sprite').forEach(s => s.setAttribute('render', b.dataset.r));
+  });
+})();

@@ -312,3 +312,13 @@ code,kbd,pre{font-family:var(--f-mono)}
 .theme button[aria-pressed=true]{background:var(--ink);color:var(--paper)}
 .theme svg{width:14px;height:14px}
 @media (max-width:520px){.theme button{width:26px}}
+
+/* ---------- big sprites stage on the home page ---------- */
+.bigstage{margin-bottom:22px;border:2px solid var(--ink);border-radius:var(--r-lg);overflow:hidden;box-shadow:0 4px 0 var(--ink);
+  background:radial-gradient(rgba(255,255,255,.14) 1px,transparent 1.4px) 0 0/20px 20px,var(--code);color:#fff}
+.bs-grid{display:flex;align-items:flex-end;justify-content:space-around;gap:20px;padding:56px 24px 34px;min-height:330px}
+.bs-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-top:1.5px solid rgba(255,255,255,.14)}
+.bs-label{font:400 12px/1 var(--f-pix);text-transform:uppercase;color:#cfc8db}
+.bs-modes button{background:transparent;color:#fff;border-color:rgba(255,255,255,.5)}
+.bs-modes button[aria-pressed=true]{background:var(--lime);color:#17121f;border-color:var(--lime)}
+@media (max-width:700px){.bs-grid piix-sprite:nth-child(3){display:none}.bs-grid{min-height:240px}}
