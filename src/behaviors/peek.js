@@ -72,6 +72,11 @@ defineBehavior('peek', (a, [el], host) => {
         else a.play(look());
       }
     },
+    hear(type) {
+      if (type !== 'thud' || state === 'hidden' || state === 'duck') return;
+      eep = .3; if (chance(.5)) a.say('eep', 600);
+      go('duck', rnd(1.5, 3)); goal = H;
+    },
     poke() {
       if (state === 'hidden' || state === 'duck') return;
       eep = .35; a.say('eep', 800);
