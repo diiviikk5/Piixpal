@@ -682,6 +682,157 @@ defineBehavior('crawl', (a, [el], host) => {
   };
 });
 
+/* ---- behaviors/creep.js ---- */
+/* creep: glides very slowly along the top of an element's text (or edge), leaving a
+ * shimmering slime trail that fades out behind it. Hides in its shell when the cursor
+ * gets close or something thuds nearby, then peeks out and carries on. */
+defineBehavior('creep', (a, [el], host) => {
+  const S = a.s / 3;
+  const speed = 9 * S * (+host.getAttribute('speed') || 1);
+  const mode = host.getAttribute('edge') || (typeof el.piixSurface === 'function' ? 'surface' : 'text');
+  const cache = {};
+  let box = null, state = 'walk', timer = rnd(4, 8), placed = false, run = 0, lastY = 0;
+
+  const slime = document.createElement('div');
+  slime.style.cssText = `position:absolute;left:0;top:0;height:${Math.max(2, Math.round(a.s * .7))}px;pointer-events:none;border-radius:2px;` +
+    'background:linear-gradient(90deg,rgba(150,225,255,0),rgba(150,225,255,.55) 70%,rgba(255,255,255,.85));' +
+    'transform-origin:100% 50%';
+  a.node.parentNode.insertBefore(slime, a.node);
+
+  const lane = () => {
+    if (mode === 'surface') { const r = rectOf(el); return { l: r.l, r: r.r, t: r.t }; }
+    if (mode === 'text') { const t = textProfile(el, cache); if (t) return t; }
+    const r = rectOf(el); return { l: r.l, r: r.r, t: r.t };
+  };
+  const surf = x => {
+    if (x < box.l + a.w * .35 || x > box.r - a.w * .35) return null;
+    if (mode === 'surface') return el.piixSurface(x);
+    return box.segs ? segAt(box.segs, x) : box.t;
+  };
+  const hide = t => { state = 'hide'; timer = t; a.play('hide'); };
+
+  return {
+    tick(dt) {
+      box = lane();
+      if (!placed) {
+        const at = host.getAttribute('at');
+        a.x = box.l + (box.r - box.l) * (at != null ? clamp(+at, 0, 1) : rnd(.2, .8));
+        a.y = surf(a.x) ?? box.t; lastY = a.y; a.face = chance(.5) ? 1 : -1; placed = true;
+      }
+      const g = surf(a.x);
+      if (g != null) a.y = g;
+      if (reduced()) { a.play('idle'); slime.style.width = '0px'; return; }
+
+      const near = ptr.seen && ptrDist(a.x, a.y - a.h / 2) < 60 * S + a.w / 2;
+      timer -= dt;
+      switch (state) {
+        case 'walk': {
+          a.play('walk');
+          if (near) { hide(rnd(2.5, 4)); a.say('sweat', 700); break; }
+          const nx = a.x + a.face * speed * dt;
+          const ny = surf(nx);
+          /* snails don't jump: at a gap or an edge, it turns around */
+          if (ny == null || Math.abs(ny - a.y) > a.h * .9) { a.face = -a.face; run = 0; state = 'rest'; timer = rnd(1, 2); a.play('idle'); break; }
+          a.x = nx; a.y = ny;
+          run = Math.abs(a.y - lastY) > 1 ? 0 : Math.min(run + speed * dt, 170 * S);
+          lastY = a.y;
+          if (timer <= 0) { state = 'rest'; timer = rnd(1.5, 3); a.play('idle'); }
+          break;
+        }
+        case 'rest':
+          if (near) { hide(rnd(2.5, 4)); break; }
+          if (timer <= 0) { state = 'walk'; timer = rnd(5, 10); if (chance(.25)) { a.face = -a.face; run = 0; } }
+          break;
+        case 'hide':
+          a.play('hide');
+          if (near) timer = Math.max(timer, 1.2);
+          if (timer <= 0) { state = 'peek'; timer = rnd(.8, 1.4); a.play('peek'); }
+          break;
+        case 'peek':
+          if (near) { hide(rnd(2, 3)); break; }
+          if (timer <= 0) { state = 'walk'; timer = rnd(4, 8); }
+          break;
+      }
+
+      /* the trail sits under the shell and stretches out behind it, fading */
+      const len = Math.round(run);
+      const tail = a.face > 0 ? a.x - a.w * .25 - len : a.x + a.w * .25;
+      slime.style.width = len + 'px';
+      slime.style.transform = `translate3d(${Math.round(tail - origin.x)}px,${Math.round(a.y - 2 - origin.y)}px,0) scaleX(${a.face > 0 ? 1 : -1})`;
+      slime.style.transformOrigin = a.face > 0 ? '100% 50%' : '0 50%';
+    },
+    poke() { hide(rnd(3, 4.5)); a.say(pick(['!', 'eep']), 700); },
+    hear(type) { if (type === 'thud') hide(rnd(2.5, 4)); },
+    destroy() { slime.remove(); }
+  };
+});
+
+/* ---- behaviors/follow.js ---- */
+/* follow: naps on its element until the cursor comes near, then tags along behind it
+ * around the page. When the cursor stops for a while it flies home and naps again.
+ * Poke it for a loop-the-loop. */
+defineBehavior('follow', (a, [el], host) => {
+  const S = a.s / 3;
+  const at = host.getAttribute('at') != null ? clamp(+host.getAttribute('at'), 0, 1) : .5;
+  const MAX = 760 * S;
+  let state = 'home', vx = 0, vy = 0, loop = 0, side = -1, idleSince = now(), placed = false;
+
+  const home = () => {
+    const r = rectOf(el);
+    return { x: r.l + a.w / 2 + (r.w - a.w) * at, y: typeof el.piixSurface === 'function' ? (el.piixSurface(r.l + r.w * at) ?? r.t) : r.t };
+  };
+  const steer = (gx, gy, dt, gain, max) => {
+    const dx = gx - a.x, dy = gy - a.y;
+    vx = lerp(vx, clamp(dx * gain, -max, max), 1 - Math.exp(-5 * dt));
+    vy = lerp(vy, clamp(dy * gain, -max, max), 1 - Math.exp(-5 * dt));
+    a.x += vx * dt; a.y += vy * dt;
+    return Math.hypot(dx, dy);
+  };
+
+  return {
+    tick(dt, t) {
+      const h = home();
+      if (!placed) { a.x = h.x; a.y = h.y; placed = true; a.play('sleep'); a.say('zz', 0); }
+      if (reduced()) { a.x = h.x; a.y = h.y; a.play('perch'); return; }
+      if (now() - ptr.last < 120) idleSince = now();
+      const idle = now() - idleSince;
+
+      if (state === 'home') {
+        a.x = h.x; a.y = h.y; a.rot = 0;
+        a.play(idle > 6000 ? 'sleep' : 'perch');
+        if (ptr.seen && idle < 400 && ptrDist(a.x, a.y - a.h / 2) < 220 * S) {
+          state = 'follow'; a.hush(); a.say(chance(.5) ? 'heart' : '!', 700); vy = -200 * S;
+        }
+        return;
+      }
+
+      if (state === 'follow') {
+        /* hang back on the side the cursor came from, a little above it */
+        if (Math.abs(ptr.vx) > 60) side = ptr.vx > 0 ? -1 : 1;
+        const gx = ptr.x + side * 46 * S, gy = ptr.y - 18 * S + Math.sin(t / 160) * 6 * S;
+        steer(gx, gy, dt, 6, MAX);
+        if (idle > 4500 || !ptr.seen || ptr.cx < -1e4) { state = 'return'; a.say('zz', 900); }
+      } else if (state === 'return') {
+        const d = steer(h.x, h.y - 2 * S, dt, 3.2, MAX * .55);
+        if (d < 3 * S) { state = 'home'; vx = vy = 0; a.say('zz', 0); }
+        if (idle < 200 && ptrDist(a.x, a.y) < 260 * S) state = 'follow';
+      }
+
+      if (loop > 0) { loop = Math.max(0, loop - dt / .6); a.rot = (1 - loop) * 360 * (a.face || 1); a.play('happy'); }
+      else {
+        a.rot = clamp(vx / MAX * 18, -18, 18);
+        a.play('fly');
+      }
+      if (Math.abs(vx) > 25) a.face = vx > 0 ? 1 : -1;
+    },
+    poke() {
+      if (state === 'home') { state = 'follow'; a.hush(); }
+      loop = 1; a.say('heart', 800);
+    },
+    hear(type) { if (type === 'thud' && state === 'home') { state = 'follow'; a.hush(); a.say('!', 600); } }
+  };
+});
+
 /* ---- behaviors/hang.js ---- */
 /* hang: dangles from the bottom edge of an element on a silk thread. Swings when the
  * page scrolls or the cursor brushes past, zips up when you reach for it, then lowers
@@ -1160,6 +1311,56 @@ defineBehavior('perch', (a, targets, host) => {
   });
 })();
 
+/* ---- pals/bumble.js ---- */
+/* BUMBLE: a fuzzy little bee who naps on your element.
+ * Job: wakes up when your cursor comes by, follows you around the page, and flies
+ * home for another nap when you stop moving. Poke it for a loop-the-loop. */
+(() => {
+  const up = [
+    '.kk........kk.',
+    'kwwk......kwwk',
+    'kwwwk....kwwwk',
+    '.kwwkkkkkkwwk.'
+  ];
+  const down = [
+    '..............',
+    '..............',
+    '.kkk......kkk.',
+    'kwwwkkkkkkwwwk'
+  ];
+  const body = (eyes) => [
+    '...kyyyyyyk...',
+    '..kyY' + 'yyyyyyk..'.slice(0, 9),
+    ...eyes,
+    '..kkkkkkkkkk..',
+    '..kyyyyyyyyk..',
+    '..kkkkkkkkkk..',
+    '...kyyyyyyk...',
+    '....kkkkkk....',
+    '......kk......'
+  ];
+  const EYES = {
+    open: ['..kywwyywwyk..', '..kywkyywkyk..'],
+    shut: ['..kyyyyyyyyk..', '..kykkyykkyk..'],
+    happy: ['..kykkyykkyk..', '..kkyykkyyk...'.slice(0, 14).padEnd(14, '.')]
+  };
+  /* wings on top of a body (the body's first row overlaps the wing base) */
+  const bee = (wings, eyes = 'open') => wings.concat(body(EYES[eyes]));
+
+  defineSprite('bumble', {
+    w: 14, h: 15, scale: 3,
+    does: 'follow',
+    palette: { k: '#17121f', y: '#ffd23f', Y: '#fff2a8', w: '#e4f6ff' },
+    frames: {
+      fly: [bee(up), bee(down)],
+      happy: [bee(up, 'happy'), bee(down, 'happy')],
+      sleep: [bee(down, 'shut')],
+      perch: [bee(down), bee(down), bee(down), bee(down, 'shut')]
+    },
+    fps: { fly: 20, happy: 22, sleep: 1, perch: 3 }
+  });
+})();
+
 /* ---- pals/lurk.js ---- */
 /* LURK — big eyes, little hands, zero courage.
  * Job: hides behind an element and peeks over its edge. Eyes follow you from a distance;
@@ -1304,6 +1505,52 @@ defineBehavior('perch', (a, targets, host) => {
       fly: [wingUp, wingDown]
     },
     fps: { idle: 3, look: 2, peck: 8, fly: 12 }
+  });
+})();
+
+/* ---- pals/shel.js ---- */
+/* SHEL: a very slow snail with a very nice shell.
+ * Job: creeps along your text leaving a shimmering slime trail.
+ * Too close and it hides in its shell until you go away. */
+(() => {
+  const walkA = [
+    '...kkkkkk.......',
+    '..kSSssssk...k.k',
+    '.kSskkkkssk..b.b',
+    '.kskSsssksk..b.b',
+    '.kskskksksk.kbbk',
+    '.kskssskssk.kbbk',
+    '.kskkkkkssk.kbpk',
+    'kbkkkkkkkkkkkbbk',
+    'kbbbbbbbbbbbbbbk',
+    '.kkkkkkkkkkkkkk.'
+  ];
+  const walkB = art.compose(walkA, [0, 8, ['kbbbbbbbbbbbbbk.']], [0, 9, ['.kkkkkkkkkkkkk..']]);
+  const sway = art.put(walkA, 12, 1, ['.k.k', '.b.b']);
+  const shell = [
+    '...kkkkkk...',
+    '..kSSssssk..',
+    '.kSskkkkssk.',
+    '.kskSsssksk.',
+    '.kskskksksk.',
+    '.kskssskssk.',
+    '.kskkkkkssk.',
+    '.kssssssssk.',
+    '..kkkkkkkk..'
+  ].map(r => r.padEnd(16, '.'));
+  const peek = art.compose(shell, [11, 3, ['..k.']], [11, 4, ['.kbk']], [11, 5, ['kbbk']], [11, 6, ['kbbk']], [10, 7, ['kkkkk']]);
+
+  defineSprite('shel', {
+    w: 16, h: 10, scale: 3,
+    does: 'creep',
+    palette: { k: '#17121f', S: '#ffe2bd', s: '#ef9a4b', b: '#9fe3c9', p: '#ff9cc2' },
+    frames: {
+      walk: [walkA, walkA, walkB, walkB],
+      idle: [walkA, walkA, sway, walkA],
+      hide: [shell],
+      peek: [peek]
+    },
+    fps: { walk: 3, idle: 2 }
   });
 })();
 
