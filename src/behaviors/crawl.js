@@ -68,11 +68,12 @@ defineBehavior('crawl', (a, [el], host) => {
     return box.segs ? segAt(box.segs, x) : box.t;
   };
   const go = (st, t, clip, opt) => { state = st; timer = t; if (clip) a.play(clip, opt); };
-  const startHop = (x1, y1) => {
+  const startHop = (x1, y1, drop = false) => {
     const hgt = Math.max(10 * S, a.y - y1 + 8 * S);
-    hop = { x0: a.x, y0: a.y, x1, y1, p: 0, d: clamp(.28 + Math.abs(x1 - a.x) / 500, .28, .6), yc: Math.min(a.y, y1) - hgt * 1.4 };
+    hop = { x0: a.x, y0: a.y, x1, y1, p: 0, d: drop ? .55 : clamp(.28 + Math.abs(x1 - a.x) / 500, .28, .6), yc: drop ? a.y : Math.min(a.y, y1) - hgt * 1.4 };
     a.play('hop');
   };
+  const bump = power => { if (typeof el.piixImpact === 'function') el.piixImpact(a.x, a.y, power); };
   /* look ahead for somewhere to land; null if there's nowhere */
   const landing = from => {
     for (let dx = 2; dx < reach; dx += 2) {
@@ -96,10 +97,17 @@ defineBehavior('crawl', (a, [el], host) => {
     tick(dt) {
       box = lane();
       if (!placed) {
+        /* wait for pixel lettering to finish raining in, then drop onto it */
+        if (el.piixSettled === false) { a.node.style.visibility = 'hidden'; return; }
+        a.node.style.visibility = '';
         const at = host.getAttribute('at');
         a.x = box.l + (box.r - box.l) * (at != null ? clamp(+at, 0, 1) : rnd(.15, .85));
-        a.y = surf(a.x) ?? box.t; a.face = chance(.5) ? 1 : -1;
-        a.play('walk'); placed = true;
+        let y = surf(a.x);
+        for (let i = 0; y == null && i < 40; i++) { a.x += a.w * .1; y = surf(a.x); }
+        a.face = chance(.5) ? 1 : -1;
+        placed = true;
+        if (reduced() || y == null) { a.y = y ?? box.t; a.play('walk'); }
+        else { a.y = y - 160 * S; startHop(a.x, y, true); }
       }
       if (reduced()) { a.y = surf(a.x) ?? box.t; a.play('idle'); return; }
       move.dt = dt;
@@ -111,7 +119,12 @@ defineBehavior('crawl', (a, [el], host) => {
         a.x = lerp(hop.x0, hop.x1, p);
         a.y = q * q * hop.y0 + 2 * q * p * hop.yc + p * p * hop.y1;
         a.sy = 1.08; a.sx = .94;
-        if (p >= 1) { hop = null; a.y = surf(a.x) ?? a.y; a.sy = .8; a.sx = 1.15; a.play(state === 'flip' ? 'flip' : 'walk'); }
+        if (p >= 1) {
+          const fall = Math.max(0, hop.y1 - Math.min(hop.y0, hop.yc));
+          hop = null; a.y = surf(a.x) ?? a.y; a.sy = .8; a.sx = 1.15;
+          a.play(state === 'flip' ? 'flip' : 'walk');
+          bump(clamp(fall / (60 * S), .3, 1.4));
+        }
         return;
       }
       a.sx = lerp(a.sx, 1, .25); a.sy = lerp(a.sy, 1, .25);
