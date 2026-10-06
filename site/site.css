@@ -114,3 +114,14 @@ code,kbd,pre{font-family:var(--f-mono)}
   transition:opacity .8s var(--ease),transform .9s var(--ease),filter .8s var(--ease);transition-delay:var(--d,0s)}
 .js .rv.in{opacity:1;transform:none;filter:none}
 @media (prefers-reduced-motion:reduce){.js .rv{opacity:1;transform:none;filter:none;transition:none}}
+
+/* ---------- ticker band ---------- */
+.ticker{position:relative;background:var(--ink);color:var(--paper);border-block:2px solid var(--ink);overflow:hidden;
+  --gap:34px}
+.ticker-track{display:flex;width:max-content;gap:var(--gap);padding:18px 0;animation:tick 38s linear infinite}
+.ticker:hover .ticker-track{animation-play-state:paused}
+.ticker-track span{display:inline-flex;align-items:center;gap:var(--gap);font:400 clamp(15px,1.6vw,19px)/1 var(--f-pix);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.ticker-track span::after{content:"";width:10px;height:10px;background:var(--lime);box-shadow:12px 0 0 var(--coral),24px 0 0 var(--sky);margin-right:24px}
+.ticker-track span:nth-child(3n+2){color:var(--lime)}
+@keyframes tick{to{transform:translateX(calc(-50% - var(--gap) / 2))}}
+@media (prefers-reduced-motion:reduce){.ticker-track{animation:none}}
