@@ -102,7 +102,7 @@ const getLayer = () => {
   layer = document.createElement('div');
   layer.setAttribute('data-piixpal', VERSION);
   layer.setAttribute('aria-hidden', 'true');
-  layer.style.cssText = 'position:absolute;left:0;top:0;width:0;height:0;overflow:visible;z-index:2147482000;pointer-events:none;margin:0;padding:0;border:0';
+  layer.style.cssText = 'position:absolute;left:0;top:0;width:0;height:0;overflow:visible;z-index:var(--piix-z,2147482000);pointer-events:none;margin:0;padding:0;border:0';
   layerRoot = layer.attachShadow({ mode: 'open' });
   const st = document.createElement('style');
   st.textContent = LAYER_CSS;
