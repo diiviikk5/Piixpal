@@ -322,3 +322,6 @@ code,kbd,pre{font-family:var(--f-mono)}
 .bs-modes button{background:transparent;color:#fff;border-color:rgba(255,255,255,.5)}
 .bs-modes button[aria-pressed=true]{background:var(--lime);color:#17121f;border-color:var(--lime)}
 @media (max-width:700px){.bs-grid piix-sprite:nth-child(3){display:none}.bs-grid{min-height:240px}}
+.h-tank{position:absolute;inset:26px;border:2px solid var(--ink);border-radius:12px;background:linear-gradient(#bfe9ff,#7fd3ff)}
+.h-night{position:absolute;inset:22px;border-radius:12px;background:#17121f}
+.h-wire{position:absolute;left:0;right:0;top:120px;height:2px;background:var(--ink)}

@@ -117,3 +117,16 @@
 .ctl input[type=color]{width:100%;height:36px;padding:2px;border:2px solid var(--ink);border-radius:10px;background:var(--paper);cursor:pointer}
 .ctl input:disabled{opacity:.35;cursor:not-allowed}
 .mini{font:600 11.5px/1 var(--f-sans);padding:8px 6px;border:1.5px solid var(--ink);border-radius:8px;background:var(--paper);color:var(--ink);cursor:pointer}
+
+/* toy box + groups habitats, crowd page */
+.fam-h{display:flex;align-items:center;gap:12px}
+.family{padding-top:72px}
+.family + .doc-sec{padding-top:28px}
+.h-tank{position:absolute;inset:26px 26px 26px;border:2px solid var(--ink);border-radius:12px;background:linear-gradient(#bfe9ff,#7fd3ff)}
+.h-night{position:absolute;inset:22px;border-radius:12px;background:#17121f}
+.h-wire{position:absolute;left:0;right:0;top:140px;height:2px;background:var(--ink)}
+.crowd-box{border:2px solid var(--ink);border-radius:var(--r-lg);overflow:hidden;box-shadow:8px 8px 0 var(--sky);background:var(--card)}
+.crowd-box piix-crowd{background:radial-gradient(color-mix(in oklab,var(--ink) 12%,transparent) 1px,transparent 1.3px) 0 0/16px 16px,var(--paper);border-bottom:2px solid var(--ink)}
+.crowd-ctl{grid-template-columns:repeat(3,minmax(0,1fr));align-items:center}
+@media (max-width:980px){.crowd-ctl{grid-template-columns:minmax(0,1fr)}}
+.ov{grid-template-columns:repeat(3,minmax(0,1fr))}
