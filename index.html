@@ -181,8 +181,116 @@
   </div>
 </section>
 
+<section class="sec" id="api" aria-labelledby="api-h">
+  <div class="wrap">
+    <header class="sec-head">
+      <div><span class="eyebrow rv" style="--accent:var(--violet)">API</span><h2 class="rv" id="api-h">Every attribute is optional.</h2></div>
+      <p class="rv">Great defaults with nothing set. When you want control, it's plain HTML attributes, two events and two functions.</p>
+    </header>
+    <div class="api">
+      <div class="table-wrap rv">
+        <table>
+          <caption>&lt;piix-pal&gt;</caption>
+          <thead><tr><th>Attribute</th><th>What it does</th><th>Default</th></tr></thead>
+          <tbody>
+            <tr><td><code>pal</code></td><td>Which character: <code>bitbug</code> <code>boing</code> <code>moss</code> <code>lurk</code> <code>thread</code> <code>pip</code></td><td>bitbug</td></tr>
+            <tr><td><code>on</code></td><td>CSS selector of what to live on. Several matches give Pip more perches.</td><td>parent</td></tr>
+            <tr><td><code>do</code></td><td>Swap the behaviour: <code>crawl</code> <code>bounce</code> <code>mind</code> <code>peek</code> <code>hang</code> <code>perch</code></td><td>its own</td></tr>
+            <tr><td><code>at</code></td><td>Where along the element, from 0 (left) to 1 (right).</td><td>random</td></tr>
+            <tr><td><code>scale</code></td><td>Size of one sprite pixel, in CSS pixels.</td><td>3–4</td></tr>
+            <tr><td><code>hue</code></td><td>Recolour it by rotating the hue, in degrees.</td><td>0</td></tr>
+            <tr><td><code>edge</code></td><td><code>text</code> walks the glyph outlines, <code>box</code> walks the element's top edge.</td><td>text</td></tr>
+            <tr><td><code>speed</code> <code>energy</code> <code>length</code></td><td>Crawl speed, bounce energy, thread length.</td><td>1 · 1 · 70</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="side">
+        <div class="panel rv">
+          <h3>Events + methods</h3>
+<pre><code><span class="c-c">// a pal was poked</span>
+pal.<span class="c-a">addEventListener</span>(<span class="c-s">'piix:poke'</span>, e =&gt; …)
+
+<span class="c-c">// poke it yourself</span>
+pal.<span class="c-a">poke</span>()
+
+<span class="c-c">// tuck pals under a sticky header</span>
+:root { <span class="c-a">--piix-z</span>: <span class="c-s">40</span> }</code></pre>
+        </div>
+        <div class="panel rv">
+          <h3>Draw your own pal</h3>
+<pre><code>Piixpal.<span class="c-a">sprite</span>(<span class="c-s">'blip'</span>, {
+  w: <span class="c-s">6</span>, h: <span class="c-s">4</span>, does: <span class="c-s">'crawl'</span>,
+  palette: { k: <span class="c-s">'#000'</span>, g: <span class="c-s">'#c6f432'</span> },
+  frames: { walk: [[
+    <span class="c-s">'.kkkk.'</span>,
+    <span class="c-s">'kgkgkk'</span>,
+    <span class="c-s">'kggggk'</span>,
+    <span class="c-s">'.k..k.'</span> ]] }
+})</code></pre>
+          <p>Pixels are strings. Any pal works with any behaviour that finds the clips it needs.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="install" aria-labelledby="install-h">
+  <div class="wrap">
+    <header class="sec-head">
+      <div><span class="eyebrow rv" style="--accent:var(--lime)">Install</span><h2 class="rv" id="install-h">Free, open source, yours.</h2></div>
+      <p class="rv">MIT licensed. Use it on client work, side projects, your portfolio, your 404 page. No sign-up and no tracking. A star on GitHub is plenty.</p>
+    </header>
+    <div class="install">
+      <div class="way rv" style="--accent:var(--lime)">
+        <span class="tag">Fastest</span>
+        <h3>Script tag</h3>
+        <p>Paste it before <code>&lt;/body&gt;</code>. Served free by jsDelivr, straight from GitHub.</p>
+        <div class="snip"><code>&lt;script src="…/piixpal.js"&gt;</code><button class="copy" type="button" data-copy-tag>Copy</button></div>
+      </div>
+      <div class="way rv" style="--accent:var(--sky)">
+        <span class="tag">Offline</span>
+        <h3>Download the file</h3>
+        <p>One self-contained file. Drop it next to your HTML and point a script tag at it.</p>
+        <a class="btn btn-sm perch" href="https://raw.githubusercontent.com/diiviikk5/Piixpal/main/piixpal.js" download>Download piixpal.js</a>
+      </div>
+      <div class="way rv" style="--accent:var(--sun)">
+        <span class="tag">Frameworks</span>
+        <h3>React, Vue, Svelte</h3>
+        <p>Pals are standard web components, so they work as-is. Import the file once and use the tag in your JSX or templates.</p>
+        <div class="snip"><code>import "<b>./piixpal.js</b>"</code><button class="copy" type="button" data-copy='import "./piixpal.js"'>Copy</button></div>
+      </div>
+    </div>
+    <div class="facts">
+      <div class="fact rv"><b id="kb">~20 KB</b><span>gzipped, no dependencies</span></div>
+      <div class="fact rv"><b>1 loop</b><span>one shared animation loop, paused off-screen</span></div>
+      <div class="fact rv"><b>0 clicks</b><span>blocked. Pals only catch clicks on themselves</span></div>
+      <div class="fact rv"><b>A11y</b><span>respects reduced motion, hidden from screen readers</span></div>
+    </div>
+  </div>
+</section>
+
 <!-- /sections -->
 </main>
+
+<footer class="foot" id="foot">
+  <div class="wrap foot-in">
+    <div class="foot-cta">
+      <h2 class="rv">Your website is lonely. <span>Get it a pal.</span></h2>
+      <button class="btn btn-lime perch rv" type="button" data-copy-tag><span data-label>Copy the script tag</span></button>
+    </div>
+    <div class="foot-bottom">
+      <a class="logo" href="#top" aria-label="Back to top" style="color:#fff"><span>p<span class="i">ı</span><span class="i">ı</span>xpal</span></a>
+      <nav aria-label="Footer">
+        <a href="#pals">Pals</a><a href="#how">How it works</a><a href="#api">API</a>
+        <a href="https://github.com/diiviikk5/Piixpal" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/diiviikk5/Piixpal/issues" target="_blank" rel="noopener">Request a pal</a>
+      </nav>
+      <span class="foot-small">MIT · made of tiny squares</span>
+    </div>
+  </div>
+  <piix-pal pal="boing" scale="5"></piix-pal>
+</footer>
+
 
 <!-- one bird, many perches -->
 <piix-pal pal="pip" on=".perch"></piix-pal>

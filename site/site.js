@@ -23,6 +23,7 @@
   };
   const tagBtn = $('#copy-tag');
   if (tagBtn) tagBtn.addEventListener('click', () => copy(TAG, tagBtn));
+  $('[data-copy-tag]').forEach(b => b.addEventListener('click', () => copy(TAG, b)));
 
   /* ---------- nav gets a border once the page moves ---------- */
   const nav = $('#nav');
