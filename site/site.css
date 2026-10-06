@@ -96,7 +96,7 @@ code,kbd,pre{font-family:var(--f-mono)}
 .lede em{font-style:normal;background:linear-gradient(transparent 62%,var(--lime) 62% 92%,transparent 92%);padding:0 .06em}
 .sub{font-size:clamp(17px,1.5vw,19.5px);line-height:1.5;color:var(--ink-2);max-width:50ch;margin:0 0 30px;text-wrap:pretty}
 .ctas{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
-.hint{display:flex;align-items:center;gap:8px;margin-top:22px;font-size:13.5px;color:var(--muted)}
+.hint{margin:22px 0 0;font-size:13.5px;line-height:2;color:var(--muted)}
 .hint kbd{font:600 11px/1 var(--f-mono);padding:4px 6px;border:1.5px solid var(--line-2);border-bottom-width:3px;border-radius:6px;background:var(--card);color:var(--ink-2)}
 @media (max-width:900px){.hero-grid{grid-template-columns:minmax(0,1fr)}}
 
