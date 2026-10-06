@@ -6,24 +6,27 @@ import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const src = join(root, 'src');
-const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
 
 const dir = d => existsSync(join(src, d))
   ? readdirSync(join(src, d)).filter(f => f.endsWith('.js')).sort().map(f => join(d, f))
   : [];
 
-const order = [
-  'core.js',
-  'icons.js',
-  ...dir('behaviors'),
-  ...dir('pals'),
-  ...dir('elements'),
-  'boot.js'
-].filter(f => existsSync(join(src, f)));
+export function bundle() {
+  const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
+  const order = [
+    'core.js',
+    'icons.js',
+    ...dir('behaviors'),
+    ...dir('pals'),
+    ...dir('elements'),
+    'boot.js'
+  ].filter(f => existsSync(join(src, f)));
 
-const body = order.map(f => `/* ---- ${f.replace(/\/g, '/')} ---- */\n` + readFileSync(join(src, f), 'utf8').trim()).join('\n\n');
+  const body = order
+    .map(f => `/* ---- ${f.replace(/\/g, '/')} ---- */\n` + readFileSync(join(src, f), 'utf8').trim())
+    .join('\n\n');
 
-const out = `/*! Piixpal v${pkg.version} | tiny pixel creatures that live on your website | MIT
+  const code = `/*! Piixpal v${pkg.version} | tiny pixel creatures that live on your website | MIT
  *  https://github.com/diiviikk5/Piixpal
  *
  *    <script src="piixpal.js"></script>
@@ -37,10 +40,13 @@ const VERSION = '${pkg.version}';
 ${body}
 })();
 `;
+  return { code, files: order.length };
+}
 
 export function build() {
-  writeFileSync(join(root, 'piixpal.js'), out);
-  return { files: order.length, bytes: Buffer.byteLength(out) };
+  const { code, files } = bundle();
+  writeFileSync(join(root, 'piixpal.js'), code);
+  return { files, bytes: Buffer.byteLength(code) };
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
