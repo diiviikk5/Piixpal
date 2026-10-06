@@ -19,6 +19,7 @@ export function bundle() {
     ...dir('behaviors'),
     ...dir('pals'),
     ...dir('elements'),
+    ...dir('sprites'),
     'boot.js'
   ].filter(f => existsSync(join(src, f)));
 
