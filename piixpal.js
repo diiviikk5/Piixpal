@@ -1,14 +1,10 @@
 /*! Piixpal v0.2.0 | tiny pixel creatures that live on your website | MIT
  *  https://github.com/diiviikk5/Piixpal
- *
- *    <script src="piixpal.js"></script>
- *    <h1>Hello <piix-pal pal="bitbug"></piix-pal></h1>
  */
 (() => {
 'use strict';
-if (window.Piixpal) return;
 const VERSION = '0.2.0';
-
+const K = (window.Piixpal && window.Piixpal._k) || (function piixCore() {
 /* ---- core.js ---- */
 /* The engine: one animation loop, one pointer, one overlay layer, a sprite baker
  * and the Actor that every pal is built from. Behaviours and pals plug in below. */
@@ -394,7 +390,52 @@ const bakeIcon = name => {
 };
 Piixpal.icons = ICONS;
 
-/* ---- behaviors/_drag.js ---- */
+/* ---- text.js ---- */
+/* Text geometry shared by every pal that lives on text. */
+/* Per-glyph contour of an element's first line of text: [{l, r, t}] in doc coords.
+ * Each glyph's real ink top is measured with canvas metrics, so a pal climbs onto
+ * a tall "T", steps down to an "e" and hops across spaces. Cached until layout moves. */
+const measureCtx = document.createElement('canvas').getContext('2d');
+const glyphTop = (ch, font) => {
+  measureCtx.font = font;
+  const m = measureCtx.measureText(ch);
+  return [m.fontBoundingBoxAscent || 0, m.actualBoundingBoxAscent || 0];
+};
+const textProfile = (el, cache) => {
+  const box = el.getBoundingClientRect();
+  const key = [box.left, box.top, box.width, box.height, scrollX, scrollY, document.fonts.status].join();
+  if (cache.key === key) return cache.v;
+  const segs = [];
+  const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+  const rg = document.createRange();
+  let top = null, n, count = 0;
+  outer: while ((n = walk.nextNode())) {
+    const p = n.parentElement;
+    if (!p || p.closest('piix-pal')) continue;
+    const cs = getComputedStyle(p);
+    if (cs.visibility === 'hidden' || cs.display === 'none') continue;
+    const font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+    const txt = n.data;
+    for (let i = 0; i < txt.length && count < 400; i++, count++) {
+      rg.setStart(n, i); rg.setEnd(n, i + 1);
+      const r = rg.getClientRects()[0];
+      if (!r || r.width < .5) continue;
+      if (top === null) top = r.top;
+      if (r.top - top > r.height * .6) break outer;   /* reached the second line */
+      if (/\s/.test(txt[i])) continue;              /* spaces are gaps */
+      const [fa, ga] = glyphTop(txt[i], font);
+      segs.push({ l: r.left + scrollX, r: r.right + scrollX, t: r.top + scrollY + (fa - ga) });
+    }
+  }
+  /* glue neighbours into runs so tiny kerning gaps don't count as holes */
+  for (let i = 1; i < segs.length; i++) if (segs[i].l - segs[i - 1].r < 2) segs[i - 1].r = segs[i].l;
+  const v = segs.length ? { l: segs[0].l, r: segs[segs.length - 1].r, t: Math.min(...segs.map(s => s.t)), segs } : null;
+  cache.key = key; cache.v = v;
+  return v;
+};
+const segAt = (segs, x) => { for (const s of segs) if (x >= s.l && x <= s.r) return s.t; return null; };
+
+/* ---- drag.js ---- */
 /* Shared pick-up-and-throw handling. Calls move(x, y, vx, vy) while held (foot point,
  * doc coords) and end({ moved, vx, vy }) on release. A press without movement is a click. */
 const drag = (actor, e, { move, end }) => {
@@ -425,6 +466,994 @@ const drag = (actor, e, { move, end }) => {
   cv.addEventListener('pointerup', up);
   cv.addEventListener('pointercancel', up);
 };
+
+/* ---- elements/crowd.js ---- */
+/* <piix-crowd mode="crowd|swarm|form" count="80" text="HELLO" height="420">
+ * A stage full of tiny agents on one canvas, depth-sorted on a 2.5D floor.
+ *   crowd   they wander, stop to high-five when they meet, and dodge the cursor
+ *   swarm   they flock across the floor after the cursor
+ *   form    they walk into place to spell `text`; click to scatter, they regroup
+ * Everywhere: click empty floor to drop in a new one, grab one and throw it.
+ * Batched Canvas 2D: hundreds of agents at 60fps without WebGL. */
+const BLIP = (() => {
+  const body = [
+    '..kkkkk..',
+    '.kbBbbbk.',
+    '.kbkbkbk.',
+    '.kbbbbbk.',
+    '.kbbbbbk.',
+    '.kdbbbdk.',
+    '..kkkkk..'
+  ];
+  const legs = { a: '..k...k..', b: '...k.k...', stand: '..k...k..', dangle: '.k.....k.' };
+  const f = (rows, l) => rows.concat([l]);
+  return {
+    w: 9, h: 8,
+    frames: {
+      walkA: f(body, legs.a), walkB: f(body, legs.b), stand: f(body, legs.stand),
+      wave: f(art.compose(body, [7, 0, ['.k']], [7, 1, ['kk']]), legs.stand),
+      held: f(art.put(body, 2, 2, ['bkbkb']), legs.dangle),
+      dizzy: f(art.put(body, 2, 2, ['kbbbk']), legs.stand),
+      sleep: f(art.put(body, 2, 2, ['bbbbb', 'kbbbk'].slice(0, 1)), legs.stand)
+    }
+  };
+})();
+const CROWD_COLORS = ['#c6f432', '#ff6b4a', '#6b4cff', '#58c8ff', '#ffd23f', '#ff9cc2', '#25b89a', '#f4f1fa'];
+
+class PiixCrowdElement extends HTMLElement {
+  static get observedAttributes() { return ['mode', 'count', 'text', 'scale']; }
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    this._tick = this._tick.bind(this);
+    this._agents = []; this._fx = []; this._vis = true;
+  }
+  connectedCallback() {
+    this.shadowRoot.innerHTML = `<style>
+:host{display:block;position:relative;height:${+this.getAttribute('height') || 420}px;touch-action:none;user-select:none}
+canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;cursor:grab}
+canvas.held{cursor:grabbing}
+</style><canvas aria-hidden="true"></canvas>`;
+    this._cv = this.shadowRoot.querySelector('canvas');
+    this._g = this._cv.getContext('2d');
+    this.setAttribute('role', 'img');
+    if (!this.hasAttribute('aria-label')) this.setAttribute('aria-label', 'A crowd of tiny pixel characters');
+    this._bake();
+    this._ro = new ResizeObserver(() => this._resize());
+    this._ro.observe(this);
+    this._io = new IntersectionObserver(es => { this._vis = es[es.length - 1].isIntersecting; }, { rootMargin: '100px' });
+    this._io.observe(this);
+    this._cv.addEventListener('pointerdown', e => this._down(e));
+    this._resize();
+    sub(this._tick);
+  }
+  disconnectedCallback() { unsub(this._tick); if (this._ro) this._ro.disconnect(); if (this._io) this._io.disconnect(); }
+  attributeChangedCallback(n) {
+    if (!this._cv) return;
+    if (n === 'scale') { this._bake(); return; }
+    if (n === 'text' || n === 'mode') this._targets();
+    if (n === 'count') this._populate();
+  }
+  get mode() { const m = this.getAttribute('mode'); return m === 'swarm' || m === 'form' ? m : 'crowd'; }
+  /* scatter everyone, then let them settle again */
+  scatter() { this._agents.forEach(a => { a.vx += rnd(-300, 300); a.vy += rnd(-200, 200); a.z = Math.max(a.z, 0); a.vz = rnd(150, 320); a.scatter = 1.4; }); }
+
+  _bake() {
+    /* every frame in every colour, facing both ways, baked once */
+    const s = this._s = +this.getAttribute('scale') || 3;
+    this._sprites = CROWD_COLORS.map(col => {
+      const pal = { k: hexRGBA('#17121f'), b: hexRGBA(col), B: hexRGBA(mixHex(col, .45)), d: hexRGBA(mixHex(col, -.22)) };
+      const out = {};
+      for (const k in BLIP.frames) {
+        const one = bake(BLIP.frames[k], pal, BLIP.w, BLIP.h);
+        const right = document.createElement('canvas'); right.width = BLIP.w * s; right.height = BLIP.h * s;
+        const rg = right.getContext('2d'); rg.imageSmoothingEnabled = false; rg.drawImage(one, 0, 0, right.width, right.height);
+        const left = document.createElement('canvas'); left.width = right.width; left.height = right.height;
+        const lg = left.getContext('2d'); lg.translate(left.width, 0); lg.scale(-1, 1); lg.drawImage(right, 0, 0);
+        out[k] = [left, right];
+      }
+      return out;
+    });
+  }
+  _resize() {
+    const r = this.getBoundingClientRect(), d = this._dpr = Math.min(devicePixelRatio || 1, 2);
+    this._W = r.width; this._H = r.height;
+    this._cv.width = Math.round(r.width * d); this._cv.height = Math.round(r.height * d);
+    if (!this._agents.length) this._populate(); else this._agents.forEach(a => { a.x = clamp(a.x, 8, this._W - 8); a.y = clamp(a.y, 20, this._H - 6); });
+    this._targets();
+  }
+  _new(x, y, z = 0) {
+    return { x, y, z, vx: 0, vy: 0, vz: 0, c: (Math.random() * CROWD_COLORS.length) | 0, face: chance(.5) ? 1 : 0,
+      state: 'walk', timer: rnd(1, 4), gx: x, gy: y, t: rnd(0, 1), mate: null, dizzy: 0, scatter: 0, tx: null, ty: null };
+  }
+  _populate() {
+    const n = clamp(+this.getAttribute('count') || (this.mode === 'form' ? 160 : 70), 1, 600);
+    while (this._agents.length < n) this._agents.push(this._new(rnd(10, this._W - 10), rnd(30, this._H - 8)));
+    this._agents.length = n;
+    this._targets();
+  }
+  /* formation: rasterise the text and hand each agent a spot */
+  _targets() {
+    this._agents.forEach(a => { a.tx = a.ty = null; });
+    if (this.mode !== 'form' || !this._W) return;
+    const text = (this.getAttribute('text') || 'HELLO').slice(0, 16);
+    const c = document.createElement('canvas'), x = c.getContext('2d', { willReadFrequently: true });
+    const rows = 40, font = `900 ${rows}px ${getComputedStyle(this).fontFamily || 'sans-serif'}`;
+    x.font = font;
+    const w = Math.ceil(x.measureText(text).width) + 4; c.width = w; c.height = Math.ceil(rows * 1.1);
+    x.font = font; x.textBaseline = 'top'; x.fillText(text, 2, 2);
+    const d = x.getImageData(0, 0, c.width, c.height).data;
+    /* pick the coarsest grid that still has a spot for (nearly) everyone */
+    let pts = [], step = 1;
+    const sample = st => { const out = []; for (let yy = 0; yy < c.height; yy += st) for (let xx = 0; xx < c.width; xx += st) if (d[(yy * c.width + xx) * 4 + 3] > 120) out.push([xx, yy]); return out; };
+    for (let st = 8; st >= 1; st--) { pts = sample(st); step = st; if (pts.length >= this._agents.length * .92) break; }
+    const cell = Math.min((this._W - 40) / c.width, (this._H - 50) / c.height);
+    const ox = (this._W - c.width * cell) / 2, oy = (this._H - c.height * cell) / 2 + 20;
+    /* nearest-ish assignment: sort both by x so nobody crosses the whole stage */
+    const spots = pts.map(([px, py]) => [ox + px * cell, oy + py * cell]).sort((p, q) => p[0] - q[0]);
+    const order = this._agents.slice().sort((p, q) => p.x - q.x);
+    order.forEach((a, i) => { const s = spots[Math.floor(i * spots.length / order.length)]; if (s && i < spots.length * 1.0) { a.tx = s[0]; a.ty = s[1]; } });
+  }
+
+  _local(e) { const r = this._cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
+  _hit(x, y) {
+    const s = this._s, w = BLIP.w * s, h = BLIP.h * s;
+    let best = null;
+    for (const a of this._agents) if (Math.abs(x - a.x) < w / 2 + 2 && y < a.y - a.z + 2 && y > a.y - a.z - h - 2 && (!best || a.y > best.y)) best = a;
+    return best;
+  }
+  _down(e) {
+    if (e.button > 0) return;
+    e.preventDefault();
+    const [x, y] = this._local(e);
+    const a = this._hit(x, y);
+    if (!a) {
+      /* empty floor: drop a new one in (or scatter the formation) */
+      if (this.mode === 'form' && this._agents.some(q => q.tx != null)) { this.scatter(); return; }
+      if (this._agents.length < 600) { const n = this._new(x, clamp(y, 24, this._H - 6), 220); n.vz = -50; this._agents.push(n); }
+      return;
+    }
+    try { this._cv.setPointerCapture(e.pointerId); } catch (_) { /* ignore */ }
+    a.held = true; a.state = 'held'; this._cv.classList.add('held');
+    let lx = x, ly = y, lt = now(), vx = 0, vy = 0;
+    const mv = ev => {
+      const [mx, my] = this._local(ev), t = now(), dt = Math.max(8, t - lt);
+      vx = lerp(vx, (mx - lx) / dt * 1000, .5); vy = lerp(vy, (my - ly) / dt * 1000, .5); lx = mx; ly = my; lt = t;
+      a.x = clamp(mx, 6, this._W - 6); a.z = Math.max(20, a.y - my + BLIP.h * this._s * .6);
+    };
+    const up = () => {
+      this._cv.removeEventListener('pointermove', mv); this._cv.removeEventListener('pointerup', up); this._cv.removeEventListener('pointercancel', up);
+      this._cv.classList.remove('held');
+      a.held = false; a.state = 'air';
+      if (now() - lt > 90) vx = vy = 0;
+      a.vx = clamp(vx, -900, 900); a.vy = clamp(vy * .25, -300, 300); a.vz = clamp(-vy * .6, -200, 700);
+    };
+    this._cv.addEventListener('pointermove', mv); this._cv.addEventListener('pointerup', up); this._cv.addEventListener('pointercancel', up);
+  }
+
+  _tick(dt, t) {
+    if (!this._vis || !this._W) return;
+    const R = reduced(), W = this._W, H = this._H, A = this._agents, mode = this.mode;
+    const r = this.getBoundingClientRect();
+    const px = ptr.cx - r.left, py = ptr.cy - r.top;
+    const inside = ptr.seen && px > 0 && py > 0 && px < W && py < H;
+    if (!R) for (const a of A) {
+      if (a.held) continue;
+      a.t += dt;
+      /* air time: thrown or dropped in */
+      if (a.z > 0 || a.vz > 0 || a.state === 'air') {
+        a.vz -= 1400 * dt; a.z += a.vz * dt; a.x += a.vx * dt; a.y += a.vy * dt;
+        if (a.x < 6 || a.x > W - 6) { a.vx *= -.6; a.x = clamp(a.x, 6, W - 6); }
+        a.y = clamp(a.y, 24, H - 4);
+        if (a.z <= 0) {
+          a.z = 0;
+          if (a.vz < -260) { a.vz = -a.vz * .35; this._fx.push({ x: a.x, y: a.y, t: 0, k: 'dust' }); }
+          else { a.vz = 0; a.vx *= .3; a.vy *= .3; a.state = 'walk'; a.timer = rnd(.5, 2); if (Math.hypot(a.vx, a.vy) > 30 || a._fell) a.dizzy = 1.2; }
+        }
+        continue;
+      }
+      a.dizzy = Math.max(0, a.dizzy - dt);
+      a.scatter = Math.max(0, a.scatter - dt);
+      let fx = 0, fy = 0, speed = 34;
+      if (mode === 'swarm' && inside) {
+        /* head for the cursor, but keep a little personal space */
+        const dx = px - a.x, dy = py - a.y, d = Math.hypot(dx, dy) || 1;
+        if (d > 30) { fx += dx / d * 90; fy += dy / d * 90; }
+        speed = 70;
+      } else if (mode === 'form' && a.tx != null && a.scatter <= 0) {
+        const dx = a.tx - a.x, dy = a.ty - a.y, d = Math.hypot(dx, dy);
+        if (d > 1.5) { fx += dx / d * Math.min(80, d * 4); fy += dy / d * Math.min(80, d * 4); speed = 60; a.state = 'walk'; }
+        else { a.x = a.tx; a.y = a.ty; a.vx = a.vy = 0; a.state = a.t % 9 < .4 ? 'wave' : 'stand'; a.face = 1; }
+      } else {
+        /* wander between little waypoints, sometimes stop for a wave */
+        a.timer -= dt;
+        if (a.state === 'walk') {
+          const dx = a.gx - a.x, dy = a.gy - a.y, d = Math.hypot(dx, dy);
+          if (d < 4 || a.timer <= 0) {
+            if (chance(.35)) { a.state = chance(.3) ? 'wave' : 'stand'; a.timer = rnd(.8, 2.5); }
+            else { a.gx = clamp(a.x + rnd(-120, 120), 10, W - 10); a.gy = clamp(a.y + rnd(-70, 70), 26, H - 6); a.timer = rnd(2, 5); }
+          } else { fx += dx / d * 40; fy += dy / d * 40; }
+        } else if (a.timer <= 0 && a.state !== 'five') { a.state = 'walk'; a.timer = rnd(2, 5); }
+      }
+      /* the cursor parts the crowd */
+      if (inside && mode !== 'swarm') {
+        const dx = a.x - px, dy = a.y - py, d = Math.hypot(dx, dy) || 1;
+        if (d < 56) { fx += dx / d * 900 / Math.max(d / 14, 1); fy += dy / d * 900 / Math.max(d / 14, 1); a.state = 'walk'; }
+      }
+      if (a.state === 'walk' || mode === 'swarm' || (fx || fy)) {
+        a.vx = lerp(a.vx, fx, 1 - Math.exp(-6 * dt)); a.vy = lerp(a.vy, fy, 1 - Math.exp(-6 * dt));
+        const sp = Math.hypot(a.vx, a.vy), lim = speed * 2.2;
+        if (sp > lim) { a.vx *= lim / sp; a.vy *= lim / sp; }
+        a.x = clamp(a.x + a.vx * dt, 6, W - 6); a.y = clamp(a.y + a.vy * dt, 24, H - 4);
+        if (Math.abs(a.vx) > 3) a.face = a.vx > 0 ? 1 : 0;
+      }
+    }
+
+    /* separation + high fives (crowd mode), using a coarse grid so it stays cheap */
+    if (!R) {
+      const cell = 16, grid = new Map();
+      for (const a of A) { const k = ((a.x / cell) | 0) + ',' + ((a.y / cell) | 0); (grid.get(k) || grid.set(k, []).get(k)).push(a); }
+      for (const a of A) {
+        if (a.held || a.z > 0) continue;
+        const gx = (a.x / cell) | 0, gy = (a.y / cell) | 0;
+        for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) {
+          const list = grid.get((gx + i) + ',' + (gy + j)); if (!list) continue;
+          for (const o of list) {
+            if (o === a || o.z > 0) continue;
+            const dx = a.x - o.x, dy = a.y - o.y, d = Math.hypot(dx, dy * 2) || .1;
+            if (d < 9 && !(mode === 'form' && a.tx != null && a.scatter <= 0)) { a.x += dx / d * .6; a.y += dy / d * .3; }
+            if (mode === 'crowd' && d < 14 && a.state === 'walk' && o.state === 'walk' && !a.mate && !o.mate && chance(.02)) {
+              a.mate = o; o.mate = a; a.state = o.state = 'five'; a.timer = o.timer = .7;
+              a.face = o.x > a.x ? 1 : 0; o.face = 1 - a.face;
+              this._fx.push({ x: (a.x + o.x) / 2, y: Math.min(a.y, o.y) - BLIP.h * this._s - 4, t: 0, k: 'spark' });
+            }
+          }
+        }
+      }
+      for (const a of A) if (a.state === 'five') { a.timer -= dt; if (a.timer <= 0) { a.state = 'walk'; a.timer = rnd(1, 3); a.mate = null; a.gx = clamp(a.x + (a.face ? -80 : 80), 10, W - 10); } }
+    }
+    this._render(t);
+  }
+
+  _render(t) {
+    const g = this._g, d = this._dpr, s = this._s, W = this._W, H = this._H;
+    g.setTransform(d, 0, 0, d, 0, 0);
+    g.clearRect(0, 0, W, H);
+    g.imageSmoothingEnabled = false;
+    const A = this._agents.slice().sort((p, q) => p.y - q.y);
+    /* shadows first, then everyone back to front */
+    g.fillStyle = 'rgba(23,18,31,.16)';
+    for (const a of A) { const w = BLIP.w * s * (a.z > 0 ? clamp(1 - a.z / 300, .4, 1) : 1); g.fillRect(Math.round(a.x - w / 2 + s), Math.round(a.y - s / 2), Math.round(w - 2 * s), s); }
+    for (const a of A) {
+      const set = this._sprites[a.c];
+      let fr = 'stand';
+      if (a.held) fr = 'held';
+      else if (a.z > 0) fr = 'held';
+      else if (a.dizzy > 0) fr = 'dizzy';
+      else if (a.state === 'wave' || a.state === 'five') fr = Math.floor(a.t * 6) % 2 ? 'wave' : 'stand';
+      else if (a.state === 'walk' && Math.hypot(a.vx, a.vy) > 6) fr = Math.floor(a.t * 9) % 2 ? 'walkA' : 'walkB';
+      const img = set[fr][a.face];
+      const bob = fr.startsWith('walk') ? (Math.floor(a.t * 9) % 2) * -s : 0;
+      g.drawImage(img, Math.round(a.x - img.width / 2), Math.round(a.y - img.height - a.z + bob));
+    }
+    /* sparks for high fives, dust for landings */
+    this._fx = this._fx.filter(f => (f.t += 1 / 60) < .5);
+    for (const f of this._fx) {
+      const k = f.t / .5, n = 6, rad = 4 + k * 14;
+      g.fillStyle = f.k === 'spark' ? '#ffd23f' : 'rgba(23,18,31,.35)';
+      for (let i = 0; i < n; i++) {
+        const ang = i / n * 6.283 + (f.k === 'spark' ? 0 : .5);
+        g.fillRect(Math.round(f.x + Math.cos(ang) * rad - s / 2), Math.round(f.y + Math.sin(ang) * rad * (f.k === 'spark' ? 1 : .4) - s / 2), s, s);
+      }
+    }
+  }
+}
+
+/* ---- elements/sprite.js ---- */
+/* <piix-sprite name="mochi" size="96"></piix-sprite>
+ * Self-contained characters you can paste anywhere: they sit inline like an image.
+ * Eyes follow the cursor, they blink, breathe, hop when clicked and nap when ignored.
+ *
+ *   name         which sprite (see Piixpal.figures)
+ *   size         width in px (snapped to whole sprite pixels)   default: 5 × sprite width
+ *   scale        or give the pixel size directly
+ *   render       pixel | dots | halftone | dither | ascii | voxel   default: the sprite's own (pixel)
+ *                  dots = LED dot-matrix, halftone = shaded sub-dots, dither = 1-bit grain,
+ *                  ascii = characters, voxel = extruded 3D blocks that turn toward you
+ *   depth        voxel extrusion, in sprite pixels                default: 3
+ *   color        body colour (sprites that support it); shade and light are derived
+ *   eye          pupil colour
+ *   hue          or just rotate every colour, degrees
+ *   look         mouse | wander | none                          default: mouse
+ *   shy, tilt    flinch away / lean toward the cursor (big sprites do both by default;
+ *                turn off with no-shy / no-tilt)
+ *   still        no breathing or hopping
+ *   sleep-after  seconds of no input before napping, 0 = never  default: 25
+ *
+ * Figure spec: { w, h, palette, frames:[rows…], fps, eyes:[{x,y,w,h}], pupil:{w,h}, lid:'b',
+ *                recolor:{ key: mix }, render, tilt, shy, glint, kind } */
+const FIGURES = {};
+const defineFigure = (name, spec) => {
+  spec.name = name;
+  spec.pupil = spec.pupil || { w: 1, h: 1 };
+  spec._cache = {};
+  FIGURES[name] = spec;
+  return spec;
+};
+/* mix a hex colour toward black (amt < 0) or white (amt > 0) */
+const mixHex = (hex, amt) => {
+  const [r, g, b] = hexRGBA(hex), t = amt < 0 ? 0 : 255, k = Math.abs(amt);
+  const c = v => Math.round(v + (t - v) * k).toString(16).padStart(2, '0');
+  return '#' + c(r) + c(g) + c(b);
+};
+const figurePalette = (spec, color) => {
+  const pal = { ...spec.palette };
+  if (color && spec.recolor) for (const k in spec.recolor) pal[k] = spec.recolor[k] ? mixHex(color, spec.recolor[k]) : color;
+  return pal;
+};
+const bakeFigure = (spec, pal) => {
+  const key = JSON.stringify(pal);
+  if (!spec._cache[key]) {
+    const rgba = {};
+    for (const k in pal) rgba[k] = hexRGBA(pal[k]);
+    spec._cache[key] = spec.frames.map(rows => bake(rows, rgba, spec.w, spec.h));
+  }
+  return spec._cache[key];
+};
+const HEAD = 3; /* rows of headroom above the sprite for breathing and z's */
+
+class PiixSpriteElement extends HTMLElement {
+  static get observedAttributes() { return ['name', 'size', 'scale', 'hue', 'color', 'eye', 'render', 'depth']; }
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    this._tick = this._tick.bind(this);
+    this._down = this._down.bind(this);
+    this._vis = true;
+  }
+  connectedCallback() {
+    this._build();
+    this._io = new IntersectionObserver(es => { this._vis = es[es.length - 1].isIntersecting; }, { rootMargin: '120px' });
+    this._io.observe(this);
+    this.addEventListener('pointerdown', this._down);
+    sub(this._tick);
+  }
+  disconnectedCallback() {
+    unsub(this._tick);
+    if (this._io) this._io.disconnect();
+    this.removeEventListener('pointerdown', this._down);
+  }
+  attributeChangedCallback(n) {
+    if (!this.isConnected || !this._cv) return;
+    if (n === 'hue') { this._cv.style.filter = this.getAttribute('hue') ? `hue-rotate(${+this.getAttribute('hue')}deg)` : ''; return; }
+    this._build();
+  }
+  /* make it hop from code */
+  poke() { this._down(); }
+  _on(attr) { return this.hasAttribute(attr) || (!!this._spec[attr] && !this.hasAttribute('no-' + attr)); }
+
+  _build() {
+    const want = this.getAttribute('name');
+    /* its file may still be loading: wait for it rather than showing someone else */
+    if (want && !FIGURES[want]) {
+      this._tries = (this._tries || 0) + 1;
+      if (this._tries < 80) { clearTimeout(this._retry); this._retry = setTimeout(() => this.isConnected && this._build(), 125); }
+      return;
+    }
+    const spec = this._spec = FIGURES[want] || FIGURES[Object.keys(FIGURES)[0]];
+    if (!spec) return;
+    this._pal = figurePalette(spec, this.getAttribute('color'));
+    this._frames = bakeFigure(spec, this._pal);
+    const size = +this.getAttribute('size');
+    const s = this._s = +this.getAttribute('scale') || (size ? Math.max(1, Math.round(size / spec.w)) : (spec.scale || 5));
+    const mode = this._mode = RENDERS.includes(this.getAttribute('render')) ? this.getAttribute('render') : (spec.render || 'pixel');
+    const W = spec.w, H = spec.h + HEAD;
+    const depth = this._depth = mode === 'voxel' ? Math.max(1, +this.getAttribute('depth') || spec.depth || 3) : 0;
+    const pad = this._pad = depth * s;
+    const dpr = this._dpr = mode === 'pixel' ? 1 : Math.min(devicePixelRatio || 1, 2);
+    const cw = mode === 'pixel' ? W : Math.round((W * s + pad * 2) * dpr);
+    const ch = mode === 'pixel' ? H : Math.round((H * s + pad * 2) * dpr);
+    this.shadowRoot.innerHTML = `<style>
+:host{display:inline-block;line-height:0;vertical-align:bottom;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.w{display:block;transform-origin:50% 100%;will-change:transform}
+canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;margin:${-HEAD * s - pad}px ${-pad}px ${-pad}px}
+</style><div class="w"><canvas width="${cw}" height="${ch}" style="width:${W * s + pad * 2}px;height:${H * s + pad * 2}px"></canvas></div>`;
+    this._wrap = this.shadowRoot.querySelector('.w');
+    this._cv = this.shadowRoot.querySelector('canvas');
+    if (this.getAttribute('hue')) this._cv.style.filter = `hue-rotate(${+this.getAttribute('hue')}deg)`;
+    this._out = this._cv.getContext('2d');
+    /* everything is composed at 1x here, then presented as pixels, dots or voxels */
+    const buf = this._buf = document.createElement('canvas');
+    buf.width = W; buf.height = H;
+    this._g = buf.getContext('2d', { willReadFrequently: mode !== 'pixel' && mode !== 'voxel' });
+    if (mode === 'voxel') { this._shade = document.createElement('canvas'); this._shade.width = W; this._shade.height = H; }
+    this._key = '';
+    this._ox = 0; this._oy = 0; this._tilt = 0; this._rx = 0; this._ry = 0;
+    this._blinkEnd = 0; this._nextBlink = now() + rnd(1200, 3600);
+    this._look = { x: 0, y: 0, until: 0 };
+    this._lastPoke = now();
+    if (!this.hasAttribute('aria-label')) this.setAttribute('aria-hidden', 'true');
+    else this.setAttribute('role', 'img');
+  }
+
+  _down() {
+    this._hop = now(); this._happy = now() + 650; this._lastPoke = now();
+    this.dispatchEvent(new CustomEvent('piix:poke', { bubbles: true }));
+  }
+
+  _tick(dt, t) {
+    if (!this._vis || !this._cv || !this._spec) return;
+    const spec = this._spec, s = this._s, R = reduced();
+    const r = this.getBoundingClientRect();
+    const cx = r.left + r.width / 2, cy = r.top + r.height * .45;
+    const idle = t - Math.max(ptr.last, this._lastPoke);
+    const nap = this.hasAttribute('sleep-after') ? +this.getAttribute('sleep-after') : 25;
+    const asleep = nap > 0 && idle > nap * 1000;
+    const mode = this.getAttribute('look') || 'mouse';
+    const vx = ptr.cx - cx, vy = ptr.cy - cy;
+    const tracking = mode === 'mouse' && ptr.seen && idle < 4000;
+
+    /* gaze, -1..1 on both axes */
+    let gx = 0, gy = 0;
+    if (tracking) { const k = Math.max(r.width, 40) * 1.4; gx = clamp(vx / k, -1, 1); gy = clamp(vy / k, -1, 1); }
+    else if (mode !== 'none') {
+      if (t > this._look.until) this._look = { x: rnd(-1, 1), y: rnd(-.7, .7), until: t + rnd(1200, 3000) };
+      gx = this._look.x; gy = this._look.y;
+    }
+    if (asleep) { gx = 0; gy = 0; }
+    if (t > this._nextBlink) { this._blinkEnd = t + 130; this._nextBlink = t + rnd(2400, 6000); }
+    const eyes = asleep ? 'shut' : t < this._happy ? 'happy' : t < this._blinkEnd ? 'shut' : 'open';
+
+    /* idle frames and a one-pixel breath */
+    const fps = spec.fps || 2;
+    const fi = R || spec.frames.length < 2 ? 0 : Math.floor(t / 1000 * fps * (asleep ? .4 : 1)) % spec.frames.length;
+    const still = R || this.hasAttribute('still');
+    const breath = still ? 0 : Math.floor(t / (asleep ? 1400 : 760)) % 2;
+    const z = asleep && !R ? Math.floor(t / 700) % 3 : -1;
+    const e0 = spec.eyes[0];
+    const px = Math.round((gx + 1) / 2 * (e0 ? e0.w - spec.pupil.w : 0));
+    const py = Math.round((gy + 1) / 2 * (e0 ? e0.h - spec.pupil.h : 0));
+
+    /* voxel: the 3D turn, smoothed; the extrusion shows the side facing away from you */
+    this._ry += ((still ? 0 : gx) - this._ry) * .12;
+    this._rx += ((still ? 0 : gy) - this._rx) * .12;
+    const ex = this._mode === 'voxel' ? Math.round(-this._ry * 4) / 4 : 0;
+    const ey = this._mode === 'voxel' ? Math.round((-this._rx * .8 + .55) * 4) / 4 : 0;
+
+    const key = [fi, breath, eyes, px, py, z, ex, ey].join();
+    if (key !== this._key) { this._key = key; this._draw(fi, breath, eyes, px, py, z); this._present(ex, ey); }
+
+    /* body motion */
+    let tx = 0, ty = 0, sx = 1, sy = 1, tilt = 0;
+    if (!still) {
+      if (this._on('tilt') && tracking && !asleep) tilt = clamp(vx / (innerWidth * .4), -1, 1) * 8;
+      if (this._on('shy') && ptr.seen && !asleep) {
+        const d = Math.hypot(vx, vy) || 1, lim = r.width * 1.2;
+        if (d < lim) { const k = (1 - d / lim) * r.width * .18; tx = -vx / d * k; ty = -vy / d * k; }
+      }
+      if (this._hop) {
+        const p = (t - this._hop) / 460;
+        if (p >= 1) this._hop = 0;
+        else { ty -= Math.sin(Math.PI * p) * spec.h * s * .35; const q = Math.sin(Math.PI * p * 2) * .08; sx = 1 - q * .6; sy = 1 + q; }
+      }
+    }
+    this._ox += (tx - this._ox) * .18; this._oy += (ty - this._oy) * .18; this._tilt += (tilt - this._tilt) * .1;
+    const oy = this._hop ? ty : this._oy;
+    const turn = this._mode === 'voxel' ? `perspective(${Math.round(r.width * 5)}px) rotateY(${(this._ry * 24).toFixed(1)}deg) rotateX(${(-this._rx * 14).toFixed(1)}deg) ` : '';
+    this._wrap.style.transform = `translate(${this._ox.toFixed(1)}px,${oy.toFixed(1)}px) ${turn}rotate(${this._tilt.toFixed(1)}deg) scale(${sx.toFixed(3)},${sy.toFixed(3)})`;
+  }
+
+  /* compose one 1x frame: body, live eyes, z's */
+  _draw(fi, breath, eyes, px, py, z) {
+    const spec = this._spec, g = this._g, y0 = HEAD - breath, pal = this._pal;
+    g.clearRect(0, 0, spec.w, spec.h + HEAD);
+    g.drawImage(this._frames[fi], 0, y0);
+    const ink = pal.k || '#17121f', lid = pal[spec.lid] || ink;
+    const pupil = this.getAttribute('eye') || pal[spec.pupilKey || 'k'] || ink;
+    for (const e of spec.eyes) {
+      const x = e.x, y = e.y + y0;
+      if (eyes === 'open') {
+        g.fillStyle = pupil;
+        g.fillRect(x + px, y + py, spec.pupil.w, spec.pupil.h);
+        if (spec.glint && spec.pupil.w > 1) { g.fillStyle = spec.glint; g.fillRect(x + px, y + py, 1, 1); }
+      } else {
+        g.fillStyle = lid; g.fillRect(x, y, e.w, e.h);
+        g.fillStyle = pupil;
+        if (eyes === 'shut') g.fillRect(x, y + e.h - 1, e.w, 1);
+        else { /* happy: an upside-down U */
+          const top = y + Math.max(0, e.h - 2);
+          g.fillRect(x, top, e.w, 1); g.fillRect(x, y + e.h - 1, 1, 1); g.fillRect(x + e.w - 1, y + e.h - 1, 1, 1);
+        }
+      }
+    }
+    if (z >= 0) {
+      /* a little "z" drifting up in the headroom */
+      g.fillStyle = pupil;
+      const zx = spec.w - 4 + (z > 1 ? 1 : 0), zy = 2 - z;
+      g.fillRect(zx, zy + 0, 3, 1); g.fillRect(zx + 1, zy + 1, 1, 1); g.fillRect(zx, zy + 2, 3, 1);
+    }
+  }
+
+  /* put the composed frame on screen in the chosen style */
+  _present(ex, ey) {
+    const o = this._out, buf = this._buf, W = buf.width, H = buf.height, s = this._s, pad = this._pad, d = this._dpr;
+    if (this._mode === 'pixel') { o.clearRect(0, 0, W, H); o.drawImage(buf, 0, 0); return; }
+    o.setTransform(d, 0, 0, d, 0, 0);
+    o.clearRect(0, 0, W * s + pad * 2, H * s + pad * 2);
+    o.imageSmoothingEnabled = false;
+    if (TEXTURES[this._mode]) {
+      const data = this._g.getImageData(0, 0, W, H).data;
+      TEXTURES[this._mode](o, data, W, H, s);
+      return;
+    }
+    if (this._mode === 'dots') {
+      /* one round dot per pixel, batched by colour */
+      const data = this._g.getImageData(0, 0, W, H).data, groups = new Map(), rad = s * .44;
+      for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+        const i = (y * W + x) * 4;
+        if (data[i + 3] < 40) continue;
+        const c = `rgb(${data[i]},${data[i + 1]},${data[i + 2]})`;
+        if (!groups.has(c)) groups.set(c, []);
+        groups.get(c).push(x, y);
+      }
+      groups.forEach((pts, c) => {
+        o.fillStyle = c; o.beginPath();
+        for (let i = 0; i < pts.length; i += 2) {
+          const cx = (pts[i] + .5) * s, cy = (pts[i + 1] + .5) * s;
+          o.moveTo(cx + rad, cy); o.arc(cx, cy, rad, 0, 6.2832);
+        }
+        o.fill();
+      });
+      return;
+    }
+    /* voxel: stack darkened copies behind the face, half a pixel apart */
+    const sh = this._shade, sg = sh.getContext('2d');
+    sg.clearRect(0, 0, W, H); sg.globalCompositeOperation = 'source-over'; sg.drawImage(buf, 0, 0);
+    sg.globalCompositeOperation = 'source-atop'; sg.fillStyle = 'rgba(10,6,20,.42)'; sg.fillRect(0, 0, W, H);
+    const steps = this._depth * 2, u = s / 2;
+    for (let i = steps; i >= 1; i--) o.drawImage(sh, pad + ex * i * u, pad + ey * i * u, W * s, H * s);
+    o.drawImage(buf, pad, pad, W * s, H * s);
+  }
+}
+Piixpal.figures = FIGURES;
+Piixpal.figure = defineFigure;
+
+/* ---------- texture renderers: each turns the 1x frame into something with grain ---------- */
+const RENDERS = ['pixel', 'dots', 'voxel', 'halftone', 'dither', 'ascii'];
+const lum = (r, g, b) => (r * .299 + g * .587 + b * .114) / 255;
+const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map(v => (v + .5) / 16);
+const ASCII = ' .:-=+*#%@';
+const TEXTURES = {
+  /* halftone: each pixel is four sub-dots, bigger where the colour is darker */
+  halftone(o, d, W, H, s) {
+    const half = s / 2;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const i = (y * W + x) * 4; if (d[i + 3] < 40) continue;
+      const L = lum(d[i], d[i + 1], d[i + 2]);
+      const rad = half * (.32 + (1 - L) * .5);
+      o.fillStyle = `rgb(${d[i]},${d[i + 1]},${d[i + 2]})`; o.beginPath();
+      for (let k = 0; k < 4; k++) {
+        const cx = x * s + (k & 1) * half + half / 2, cy = y * s + (k >> 1) * half + half / 2;
+        o.moveTo(cx + rad, cy); o.arc(cx, cy, rad, 0, 6.2832);
+      }
+      o.fill();
+    }
+  },
+  /* dither: 1-bit grain. Each pixel becomes a 4x4 patch thresholded by a Bayer matrix,
+   * so light areas thin out into speckle and dark ones stay solid */
+  dither(o, d, W, H, s) {
+    const sub = s / 4;
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const i = (y * W + x) * 4; if (d[i + 3] < 40) continue;
+      const L = lum(d[i], d[i + 1], d[i + 2]), dark = 1.12 - L * .95;
+      o.fillStyle = `rgb(${Math.round(d[i] * .82)},${Math.round(d[i + 1] * .82)},${Math.round(d[i + 2] * .82)})`;
+      for (let k = 0; k < 16; k++) {
+        const bx = (x * 4 + (k & 3)) & 3, by = (y * 4 + (k >> 2)) & 3;
+        if (BAYER[by * 4 + bx] < dark) o.fillRect(x * s + (k & 3) * sub, y * s + (k >> 2) * sub, Math.ceil(sub), Math.ceil(sub));
+      }
+    }
+  },
+  /* ascii: one character per pixel, denser glyphs for darker colours */
+  ascii(o, d, W, H, s) {
+    o.font = `800 ${Math.round(s * 1.5)}px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace`;
+    o.textAlign = 'center'; o.textBaseline = 'middle';
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+      const i = (y * W + x) * 4; if (d[i + 3] < 40) continue;
+      const L = lum(d[i], d[i + 1], d[i + 2]);
+      const ch = ASCII[clamp(Math.round((1 - L) * (ASCII.length - 1)) + 4, 2, ASCII.length - 1)];
+      o.fillStyle = `rgb(${d[i]},${d[i + 1]},${d[i + 2]})`;
+      o.fillText(ch, x * s + s / 2, y * s + s / 2);
+    }
+  }
+};
+
+/* defaults for the big, bold sprites: one recolourable body, chunky 3D blocks, block eyes */
+const BIG = { kind: 'big', scale: 8, render: 'voxel', depth: 2, tilt: true, shy: true, glint: '#ffffff', lid: 'b', recolor: { b: 0, d: -.24, B: .42 } };
+
+/* ---- elements/type.js ---- */
+/* <piix-type text="PIIXPAL" rows="18" cell="8" color="#16111f" shade="#c6f432" depth="1" fit>
+ * Any font, rasterised into chunky blocks with an extruded shadow.
+ * Pixels rain in on load, lift off their shadow around the cursor, and ripple when clicked.
+ * Exposes piixSurface(x) so pals can walk on the actual letter tops. */
+class PiixTypeElement extends HTMLElement {
+  static get observedAttributes() { return ['text', 'rows', 'cell', 'font', 'weight', 'color', 'shade', 'depth', 'gap', 'fit', 'align', 'intro', 'shape']; }
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    this._tick = this._tick.bind(this);
+    this._pm = this._pm.bind(this);
+    this._pd = this._pd.bind(this);
+    this._cells = []; this._on = false; this._tok = 0; this._waves = [];
+  }
+  connectedCallback() {
+    this.shadowRoot.innerHTML = `<style>
+:host{display:block;line-height:0;position:relative}
+canvas{display:block;pointer-events:none;image-rendering:pixelated}
+</style><canvas aria-hidden="true"></canvas>`;
+    this._cv = this.shadowRoot.querySelector('canvas');
+    this._g = this._cv.getContext('2d');
+    this.setAttribute('role', 'img');
+    this._ro = new ResizeObserver(() => { if (this._cols) this._layout(); });
+    this._ro.observe(this);
+    addEventListener('pointermove', this._pm, { passive: true });
+    this.addEventListener('pointerdown', this._pd);
+    this._raster();
+  }
+  disconnectedCallback() {
+    if (this._ro) this._ro.disconnect();
+    removeEventListener('pointermove', this._pm);
+    this.removeEventListener('pointerdown', this._pd);
+    unsub(this._tick); this._on = false;
+  }
+  attributeChangedCallback(n) {
+    if (!this._cv) return;
+    if (['text', 'rows', 'font', 'weight', 'align'].includes(n)) { clearTimeout(this._rt); this._rt = setTimeout(() => this._raster(), 40); }
+    else if (this._cols) this._layout();
+  }
+  get text() { return (this.getAttribute('text') ?? this.textContent).trim(); }
+
+  /* rain the pixels in again */
+  replay() { this._seedIntro(); this._wake(); }
+
+  /* true once every pixel has landed (pals wait for this before stepping on) */
+  get piixSettled() { return !!this._cols && this._cells.every(p => p.landed); }
+
+  /* something landed on the letters at doc (x, y): send a small ripple through them */
+  piixImpact(x, y, power = 1) {
+    if (!this._cols || reduced()) return;
+    const r = this._cv.getBoundingClientRect();
+    this._waves.push({ x: (x - scrollX - r.left) / this._cell, y: (y - scrollY - r.top - this._head) / this._cell, r: 0, max: 5 + 5 * power, amp: .5 + .4 * power });
+    this._wake();
+  }
+
+  /* doc-y of the top letter pixel at doc-x, or null over a gap */
+  piixSurface(x) {
+    if (!this._cols) return null;
+    const r = this._cv.getBoundingClientRect();
+    const c = Math.floor((x - scrollX - r.left) / this._cell);
+    const top = this._top[c];
+    return top == null ? null : r.top + scrollY + this._head + top * this._cell;
+  }
+
+  async _raster() {
+    const tok = ++this._tok;
+    const lines = this.text.split(/\||\n/).map(s => s.trim()).filter(Boolean);
+    if (!lines.length) { this._cols = 0; return; }
+    const rows = +this.getAttribute('rows') || 18;
+    const weight = this.getAttribute('weight') || 800;
+    const fam = this.getAttribute('font') || getComputedStyle(this).fontFamily || 'system-ui,sans-serif';
+    const font = `${weight} ${rows}px ${fam}`;
+    try { await document.fonts.load(font, lines.join('')); } catch (_) { /* use whatever is there */ }
+    if (tok !== this._tok) return;
+    const c = document.createElement('canvas'), x = c.getContext('2d', { willReadFrequently: true });
+    x.font = font;
+    const ws = lines.map(l => Math.ceil(x.measureText(l).width));
+    const W = Math.max(...ws) + 2, lh = Math.round(rows * 1.02);
+    c.width = W; c.height = lh * lines.length + 2;
+    x.font = font; x.fillStyle = '#000'; x.textBaseline = 'alphabetic';
+    const align = this.getAttribute('align') || 'left';
+    lines.forEach((l, i) => {
+      const ox = align === 'center' ? Math.round((W - ws[i]) / 2) : align === 'right' ? W - ws[i] - 1 : 1;
+      x.fillText(l, ox, Math.round(i * lh + rows * .8) + 1);
+    });
+    const d = x.getImageData(0, 0, c.width, c.height).data, cells = [];
+    for (let yy = 0; yy < c.height; yy++) for (let xx = 0; xx < c.width; xx++) {
+      if (d[(yy * c.width + xx) * 4 + 3] > 110) cells.push({ x: xx, y: yy, oy: 0, vy: 0, lift: 0, lv: 0, delay: 0, landed: true });
+    }
+    /* crop empty margins */
+    const minX = Math.min(...cells.map(p => p.x)), minY = Math.min(...cells.map(p => p.y));
+    for (const p of cells) { p.x -= minX; p.y -= minY; }
+    this._cols = Math.max(...cells.map(p => p.x)) + 1;
+    this._rowsN = Math.max(...cells.map(p => p.y)) + 1;
+    this._cells = cells;
+    this._top = [];
+    for (const p of cells) if (this._top[p.x] == null || p.y < this._top[p.x]) this._top[p.x] = p.y;
+    this.setAttribute('aria-label', lines.join(' '));
+    this._layout();
+    if (this.getAttribute('intro') !== 'none') this._seedIntro();
+    this._wake();
+    this.dispatchEvent(new CustomEvent('piix:type', { bubbles: true }));
+  }
+
+  _layout() {
+    let cell = +this.getAttribute('cell') || 8;
+    if (this.hasAttribute('fit')) {
+      const avail = this.clientWidth || (this.parentElement && this.parentElement.clientWidth) || 0;
+      if (avail) cell = Math.max(2, Math.min(cell, Math.floor(avail / (this._cols + 1))));
+    }
+    this._cell = cell;
+    this._depth = Math.round(cell * (this.getAttribute('depth') != null ? +this.getAttribute('depth') : 1) * .6);
+    const gap = this.getAttribute('gap');
+    this._gap = Math.round(cell * clamp(gap != null ? +gap : .1, 0, .45));
+    this._head = cell * 3;                  /* headroom for lifted pixels */
+    const w = this._cols * cell + this._depth, h = this._rowsN * cell + this._depth + this._head;
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    this._dpr = dpr;
+    this._cv.width = Math.round(w * dpr); this._cv.height = Math.round(h * dpr);
+    this._cv.style.width = w + 'px'; this._cv.style.height = h + 'px';
+    this._cv.style.marginTop = -this._head + 'px';
+    this._render();
+  }
+
+  _seedIntro() {
+    if (reduced()) return;
+    const H = (this._rowsN + 6) * this._cell;
+    for (const p of this._cells) {
+      p.landed = false; p.vy = 0;
+      p.oy = -H - rnd(0, this._cell * 8);
+      p.delay = p.x * .012 + rnd(0, .18) + (this._rowsN - p.y) * .004;
+    }
+    this._t = 0;
+  }
+
+  _wake() { if (!this._on) { this._on = true; sub(this._tick); } }
+
+  _pm() {
+    if (!this._cols || reduced()) return;
+    const r = this._cv.getBoundingClientRect(), m = this._cell * 8;
+    if (ptr.cx > r.left - m && ptr.cx < r.right + m && ptr.cy > r.top - m && ptr.cy < r.bottom + m) { this._hot = true; this._wake(); }
+  }
+  _pd(e) {
+    if (!this._cols || reduced()) return;
+    const r = this._cv.getBoundingClientRect();
+    this._waves.push({ x: (e.clientX - r.left) / this._cell, y: (e.clientY - r.top - this._head) / this._cell, r: 0, max: this._cols + 20, amp: 1.6 });
+    this._wake();
+  }
+
+  _tick(dt) {
+    if (!this._cols) return;
+    const cell = this._cell, G = 5200;
+    let busy = false;
+    this._t = (this._t || 0) + dt;
+    const r = this._cv.getBoundingClientRect();
+    const px = (ptr.cx - r.left) / cell, py = (ptr.cy - r.top - this._head) / cell;
+    const R = 7, hot = this._hot && ptr.seen;
+    this._waves.forEach(w => { w.r += dt * 60; });
+    this._waves = this._waves.filter(w => w.r < w.max);
+    if (this._waves.length) busy = true;
+    let near = false;
+    for (const p of this._cells) {
+      /* falling in */
+      if (!p.landed) {
+        busy = true;
+        if (this._t < p.delay) continue;
+        p.vy += G * dt; p.oy += p.vy * dt;
+        if (p.oy >= 0) {
+          if (p.vy > 500) { p.oy = 0; p.vy = -p.vy * .22; }
+          else { p.oy = 0; p.vy = 0; p.landed = true; }
+        }
+      }
+      /* lift around the cursor, and on passing ripples */
+      let goal = 0;
+      if (hot) {
+        const dx = p.x + .5 - px, dy = p.y + .5 - py, d = Math.sqrt(dx * dx + dy * dy);
+        if (d < R) { const k = 1 - d / R; goal = k * k * cell * 1.4; near = true; }
+      }
+      for (const w of this._waves) {
+        const d = Math.hypot(p.x - w.x, p.y - w.y), band = Math.abs(d - w.r);
+        if (band < 2.5) goal = Math.max(goal, (1 - band / 2.5) * cell * w.amp * Math.max(0, 1 - w.r / w.max));
+      }
+      p.lv += ((goal - p.lift) * 320 - p.lv * 22) * dt;
+      p.lift += p.lv * dt;
+      if (Math.abs(p.lift) > .05 || Math.abs(p.lv) > .5) busy = true;
+    }
+    if (!near) this._hot = false;
+    this._render();
+    if (!busy && !this._hot) { unsub(this._tick); this._on = false; }
+  }
+
+  _render() {
+    if (!this._cols) return;
+    const g = this._g, cell = this._cell, gap = this._gap, s = cell - gap, dep = this._depth, head = this._head;
+    g.setTransform(this._dpr, 0, 0, this._dpr, 0, 0);
+    g.clearRect(0, 0, this._cv.width, this._cv.height);
+    const color = this.getAttribute('color') || 'currentColor';
+    const ink = color === 'currentColor' ? getComputedStyle(this).color : color;
+    const shade = this.getAttribute('shade');
+    const put = CELL_SHAPES[this.getAttribute('shape')] || CELL_SHAPES.square;
+    /* shadow layer stays on the ground */
+    if (shade && dep) {
+      g.fillStyle = shade; g.beginPath();
+      for (const p of this._cells) {
+        if (!p.landed && p.oy < -cell) continue;
+        put(g, p.x * cell + dep, head + p.y * cell + dep + Math.round(Math.min(0, p.oy)), s);
+      }
+      g.fill();
+    }
+    g.fillStyle = ink; g.beginPath();
+    for (const p of this._cells) {
+      const y = head + p.y * cell + Math.round(p.oy - p.lift);
+      if (y + s < 0) continue;
+      put(g, p.x * cell, y, s);
+    }
+    g.fill();
+  }
+}
+
+/* how one block is drawn: shape="square|dot|round|plus|diamond" (all added to one path) */
+const CELL_SHAPES = {
+  square: (g, x, y, s) => g.rect(x, y, s, s),
+  dot: (g, x, y, s) => { const r = s * .46; g.moveTo(x + s / 2 + r, y + s / 2); g.arc(x + s / 2, y + s / 2, r, 0, 6.2832); },
+  round: (g, x, y, s) => { if (g.roundRect) g.roundRect(x, y, s, s, s * .32); else g.rect(x, y, s, s); },
+  plus: (g, x, y, s) => { const t = s / 3; g.rect(x + t, y, t, s); g.rect(x, y + t, t, t); g.rect(x + 2 * t, y + t, t, t); },
+  diamond: (g, x, y, s) => { g.moveTo(x + s / 2, y); g.lineTo(x + s, y + s / 2); g.lineTo(x + s / 2, y + s); g.lineTo(x, y + s / 2); g.closePath(); }
+};
+
+/* ---- boot.js ---- */
+/* <piix-pal pal="bitbug" do="crawl" on="#title" scale="4" hue="0">
+ * Put it inside the element it should live on, or point at one with on="css selector".
+ * The tag itself stays invisible; the pal is drawn on a shared overlay layer. */
+class PiixPalElement extends HTMLElement {
+  static get observedAttributes() { return ['pal', 'do', 'on', 'scale', 'hue', 'at', 'side']; }
+  connectedCallback() {
+    this.style.display = 'none';
+    if (this._mounted) return;
+    cancelAnimationFrame(this._q);
+    /* two frames: let the page lay out (and webfonts settle) before measuring */
+    this._q = requestAnimationFrame(() => { this._q = requestAnimationFrame(() => this._mount()); });
+  }
+  disconnectedCallback() {
+    cancelAnimationFrame(this._q);
+    /* a moved element reconnects in the same task; only tear down if it really left */
+    queueMicrotask(() => { if (!this.isConnected) this._unmount(); });
+  }
+  attributeChangedCallback(n, a, b) {
+    if (a === b || !this._mounted) return;
+    /* recolouring doesn't need a fresh pal */
+    if (n === 'hue') { this._actor.cv.style.filter = b ? `hue-rotate(${+b}deg)` : ''; return; }
+    this._unmount(); this._mount();
+  }
+  get actor() { return this._actor || null; }
+  /* poke it from code: el.poke() */
+  poke() { if (this._ctl && this._ctl.poke) this._ctl.poke(); }
+
+  _mount() {
+    if (!this.isConnected || this._mounted) return;
+    const name = (this.getAttribute('pal') || '').toLowerCase();
+    const sel = this.getAttribute('on');
+    let targets;
+    try { targets = sel ? [...document.querySelectorAll(sel)] : [this.parentElement]; } catch (e) { targets = []; }
+    targets = targets.filter(el => el && el !== document.documentElement);
+    const spec = SPRITES[name] || (!name && SPRITES[Object.keys(SPRITES)[0]]);
+    const make = spec && (BEHAVIORS[this.getAttribute('do')] || BEHAVIORS[spec.does]);
+    /* the pal's own file, or the element it lives on, may simply not be here yet
+       (a second script still loading, a framework still rendering): try again shortly */
+    if (!spec || !make || !targets.length) {
+      this._tries = (this._tries || 0) + 1;
+      if (this._tries < 80) { clearTimeout(this._retry); this._retry = setTimeout(() => this._mount(), 125); }
+      else console.warn('[piixpal]', !spec ? `no pal called "${name}"` : !make ? `unknown behaviour "${this.getAttribute('do') || spec.does}"` : 'nothing to live on', this);
+      return;
+    }
+    this._tries = 0;
+
+    const actor = this._actor = new Actor(spec, { scale: +this.getAttribute('scale') || 0, hue: this.getAttribute('hue'), fixed: this.hasAttribute('fixed-scale') });
+    actor.host = this;
+    const ctl = this._ctl = actor.ctl = make(actor, targets, this) || {};
+    if (!ctl.grab) actor.node.classList.add('nograb');
+
+    this._pd = e => {
+      if (e.button > 0) return;
+      e.preventDefault();
+      this.dispatchEvent(new CustomEvent('piix:poke', { bubbles: true }));
+      if (ctl.grab) ctl.grab(e); else if (ctl.poke) ctl.poke(e);
+    };
+    actor.cv.addEventListener('pointerdown', this._pd);
+
+    /* a behaviour can run a whole crew of extra actors (groups, flocks, families) */
+    const wire = c => {
+      if (c._wired) return;
+      c._wired = true; c.host = this;
+      if (!ctl.grab) c.node.classList.add('nograb');
+      c.cv.addEventListener('pointerdown', e => {
+        if (e.button > 0) return;
+        e.preventDefault();
+        this.dispatchEvent(new CustomEvent('piix:poke', { bubbles: true }));
+        if (ctl.grab) ctl.grab(e, c); else if (ctl.poke) ctl.poke(e, c);
+      });
+    };
+    let first = true;
+    this._tick = (dt, t) => {
+      /* sleep when far off-screen, but always draw the first frame */
+      const awake = first || (ctl.awake ? ctl.awake() : Math.abs(actor.y - (scrollY + innerHeight / 2)) < innerHeight * 1.5) || actor.held;
+      if (!awake) return;
+      first = false;
+      ctl.tick(dt, t);
+      actor.step(dt);
+      actor.render();
+      if (ctl.crew) for (const c of ctl.crew) { wire(c); c.step(dt); c.render(); }
+    };
+    sub(this._tick);
+    this._mounted = true;
+    this.dispatchEvent(new CustomEvent('piix:ready', { bubbles: true, detail: { pal: spec.name } }));
+  }
+  _unmount() {
+    if (!this._mounted) return;
+    unsub(this._tick);
+    if (this._ctl && this._ctl.destroy) this._ctl.destroy();
+    if (this._ctl && this._ctl.crew) this._ctl.crew.forEach(c => c.destroy());
+    if (this._actor) { this._actor.cv.removeEventListener('pointerdown', this._pd); this._actor.destroy(); }
+    this._actor = this._ctl = null;
+    this._mounted = false;
+  }
+}
+
+const define = (n, c) => { if (!customElements.get(n)) customElements.define(n, c); };
+
+/* ---------- JS API: add pals without writing any markup ---------- */
+/* Piixpal.add('bitbug', 'h1')                      a pal living on the first h1
+ * Piixpal.add('pip', '.btn')                       one bird, every .btn a perch
+ * Piixpal.add('mochi', '#card', { size: 120 })     sprites go inside the element
+ * Piixpal.add('kitty', someElement)                or pass an element directly */
+const add = (name, where = 'body', attrs = {}) => {
+  name = String(name).toLowerCase();
+  const isSprite = attrs.type === 'sprite' || (!SPRITES[name] && !!FIGURES[name]);
+  const target = typeof where === 'string' ? null : where;
+  const el = document.createElement(isSprite ? 'piix-sprite' : 'piix-pal');
+  attrs = { ...attrs }; delete attrs.type;
+  el.setAttribute(el.tagName === 'PIIX-SPRITE' ? 'name' : 'pal', name);
+  for (const k in attrs) if (attrs[k] !== false && attrs[k] != null) el.setAttribute(k, attrs[k] === true ? '' : attrs[k]);
+  if (el.tagName === 'PIIX-SPRITE') {
+    const host = target || document.querySelector(where);
+    if (host) host.appendChild(el);
+  } else {
+    if (target) target.appendChild(el);
+    else { el.setAttribute('on', where); document.body.appendChild(el); }
+  }
+  return el;
+};
+/* data-pals="bitbug@h1, boing@footer, pip@.btn?scale=3" on the script tag itself */
+const autoAttach = script => {
+  const list = script && script.getAttribute('data-pals');
+  if (!list) return;
+  const run = () => list.split(',').map(s => s.trim()).filter(Boolean).forEach(item => {
+    const [head, query = ''] = item.split('?');
+    const [name, where = 'body'] = head.split('@').map(s => s.trim());
+    const attrs = Object.fromEntries(new URLSearchParams(query));
+    add(name, where, attrs);
+  });
+  if (document.readyState === 'loading') addEventListener('DOMContentLoaded', run, { once: true }); else run();
+};
+const SCRIPT = document.currentScript;
+
+/* define the elements once every component in this file has registered */
+const start = (script = SCRIPT) => {
+  define('piix-pal', PiixPalElement);
+  define('piix-type', PiixTypeElement);
+  define('piix-sprite', PiixSpriteElement);
+  define('piix-crowd', PiixCrowdElement);
+  if (script && !script._piix) { script._piix = true; autoAttach(script); }
+};
+Object.assign(Piixpal, {
+  add,
+  /* every pal, sprite and behaviour currently registered */
+  list: () => ({ pals: Object.keys(SPRITES), sprites: Object.keys(FIGURES), behaviors: Object.keys(BEHAVIORS) }),
+  clear: () => document.querySelectorAll('piix-pal,piix-sprite').forEach(e => e.remove())
+});
+
+Piixpal._k = { reduceMQ, reduced, clamp, rnd, chance, pick, lerp, now, hexRGBA, ptr, ptrDist, scroll, subs, raf, frame, sub, unsub, rectOf, docW, onScreen, surfaceAt, LAYER_CSS, layer, origin, getLayer, layerOrigin, SPRITES, bake, defineSprite, baked, ACTORS, shout, Actor, recruit, BEHAVIORS, defineBehavior, Piixpal, art, ICON_PAL, ICONS, DIGITS, numberIcon, iconCache, iconPal, bakeIcon, measureCtx, glyphTop, textProfile, segAt, drag, BLIP, CROWD_COLORS, PiixCrowdElement, FIGURES, defineFigure, mixHex, figurePalette, bakeFigure, HEAD, PiixSpriteElement, RENDERS, lum, BAYER, ASCII, TEXTURES, BIG, PiixTypeElement, CELL_SHAPES, PiixPalElement, define, add, autoAttach, SCRIPT, start };
+return Piixpal._k;
+})();
+const { reduceMQ, reduced, clamp, rnd, chance, pick, lerp, now, hexRGBA, ptr, ptrDist, scroll, subs, raf, frame, sub, unsub, rectOf, docW, onScreen, surfaceAt, LAYER_CSS, layer, origin, getLayer, layerOrigin, SPRITES, bake, defineSprite, baked, ACTORS, shout, Actor, recruit, BEHAVIORS, defineBehavior, Piixpal, art, ICON_PAL, ICONS, DIGITS, numberIcon, iconCache, iconPal, bakeIcon, measureCtx, glyphTop, textProfile, segAt, drag, BLIP, CROWD_COLORS, PiixCrowdElement, FIGURES, defineFigure, mixHex, figurePalette, bakeFigure, HEAD, PiixSpriteElement, RENDERS, lum, BAYER, ASCII, TEXTURES, BIG, PiixTypeElement, CELL_SHAPES, PiixPalElement, define, add, autoAttach, SCRIPT, start } = K;
 
 /* ---- behaviors/beeline.js ---- */
 /* beeline: a little line of worker bees buzzing round their element. Come close and
@@ -719,49 +1748,6 @@ defineBehavior('count', (a, [el], host) => {
  *   1. el.piixSurface(x)         (e.g. <piix-type> exposes the real letter contour)
  *   2. the first line of text    (real glyph tops, unless edge="box")
  *   3. the element's top edge */
-/* Per-glyph contour of an element's first line of text: [{l, r, t}] in doc coords.
- * Each glyph's real ink top is measured with canvas metrics, so a pal climbs onto
- * a tall "T", steps down to an "e" and hops across spaces. Cached until layout moves. */
-const measureCtx = document.createElement('canvas').getContext('2d');
-const glyphTop = (ch, font) => {
-  measureCtx.font = font;
-  const m = measureCtx.measureText(ch);
-  return [m.fontBoundingBoxAscent || 0, m.actualBoundingBoxAscent || 0];
-};
-const textProfile = (el, cache) => {
-  const box = el.getBoundingClientRect();
-  const key = [box.left, box.top, box.width, box.height, scrollX, scrollY, document.fonts.status].join();
-  if (cache.key === key) return cache.v;
-  const segs = [];
-  const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
-  const rg = document.createRange();
-  let top = null, n, count = 0;
-  outer: while ((n = walk.nextNode())) {
-    const p = n.parentElement;
-    if (!p || p.closest('piix-pal')) continue;
-    const cs = getComputedStyle(p);
-    if (cs.visibility === 'hidden' || cs.display === 'none') continue;
-    const font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
-    const txt = n.data;
-    for (let i = 0; i < txt.length && count < 400; i++, count++) {
-      rg.setStart(n, i); rg.setEnd(n, i + 1);
-      const r = rg.getClientRects()[0];
-      if (!r || r.width < .5) continue;
-      if (top === null) top = r.top;
-      if (r.top - top > r.height * .6) break outer;   /* reached the second line */
-      if (/\s/.test(txt[i])) continue;              /* spaces are gaps */
-      const [fa, ga] = glyphTop(txt[i], font);
-      segs.push({ l: r.left + scrollX, r: r.right + scrollX, t: r.top + scrollY + (fa - ga) });
-    }
-  }
-  /* glue neighbours into runs so tiny kerning gaps don't count as holes */
-  for (let i = 1; i < segs.length; i++) if (segs[i].l - segs[i - 1].r < 2) segs[i - 1].r = segs[i].l;
-  const v = segs.length ? { l: segs[0].l, r: segs[segs.length - 1].r, t: Math.min(...segs.map(s => s.t)), segs } : null;
-  cache.key = key; cache.v = v;
-  return v;
-};
-const segAt = (segs, x) => { for (const s of segs) if (x >= s.l && x <= s.r) return s.t; return null; };
-
 defineBehavior('crawl', (a, [el], host) => {
   const mode = host.getAttribute('edge') || (typeof el.piixSurface === 'function' ? 'surface' : 'text');
   const S = a.s / 3;                      /* everything scales with the sprite */
@@ -2914,831 +3900,6 @@ defineBehavior('wire', (a, [el], host) => {
   });
 })();
 
-/* ---- elements/crowd.js ---- */
-/* <piix-crowd mode="crowd|swarm|form" count="80" text="HELLO" height="420">
- * A stage full of tiny agents on one canvas, depth-sorted on a 2.5D floor.
- *   crowd   they wander, stop to high-five when they meet, and dodge the cursor
- *   swarm   they flock across the floor after the cursor
- *   form    they walk into place to spell `text`; click to scatter, they regroup
- * Everywhere: click empty floor to drop in a new one, grab one and throw it.
- * Batched Canvas 2D: hundreds of agents at 60fps without WebGL. */
-const BLIP = (() => {
-  const body = [
-    '..kkkkk..',
-    '.kbBbbbk.',
-    '.kbkbkbk.',
-    '.kbbbbbk.',
-    '.kbbbbbk.',
-    '.kdbbbdk.',
-    '..kkkkk..'
-  ];
-  const legs = { a: '..k...k..', b: '...k.k...', stand: '..k...k..', dangle: '.k.....k.' };
-  const f = (rows, l) => rows.concat([l]);
-  return {
-    w: 9, h: 8,
-    frames: {
-      walkA: f(body, legs.a), walkB: f(body, legs.b), stand: f(body, legs.stand),
-      wave: f(art.compose(body, [7, 0, ['.k']], [7, 1, ['kk']]), legs.stand),
-      held: f(art.put(body, 2, 2, ['bkbkb']), legs.dangle),
-      dizzy: f(art.put(body, 2, 2, ['kbbbk']), legs.stand),
-      sleep: f(art.put(body, 2, 2, ['bbbbb', 'kbbbk'].slice(0, 1)), legs.stand)
-    }
-  };
-})();
-const CROWD_COLORS = ['#c6f432', '#ff6b4a', '#6b4cff', '#58c8ff', '#ffd23f', '#ff9cc2', '#25b89a', '#f4f1fa'];
-
-class PiixCrowdElement extends HTMLElement {
-  static get observedAttributes() { return ['mode', 'count', 'text', 'scale']; }
-  constructor() {
-    super();
-    this.attachShadow({ mode: 'open' });
-    this._tick = this._tick.bind(this);
-    this._agents = []; this._fx = []; this._vis = true;
-  }
-  connectedCallback() {
-    this.shadowRoot.innerHTML = `<style>
-:host{display:block;position:relative;height:${+this.getAttribute('height') || 420}px;touch-action:none;user-select:none}
-canvas{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;cursor:grab}
-canvas.held{cursor:grabbing}
-</style><canvas aria-hidden="true"></canvas>`;
-    this._cv = this.shadowRoot.querySelector('canvas');
-    this._g = this._cv.getContext('2d');
-    this.setAttribute('role', 'img');
-    if (!this.hasAttribute('aria-label')) this.setAttribute('aria-label', 'A crowd of tiny pixel characters');
-    this._bake();
-    this._ro = new ResizeObserver(() => this._resize());
-    this._ro.observe(this);
-    this._io = new IntersectionObserver(es => { this._vis = es[es.length - 1].isIntersecting; }, { rootMargin: '100px' });
-    this._io.observe(this);
-    this._cv.addEventListener('pointerdown', e => this._down(e));
-    this._resize();
-    sub(this._tick);
-  }
-  disconnectedCallback() { unsub(this._tick); if (this._ro) this._ro.disconnect(); if (this._io) this._io.disconnect(); }
-  attributeChangedCallback(n) {
-    if (!this._cv) return;
-    if (n === 'scale') { this._bake(); return; }
-    if (n === 'text' || n === 'mode') this._targets();
-    if (n === 'count') this._populate();
-  }
-  get mode() { const m = this.getAttribute('mode'); return m === 'swarm' || m === 'form' ? m : 'crowd'; }
-  /* scatter everyone, then let them settle again */
-  scatter() { this._agents.forEach(a => { a.vx += rnd(-300, 300); a.vy += rnd(-200, 200); a.z = Math.max(a.z, 0); a.vz = rnd(150, 320); a.scatter = 1.4; }); }
-
-  _bake() {
-    /* every frame in every colour, facing both ways, baked once */
-    const s = this._s = +this.getAttribute('scale') || 3;
-    this._sprites = CROWD_COLORS.map(col => {
-      const pal = { k: hexRGBA('#17121f'), b: hexRGBA(col), B: hexRGBA(mixHex(col, .45)), d: hexRGBA(mixHex(col, -.22)) };
-      const out = {};
-      for (const k in BLIP.frames) {
-        const one = bake(BLIP.frames[k], pal, BLIP.w, BLIP.h);
-        const right = document.createElement('canvas'); right.width = BLIP.w * s; right.height = BLIP.h * s;
-        const rg = right.getContext('2d'); rg.imageSmoothingEnabled = false; rg.drawImage(one, 0, 0, right.width, right.height);
-        const left = document.createElement('canvas'); left.width = right.width; left.height = right.height;
-        const lg = left.getContext('2d'); lg.translate(left.width, 0); lg.scale(-1, 1); lg.drawImage(right, 0, 0);
-        out[k] = [left, right];
-      }
-      return out;
-    });
-  }
-  _resize() {
-    const r = this.getBoundingClientRect(), d = this._dpr = Math.min(devicePixelRatio || 1, 2);
-    this._W = r.width; this._H = r.height;
-    this._cv.width = Math.round(r.width * d); this._cv.height = Math.round(r.height * d);
-    if (!this._agents.length) this._populate(); else this._agents.forEach(a => { a.x = clamp(a.x, 8, this._W - 8); a.y = clamp(a.y, 20, this._H - 6); });
-    this._targets();
-  }
-  _new(x, y, z = 0) {
-    return { x, y, z, vx: 0, vy: 0, vz: 0, c: (Math.random() * CROWD_COLORS.length) | 0, face: chance(.5) ? 1 : 0,
-      state: 'walk', timer: rnd(1, 4), gx: x, gy: y, t: rnd(0, 1), mate: null, dizzy: 0, scatter: 0, tx: null, ty: null };
-  }
-  _populate() {
-    const n = clamp(+this.getAttribute('count') || (this.mode === 'form' ? 160 : 70), 1, 600);
-    while (this._agents.length < n) this._agents.push(this._new(rnd(10, this._W - 10), rnd(30, this._H - 8)));
-    this._agents.length = n;
-    this._targets();
-  }
-  /* formation: rasterise the text and hand each agent a spot */
-  _targets() {
-    this._agents.forEach(a => { a.tx = a.ty = null; });
-    if (this.mode !== 'form' || !this._W) return;
-    const text = (this.getAttribute('text') || 'HELLO').slice(0, 16);
-    const c = document.createElement('canvas'), x = c.getContext('2d', { willReadFrequently: true });
-    const rows = 40, font = `900 ${rows}px ${getComputedStyle(this).fontFamily || 'sans-serif'}`;
-    x.font = font;
-    const w = Math.ceil(x.measureText(text).width) + 4; c.width = w; c.height = Math.ceil(rows * 1.1);
-    x.font = font; x.textBaseline = 'top'; x.fillText(text, 2, 2);
-    const d = x.getImageData(0, 0, c.width, c.height).data;
-    /* pick the coarsest grid that still has a spot for (nearly) everyone */
-    let pts = [], step = 1;
-    const sample = st => { const out = []; for (let yy = 0; yy < c.height; yy += st) for (let xx = 0; xx < c.width; xx += st) if (d[(yy * c.width + xx) * 4 + 3] > 120) out.push([xx, yy]); return out; };
-    for (let st = 8; st >= 1; st--) { pts = sample(st); step = st; if (pts.length >= this._agents.length * .92) break; }
-    const cell = Math.min((this._W - 40) / c.width, (this._H - 50) / c.height);
-    const ox = (this._W - c.width * cell) / 2, oy = (this._H - c.height * cell) / 2 + 20;
-    /* nearest-ish assignment: sort both by x so nobody crosses the whole stage */
-    const spots = pts.map(([px, py]) => [ox + px * cell, oy + py * cell]).sort((p, q) => p[0] - q[0]);
-    const order = this._agents.slice().sort((p, q) => p.x - q.x);
-    order.forEach((a, i) => { const s = spots[Math.floor(i * spots.length / order.length)]; if (s && i < spots.length * 1.0) { a.tx = s[0]; a.ty = s[1]; } });
-  }
-
-  _local(e) { const r = this._cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; }
-  _hit(x, y) {
-    const s = this._s, w = BLIP.w * s, h = BLIP.h * s;
-    let best = null;
-    for (const a of this._agents) if (Math.abs(x - a.x) < w / 2 + 2 && y < a.y - a.z + 2 && y > a.y - a.z - h - 2 && (!best || a.y > best.y)) best = a;
-    return best;
-  }
-  _down(e) {
-    if (e.button > 0) return;
-    e.preventDefault();
-    const [x, y] = this._local(e);
-    const a = this._hit(x, y);
-    if (!a) {
-      /* empty floor: drop a new one in (or scatter the formation) */
-      if (this.mode === 'form' && this._agents.some(q => q.tx != null)) { this.scatter(); return; }
-      if (this._agents.length < 600) { const n = this._new(x, clamp(y, 24, this._H - 6), 220); n.vz = -50; this._agents.push(n); }
-      return;
-    }
-    try { this._cv.setPointerCapture(e.pointerId); } catch (_) { /* ignore */ }
-    a.held = true; a.state = 'held'; this._cv.classList.add('held');
-    let lx = x, ly = y, lt = now(), vx = 0, vy = 0;
-    const mv = ev => {
-      const [mx, my] = this._local(ev), t = now(), dt = Math.max(8, t - lt);
-      vx = lerp(vx, (mx - lx) / dt * 1000, .5); vy = lerp(vy, (my - ly) / dt * 1000, .5); lx = mx; ly = my; lt = t;
-      a.x = clamp(mx, 6, this._W - 6); a.z = Math.max(20, a.y - my + BLIP.h * this._s * .6);
-    };
-    const up = () => {
-      this._cv.removeEventListener('pointermove', mv); this._cv.removeEventListener('pointerup', up); this._cv.removeEventListener('pointercancel', up);
-      this._cv.classList.remove('held');
-      a.held = false; a.state = 'air';
-      if (now() - lt > 90) vx = vy = 0;
-      a.vx = clamp(vx, -900, 900); a.vy = clamp(vy * .25, -300, 300); a.vz = clamp(-vy * .6, -200, 700);
-    };
-    this._cv.addEventListener('pointermove', mv); this._cv.addEventListener('pointerup', up); this._cv.addEventListener('pointercancel', up);
-  }
-
-  _tick(dt, t) {
-    if (!this._vis || !this._W) return;
-    const R = reduced(), W = this._W, H = this._H, A = this._agents, mode = this.mode;
-    const r = this.getBoundingClientRect();
-    const px = ptr.cx - r.left, py = ptr.cy - r.top;
-    const inside = ptr.seen && px > 0 && py > 0 && px < W && py < H;
-    if (!R) for (const a of A) {
-      if (a.held) continue;
-      a.t += dt;
-      /* air time: thrown or dropped in */
-      if (a.z > 0 || a.vz > 0 || a.state === 'air') {
-        a.vz -= 1400 * dt; a.z += a.vz * dt; a.x += a.vx * dt; a.y += a.vy * dt;
-        if (a.x < 6 || a.x > W - 6) { a.vx *= -.6; a.x = clamp(a.x, 6, W - 6); }
-        a.y = clamp(a.y, 24, H - 4);
-        if (a.z <= 0) {
-          a.z = 0;
-          if (a.vz < -260) { a.vz = -a.vz * .35; this._fx.push({ x: a.x, y: a.y, t: 0, k: 'dust' }); }
-          else { a.vz = 0; a.vx *= .3; a.vy *= .3; a.state = 'walk'; a.timer = rnd(.5, 2); if (Math.hypot(a.vx, a.vy) > 30 || a._fell) a.dizzy = 1.2; }
-        }
-        continue;
-      }
-      a.dizzy = Math.max(0, a.dizzy - dt);
-      a.scatter = Math.max(0, a.scatter - dt);
-      let fx = 0, fy = 0, speed = 34;
-      if (mode === 'swarm' && inside) {
-        /* head for the cursor, but keep a little personal space */
-        const dx = px - a.x, dy = py - a.y, d = Math.hypot(dx, dy) || 1;
-        if (d > 30) { fx += dx / d * 90; fy += dy / d * 90; }
-        speed = 70;
-      } else if (mode === 'form' && a.tx != null && a.scatter <= 0) {
-        const dx = a.tx - a.x, dy = a.ty - a.y, d = Math.hypot(dx, dy);
-        if (d > 1.5) { fx += dx / d * Math.min(80, d * 4); fy += dy / d * Math.min(80, d * 4); speed = 60; a.state = 'walk'; }
-        else { a.x = a.tx; a.y = a.ty; a.vx = a.vy = 0; a.state = a.t % 9 < .4 ? 'wave' : 'stand'; a.face = 1; }
-      } else {
-        /* wander between little waypoints, sometimes stop for a wave */
-        a.timer -= dt;
-        if (a.state === 'walk') {
-          const dx = a.gx - a.x, dy = a.gy - a.y, d = Math.hypot(dx, dy);
-          if (d < 4 || a.timer <= 0) {
-            if (chance(.35)) { a.state = chance(.3) ? 'wave' : 'stand'; a.timer = rnd(.8, 2.5); }
-            else { a.gx = clamp(a.x + rnd(-120, 120), 10, W - 10); a.gy = clamp(a.y + rnd(-70, 70), 26, H - 6); a.timer = rnd(2, 5); }
-          } else { fx += dx / d * 40; fy += dy / d * 40; }
-        } else if (a.timer <= 0 && a.state !== 'five') { a.state = 'walk'; a.timer = rnd(2, 5); }
-      }
-      /* the cursor parts the crowd */
-      if (inside && mode !== 'swarm') {
-        const dx = a.x - px, dy = a.y - py, d = Math.hypot(dx, dy) || 1;
-        if (d < 56) { fx += dx / d * 900 / Math.max(d / 14, 1); fy += dy / d * 900 / Math.max(d / 14, 1); a.state = 'walk'; }
-      }
-      if (a.state === 'walk' || mode === 'swarm' || (fx || fy)) {
-        a.vx = lerp(a.vx, fx, 1 - Math.exp(-6 * dt)); a.vy = lerp(a.vy, fy, 1 - Math.exp(-6 * dt));
-        const sp = Math.hypot(a.vx, a.vy), lim = speed * 2.2;
-        if (sp > lim) { a.vx *= lim / sp; a.vy *= lim / sp; }
-        a.x = clamp(a.x + a.vx * dt, 6, W - 6); a.y = clamp(a.y + a.vy * dt, 24, H - 4);
-        if (Math.abs(a.vx) > 3) a.face = a.vx > 0 ? 1 : 0;
-      }
-    }
-
-    /* separation + high fives (crowd mode), using a coarse grid so it stays cheap */
-    if (!R) {
-      const cell = 16, grid = new Map();
-      for (const a of A) { const k = ((a.x / cell) | 0) + ',' + ((a.y / cell) | 0); (grid.get(k) || grid.set(k, []).get(k)).push(a); }
-      for (const a of A) {
-        if (a.held || a.z > 0) continue;
-        const gx = (a.x / cell) | 0, gy = (a.y / cell) | 0;
-        for (let i = -1; i <= 1; i++) for (let j = -1; j <= 1; j++) {
-          const list = grid.get((gx + i) + ',' + (gy + j)); if (!list) continue;
-          for (const o of list) {
-            if (o === a || o.z > 0) continue;
-            const dx = a.x - o.x, dy = a.y - o.y, d = Math.hypot(dx, dy * 2) || .1;
-            if (d < 9 && !(mode === 'form' && a.tx != null && a.scatter <= 0)) { a.x += dx / d * .6; a.y += dy / d * .3; }
-            if (mode === 'crowd' && d < 14 && a.state === 'walk' && o.state === 'walk' && !a.mate && !o.mate && chance(.02)) {
-              a.mate = o; o.mate = a; a.state = o.state = 'five'; a.timer = o.timer = .7;
-              a.face = o.x > a.x ? 1 : 0; o.face = 1 - a.face;
-              this._fx.push({ x: (a.x + o.x) / 2, y: Math.min(a.y, o.y) - BLIP.h * this._s - 4, t: 0, k: 'spark' });
-            }
-          }
-        }
-      }
-      for (const a of A) if (a.state === 'five') { a.timer -= dt; if (a.timer <= 0) { a.state = 'walk'; a.timer = rnd(1, 3); a.mate = null; a.gx = clamp(a.x + (a.face ? -80 : 80), 10, W - 10); } }
-    }
-    this._render(t);
-  }
-
-  _render(t) {
-    const g = this._g, d = this._dpr, s = this._s, W = this._W, H = this._H;
-    g.setTransform(d, 0, 0, d, 0, 0);
-    g.clearRect(0, 0, W, H);
-    g.imageSmoothingEnabled = false;
-    const A = this._agents.slice().sort((p, q) => p.y - q.y);
-    /* shadows first, then everyone back to front */
-    g.fillStyle = 'rgba(23,18,31,.16)';
-    for (const a of A) { const w = BLIP.w * s * (a.z > 0 ? clamp(1 - a.z / 300, .4, 1) : 1); g.fillRect(Math.round(a.x - w / 2 + s), Math.round(a.y - s / 2), Math.round(w - 2 * s), s); }
-    for (const a of A) {
-      const set = this._sprites[a.c];
-      let fr = 'stand';
-      if (a.held) fr = 'held';
-      else if (a.z > 0) fr = 'held';
-      else if (a.dizzy > 0) fr = 'dizzy';
-      else if (a.state === 'wave' || a.state === 'five') fr = Math.floor(a.t * 6) % 2 ? 'wave' : 'stand';
-      else if (a.state === 'walk' && Math.hypot(a.vx, a.vy) > 6) fr = Math.floor(a.t * 9) % 2 ? 'walkA' : 'walkB';
-      const img = set[fr][a.face];
-      const bob = fr.startsWith('walk') ? (Math.floor(a.t * 9) % 2) * -s : 0;
-      g.drawImage(img, Math.round(a.x - img.width / 2), Math.round(a.y - img.height - a.z + bob));
-    }
-    /* sparks for high fives, dust for landings */
-    this._fx = this._fx.filter(f => (f.t += 1 / 60) < .5);
-    for (const f of this._fx) {
-      const k = f.t / .5, n = 6, rad = 4 + k * 14;
-      g.fillStyle = f.k === 'spark' ? '#ffd23f' : 'rgba(23,18,31,.35)';
-      for (let i = 0; i < n; i++) {
-        const ang = i / n * 6.283 + (f.k === 'spark' ? 0 : .5);
-        g.fillRect(Math.round(f.x + Math.cos(ang) * rad - s / 2), Math.round(f.y + Math.sin(ang) * rad * (f.k === 'spark' ? 1 : .4) - s / 2), s, s);
-      }
-    }
-  }
-}
-
-/* ---- elements/sprite.js ---- */
-/* <piix-sprite name="mochi" size="96"></piix-sprite>
- * Self-contained characters you can paste anywhere: they sit inline like an image.
- * Eyes follow the cursor, they blink, breathe, hop when clicked and nap when ignored.
- *
- *   name         which sprite (see Piixpal.figures)
- *   size         width in px (snapped to whole sprite pixels)   default: 5 × sprite width
- *   scale        or give the pixel size directly
- *   render       pixel | dots | halftone | dither | ascii | voxel   default: the sprite's own (pixel)
- *                  dots = LED dot-matrix, halftone = shaded sub-dots, dither = 1-bit grain,
- *                  ascii = characters, voxel = extruded 3D blocks that turn toward you
- *   depth        voxel extrusion, in sprite pixels                default: 3
- *   color        body colour (sprites that support it); shade and light are derived
- *   eye          pupil colour
- *   hue          or just rotate every colour, degrees
- *   look         mouse | wander | none                          default: mouse
- *   shy, tilt    flinch away / lean toward the cursor (big sprites do both by default;
- *                turn off with no-shy / no-tilt)
- *   still        no breathing or hopping
- *   sleep-after  seconds of no input before napping, 0 = never  default: 25
- *
- * Figure spec: { w, h, palette, frames:[rows…], fps, eyes:[{x,y,w,h}], pupil:{w,h}, lid:'b',
- *                recolor:{ key: mix }, render, tilt, shy, glint, kind } */
-const FIGURES = {};
-const defineFigure = (name, spec) => {
-  spec.name = name;
-  spec.pupil = spec.pupil || { w: 1, h: 1 };
-  spec._cache = {};
-  FIGURES[name] = spec;
-  return spec;
-};
-/* mix a hex colour toward black (amt < 0) or white (amt > 0) */
-const mixHex = (hex, amt) => {
-  const [r, g, b] = hexRGBA(hex), t = amt < 0 ? 0 : 255, k = Math.abs(amt);
-  const c = v => Math.round(v + (t - v) * k).toString(16).padStart(2, '0');
-  return '#' + c(r) + c(g) + c(b);
-};
-const figurePalette = (spec, color) => {
-  const pal = { ...spec.palette };
-  if (color && spec.recolor) for (const k in spec.recolor) pal[k] = spec.recolor[k] ? mixHex(color, spec.recolor[k]) : color;
-  return pal;
-};
-const bakeFigure = (spec, pal) => {
-  const key = JSON.stringify(pal);
-  if (!spec._cache[key]) {
-    const rgba = {};
-    for (const k in pal) rgba[k] = hexRGBA(pal[k]);
-    spec._cache[key] = spec.frames.map(rows => bake(rows, rgba, spec.w, spec.h));
-  }
-  return spec._cache[key];
-};
-const HEAD = 3; /* rows of headroom above the sprite for breathing and z's */
-
-class PiixSpriteElement extends HTMLElement {
-  static get observedAttributes() { return ['name', 'size', 'scale', 'hue', 'color', 'eye', 'render', 'depth']; }
-  constructor() {
-    super();
-    this.attachShadow({ mode: 'open' });
-    this._tick = this._tick.bind(this);
-    this._down = this._down.bind(this);
-    this._vis = true;
-  }
-  connectedCallback() {
-    this._build();
-    this._io = new IntersectionObserver(es => { this._vis = es[es.length - 1].isIntersecting; }, { rootMargin: '120px' });
-    this._io.observe(this);
-    this.addEventListener('pointerdown', this._down);
-    sub(this._tick);
-  }
-  disconnectedCallback() {
-    unsub(this._tick);
-    if (this._io) this._io.disconnect();
-    this.removeEventListener('pointerdown', this._down);
-  }
-  attributeChangedCallback(n) {
-    if (!this.isConnected || !this._cv) return;
-    if (n === 'hue') { this._cv.style.filter = this.getAttribute('hue') ? `hue-rotate(${+this.getAttribute('hue')}deg)` : ''; return; }
-    this._build();
-  }
-  /* make it hop from code */
-  poke() { this._down(); }
-  _on(attr) { return this.hasAttribute(attr) || (!!this._spec[attr] && !this.hasAttribute('no-' + attr)); }
-
-  _build() {
-    const spec = this._spec = FIGURES[this.getAttribute('name')] || FIGURES[Object.keys(FIGURES)[0]];
-    if (!spec) return;
-    this._pal = figurePalette(spec, this.getAttribute('color'));
-    this._frames = bakeFigure(spec, this._pal);
-    const size = +this.getAttribute('size');
-    const s = this._s = +this.getAttribute('scale') || (size ? Math.max(1, Math.round(size / spec.w)) : (spec.scale || 5));
-    const mode = this._mode = RENDERS.includes(this.getAttribute('render')) ? this.getAttribute('render') : (spec.render || 'pixel');
-    const W = spec.w, H = spec.h + HEAD;
-    const depth = this._depth = mode === 'voxel' ? Math.max(1, +this.getAttribute('depth') || spec.depth || 3) : 0;
-    const pad = this._pad = depth * s;
-    const dpr = this._dpr = mode === 'pixel' ? 1 : Math.min(devicePixelRatio || 1, 2);
-    const cw = mode === 'pixel' ? W : Math.round((W * s + pad * 2) * dpr);
-    const ch = mode === 'pixel' ? H : Math.round((H * s + pad * 2) * dpr);
-    this.shadowRoot.innerHTML = `<style>
-:host{display:inline-block;line-height:0;vertical-align:bottom;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-.w{display:block;transform-origin:50% 100%;will-change:transform}
-canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;margin:${-HEAD * s - pad}px ${-pad}px ${-pad}px}
-</style><div class="w"><canvas width="${cw}" height="${ch}" style="width:${W * s + pad * 2}px;height:${H * s + pad * 2}px"></canvas></div>`;
-    this._wrap = this.shadowRoot.querySelector('.w');
-    this._cv = this.shadowRoot.querySelector('canvas');
-    if (this.getAttribute('hue')) this._cv.style.filter = `hue-rotate(${+this.getAttribute('hue')}deg)`;
-    this._out = this._cv.getContext('2d');
-    /* everything is composed at 1x here, then presented as pixels, dots or voxels */
-    const buf = this._buf = document.createElement('canvas');
-    buf.width = W; buf.height = H;
-    this._g = buf.getContext('2d', { willReadFrequently: mode !== 'pixel' && mode !== 'voxel' });
-    if (mode === 'voxel') { this._shade = document.createElement('canvas'); this._shade.width = W; this._shade.height = H; }
-    this._key = '';
-    this._ox = 0; this._oy = 0; this._tilt = 0; this._rx = 0; this._ry = 0;
-    this._blinkEnd = 0; this._nextBlink = now() + rnd(1200, 3600);
-    this._look = { x: 0, y: 0, until: 0 };
-    this._lastPoke = now();
-    if (!this.hasAttribute('aria-label')) this.setAttribute('aria-hidden', 'true');
-    else this.setAttribute('role', 'img');
-  }
-
-  _down() {
-    this._hop = now(); this._happy = now() + 650; this._lastPoke = now();
-    this.dispatchEvent(new CustomEvent('piix:poke', { bubbles: true }));
-  }
-
-  _tick(dt, t) {
-    if (!this._vis || !this._cv) return;
-    const spec = this._spec, s = this._s, R = reduced();
-    const r = this.getBoundingClientRect();
-    const cx = r.left + r.width / 2, cy = r.top + r.height * .45;
-    const idle = t - Math.max(ptr.last, this._lastPoke);
-    const nap = this.hasAttribute('sleep-after') ? +this.getAttribute('sleep-after') : 25;
-    const asleep = nap > 0 && idle > nap * 1000;
-    const mode = this.getAttribute('look') || 'mouse';
-    const vx = ptr.cx - cx, vy = ptr.cy - cy;
-    const tracking = mode === 'mouse' && ptr.seen && idle < 4000;
-
-    /* gaze, -1..1 on both axes */
-    let gx = 0, gy = 0;
-    if (tracking) { const k = Math.max(r.width, 40) * 1.4; gx = clamp(vx / k, -1, 1); gy = clamp(vy / k, -1, 1); }
-    else if (mode !== 'none') {
-      if (t > this._look.until) this._look = { x: rnd(-1, 1), y: rnd(-.7, .7), until: t + rnd(1200, 3000) };
-      gx = this._look.x; gy = this._look.y;
-    }
-    if (asleep) { gx = 0; gy = 0; }
-    if (t > this._nextBlink) { this._blinkEnd = t + 130; this._nextBlink = t + rnd(2400, 6000); }
-    const eyes = asleep ? 'shut' : t < this._happy ? 'happy' : t < this._blinkEnd ? 'shut' : 'open';
-
-    /* idle frames and a one-pixel breath */
-    const fps = spec.fps || 2;
-    const fi = R || spec.frames.length < 2 ? 0 : Math.floor(t / 1000 * fps * (asleep ? .4 : 1)) % spec.frames.length;
-    const still = R || this.hasAttribute('still');
-    const breath = still ? 0 : Math.floor(t / (asleep ? 1400 : 760)) % 2;
-    const z = asleep && !R ? Math.floor(t / 700) % 3 : -1;
-    const e0 = spec.eyes[0];
-    const px = Math.round((gx + 1) / 2 * (e0 ? e0.w - spec.pupil.w : 0));
-    const py = Math.round((gy + 1) / 2 * (e0 ? e0.h - spec.pupil.h : 0));
-
-    /* voxel: the 3D turn, smoothed; the extrusion shows the side facing away from you */
-    this._ry += ((still ? 0 : gx) - this._ry) * .12;
-    this._rx += ((still ? 0 : gy) - this._rx) * .12;
-    const ex = this._mode === 'voxel' ? Math.round(-this._ry * 4) / 4 : 0;
-    const ey = this._mode === 'voxel' ? Math.round((-this._rx * .8 + .55) * 4) / 4 : 0;
-
-    const key = [fi, breath, eyes, px, py, z, ex, ey].join();
-    if (key !== this._key) { this._key = key; this._draw(fi, breath, eyes, px, py, z); this._present(ex, ey); }
-
-    /* body motion */
-    let tx = 0, ty = 0, sx = 1, sy = 1, tilt = 0;
-    if (!still) {
-      if (this._on('tilt') && tracking && !asleep) tilt = clamp(vx / (innerWidth * .4), -1, 1) * 8;
-      if (this._on('shy') && ptr.seen && !asleep) {
-        const d = Math.hypot(vx, vy) || 1, lim = r.width * 1.2;
-        if (d < lim) { const k = (1 - d / lim) * r.width * .18; tx = -vx / d * k; ty = -vy / d * k; }
-      }
-      if (this._hop) {
-        const p = (t - this._hop) / 460;
-        if (p >= 1) this._hop = 0;
-        else { ty -= Math.sin(Math.PI * p) * spec.h * s * .35; const q = Math.sin(Math.PI * p * 2) * .08; sx = 1 - q * .6; sy = 1 + q; }
-      }
-    }
-    this._ox += (tx - this._ox) * .18; this._oy += (ty - this._oy) * .18; this._tilt += (tilt - this._tilt) * .1;
-    const oy = this._hop ? ty : this._oy;
-    const turn = this._mode === 'voxel' ? `perspective(${Math.round(r.width * 5)}px) rotateY(${(this._ry * 24).toFixed(1)}deg) rotateX(${(-this._rx * 14).toFixed(1)}deg) ` : '';
-    this._wrap.style.transform = `translate(${this._ox.toFixed(1)}px,${oy.toFixed(1)}px) ${turn}rotate(${this._tilt.toFixed(1)}deg) scale(${sx.toFixed(3)},${sy.toFixed(3)})`;
-  }
-
-  /* compose one 1x frame: body, live eyes, z's */
-  _draw(fi, breath, eyes, px, py, z) {
-    const spec = this._spec, g = this._g, y0 = HEAD - breath, pal = this._pal;
-    g.clearRect(0, 0, spec.w, spec.h + HEAD);
-    g.drawImage(this._frames[fi], 0, y0);
-    const ink = pal.k || '#17121f', lid = pal[spec.lid] || ink;
-    const pupil = this.getAttribute('eye') || pal[spec.pupilKey || 'k'] || ink;
-    for (const e of spec.eyes) {
-      const x = e.x, y = e.y + y0;
-      if (eyes === 'open') {
-        g.fillStyle = pupil;
-        g.fillRect(x + px, y + py, spec.pupil.w, spec.pupil.h);
-        if (spec.glint && spec.pupil.w > 1) { g.fillStyle = spec.glint; g.fillRect(x + px, y + py, 1, 1); }
-      } else {
-        g.fillStyle = lid; g.fillRect(x, y, e.w, e.h);
-        g.fillStyle = pupil;
-        if (eyes === 'shut') g.fillRect(x, y + e.h - 1, e.w, 1);
-        else { /* happy: an upside-down U */
-          const top = y + Math.max(0, e.h - 2);
-          g.fillRect(x, top, e.w, 1); g.fillRect(x, y + e.h - 1, 1, 1); g.fillRect(x + e.w - 1, y + e.h - 1, 1, 1);
-        }
-      }
-    }
-    if (z >= 0) {
-      /* a little "z" drifting up in the headroom */
-      g.fillStyle = pupil;
-      const zx = spec.w - 4 + (z > 1 ? 1 : 0), zy = 2 - z;
-      g.fillRect(zx, zy + 0, 3, 1); g.fillRect(zx + 1, zy + 1, 1, 1); g.fillRect(zx, zy + 2, 3, 1);
-    }
-  }
-
-  /* put the composed frame on screen in the chosen style */
-  _present(ex, ey) {
-    const o = this._out, buf = this._buf, W = buf.width, H = buf.height, s = this._s, pad = this._pad, d = this._dpr;
-    if (this._mode === 'pixel') { o.clearRect(0, 0, W, H); o.drawImage(buf, 0, 0); return; }
-    o.setTransform(d, 0, 0, d, 0, 0);
-    o.clearRect(0, 0, W * s + pad * 2, H * s + pad * 2);
-    o.imageSmoothingEnabled = false;
-    if (TEXTURES[this._mode]) {
-      const data = this._g.getImageData(0, 0, W, H).data;
-      TEXTURES[this._mode](o, data, W, H, s);
-      return;
-    }
-    if (this._mode === 'dots') {
-      /* one round dot per pixel, batched by colour */
-      const data = this._g.getImageData(0, 0, W, H).data, groups = new Map(), rad = s * .44;
-      for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
-        const i = (y * W + x) * 4;
-        if (data[i + 3] < 40) continue;
-        const c = `rgb(${data[i]},${data[i + 1]},${data[i + 2]})`;
-        if (!groups.has(c)) groups.set(c, []);
-        groups.get(c).push(x, y);
-      }
-      groups.forEach((pts, c) => {
-        o.fillStyle = c; o.beginPath();
-        for (let i = 0; i < pts.length; i += 2) {
-          const cx = (pts[i] + .5) * s, cy = (pts[i + 1] + .5) * s;
-          o.moveTo(cx + rad, cy); o.arc(cx, cy, rad, 0, 6.2832);
-        }
-        o.fill();
-      });
-      return;
-    }
-    /* voxel: stack darkened copies behind the face, half a pixel apart */
-    const sh = this._shade, sg = sh.getContext('2d');
-    sg.clearRect(0, 0, W, H); sg.globalCompositeOperation = 'source-over'; sg.drawImage(buf, 0, 0);
-    sg.globalCompositeOperation = 'source-atop'; sg.fillStyle = 'rgba(10,6,20,.42)'; sg.fillRect(0, 0, W, H);
-    const steps = this._depth * 2, u = s / 2;
-    for (let i = steps; i >= 1; i--) o.drawImage(sh, pad + ex * i * u, pad + ey * i * u, W * s, H * s);
-    o.drawImage(buf, pad, pad, W * s, H * s);
-  }
-}
-Piixpal.figures = FIGURES;
-Piixpal.figure = defineFigure;
-
-/* ---------- texture renderers: each turns the 1x frame into something with grain ---------- */
-const RENDERS = ['pixel', 'dots', 'voxel', 'halftone', 'dither', 'ascii'];
-const lum = (r, g, b) => (r * .299 + g * .587 + b * .114) / 255;
-const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5].map(v => (v + .5) / 16);
-const ASCII = ' .:-=+*#%@';
-const TEXTURES = {
-  /* halftone: each pixel is four sub-dots, bigger where the colour is darker */
-  halftone(o, d, W, H, s) {
-    const half = s / 2;
-    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
-      const i = (y * W + x) * 4; if (d[i + 3] < 40) continue;
-      const L = lum(d[i], d[i + 1], d[i + 2]);
-      const rad = half * (.32 + (1 - L) * .5);
-      o.fillStyle = `rgb(${d[i]},${d[i + 1]},${d[i + 2]})`; o.beginPath();
-      for (let k = 0; k < 4; k++) {
-        const cx = x * s + (k & 1) * half + half / 2, cy = y * s + (k >> 1) * half + half / 2;
-        o.moveTo(cx + rad, cy); o.arc(cx, cy, rad, 0, 6.2832);
-      }
-      o.fill();
-    }
-  },
-  /* dither: 1-bit grain. Each pixel becomes a 4x4 patch thresholded by a Bayer matrix,
-   * so light areas thin out into speckle and dark ones stay solid */
-  dither(o, d, W, H, s) {
-    const sub = s / 4;
-    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
-      const i = (y * W + x) * 4; if (d[i + 3] < 40) continue;
-      const L = lum(d[i], d[i + 1], d[i + 2]), dark = 1.12 - L * .95;
-      o.fillStyle = `rgb(${Math.round(d[i] * .82)},${Math.round(d[i + 1] * .82)},${Math.round(d[i + 2] * .82)})`;
-      for (let k = 0; k < 16; k++) {
-        const bx = (x * 4 + (k & 3)) & 3, by = (y * 4 + (k >> 2)) & 3;
-        if (BAYER[by * 4 + bx] < dark) o.fillRect(x * s + (k & 3) * sub, y * s + (k >> 2) * sub, Math.ceil(sub), Math.ceil(sub));
-      }
-    }
-  },
-  /* ascii: one character per pixel, denser glyphs for darker colours */
-  ascii(o, d, W, H, s) {
-    o.font = `800 ${Math.round(s * 1.5)}px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace`;
-    o.textAlign = 'center'; o.textBaseline = 'middle';
-    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
-      const i = (y * W + x) * 4; if (d[i + 3] < 40) continue;
-      const L = lum(d[i], d[i + 1], d[i + 2]);
-      const ch = ASCII[clamp(Math.round((1 - L) * (ASCII.length - 1)) + 4, 2, ASCII.length - 1)];
-      o.fillStyle = `rgb(${d[i]},${d[i + 1]},${d[i + 2]})`;
-      o.fillText(ch, x * s + s / 2, y * s + s / 2);
-    }
-  }
-};
-
-/* defaults for the big, bold sprites: one recolourable body, chunky 3D blocks, block eyes */
-const BIG = { kind: 'big', scale: 8, render: 'voxel', depth: 2, tilt: true, shy: true, glint: '#ffffff', lid: 'b', recolor: { b: 0, d: -.24, B: .42 } };
-
-/* ---- elements/type.js ---- */
-/* <piix-type text="PIIXPAL" rows="18" cell="8" color="#16111f" shade="#c6f432" depth="1" fit>
- * Any font, rasterised into chunky blocks with an extruded shadow.
- * Pixels rain in on load, lift off their shadow around the cursor, and ripple when clicked.
- * Exposes piixSurface(x) so pals can walk on the actual letter tops. */
-class PiixTypeElement extends HTMLElement {
-  static get observedAttributes() { return ['text', 'rows', 'cell', 'font', 'weight', 'color', 'shade', 'depth', 'gap', 'fit', 'align', 'intro', 'shape']; }
-  constructor() {
-    super();
-    this.attachShadow({ mode: 'open' });
-    this._tick = this._tick.bind(this);
-    this._pm = this._pm.bind(this);
-    this._pd = this._pd.bind(this);
-    this._cells = []; this._on = false; this._tok = 0; this._waves = [];
-  }
-  connectedCallback() {
-    this.shadowRoot.innerHTML = `<style>
-:host{display:block;line-height:0;position:relative}
-canvas{display:block;pointer-events:none;image-rendering:pixelated}
-</style><canvas aria-hidden="true"></canvas>`;
-    this._cv = this.shadowRoot.querySelector('canvas');
-    this._g = this._cv.getContext('2d');
-    this.setAttribute('role', 'img');
-    this._ro = new ResizeObserver(() => { if (this._cols) this._layout(); });
-    this._ro.observe(this);
-    addEventListener('pointermove', this._pm, { passive: true });
-    this.addEventListener('pointerdown', this._pd);
-    this._raster();
-  }
-  disconnectedCallback() {
-    if (this._ro) this._ro.disconnect();
-    removeEventListener('pointermove', this._pm);
-    this.removeEventListener('pointerdown', this._pd);
-    unsub(this._tick); this._on = false;
-  }
-  attributeChangedCallback(n) {
-    if (!this._cv) return;
-    if (['text', 'rows', 'font', 'weight', 'align'].includes(n)) { clearTimeout(this._rt); this._rt = setTimeout(() => this._raster(), 40); }
-    else if (this._cols) this._layout();
-  }
-  get text() { return (this.getAttribute('text') ?? this.textContent).trim(); }
-
-  /* rain the pixels in again */
-  replay() { this._seedIntro(); this._wake(); }
-
-  /* true once every pixel has landed (pals wait for this before stepping on) */
-  get piixSettled() { return !!this._cols && this._cells.every(p => p.landed); }
-
-  /* something landed on the letters at doc (x, y): send a small ripple through them */
-  piixImpact(x, y, power = 1) {
-    if (!this._cols || reduced()) return;
-    const r = this._cv.getBoundingClientRect();
-    this._waves.push({ x: (x - scrollX - r.left) / this._cell, y: (y - scrollY - r.top - this._head) / this._cell, r: 0, max: 5 + 5 * power, amp: .5 + .4 * power });
-    this._wake();
-  }
-
-  /* doc-y of the top letter pixel at doc-x, or null over a gap */
-  piixSurface(x) {
-    if (!this._cols) return null;
-    const r = this._cv.getBoundingClientRect();
-    const c = Math.floor((x - scrollX - r.left) / this._cell);
-    const top = this._top[c];
-    return top == null ? null : r.top + scrollY + this._head + top * this._cell;
-  }
-
-  async _raster() {
-    const tok = ++this._tok;
-    const lines = this.text.split(/\||\n/).map(s => s.trim()).filter(Boolean);
-    if (!lines.length) { this._cols = 0; return; }
-    const rows = +this.getAttribute('rows') || 18;
-    const weight = this.getAttribute('weight') || 800;
-    const fam = this.getAttribute('font') || getComputedStyle(this).fontFamily || 'system-ui,sans-serif';
-    const font = `${weight} ${rows}px ${fam}`;
-    try { await document.fonts.load(font, lines.join('')); } catch (_) { /* use whatever is there */ }
-    if (tok !== this._tok) return;
-    const c = document.createElement('canvas'), x = c.getContext('2d', { willReadFrequently: true });
-    x.font = font;
-    const ws = lines.map(l => Math.ceil(x.measureText(l).width));
-    const W = Math.max(...ws) + 2, lh = Math.round(rows * 1.02);
-    c.width = W; c.height = lh * lines.length + 2;
-    x.font = font; x.fillStyle = '#000'; x.textBaseline = 'alphabetic';
-    const align = this.getAttribute('align') || 'left';
-    lines.forEach((l, i) => {
-      const ox = align === 'center' ? Math.round((W - ws[i]) / 2) : align === 'right' ? W - ws[i] - 1 : 1;
-      x.fillText(l, ox, Math.round(i * lh + rows * .8) + 1);
-    });
-    const d = x.getImageData(0, 0, c.width, c.height).data, cells = [];
-    for (let yy = 0; yy < c.height; yy++) for (let xx = 0; xx < c.width; xx++) {
-      if (d[(yy * c.width + xx) * 4 + 3] > 110) cells.push({ x: xx, y: yy, oy: 0, vy: 0, lift: 0, lv: 0, delay: 0, landed: true });
-    }
-    /* crop empty margins */
-    const minX = Math.min(...cells.map(p => p.x)), minY = Math.min(...cells.map(p => p.y));
-    for (const p of cells) { p.x -= minX; p.y -= minY; }
-    this._cols = Math.max(...cells.map(p => p.x)) + 1;
-    this._rowsN = Math.max(...cells.map(p => p.y)) + 1;
-    this._cells = cells;
-    this._top = [];
-    for (const p of cells) if (this._top[p.x] == null || p.y < this._top[p.x]) this._top[p.x] = p.y;
-    this.setAttribute('aria-label', lines.join(' '));
-    this._layout();
-    if (this.getAttribute('intro') !== 'none') this._seedIntro();
-    this._wake();
-    this.dispatchEvent(new CustomEvent('piix:type', { bubbles: true }));
-  }
-
-  _layout() {
-    let cell = +this.getAttribute('cell') || 8;
-    if (this.hasAttribute('fit')) {
-      const avail = this.clientWidth || (this.parentElement && this.parentElement.clientWidth) || 0;
-      if (avail) cell = Math.max(2, Math.min(cell, Math.floor(avail / (this._cols + 1))));
-    }
-    this._cell = cell;
-    this._depth = Math.round(cell * (this.getAttribute('depth') != null ? +this.getAttribute('depth') : 1) * .6);
-    const gap = this.getAttribute('gap');
-    this._gap = Math.round(cell * clamp(gap != null ? +gap : .1, 0, .45));
-    this._head = cell * 3;                  /* headroom for lifted pixels */
-    const w = this._cols * cell + this._depth, h = this._rowsN * cell + this._depth + this._head;
-    const dpr = Math.min(devicePixelRatio || 1, 2);
-    this._dpr = dpr;
-    this._cv.width = Math.round(w * dpr); this._cv.height = Math.round(h * dpr);
-    this._cv.style.width = w + 'px'; this._cv.style.height = h + 'px';
-    this._cv.style.marginTop = -this._head + 'px';
-    this._render();
-  }
-
-  _seedIntro() {
-    if (reduced()) return;
-    const H = (this._rowsN + 6) * this._cell;
-    for (const p of this._cells) {
-      p.landed = false; p.vy = 0;
-      p.oy = -H - rnd(0, this._cell * 8);
-      p.delay = p.x * .012 + rnd(0, .18) + (this._rowsN - p.y) * .004;
-    }
-    this._t = 0;
-  }
-
-  _wake() { if (!this._on) { this._on = true; sub(this._tick); } }
-
-  _pm() {
-    if (!this._cols || reduced()) return;
-    const r = this._cv.getBoundingClientRect(), m = this._cell * 8;
-    if (ptr.cx > r.left - m && ptr.cx < r.right + m && ptr.cy > r.top - m && ptr.cy < r.bottom + m) { this._hot = true; this._wake(); }
-  }
-  _pd(e) {
-    if (!this._cols || reduced()) return;
-    const r = this._cv.getBoundingClientRect();
-    this._waves.push({ x: (e.clientX - r.left) / this._cell, y: (e.clientY - r.top - this._head) / this._cell, r: 0, max: this._cols + 20, amp: 1.6 });
-    this._wake();
-  }
-
-  _tick(dt) {
-    if (!this._cols) return;
-    const cell = this._cell, G = 5200;
-    let busy = false;
-    this._t = (this._t || 0) + dt;
-    const r = this._cv.getBoundingClientRect();
-    const px = (ptr.cx - r.left) / cell, py = (ptr.cy - r.top - this._head) / cell;
-    const R = 7, hot = this._hot && ptr.seen;
-    this._waves.forEach(w => { w.r += dt * 60; });
-    this._waves = this._waves.filter(w => w.r < w.max);
-    if (this._waves.length) busy = true;
-    let near = false;
-    for (const p of this._cells) {
-      /* falling in */
-      if (!p.landed) {
-        busy = true;
-        if (this._t < p.delay) continue;
-        p.vy += G * dt; p.oy += p.vy * dt;
-        if (p.oy >= 0) {
-          if (p.vy > 500) { p.oy = 0; p.vy = -p.vy * .22; }
-          else { p.oy = 0; p.vy = 0; p.landed = true; }
-        }
-      }
-      /* lift around the cursor, and on passing ripples */
-      let goal = 0;
-      if (hot) {
-        const dx = p.x + .5 - px, dy = p.y + .5 - py, d = Math.sqrt(dx * dx + dy * dy);
-        if (d < R) { const k = 1 - d / R; goal = k * k * cell * 1.4; near = true; }
-      }
-      for (const w of this._waves) {
-        const d = Math.hypot(p.x - w.x, p.y - w.y), band = Math.abs(d - w.r);
-        if (band < 2.5) goal = Math.max(goal, (1 - band / 2.5) * cell * w.amp * Math.max(0, 1 - w.r / w.max));
-      }
-      p.lv += ((goal - p.lift) * 320 - p.lv * 22) * dt;
-      p.lift += p.lv * dt;
-      if (Math.abs(p.lift) > .05 || Math.abs(p.lv) > .5) busy = true;
-    }
-    if (!near) this._hot = false;
-    this._render();
-    if (!busy && !this._hot) { unsub(this._tick); this._on = false; }
-  }
-
-  _render() {
-    if (!this._cols) return;
-    const g = this._g, cell = this._cell, gap = this._gap, s = cell - gap, dep = this._depth, head = this._head;
-    g.setTransform(this._dpr, 0, 0, this._dpr, 0, 0);
-    g.clearRect(0, 0, this._cv.width, this._cv.height);
-    const color = this.getAttribute('color') || 'currentColor';
-    const ink = color === 'currentColor' ? getComputedStyle(this).color : color;
-    const shade = this.getAttribute('shade');
-    const put = CELL_SHAPES[this.getAttribute('shape')] || CELL_SHAPES.square;
-    /* shadow layer stays on the ground */
-    if (shade && dep) {
-      g.fillStyle = shade; g.beginPath();
-      for (const p of this._cells) {
-        if (!p.landed && p.oy < -cell) continue;
-        put(g, p.x * cell + dep, head + p.y * cell + dep + Math.round(Math.min(0, p.oy)), s);
-      }
-      g.fill();
-    }
-    g.fillStyle = ink; g.beginPath();
-    for (const p of this._cells) {
-      const y = head + p.y * cell + Math.round(p.oy - p.lift);
-      if (y + s < 0) continue;
-      put(g, p.x * cell, y, s);
-    }
-    g.fill();
-  }
-}
-
-/* how one block is drawn: shape="square|dot|round|plus|diamond" (all added to one path) */
-const CELL_SHAPES = {
-  square: (g, x, y, s) => g.rect(x, y, s, s),
-  dot: (g, x, y, s) => { const r = s * .46; g.moveTo(x + s / 2 + r, y + s / 2); g.arc(x + s / 2, y + s / 2, r, 0, 6.2832); },
-  round: (g, x, y, s) => { if (g.roundRect) g.roundRect(x, y, s, s, s * .32); else g.rect(x, y, s, s); },
-  plus: (g, x, y, s) => { const t = s / 3; g.rect(x + t, y, t, s); g.rect(x, y + t, t, t); g.rect(x + 2 * t, y + t, t, t); },
-  diamond: (g, x, y, s) => { g.moveTo(x + s / 2, y); g.lineTo(x + s, y + s / 2); g.lineTo(x + s / 2, y + s); g.lineTo(x, y + s / 2); g.closePath(); }
-};
-
 /* ---- sprites/avocado.js ---- */
 /* AVOCADO: half an avocado, proudly showing off its pit. Ripe for exactly one day. */
 (() => {
@@ -4498,101 +4659,5 @@ defineFigure('onigiri', {
   });
 })();
 
-/* ---- boot.js ---- */
-/* <piix-pal pal="bitbug" do="crawl" on="#title" scale="4" hue="0">
- * Put it inside the element it should live on, or point at one with on="css selector".
- * The tag itself stays invisible; the pal is drawn on a shared overlay layer. */
-class PiixPalElement extends HTMLElement {
-  static get observedAttributes() { return ['pal', 'do', 'on', 'scale', 'hue', 'at', 'side']; }
-  connectedCallback() {
-    this.style.display = 'none';
-    if (this._mounted) return;
-    cancelAnimationFrame(this._q);
-    /* two frames: let the page lay out (and webfonts settle) before measuring */
-    this._q = requestAnimationFrame(() => { this._q = requestAnimationFrame(() => this._mount()); });
-  }
-  disconnectedCallback() {
-    cancelAnimationFrame(this._q);
-    /* a moved element reconnects in the same task; only tear down if it really left */
-    queueMicrotask(() => { if (!this.isConnected) this._unmount(); });
-  }
-  attributeChangedCallback(n, a, b) {
-    if (a === b || !this._mounted) return;
-    /* recolouring doesn't need a fresh pal */
-    if (n === 'hue') { this._actor.cv.style.filter = b ? `hue-rotate(${+b}deg)` : ''; return; }
-    this._unmount(); this._mount();
-  }
-  get actor() { return this._actor || null; }
-  /* poke it from code: el.poke() */
-  poke() { if (this._ctl && this._ctl.poke) this._ctl.poke(); }
-
-  _mount() {
-    if (!this.isConnected || this._mounted) return;
-    const name = (this.getAttribute('pal') || '').toLowerCase();
-    const spec = SPRITES[name] || SPRITES[Object.keys(SPRITES)[0]];
-    if (!spec) return;
-    const sel = this.getAttribute('on');
-    let targets;
-    try { targets = sel ? [...document.querySelectorAll(sel)] : [this.parentElement]; } catch (e) { targets = []; }
-    targets = targets.filter(el => el && el !== document.documentElement);
-    if (!targets.length) { console.warn('[piixpal] nothing to live on for', this); return; }
-    const make = BEHAVIORS[this.getAttribute('do')] || BEHAVIORS[spec.does];
-    if (!make) { console.warn('[piixpal] unknown behaviour', this.getAttribute('do') || spec.does); return; }
-
-    const actor = this._actor = new Actor(spec, { scale: +this.getAttribute('scale') || 0, hue: this.getAttribute('hue'), fixed: this.hasAttribute('fixed-scale') });
-    actor.host = this;
-    const ctl = this._ctl = actor.ctl = make(actor, targets, this) || {};
-    if (!ctl.grab) actor.node.classList.add('nograb');
-
-    this._pd = e => {
-      if (e.button > 0) return;
-      e.preventDefault();
-      this.dispatchEvent(new CustomEvent('piix:poke', { bubbles: true }));
-      if (ctl.grab) ctl.grab(e); else if (ctl.poke) ctl.poke(e);
-    };
-    actor.cv.addEventListener('pointerdown', this._pd);
-
-    /* a behaviour can run a whole crew of extra actors (groups, flocks, families) */
-    const wire = c => {
-      if (c._wired) return;
-      c._wired = true; c.host = this;
-      if (!ctl.grab) c.node.classList.add('nograb');
-      c.cv.addEventListener('pointerdown', e => {
-        if (e.button > 0) return;
-        e.preventDefault();
-        this.dispatchEvent(new CustomEvent('piix:poke', { bubbles: true }));
-        if (ctl.grab) ctl.grab(e, c); else if (ctl.poke) ctl.poke(e, c);
-      });
-    };
-    let first = true;
-    this._tick = (dt, t) => {
-      /* sleep when far off-screen, but always draw the first frame */
-      const awake = first || (ctl.awake ? ctl.awake() : Math.abs(actor.y - (scrollY + innerHeight / 2)) < innerHeight * 1.5) || actor.held;
-      if (!awake) return;
-      first = false;
-      ctl.tick(dt, t);
-      actor.step(dt);
-      actor.render();
-      if (ctl.crew) for (const c of ctl.crew) { wire(c); c.step(dt); c.render(); }
-    };
-    sub(this._tick);
-    this._mounted = true;
-    this.dispatchEvent(new CustomEvent('piix:ready', { bubbles: true, detail: { pal: spec.name } }));
-  }
-  _unmount() {
-    if (!this._mounted) return;
-    unsub(this._tick);
-    if (this._ctl && this._ctl.destroy) this._ctl.destroy();
-    if (this._ctl && this._ctl.crew) this._ctl.crew.forEach(c => c.destroy());
-    if (this._actor) { this._actor.cv.removeEventListener('pointerdown', this._pd); this._actor.destroy(); }
-    this._actor = this._ctl = null;
-    this._mounted = false;
-  }
-}
-
-const define = (n, c) => { if (!customElements.get(n)) customElements.define(n, c); };
-define('piix-pal', PiixPalElement);
-if (typeof PiixTypeElement !== 'undefined') define('piix-type', PiixTypeElement);
-if (typeof PiixSpriteElement !== 'undefined') define('piix-sprite', PiixSpriteElement);
-if (typeof PiixCrowdElement !== 'undefined') define('piix-crowd', PiixCrowdElement);
+K.start(document.currentScript);
 })();
