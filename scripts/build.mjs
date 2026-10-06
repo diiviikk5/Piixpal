@@ -1,7 +1,7 @@
 // Concatenates src/ fragments into one drop-in file: piixpal.js
 // Every fragment shares one closure, so helpers in core.js are visible everywhere.
 import { readFileSync, readdirSync, writeFileSync, existsSync } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { join, dirname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -23,7 +23,7 @@ export function bundle() {
   ].filter(f => existsSync(join(src, f)));
 
   const body = order
-    .map(f => `/* ---- ${f.replace(/\/g, '/')} ---- */\n` + readFileSync(join(src, f), 'utf8').trim())
+    .map(f => `/* ---- ${f.split(sep).join('/')} ---- */\n` + readFileSync(join(src, f), 'utf8').trim())
     .join('\n\n');
 
   const code = `/*! Piixpal v${pkg.version} | tiny pixel creatures that live on your website | MIT
