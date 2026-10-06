@@ -147,3 +147,66 @@
   document.getElementById('cr-text').addEventListener('input', e => { st.text = e.target.value.toUpperCase(); render(); });
   render();
 })();
+
+/* ---------- tabs: [data-tabs] > .tab-bar buttons + .tab-pane ---------- */
+document.querySelectorAll('[data-tabs]').forEach(box => {
+  const btns = [...box.querySelectorAll(':scope > .tab-bar > button')], panes = [...box.querySelectorAll(':scope > .tab-pane')];
+  btns.forEach((b, i) => b.addEventListener('click', () => {
+    btns.forEach((x, j) => x.setAttribute('aria-selected', i === j));
+    panes.forEach((p, j) => { p.hidden = i !== j; });
+  }));
+});
+
+/* ---------- builder ---------- */
+(() => {
+  const list = document.getElementById('b-list');
+  if (!list || !window.PIIX_BUILDER) return;
+  const site = document.getElementById('b-site'), code = document.getElementById('b-code');
+  const WHERE = { pal: 'h1', toy: 'h1', group: 'footer', sprite: 'h1' };
+  const BEST = { bounce: 'footer', sweep: 'footer', pop: 'footer', perch: '.btn', peek: '.card', climb: '.card', hang: 'nav', mind: 'p', lounge: 'p', school: '.card', glow: '.card', wire: 'nav', beeline: '.card' };
+  const OPTS = ['h1', 'p', 'nav', '.btn', '.card', 'footer'];
+  const picked = new Map([['bitbug', 'h1'], ['pip', '.btn'], ['boing', 'footer']]);
+  let mode = 'one';
+  const group = { pal: 'Pals', toy: 'Toy box', group: 'Groups', sprite: 'Sprites' };
+  let html = '';
+  for (const k of Object.keys(group)) {
+    html += '<h4>' + group[k] + '</h4>';
+    for (const c of window.PIIX_BUILDER.filter(c => c.kind === k)) {
+      const def = BEST[c.does] || WHERE[k];
+      html += '<label class="b-item"><input type="checkbox" value="' + c.id + '"' + (picked.has(c.id) ? ' checked' : '') + '> <span>' + c.id + '</span>' +
+        '<select data-for="' + c.id + '">' + OPTS.map(o => '<option' + (o === (picked.get(c.id) || def) ? ' selected' : '') + '>' + o + '</option>').join('') + '</select></label>';
+    }
+  }
+  list.innerHTML = html;
+  const map = sel => site.querySelector(sel === '.btn' ? '.b-btn' : '[data-where="' + sel + '"]');
+  const render = () => {
+    site.querySelectorAll('piix-pal,piix-sprite').forEach(e => e.remove());
+    picked.forEach((where, id) => {
+      const c = window.PIIX_BUILDER.find(x => x.id === id);
+      if (c.kind === 'sprite') { const t = map(where); if (t) Piixpal.add(id, t, { size: c.big ? 96 : 56, type: 'sprite' }); }
+      else if (where === '.btn') Piixpal.add(id, '#b-site .b-btn');
+      else { const t = map(where); if (t) Piixpal.add(id, t); }
+    });
+    const items = [...picked].map(([id, w]) => id + '@' + w).join(', ');
+    const base = 'https://cdn.jsdelivr.net/gh/diiviikk5/Piixpal@main/';
+    const out = !picked.size ? '<!-- tick a pal on the left -->'
+      : mode === 'all' ? '<script src="' + base + 'piixpal.min.js"\n  data-pals="' + items + '"></script>'
+      : [...picked.keys()].map((id, i) => '<script src="' + base + 'dist/c/' + id + '.min.js"' + (i === 0 ? '\n  data-pals="' + items + '"' : '') + '></script>').join('\n');
+    code.textContent = out;
+    const b = document.createElement('button'); b.className = 'copy'; b.type = 'button'; b.textContent = 'Copy';
+    b.onclick = async () => { try { await navigator.clipboard.writeText(out); } catch (_) {} b.textContent = 'Copied'; setTimeout(() => { b.textContent = 'Copy'; }, 1200); };
+    code.prepend(b);
+  };
+  list.addEventListener('change', e => {
+    const t = e.target;
+    if (t.type === 'checkbox') { if (t.checked) picked.set(t.value, list.querySelector('select[data-for="' + t.value + '"]').value); else picked.delete(t.value); }
+    if (t.tagName === 'SELECT' && picked.has(t.dataset.for)) picked.set(t.dataset.for, t.value);
+    render();
+  });
+  document.getElementById('b-mode').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    e.currentTarget.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b));
+    mode = b.dataset.v; render();
+  });
+  render();
+})();
