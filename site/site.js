@@ -117,15 +117,16 @@ document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click'
 (() => {
   const spawned = [];
   const clear = document.querySelector('[data-spawn="clear"]');
-  const homes = { bitbug: ['#mark', '#lede', '#pals-h', '#how-h', '#api-h', '#install-h'], boing: ['#mark'] };
+  const homes = { bitbug: ['#mark', '#lede', '#pals-h', '#how-h', '#api-h', '#install-h'], boing: ['#mark'], toy: ['#mark', '#lede'] };
+  const TOYS = ['ball', 'duck', 'dice', 'pebble', 'cube', 'can'];
   document.querySelectorAll('[data-spawn]').forEach(b => b.addEventListener('click', () => {
     const kind = b.dataset.spawn;
     if (kind === 'clear') { spawned.splice(0).forEach(p => p.remove()); clear.hidden = true; return; }
     if (spawned.length >= 24) spawned.shift().remove();
     const p = document.createElement('piix-pal');
-    p.setAttribute('pal', kind);
+    p.setAttribute('pal', kind === 'toy' ? TOYS[(Math.random() * TOYS.length) | 0] : kind);
     p.setAttribute('on', kind === 'bitbug' && Math.random() < .6 ? '#mark' : homes[kind][(Math.random() * homes[kind].length) | 0]);
-    p.setAttribute('hue', String(((Math.random() * 12) | 0) * 30));
+    if (kind !== 'toy') p.setAttribute('hue', String(((Math.random() * 12) | 0) * 30));
     document.body.appendChild(p);
     spawned.push(p);
     clear.hidden = false;
@@ -174,5 +175,17 @@ document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click'
     if (!b) return;
     box.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b));
     document.querySelectorAll('#bigstage piix-sprite').forEach(s => s.setAttribute('render', b.dataset.r));
+  });
+})();
+
+/* ---------- home crowd: switch modes ---------- */
+(() => {
+  const box = document.querySelector('.crowd-modes'), crowd = document.getElementById('home-crowd');
+  if (!box || !crowd) return;
+  box.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    box.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b));
+    crowd.setAttribute('mode', b.dataset.m);
+    crowd.setAttribute('count', b.dataset.m === 'form' ? 240 : b.dataset.m === 'swarm' ? 160 : 110);
   });
 })();
