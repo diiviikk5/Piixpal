@@ -10,7 +10,7 @@ One script tag. Zero dependencies. Free and open source (MIT).
 </div>
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/diiviikk5/Piixpal@main/piixpal.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/diiviikk5/Piixpal@main/piixpal.min.js"></script>
 
 <h1>
   Hello world

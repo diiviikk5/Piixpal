@@ -2,7 +2,7 @@
 (() => {
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
-  const CDN = 'https://cdn.jsdelivr.net/gh/diiviikk5/Piixpal@main/piixpal.js';
+  const CDN = 'https://cdn.jsdelivr.net/gh/diiviikk5/Piixpal@main/piixpal.min.js';
   const TAG = `<script src="${CDN}"><\/script>`;
 
   /* ---------- copy helper with a little label swap ---------- */

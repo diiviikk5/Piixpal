@@ -49,7 +49,24 @@ export function build() {
   return { files, bytes: Buffer.byteLength(code) };
 }
 
+/* piixpal.min.js, if esbuild is installed (it's a dev dependency, users never need it) */
+export async function minify() {
+  let esbuild;
+  try { esbuild = await import('esbuild'); } catch (_) { return null; }
+  const { code } = bundle();
+  const out = await esbuild.transform(code, { minify: true, legalComments: 'inline', target: 'es2019' });
+  writeFileSync(join(root, 'piixpal.min.js'), out.code);
+  return Buffer.byteLength(out.code);
+}
+
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const r = build();
-  console.log(`piixpal.js  ${r.files} fragments  ${(r.bytes / 1024).toFixed(1)} KB`);
+  console.log(`piixpal.js      ${r.files} fragments  ${(r.bytes / 1024).toFixed(1)} KB`);
+  const m = await minify();
+  if (m) {
+    const { gzipSync } = await import('node:zlib');
+    const { readFileSync: rf } = await import('node:fs');
+    const gz = gzipSync(rf(join(root, 'piixpal.min.js'))).length;
+    console.log(`piixpal.min.js  ${(m / 1024).toFixed(1)} KB  (${(gz / 1024).toFixed(1)} KB gzipped)`);
+  }
 }
