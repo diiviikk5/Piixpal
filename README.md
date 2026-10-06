@@ -5,6 +5,7 @@
 **Tiny pixel creatures that live on your website.**
 
 They crawl on your headings, nap on your paragraphs, perch on your buttons and bounce on your footer.
+62 components: 14 pals, 6 throwable toys, 8 groups, 30 sprites, a crowd stage and pixel type.
 One script tag. Zero dependencies. Free and open source (MIT).
 
 </div>
@@ -37,6 +38,37 @@ Every pal is an original character with a job: something it lives on, something 
 | **Bumble**, a fuzzy bee | `follow` | naps on its element, then follows your cursor around the page and flies home when you stop | loop-the-loop |
 | **Shel**, a very slow snail | `creep` | the top of your text, leaving a shimmering slime trail | it hides in its shell |
 
+More characters:
+
+| Pal | Does | |
+| --- | --- | --- |
+| **Gecko** | `climb` | walks the whole border of a card, upside-down underneath too |
+| **Mole** | `pop` | whack-a-mole along any edge; fires `piix:bonk` with a count |
+| **Balloon** | `float` | tied to your element, sways in the cursor's breeze, pops and re-inflates |
+| **Para** | `drop` | parachutes in when its section scrolls into view |
+| **Roomba** | `sweep` | cleans along an element, beeps at the cursor |
+| **Kitty** | `lounge` | lounges, swats the cursor, naps, purrs |
+
+### Toy box (`do="toss"`)
+
+`ball` `duck` `dice` `pebble` `cube` `can`: grab and throw them. They land on real elements
+(headings, paragraphs, buttons, cards), roll off edges onto whatever is below, and can be batted with a
+fast cursor swipe. Dice land on a random face; the pebble thuds so loudly other pals react. `land="css"`
+sets what counts as a surface.
+
+### Groups: one tag, a whole crew
+
+| Pal | Does | |
+| --- | --- | --- |
+| `ducks` | `parade` | a mother duck and ducklings who follow her exact path (`count`) |
+| `ants` | `march` | a marching line carrying crumbs; scatters and regroups |
+| `fish` | `school` | a flocking school inside any box; flees the cursor |
+| `sparrows` | `wire` | birds on a wire that hop in a ripple |
+| `choir` | `choir` | singers in perfect time, solos on click (`bpm`) |
+| `fireflies` | `glow` | blinking lights that gather round the cursor |
+| `sheep` | `count` | jump the fence one by one; the fence keeps count |
+| `bees` | `beeline` | follow your cursor in single file |
+
 Pals notice each other, too. A hard landing from Boing makes Moss grumble, Lurk duck, Pip take off
 and Bitbug run. Two Bitbugs that meet share a little heart and turn around.
 
@@ -51,8 +83,8 @@ Sprites are simpler: they sit inline like an image, wherever you paste them.
 
 Their eyes follow the cursor, they blink, breathe a pixel, hop when clicked and nap when ignored.
 
-- **12 small sprites:** mochi, toast, robo, cloud, ufo, egg, loaf, onigiri, cactus, planet, candle, pudding
-- **8 big sprites** (ghost-scale, recolourable with `color`): gloop, hops, tofu, inky, mumu, spud, fluff, flick
+- **20 small sprites:** mochi, toast, robo, cloud, ufo, egg, loaf, onigiri, cactus, planet, candle, pudding, coffee, boba, cookie, cherries, donut, avocado, sushi, star
+- **10 big sprites** (ghost-scale, recolourable with `color`): gloop, hops, tofu, inky, mumu, spud, fluff, flick, whale, bolt
 
 Every sprite can render three ways with `render`:
 
@@ -60,12 +92,25 @@ Every sprite can render three ways with `render`:
 | --- | --- |
 | `pixel` | flat, crisp blocks (small sprites' default) |
 | `dots` | LED dot-matrix |
+| `halftone` | shaded sub-dots |
+| `dither` | 1-bit Bayer grain |
+| `ascii` | one character per pixel |
 | `voxel` | chunky 3D blocks that turn toward the cursor in perspective (big sprites' default) |
 
 Other attributes: `size`, `scale`, `depth` (voxel extrusion), `color`, `eye`, `hue`, `look="mouse|wander|none"`,
 `shy`, `tilt` (`no-shy` / `no-tilt` on big ones), `still`, `sleep-after`.
 
 Browse and customise them all on the components pages (`components/sprites.html`).
+
+## Crowd
+
+```html
+<piix-crowd mode="form" text="HELLO" count="200"></piix-crowd>
+```
+
+A stage of tiny agents, hundreds of them on one canvas, depth-sorted on a 2.5D floor.
+`crowd`: they wander, wave and high-five. `swarm`: they flock after the cursor. `form`: they spell `text`.
+Click the floor to drop one in; grab one and throw it. `scatter()` knocks everyone flying.
 
 ## Usage
 
