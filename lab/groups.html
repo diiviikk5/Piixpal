@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Piixpal · groups</title>
+<style>
+  body{margin:0;background:#fff;color:#16111f;font:18px/1.5 system-ui,sans-serif;padding:40px 60px 300px}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:90px 40px;margin-top:90px}
+  .box{height:170px;border:2px solid #16111f;border-radius:14px;display:grid;place-items:center;font-weight:700;position:relative}
+  .tank{background:#dff4ff}
+  .night{background:#17121f;color:#fff}
+</style>
+</head>
+<body>
+<div class="grid">
+  <div class="box" id="ducks">ducks <piix-pal pal="ducks"></piix-pal></div>
+  <div class="box" id="ants">ants <piix-pal pal="ants"></piix-pal></div>
+  <div class="box tank" id="fish">fish tank <piix-pal pal="fish"></piix-pal></div>
+  <div class="box" id="wire">birds on a wire <piix-pal pal="sparrows"></piix-pal></div>
+  <div class="box" id="choir">choir <piix-pal pal="choir"></piix-pal></div>
+  <div class="box night" id="ff">fireflies <piix-pal pal="fireflies"></piix-pal></div>
+  <div class="box" id="sheep">counting sheep <piix-pal pal="sheep"></piix-pal></div>
+  <div class="box" id="hive">hive <piix-pal pal="bees"></piix-pal></div>
+</div>
+<script src="../piixpal.js"></script>
+</body>
+</html>
