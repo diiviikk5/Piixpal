@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Piixpal · toy box</title>
+<style>
+  body{margin:0;background:#fff;color:#16111f;font:18px/1.5 system-ui,sans-serif;padding:40px 60px 200px}
+  h1{font-size:56px;margin:120px 0 30px;max-width:700px}
+  .card{display:inline-block;vertical-align:top;width:260px;margin:80px 30px 0 0;padding:20px;border:2px solid #16111f;border-radius:12px}
+  button{font:600 16px system-ui;padding:10px 16px;border:2px solid #16111f;border-radius:10px;background:#c6f432;margin:40px 10px}
+</style>
+</head>
+<body>
+<h1 id="shelf">The toy box. Throw things.
+  <piix-pal pal="ball" at=".1"></piix-pal><piix-pal pal="duck" at=".3"></piix-pal><piix-pal pal="dice" at=".5"></piix-pal>
+  <piix-pal pal="pebble" at=".65"></piix-pal><piix-pal pal="cube" at=".8"></piix-pal><piix-pal pal="can" at=".95"></piix-pal>
+</h1>
+<p>Drag one and let go. Swipe the cursor fast through them. They land on headings, paragraphs, cards and buttons.</p>
+<div class="card"><b>A card</b><p>Things land here too.</p></div><div class="card"><b>Another</b><p>And here.</p></div>
+<div><button>Button</button><button>Another button</button></div>
+<script src="../piixpal.js"></script>
+</body>
+</html>
