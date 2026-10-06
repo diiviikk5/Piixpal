@@ -15,9 +15,10 @@ const sprites = readdirSync(join(root, 'src/sprites')).filter(f => f.endsWith('.
   const src = readFileSync(join(root, 'src/sprites', f), 'utf8');
   const name = src.match(/defineFigure\('([\w-]+)'/)[1];
   const tag = (src.match(/tag: '([^']+)'/) || [, ''])[1].replace(/\\'/g, "'");
-  return { name, tag, accent: ACCENTS[i % ACCENTS.length] };
+  return { name, tag, accent: ACCENTS[i % ACCENTS.length], big: f.startsWith('big-') };
 });
 const title = s => s[0].toUpperCase() + s.slice(1);
+const bigs = sprites.filter(s => s.big), smalls = sprites.filter(s => !s.big);
 
 export const PALS = [
   { id: 'bitbug', does: 'crawl', accent: 'var(--lime)', lives: 'the real glyph outline of the first line of text', scared: 'cursors that get too close', poke: 'flips onto its back, legs flailing',
@@ -68,8 +69,10 @@ const sidebar = active => {
     ${link('sprites.html', `Sprites <span class="n">${sprites.length}</span>`, 'sprites')}
     ${link('pals.html', `Pals <span class="n">${PALS.length}</span>`, 'pals')}
     ${link('type.html', 'Pixel type', 'type')}
+    <h4>Big sprites</h4>
+    ${bigs.map(s => `<a href="sprites.html#s-${s.name}" style="--dot:${s.accent}"><i></i>${title(s.name)}</a>`).join('\n    ')}
     <h4>Sprites</h4>
-    ${sprites.map(s => `<a href="sprites.html#s-${s.name}" style="--dot:${s.accent}"><i></i>${title(s.name)}</a>`).join('\n    ')}
+    ${smalls.map(s => `<a href="sprites.html#s-${s.name}" style="--dot:${s.accent}"><i></i>${title(s.name)}</a>`).join('\n    ')}
     <h4>Pals</h4>
     ${PALS.map(p => `<a href="pals.html#${p.id}" style="--dot:${p.accent}"><i></i>${title(p.id)}</a>`).join('\n    ')}
   </aside>`;
@@ -123,6 +126,14 @@ ${extra}
 </html>
 `;
 
+const spriteCard = s => `    <article class="scard${s.big ? ' big' : ''}" id="s-${s.name}" style="--accent:${s.accent}">
+      <div class="s-stage"><piix-sprite name="${s.name}" scale="6"></piix-sprite></div>
+      <div class="s-body">
+        <h3>${title(s.name)} <small>${s.big ? 'big · 3d' : s.name}</small></h3>
+        <p>${esc(s.tag)}</p>
+        <div class="s-actions"><button type="button" class="dark" data-copy="${esc(`<piix-sprite name="${s.name}"></piix-sprite>`)}">Copy</button><button type="button" data-pick="${s.name}">Customise</button></div>
+      </div>
+    </article>`;
 const codeBox = code => `<pre class="codebox"><button class="copy" type="button" data-copy="${esc(code)}">Copy</button>${esc(code)}</pre>`;
 const table = (cap, rows) => `<div class="table-wrap"><table><caption>${esc(cap)}</caption><thead><tr><th>Attribute</th><th>What it does</th><th>Default</th></tr></thead><tbody>
 ${rows.map(([a, d, def]) => `<tr><td><code>${a}</code></td><td>${d}</td><td>${def}</td></tr>`).join('\n')}
@@ -132,8 +143,8 @@ ${rows.map(([a, d, def]) => `<tr><td><code>${a}</code></td><td>${d}</td><td>${de
 const spritesBody = `<header class="doc-head">
   <div class="crumbs"><a href="./">Components</a><span>/</span><span>Sprites</span></div>
   <h1>Sprites</h1>
-  <p>${sprites.length} small characters that sit inline, like an image. Their eyes follow the cursor, they blink, breathe a pixel, hop when you click them and nap when nobody's around. Pick one, copy the tag, paste it anywhere.</p>
-  <div class="pills"><span class="pill">${sprites.length} sprites</span><span class="pill">inline, no positioning</span><span class="pill">eyes follow the cursor</span><span class="pill">one tag</span></div>
+  <p>${sprites.length} characters that sit inline, like an image: ${bigs.length} big 3D ones and ${smalls.length} small pixel ones. Their eyes follow the cursor, they blink, breathe a pixel, hop when you click them and nap when nobody's around. Pick one, copy the tag, paste it anywhere.</p>
+  <div class="pills"><span class="pill">${sprites.length} sprites</span><span class="pill">pixel · dots · 3D voxel</span><span class="pill">inline, no positioning</span><span class="pill">eyes follow the cursor</span><span class="pill">one tag</span></div>
 </header>
 
 <section class="doc-sec" id="customise" aria-labelledby="customise-h">
@@ -141,19 +152,29 @@ const spritesBody = `<header class="doc-head">
   <p>Pick a sprite from the grid below or the list, then tune it. The tag updates as you go.</p>
   <div class="custom" id="custom">
     <div class="c-stage" id="c-stage" data-bg="paper">
-      <span class="c-name" id="c-name">mochi</span>
+      <span class="c-name" id="c-name">gloop</span>
       <div class="c-bgs" role="group" aria-label="Background">
         <button type="button" data-bg="paper" aria-pressed="true" style="background:#f3eee3" aria-label="Paper"></button>
         <button type="button" data-bg="ink" aria-pressed="false" style="background:#17121f" aria-label="Ink"></button>
         <button type="button" data-bg="lime" aria-pressed="false" style="background:#c6f432" aria-label="Lime"></button>
         <button type="button" data-bg="violet" aria-pressed="false" style="background:#6b4cff" aria-label="Violet"></button>
       </div>
-      <piix-sprite id="c-sprite" name="mochi" size="140"></piix-sprite>
+      <piix-sprite id="c-sprite" name="gloop" size="176"></piix-sprite>
     </div>
     <div class="c-panel">
       <div class="c-controls">
         <label class="ctl wide"><span>Sprite</span><select id="c-pick" class="sel">${sprites.map(s => `<option value="${s.name}">${title(s.name)}</option>`).join('')}</select></label>
-        <label class="ctl"><span>Size</span><input type="range" id="c-size" min="40" max="220" step="4" value="140"><output id="c-size-o">140</output></label>
+        <label class="ctl"><span>Size</span><input type="range" id="c-size" min="40" max="260" step="4" value="176"><output id="c-size-o">176</output></label>
+        <div class="ctl wide"><span>Render</span>
+          <div class="seg" id="c-render" role="group" aria-label="Render style">
+            <button type="button" data-render="" aria-pressed="true">Default</button>
+            <button type="button" data-render="pixel" aria-pressed="false">Pixel</button>
+            <button type="button" data-render="dots" aria-pressed="false">Dots</button>
+            <button type="button" data-render="voxel" aria-pressed="false">3D voxel</button>
+          </div>
+        </div>
+        <label class="ctl"><span>Depth</span><input type="range" id="c-depth" min="1" max="6" value="2"><output id="c-depth-o">2</output></label>
+        <label class="ctl"><span>Colour</span><input type="color" id="c-color" value="#ff6b4a"><button type="button" class="mini" id="c-color-x">reset</button></label>
         <label class="ctl"><span>Hue</span><input type="range" id="c-hue" min="0" max="350" step="10" value="0"><output id="c-hue-o">0°</output></label>
         <div class="ctl wide"><span>Eyes</span>
           <div class="seg" id="c-look" role="group" aria-label="Where the eyes look">
@@ -176,18 +197,19 @@ const spritesBody = `<header class="doc-head">
   </div>
 </section>
 
-<section class="doc-sec" id="all" aria-labelledby="all-h">
-  <h2 id="all-h">All sprites</h2>
-  <p>Click a sprite to see it hop. Copy grabs the tag; Customise loads it into the panel above.</p>
+<section class="doc-sec" id="big" aria-labelledby="big-h">
+  <h2 id="big-h">Big sprites</h2>
+  <p>Bold, ghost-scale characters for heroes, empty states and 404s. They render as chunky 3D blocks that turn toward your cursor, lean in, flinch when you get close, and take any colour with <code>color="…"</code>. Try <code>render="pixel"</code> or <code>render="dots"</code> for a flat or dot-matrix look.</p>
   <div class="sgrid">
-${sprites.map(s => `    <article class="scard" id="s-${s.name}" style="--accent:${s.accent}">
-      <div class="s-stage"><piix-sprite name="${s.name}" scale="6"></piix-sprite></div>
-      <div class="s-body">
-        <h3>${title(s.name)} <small>${s.name}</small></h3>
-        <p>${esc(s.tag)}</p>
-        <div class="s-actions"><button type="button" class="dark" data-copy="${esc(`<piix-sprite name="${s.name}"></piix-sprite>`)}">Copy</button><button type="button" data-pick="${s.name}">Customise</button></div>
-      </div>
-    </article>`).join('\n')}
+${bigs.map(spriteCard).join('\n')}
+  </div>
+</section>
+
+<section class="doc-sec" id="all" aria-labelledby="all-h">
+  <h2 id="all-h">Sprites</h2>
+  <p>Small inline characters. Click one to see it hop. Copy grabs the tag; Customise loads it into the panel above.</p>
+  <div class="sgrid">
+${smalls.map(spriteCard).join('\n')}
   </div>
 </section>
 
@@ -198,10 +220,14 @@ ${sprites.map(s => `    <article class="scard" id="s-${s.name}" style="--accent:
     ['name', `which sprite: ${sprites.map(s => `<code>${s.name}</code>`).join(' ')}`, 'mochi'],
     ['size', 'width in CSS px (rounded to whole sprite pixels)', '5 × width'],
     ['scale', 'or set the size of one sprite pixel directly', '5'],
+    ['render', '<code>pixel</code> flat blocks, <code>dots</code> LED dot-matrix, <code>voxel</code> chunky 3D that turns toward the cursor', 'pixel (big: voxel)'],
+    ['depth', 'voxel extrusion, in sprite pixels', '3 (big: 2)'],
+    ['color', 'body colour for big sprites; shade and highlight are derived from it', 'its own'],
+    ['eye', 'pupil colour', 'its own'],
     ['hue', 'recolour by rotating the hue, in degrees', '0'],
     ['look', '<code>mouse</code> follows the cursor, <code>wander</code> looks around, <code>none</code> looks ahead', 'mouse'],
-    ['shy', 'leans away when the cursor gets close', 'off'],
-    ['tilt', 'leans toward the cursor', 'off'],
+    ['shy', 'leans away when the cursor gets close (<code>no-shy</code> turns it off on big ones)', 'off (big: on)'],
+    ['tilt', 'leans toward the cursor (<code>no-tilt</code> turns it off)', 'off (big: on)'],
     ['still', 'no breathing or hopping', 'off'],
     ['sleep-after', 'seconds without input before it naps; 0 = never', '25'],
     ['aria-label', 'give it one if it means something; otherwise it is hidden from screen readers', '–']

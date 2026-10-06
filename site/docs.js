@@ -23,20 +23,29 @@
   /* ---------- sprite customiser ---------- */
   const sp = $('#c-sprite');
   if (sp) {
-    const st = { name: 'mochi', size: 140, hue: 0, look: 'mouse', shy: false, tilt: false, still: false, nap: false };
+    const st = { name: 'gloop', size: 176, hue: 0, look: 'mouse', shy: false, tilt: false, still: false, nap: false, render: '', depth: 2, color: '' };
     const stage = $('#c-stage');
     const render = () => {
       sp.setAttribute('name', st.name);
       sp.setAttribute('size', st.size);
       st.hue ? sp.setAttribute('hue', st.hue) : sp.removeAttribute('hue');
       sp.setAttribute('look', st.look);
+      const fig = Piixpal.figures[st.name], voxel = st.render === 'voxel' || (!st.render && fig.render === 'voxel');
+      st.render ? sp.setAttribute('render', st.render) : sp.removeAttribute('render');
+      voxel ? sp.setAttribute('depth', st.depth) : sp.removeAttribute('depth');
+      st.color && fig.recolor ? sp.setAttribute('color', st.color) : sp.removeAttribute('color');
+      $('#c-depth').disabled = !voxel;
+      $('#c-color').disabled = !fig.recolor;
       ['shy', 'tilt', 'still'].forEach(k => sp.toggleAttribute(k, st[k]));
       st.nap ? sp.setAttribute('sleep-after', '4') : sp.removeAttribute('sleep-after');
       $('#c-name').textContent = st.name;
       $('#c-pick').value = st.name;
       $$('.scard').forEach(c => c.classList.toggle('sel', c.id === 's-' + st.name));
       const attrs = [`name="${st.name}"`];
-      if (st.size !== 70) attrs.push(`size="${st.size}"`);
+      attrs.push(`size="${st.size}"`);
+      if (st.render) attrs.push(`render="${st.render}"`);
+      if (voxel && st.depth !== (fig.depth || 3)) attrs.push(`depth="${st.depth}"`);
+      if (st.color && fig.recolor) attrs.push(`color="${st.color}"`);
       if (st.hue) attrs.push(`hue="${st.hue}"`);
       if (st.look !== 'mouse') attrs.push(`look="${st.look}"`);
       ['shy', 'tilt', 'still'].forEach(k => st[k] && attrs.push(k));
@@ -49,6 +58,10 @@
     $('#c-size').addEventListener('input', e => { st.size = +e.target.value; $('#c-size-o').value = st.size; render(); });
     $('#c-hue').addEventListener('input', e => { st.hue = +e.target.value; $('#c-hue-o').value = st.hue + '°'; render(); });
     seg($('#c-look'), 'look', v => { st.look = v; render(); });
+    seg($('#c-render'), 'render', v => { st.render = v; render(); });
+    $('#c-depth').addEventListener('input', e => { st.depth = +e.target.value; $('#c-depth-o').value = st.depth; render(); });
+    $('#c-color').addEventListener('input', e => { st.color = e.target.value; render(); });
+    $('#c-color-x').addEventListener('click', () => { st.color = ''; render(); });
     ['shy', 'tilt', 'still', 'nap'].forEach(k => $('#c-' + k).addEventListener('change', e => { st[k] = e.target.checked; render(); }));
     seg($('.c-bgs'), 'bg', v => { stage.dataset.bg = v; });
     $$('[data-pick]').forEach(b => b.addEventListener('click', () => {

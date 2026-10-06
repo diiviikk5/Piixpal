@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Sprites · Piixpal components</title>
-<meta name="description" content="12 inline pixel sprites with cursor-following eyes. Copy a tag, paste it anywhere.">
+<meta name="description" content="20 inline pixel sprites with cursor-following eyes. Copy a tag, paste it anywhere.">
 <meta name="theme-color" content="#f3eee3">
 <link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,22 +38,31 @@
     <a href="./">Overview</a>
     <a href="../#install">Install</a>
     <h4>Components</h4>
-    <a href="sprites.html" aria-current="page">Sprites <span class="n">12</span></a>
+    <a href="sprites.html" aria-current="page">Sprites <span class="n">20</span></a>
     <a href="pals.html">Pals <span class="n">8</span></a>
     <a href="type.html">Pixel type</a>
+    <h4>Big sprites</h4>
+    <a href="sprites.html#s-flick" style="--dot:var(--lime)"><i></i>Flick</a>
+    <a href="sprites.html#s-fluff" style="--dot:var(--coral)"><i></i>Fluff</a>
+    <a href="sprites.html#s-gloop" style="--dot:var(--violet)"><i></i>Gloop</a>
+    <a href="sprites.html#s-hops" style="--dot:var(--sky)"><i></i>Hops</a>
+    <a href="sprites.html#s-inky" style="--dot:var(--sun)"><i></i>Inky</a>
+    <a href="sprites.html#s-mumu" style="--dot:var(--mint)"><i></i>Mumu</a>
+    <a href="sprites.html#s-spud" style="--dot:var(--lime)"><i></i>Spud</a>
+    <a href="sprites.html#s-tofu" style="--dot:var(--coral)"><i></i>Tofu</a>
     <h4>Sprites</h4>
-    <a href="sprites.html#s-cactus" style="--dot:var(--lime)"><i></i>Cactus</a>
-    <a href="sprites.html#s-candle" style="--dot:var(--coral)"><i></i>Candle</a>
-    <a href="sprites.html#s-cloud" style="--dot:var(--violet)"><i></i>Cloud</a>
-    <a href="sprites.html#s-egg" style="--dot:var(--sky)"><i></i>Egg</a>
-    <a href="sprites.html#s-loaf" style="--dot:var(--sun)"><i></i>Loaf</a>
-    <a href="sprites.html#s-mochi" style="--dot:var(--mint)"><i></i>Mochi</a>
-    <a href="sprites.html#s-onigiri" style="--dot:var(--lime)"><i></i>Onigiri</a>
-    <a href="sprites.html#s-planet" style="--dot:var(--coral)"><i></i>Planet</a>
-    <a href="sprites.html#s-pudding" style="--dot:var(--violet)"><i></i>Pudding</a>
-    <a href="sprites.html#s-robo" style="--dot:var(--sky)"><i></i>Robo</a>
-    <a href="sprites.html#s-toast" style="--dot:var(--sun)"><i></i>Toast</a>
-    <a href="sprites.html#s-ufo" style="--dot:var(--mint)"><i></i>Ufo</a>
+    <a href="sprites.html#s-cactus" style="--dot:var(--violet)"><i></i>Cactus</a>
+    <a href="sprites.html#s-candle" style="--dot:var(--sky)"><i></i>Candle</a>
+    <a href="sprites.html#s-cloud" style="--dot:var(--sun)"><i></i>Cloud</a>
+    <a href="sprites.html#s-egg" style="--dot:var(--mint)"><i></i>Egg</a>
+    <a href="sprites.html#s-loaf" style="--dot:var(--lime)"><i></i>Loaf</a>
+    <a href="sprites.html#s-mochi" style="--dot:var(--coral)"><i></i>Mochi</a>
+    <a href="sprites.html#s-onigiri" style="--dot:var(--violet)"><i></i>Onigiri</a>
+    <a href="sprites.html#s-planet" style="--dot:var(--sky)"><i></i>Planet</a>
+    <a href="sprites.html#s-pudding" style="--dot:var(--sun)"><i></i>Pudding</a>
+    <a href="sprites.html#s-robo" style="--dot:var(--mint)"><i></i>Robo</a>
+    <a href="sprites.html#s-toast" style="--dot:var(--lime)"><i></i>Toast</a>
+    <a href="sprites.html#s-ufo" style="--dot:var(--coral)"><i></i>Ufo</a>
     <h4>Pals</h4>
     <a href="pals.html#bitbug" style="--dot:var(--lime)"><i></i>Bitbug</a>
     <a href="pals.html#boing" style="--dot:var(--coral)"><i></i>Boing</a>
@@ -68,8 +77,8 @@
 <header class="doc-head">
   <div class="crumbs"><a href="./">Components</a><span>/</span><span>Sprites</span></div>
   <h1>Sprites</h1>
-  <p>12 small characters that sit inline, like an image. Their eyes follow the cursor, they blink, breathe a pixel, hop when you click them and nap when nobody's around. Pick one, copy the tag, paste it anywhere.</p>
-  <div class="pills"><span class="pill">12 sprites</span><span class="pill">inline, no positioning</span><span class="pill">eyes follow the cursor</span><span class="pill">one tag</span></div>
+  <p>20 characters that sit inline, like an image: 8 big 3D ones and 12 small pixel ones. Their eyes follow the cursor, they blink, breathe a pixel, hop when you click them and nap when nobody's around. Pick one, copy the tag, paste it anywhere.</p>
+  <div class="pills"><span class="pill">20 sprites</span><span class="pill">pixel · dots · 3D voxel</span><span class="pill">inline, no positioning</span><span class="pill">eyes follow the cursor</span><span class="pill">one tag</span></div>
 </header>
 
 <section class="doc-sec" id="customise" aria-labelledby="customise-h">
@@ -77,19 +86,29 @@
   <p>Pick a sprite from the grid below or the list, then tune it. The tag updates as you go.</p>
   <div class="custom" id="custom">
     <div class="c-stage" id="c-stage" data-bg="paper">
-      <span class="c-name" id="c-name">mochi</span>
+      <span class="c-name" id="c-name">gloop</span>
       <div class="c-bgs" role="group" aria-label="Background">
         <button type="button" data-bg="paper" aria-pressed="true" style="background:#f3eee3" aria-label="Paper"></button>
         <button type="button" data-bg="ink" aria-pressed="false" style="background:#17121f" aria-label="Ink"></button>
         <button type="button" data-bg="lime" aria-pressed="false" style="background:#c6f432" aria-label="Lime"></button>
         <button type="button" data-bg="violet" aria-pressed="false" style="background:#6b4cff" aria-label="Violet"></button>
       </div>
-      <piix-sprite id="c-sprite" name="mochi" size="140"></piix-sprite>
+      <piix-sprite id="c-sprite" name="gloop" size="176"></piix-sprite>
     </div>
     <div class="c-panel">
       <div class="c-controls">
-        <label class="ctl wide"><span>Sprite</span><select id="c-pick" class="sel"><option value="cactus">Cactus</option><option value="candle">Candle</option><option value="cloud">Cloud</option><option value="egg">Egg</option><option value="loaf">Loaf</option><option value="mochi">Mochi</option><option value="onigiri">Onigiri</option><option value="planet">Planet</option><option value="pudding">Pudding</option><option value="robo">Robo</option><option value="toast">Toast</option><option value="ufo">Ufo</option></select></label>
-        <label class="ctl"><span>Size</span><input type="range" id="c-size" min="40" max="220" step="4" value="140"><output id="c-size-o">140</output></label>
+        <label class="ctl wide"><span>Sprite</span><select id="c-pick" class="sel"><option value="flick">Flick</option><option value="fluff">Fluff</option><option value="gloop">Gloop</option><option value="hops">Hops</option><option value="inky">Inky</option><option value="mumu">Mumu</option><option value="spud">Spud</option><option value="tofu">Tofu</option><option value="cactus">Cactus</option><option value="candle">Candle</option><option value="cloud">Cloud</option><option value="egg">Egg</option><option value="loaf">Loaf</option><option value="mochi">Mochi</option><option value="onigiri">Onigiri</option><option value="planet">Planet</option><option value="pudding">Pudding</option><option value="robo">Robo</option><option value="toast">Toast</option><option value="ufo">Ufo</option></select></label>
+        <label class="ctl"><span>Size</span><input type="range" id="c-size" min="40" max="260" step="4" value="176"><output id="c-size-o">176</output></label>
+        <div class="ctl wide"><span>Render</span>
+          <div class="seg" id="c-render" role="group" aria-label="Render style">
+            <button type="button" data-render="" aria-pressed="true">Default</button>
+            <button type="button" data-render="pixel" aria-pressed="false">Pixel</button>
+            <button type="button" data-render="dots" aria-pressed="false">Dots</button>
+            <button type="button" data-render="voxel" aria-pressed="false">3D voxel</button>
+          </div>
+        </div>
+        <label class="ctl"><span>Depth</span><input type="range" id="c-depth" min="1" max="6" value="2"><output id="c-depth-o">2</output></label>
+        <label class="ctl"><span>Colour</span><input type="color" id="c-color" value="#ff6b4a"><button type="button" class="mini" id="c-color-x">reset</button></label>
         <label class="ctl"><span>Hue</span><input type="range" id="c-hue" min="0" max="350" step="10" value="0"><output id="c-hue-o">0°</output></label>
         <div class="ctl wide"><span>Eyes</span>
           <div class="seg" id="c-look" role="group" aria-label="Where the eyes look">
@@ -112,11 +131,82 @@
   </div>
 </section>
 
-<section class="doc-sec" id="all" aria-labelledby="all-h">
-  <h2 id="all-h">All sprites</h2>
-  <p>Click a sprite to see it hop. Copy grabs the tag; Customise loads it into the panel above.</p>
+<section class="doc-sec" id="big" aria-labelledby="big-h">
+  <h2 id="big-h">Big sprites</h2>
+  <p>Bold, ghost-scale characters for heroes, empty states and 404s. They render as chunky 3D blocks that turn toward your cursor, lean in, flinch when you get close, and take any colour with <code>color="…"</code>. Try <code>render="pixel"</code> or <code>render="dots"</code> for a flat or dot-matrix look.</p>
   <div class="sgrid">
-    <article class="scard" id="s-cactus" style="--accent:var(--lime)">
+    <article class="scard big" id="s-flick" style="--accent:var(--lime)">
+      <div class="s-stage"><piix-sprite name="flick" scale="6"></piix-sprite></div>
+      <div class="s-body">
+        <h3>Flick <small>big · 3d</small></h3>
+        <p>A little flame with big feelings. Never, ever stands still.</p>
+        <div class="s-actions"><button type="button" class="dark" data-copy="&lt;piix-sprite name=&quot;flick&quot;&gt;&lt;/piix-sprite&gt;">Copy</button><button type="button" data-pick="flick">Customise</button></div>
+      </div>
+    </article>
+    <article class="scard big" id="s-fluff" style="--accent:var(--coral)">
+      <div class="s-stage"><piix-sprite name="fluff" scale="6"></piix-sprite></div>
+      <div class="s-body">
+        <h3>Fluff <small>big · 3d</small></h3>
+        <p>A sheep made almost entirely of cloud. Trots in place, very proudly.</p>
+        <div class="s-actions"><button type="button" class="dark" data-copy="&lt;piix-sprite name=&quot;fluff&quot;&gt;&lt;/piix-sprite&gt;">Copy</button><button type="button" data-pick="fluff">Customise</button></div>
+      </div>
+    </article>
+    <article class="scard big" id="s-gloop" style="--accent:var(--violet)">
+      <div class="s-stage"><piix-sprite name="gloop" scale="6"></piix-sprite></div>
+      <div class="s-body">
+        <h3>Gloop <small>big · 3d</small></h3>
+        <p>A slow, happy blob that drips a little. Mostly harmless.</p>
+        <div class="s-actions"><button type="button" class="dark" data-copy="&lt;piix-sprite name=&quot;gloop&quot;&gt;&lt;/piix-sprite&gt;">Copy</button><button type="button" data-pick="gloop">Customise</button></div>
+      </div>
+    </article>
+    <article class="scard big" id="s-hops" style="--accent:var(--sky)">
+      <div class="s-stage"><piix-sprite name="hops" scale="6"></piix-sprite></div>
+      <div class="s-body">
+        <h3>Hops <small>big · 3d</small></h3>
+        <p>Long ears, short attention span. One ear never quite stays up.</p>
+        <div class="s-actions"><button type="button" class="dark" data-copy="&lt;piix-sprite name=&quot;hops&quot;&gt;&lt;/piix-sprite&gt;">Copy</button><button type="button" data-pick="hops">Customise</button></div>
+      </div>
+    </article>
+    <article class="scard big" id="s-inky" style="--accent:var(--sun)">
+      <div class="s-stage"><piix-sprite name="inky" scale="6"></piix-sprite></div>
+      <div class="s-body">
+        <h3>Inky <small>big · 3d</small></h3>
+        <p>A small squid with five wiggly arms and one very big question.</p>
+        <div class="s-actions"><button type="button" class="dark" data-copy="&lt;piix-sprite name=&quot;inky&quot;&gt;&lt;/piix-sprite&gt;">Copy</button><button type="button" data-pick="inky">Customise</button></div>
+      </div>
+    </article>
+    <article class="scard big" id="s-mumu" style="--accent:var(--mint)">
+      <div class="s-stage"><piix-sprite name="mumu" scale="6"></piix-sprite></div>
+      <div class="s-body">
+        <h3>Mumu <small>big · 3d</small></h3>
+        <p>A round little bear who would like a snack, please. Ears wiggle.</p>
+        <div class="s-actions"><button type="button" class="dark" data-copy="&lt;piix-sprite name=&quot;mumu&quot;&gt;&lt;/piix-sprite&gt;">Copy</button><button type="button" data-pick="mumu">Customise</button></div>
+      </div>
+    </article>
+    <article class="scard big" id="s-spud" style="--accent:var(--lime)">
+      <div class="s-stage"><piix-sprite name="spud" scale="6"></piix-sprite></div>
+      <div class="s-body">
+        <h3>Spud <small>big · 3d</small></h3>
+        <p>A lumpy potato with a tiny sprout and a lot of potential.</p>
+        <div class="s-actions"><button type="button" class="dark" data-copy="&lt;piix-sprite name=&quot;spud&quot;&gt;&lt;/piix-sprite&gt;">Copy</button><button type="button" data-pick="spud">Customise</button></div>
+      </div>
+    </article>
+    <article class="scard big" id="s-tofu" style="--accent:var(--coral)">
+      <div class="s-stage"><piix-sprite name="tofu" scale="6"></piix-sprite></div>
+      <div class="s-body">
+        <h3>Tofu <small>big · 3d</small></h3>
+        <p>A block of tofu on two stubby legs, marching on the spot. Firm but fair.</p>
+        <div class="s-actions"><button type="button" class="dark" data-copy="&lt;piix-sprite name=&quot;tofu&quot;&gt;&lt;/piix-sprite&gt;">Copy</button><button type="button" data-pick="tofu">Customise</button></div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section class="doc-sec" id="all" aria-labelledby="all-h">
+  <h2 id="all-h">Sprites</h2>
+  <p>Small inline characters. Click one to see it hop. Copy grabs the tag; Customise loads it into the panel above.</p>
+  <div class="sgrid">
+    <article class="scard" id="s-cactus" style="--accent:var(--violet)">
       <div class="s-stage"><piix-sprite name="cactus" scale="6"></piix-sprite></div>
       <div class="s-body">
         <h3>Cactus <small>cactus</small></h3>
@@ -124,7 +214,7 @@
         <div class="s-actions"><button type="button" class="dark" data-copy="&lt;piix-sprite name=&quot;cactus&quot;&gt;&lt;/piix-sprite&gt;">Copy</button><button type="button" data-pick="cactus">Customise</button></div>
       </div>
     </article>
-    <article class="scard" id="s-candle" style="--accent:var(--coral)">
+    <article class="scard" id="s-candle" style="--accent:var(--sky)">
       <div class="s-stage"><piix-sprite name="candle" scale="6"></piix-sprite></div>
       <div class="s-body">
         <h3>Candle <small>candle</small></h3>
@@ -132,7 +222,7 @@
         <div class="s-actions"><button type="button" class="dark" data-copy="&lt;piix-sprite name=&quot;candle&quot;&gt;&lt;/piix-sprite&gt;">Copy</button><button type="button" data-pick="candle">Customise</button></div>
       </div>
     </article>
-    <article class="scard" id="s-cloud" style="--accent:var(--violet)">
+    <article class="scard" id="s-cloud" style="--accent:var(--sun)">
       <div class="s-stage"><piix-sprite name="cloud" scale="6"></piix-sprite></div>
       <div class="s-body">
         <h3>Cloud <small>cloud</small></h3>
@@ -140,7 +230,7 @@
         <div class="s-actions"><button type="button" class="dark" data-copy="&lt;piix-sprite name=&quot;cloud&quot;&gt;&lt;/piix-sprite&gt;">Copy</button><button type="button" data-pick="cloud">Customise</button></div>
       </div>
     </article>
-    <article class="scard" id="s-egg" style="--accent:var(--sky)">
+    <article class="scard" id="s-egg" style="--accent:var(--mint)">
       <div class="s-stage"><piix-sprite name="egg" scale="6"></piix-sprite></div>
       <div class="s-body">
         <h3>Egg <small>egg</small></h3>
@@ -148,7 +238,7 @@
         <div class="s-actions"><button type="button" class="dark" data-copy="&lt;piix-sprite name=&quot;egg&quot;&gt;&lt;/piix-sprite&gt;">Copy</button><button type="button" data-pick="egg">Customise</button></div>
       </div>
     </article>
-    <article class="scard" id="s-loaf" style="--accent:var(--sun)">
+    <article class="scard" id="s-loaf" style="--accent:var(--lime)">
       <div class="s-stage"><piix-sprite name="loaf" scale="6"></piix-sprite></div>
       <div class="s-body">
         <h3>Loaf <small>loaf</small></h3>
@@ -156,7 +246,7 @@
         <div class="s-actions"><button type="button" class="dark" data-copy="&lt;piix-sprite name=&quot;loaf&quot;&gt;&lt;/piix-sprite&gt;">Copy</button><button type="button" data-pick="loaf">Customise</button></div>
       </div>
     </article>
-    <article class="scard" id="s-mochi" style="--accent:var(--mint)">
+    <article class="scard" id="s-mochi" style="--accent:var(--coral)">
       <div class="s-stage"><piix-sprite name="mochi" scale="6"></piix-sprite></div>
       <div class="s-body">
         <h3>Mochi <small>mochi</small></h3>
@@ -164,7 +254,7 @@
         <div class="s-actions"><button type="button" class="dark" data-copy="&lt;piix-sprite name=&quot;mochi&quot;&gt;&lt;/piix-sprite&gt;">Copy</button><button type="button" data-pick="mochi">Customise</button></div>
       </div>
     </article>
-    <article class="scard" id="s-onigiri" style="--accent:var(--lime)">
+    <article class="scard" id="s-onigiri" style="--accent:var(--violet)">
       <div class="s-stage"><piix-sprite name="onigiri" scale="6"></piix-sprite></div>
       <div class="s-body">
         <h3>Onigiri <small>onigiri</small></h3>
@@ -172,7 +262,7 @@
         <div class="s-actions"><button type="button" class="dark" data-copy="&lt;piix-sprite name=&quot;onigiri&quot;&gt;&lt;/piix-sprite&gt;">Copy</button><button type="button" data-pick="onigiri">Customise</button></div>
       </div>
     </article>
-    <article class="scard" id="s-planet" style="--accent:var(--coral)">
+    <article class="scard" id="s-planet" style="--accent:var(--sky)">
       <div class="s-stage"><piix-sprite name="planet" scale="6"></piix-sprite></div>
       <div class="s-body">
         <h3>Planet <small>planet</small></h3>
@@ -180,7 +270,7 @@
         <div class="s-actions"><button type="button" class="dark" data-copy="&lt;piix-sprite name=&quot;planet&quot;&gt;&lt;/piix-sprite&gt;">Copy</button><button type="button" data-pick="planet">Customise</button></div>
       </div>
     </article>
-    <article class="scard" id="s-pudding" style="--accent:var(--violet)">
+    <article class="scard" id="s-pudding" style="--accent:var(--sun)">
       <div class="s-stage"><piix-sprite name="pudding" scale="6"></piix-sprite></div>
       <div class="s-body">
         <h3>Pudding <small>pudding</small></h3>
@@ -188,7 +278,7 @@
         <div class="s-actions"><button type="button" class="dark" data-copy="&lt;piix-sprite name=&quot;pudding&quot;&gt;&lt;/piix-sprite&gt;">Copy</button><button type="button" data-pick="pudding">Customise</button></div>
       </div>
     </article>
-    <article class="scard" id="s-robo" style="--accent:var(--sky)">
+    <article class="scard" id="s-robo" style="--accent:var(--mint)">
       <div class="s-stage"><piix-sprite name="robo" scale="6"></piix-sprite></div>
       <div class="s-body">
         <h3>Robo <small>robo</small></h3>
@@ -196,7 +286,7 @@
         <div class="s-actions"><button type="button" class="dark" data-copy="&lt;piix-sprite name=&quot;robo&quot;&gt;&lt;/piix-sprite&gt;">Copy</button><button type="button" data-pick="robo">Customise</button></div>
       </div>
     </article>
-    <article class="scard" id="s-toast" style="--accent:var(--sun)">
+    <article class="scard" id="s-toast" style="--accent:var(--lime)">
       <div class="s-stage"><piix-sprite name="toast" scale="6"></piix-sprite></div>
       <div class="s-body">
         <h3>Toast <small>toast</small></h3>
@@ -204,7 +294,7 @@
         <div class="s-actions"><button type="button" class="dark" data-copy="&lt;piix-sprite name=&quot;toast&quot;&gt;&lt;/piix-sprite&gt;">Copy</button><button type="button" data-pick="toast">Customise</button></div>
       </div>
     </article>
-    <article class="scard" id="s-ufo" style="--accent:var(--mint)">
+    <article class="scard" id="s-ufo" style="--accent:var(--coral)">
       <div class="s-stage"><piix-sprite name="ufo" scale="6"></piix-sprite></div>
       <div class="s-body">
         <h3>Ufo <small>ufo</small></h3>
@@ -219,13 +309,17 @@
   <h2 id="attr-h">Attributes</h2>
   <p>All optional. Size snaps to whole sprite pixels, so they always stay crisp.</p>
   <div class="table-wrap"><table><caption>&lt;piix-sprite&gt;</caption><thead><tr><th>Attribute</th><th>What it does</th><th>Default</th></tr></thead><tbody>
-<tr><td><code>name</code></td><td>which sprite: <code>cactus</code> <code>candle</code> <code>cloud</code> <code>egg</code> <code>loaf</code> <code>mochi</code> <code>onigiri</code> <code>planet</code> <code>pudding</code> <code>robo</code> <code>toast</code> <code>ufo</code></td><td>mochi</td></tr>
+<tr><td><code>name</code></td><td>which sprite: <code>flick</code> <code>fluff</code> <code>gloop</code> <code>hops</code> <code>inky</code> <code>mumu</code> <code>spud</code> <code>tofu</code> <code>cactus</code> <code>candle</code> <code>cloud</code> <code>egg</code> <code>loaf</code> <code>mochi</code> <code>onigiri</code> <code>planet</code> <code>pudding</code> <code>robo</code> <code>toast</code> <code>ufo</code></td><td>mochi</td></tr>
 <tr><td><code>size</code></td><td>width in CSS px (rounded to whole sprite pixels)</td><td>5 × width</td></tr>
 <tr><td><code>scale</code></td><td>or set the size of one sprite pixel directly</td><td>5</td></tr>
+<tr><td><code>render</code></td><td><code>pixel</code> flat blocks, <code>dots</code> LED dot-matrix, <code>voxel</code> chunky 3D that turns toward the cursor</td><td>pixel (big: voxel)</td></tr>
+<tr><td><code>depth</code></td><td>voxel extrusion, in sprite pixels</td><td>3 (big: 2)</td></tr>
+<tr><td><code>color</code></td><td>body colour for big sprites; shade and highlight are derived from it</td><td>its own</td></tr>
+<tr><td><code>eye</code></td><td>pupil colour</td><td>its own</td></tr>
 <tr><td><code>hue</code></td><td>recolour by rotating the hue, in degrees</td><td>0</td></tr>
 <tr><td><code>look</code></td><td><code>mouse</code> follows the cursor, <code>wander</code> looks around, <code>none</code> looks ahead</td><td>mouse</td></tr>
-<tr><td><code>shy</code></td><td>leans away when the cursor gets close</td><td>off</td></tr>
-<tr><td><code>tilt</code></td><td>leans toward the cursor</td><td>off</td></tr>
+<tr><td><code>shy</code></td><td>leans away when the cursor gets close (<code>no-shy</code> turns it off on big ones)</td><td>off (big: on)</td></tr>
+<tr><td><code>tilt</code></td><td>leans toward the cursor (<code>no-tilt</code> turns it off)</td><td>off (big: on)</td></tr>
 <tr><td><code>still</code></td><td>no breathing or hopping</td><td>off</td></tr>
 <tr><td><code>sleep-after</code></td><td>seconds without input before it naps; 0 = never</td><td>25</td></tr>
 <tr><td><code>aria-label</code></td><td>give it one if it means something; otherwise it is hidden from screen readers</td><td>–</td></tr>
