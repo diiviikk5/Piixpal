@@ -69,6 +69,12 @@ defineBehavior('mind', (a, [el], host) => {
           break;
       }
     },
+    hear(type) {
+      if (type !== 'thud' || hop || state === 'annoyed' || state === 'back' || now() - (this._heard || 0) < 2500) return;
+      this._heard = now();
+      a.hush(); a.say(pick(['grr', 'vein', '!?']), 900);
+      go('annoyed', .8, 'annoyed');
+    },
     poke() {
       if (hop) return;
       const t = now();
