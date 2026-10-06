@@ -1,0 +1,15 @@
+{
+  "name": "piixpal",
+  "version": "0.1.0",
+  "description": "Tiny pixel creatures that live on your website. Drop-in web components, zero dependencies.",
+  "main": "piixpal.js",
+  "files": ["piixpal.js", "piixpal.min.js"],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "node scripts/serve.mjs"
+  },
+  "keywords": ["pixel", "pixel-art", "web-components", "mascot", "sprite", "animation", "ui", "website-pet"],
+  "license": "MIT",
+  "repository": { "type": "git", "url": "git+https://github.com/diiviikk5/Piixpal.git" },
+  "homepage": "https://github.com/diiviikk5/Piixpal#readme"
+}
