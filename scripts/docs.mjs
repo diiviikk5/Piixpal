@@ -78,7 +78,7 @@ const sidebar = active => {
 const page = ({ key, title: t, desc, body, extra = '' }) => `<!doctype html>
 <html lang="en">
 <head>
-<script>document.documentElement.classList.add('js')</script>
+<script>(()=>{const d=document.documentElement;d.classList.add('js');let t;try{t=localStorage.getItem('piix-theme')}catch(e){}d.dataset.theme=t||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'white')})()</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>${esc(t)} · Piixpal components</title>
@@ -101,6 +101,11 @@ const page = ({ key, title: t, desc, body, extra = '' }) => `<!doctype html>
       <a href="./" ${key !== 'home' ? 'aria-current="page"' : ''}>Components</a>
       <a href="../#api">API</a>
     </nav>
+    <div class="theme" role="group" aria-label="Theme">
+      <button type="button" data-theme-set="white" title="White" aria-label="White theme"><svg viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M3 0h2v1H3zM3 7h2v1H3zM0 3h1v2H0zM7 3h1v2H7zM2 2h4v4H2z"/></svg></button>
+      <button type="button" data-theme-set="paper" title="Paper" aria-label="Paper theme"><svg viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M1 0h4v1h1v1h1v6H1zM2 3h4v1H2zM2 5h4v1H2z" fill-rule="evenodd"/></svg></button>
+      <button type="button" data-theme-set="dark" title="Dark" aria-label="Dark theme"><svg viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M3 0h3v1H4v1H3v4h1v1h3v1H2V7H1V6H0V2h1V1h2z"/></svg></button>
+    </div>
     <a class="btn btn-sm btn-ink" href="https://github.com/diiviikk5/Piixpal" target="_blank" rel="noopener">${GH} Star on GitHub</a>
   </div>
 </header>
