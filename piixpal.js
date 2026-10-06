@@ -4884,6 +4884,30 @@ defineBehavior('wire', (a, [el], host) => {
   });
 })();
 
+/* ---- sprites/big-astronaut.js ---- */
+/* ASTRONAUT (big): a tiny astronaut floating in place. Eyes glow behind the visor. */
+(() => {
+  const frame = blink => art.volume(art.paint(20, 24, (x, y) => {
+    if (art.ellipse(x, y, 10, 7, 7.6, 7)) {
+      if (art.rrect(x, y, 5, 4, 15, 10, 3)) return 'v';                                         /* visor */
+      return 'b';                                                                                /* helmet */
+    }
+    if (art.rrect(x, y, 2, 11, 6, 17, 1) && y >= 12) return 'p';                                 /* backpack */
+    if (art.rrect(x, y, 4, 12, 16, 20, 3)) return y === 15 && x >= 8 && x <= 12 ? (blink && x % 2 ? 'r' : 'g') : 'b';   /* suit + chest panel */
+    if (y >= 21 && ((x >= 6 && x <= 8) || (x >= 12 && x <= 14))) return 'b';                     /* boots */
+    if (y >= 13 && y <= 17 && (x === 17 || x === 18)) return 'b';                                /* arm */
+    return null;
+  }));
+  defineFigure('astronaut', {
+    ...BIG, w: 20, h: 24, fps: 2, scale: 7,
+    tag: 'A tiny astronaut floating in place. Eyes glow behind the visor.',
+    palette: { b: '#f3f0fa', d: '#b7b0c4', B: '#ffffff', v: '#1a1f3a', p: '#c9c3d6', g: '#c6f432', r: '#ff4d6d', k: '#58c8ff' },
+    frames: [frame(0), frame(1)],
+    eyes: [{ x: 7, y: 6, w: 2, h: 3 }, { x: 11, y: 6, w: 2, h: 3 }],
+    pupil: { w: 2, h: 2 }, pupilKey: 'k', glint: '#ffffff', lid: 'v'
+  });
+})();
+
 /* ---- sprites/big-bolt.js ---- */
 /* BOLT (big): a chunky robot whose face is a little screen. Its eyes glow. */
 (() => {
@@ -4909,6 +4933,69 @@ defineBehavior('wire', (a, [el], host) => {
     pupilKey: 'g',
     glint: '#ffffff',
     lid: 's'
+  });
+})();
+
+/* ---- sprites/big-brain.js ---- */
+/* BRAIN (big): a very big brain, thinking very hard. Sparks race along its folds. */
+(() => {
+  const frame = f => art.volume(art.paint(24, 19, (x, y) => {
+    const inL = art.ellipse(x, y, 8, 9, 7.6, 7.6), inR = art.ellipse(x, y, 16, 9, 7.6, 7.6);
+    if (!inL && !inR && !(y >= 15 && y <= 17 && x >= 10 && x <= 13)) return null;
+    if (x === 12 && y < 15) return 'd';                                                     /* the middle */
+    /* wiggly folds, with a spark travelling along one of them */
+    const fold = Math.sin(x * .9 + y * .35) + Math.sin(y * 1.1 - x * .3);
+    if (Math.abs(fold) < .32) return ((x + y * 2 + f * 3) % 11) === 0 ? 'y' : 'd';
+    return 'b';
+  }));
+  defineFigure('brain', {
+    ...BIG, w: 24, h: 19, fps: 6, scale: 7,
+    tag: 'A very big brain, thinking very hard. Sparks race along its folds.',
+    palette: { b: '#ff9cc2', d: '#e26f9d', B: '#ffd1e3', y: '#fff36b', k: '#17121f', m: '#17121f' },
+    frames: [0, 1, 2, 3].map(f => art.compose(frame(f), [5, 7, ['bbbb']], [5, 8, ['bbbb']], [5, 9, ['bbbb']], [15, 7, ['bbbb']], [15, 8, ['bbbb']], [15, 9, ['bbbb']], [11, 12, ['mm']])),
+    eyes: [{ x: 5, y: 7, w: 4, h: 3 }, { x: 15, y: 7, w: 4, h: 3 }],
+    pupil: { w: 2, h: 2 }
+  });
+})();
+
+/* ---- sprites/big-crt.js ---- */
+/* CRT (big): a beige monitor from the old internet. Its face glows on the screen. */
+(() => {
+  const frame = scan => art.volume(art.paint(22, 22, (x, y) => {
+    if (y >= 18) return (y === 18 && x >= 8 && x <= 13) || (y >= 19 && x >= 5 && x <= 16) ? 'b' : null;   /* stand */
+    if (!art.rrect(x, y, 1, 0, 20, 17, 2)) return null;
+    if (art.rrect(x, y, 4, 3, 17, 13, 2)) return y === 3 + scan ? 'S' : 's';                              /* screen + scanline */
+    if (y === 15 && x >= 15 && x <= 17) return x === 17 ? 'g' : 'd';                                      /* power light */
+    return 'b';
+  }), 'b', 'd', 'B');
+  defineFigure('crt', {
+    ...BIG, w: 22, h: 22, fps: 5, scale: 7,
+    tag: 'A beige monitor from the old internet. Its face glows on the screen.',
+    palette: { b: '#e8dcc2', d: '#bfb08f', B: '#fff7e6', s: '#1a2a24', S: '#24453a', g: '#c6f432', k: '#17121f' },
+    frames: Array.from({ length: 10 }, (_, i) => art.put(frame(i), 9, 11, ['gggg'])),
+    eyes: [{ x: 6, y: 5, w: 4, h: 4 }, { x: 12, y: 5, w: 4, h: 4 }],
+    pupil: { w: 2, h: 3 }, pupilKey: 'g', glint: '#ffffff', lid: 's'
+  });
+})();
+
+/* ---- sprites/big-elephant.js ---- */
+/* ELEPHANT (big): a baby elephant with big ears and a trunk that never sits still. */
+(() => {
+  const frame = sw => art.volume(art.paint(24, 20, (x, y) => {
+    if (art.ellipse(x, y, 4.5, 7, 4.2, 5.2) || art.ellipse(x, y, 19.5, 7, 4.2, 5.2)) return art.ellipse(x, y, 4.8, 7, 2.4, 3.4) || art.ellipse(x, y, 19.2, 7, 2.4, 3.4) ? 'p' : 'b';  /* ears */
+    if (art.ellipse(x, y, 12, 8, 7, 6.4)) return 'b';                                             /* head */
+    const tx = 12 + Math.round(Math.sin(y * .5 + sw) * 1.2);                                       /* swinging trunk */
+    if (y >= 13 && y <= 18 && x >= tx - 1 && x <= tx + 1 - (y > 16 ? 1 : 0)) return 'b';
+    if (y >= 15 && y <= 19 && ((x >= 6 && x <= 8) || (x >= 15 && x <= 17))) return 'd';           /* front feet */
+    return null;
+  }));
+  defineFigure('elephant', {
+    ...BIG, w: 24, h: 20, fps: 3, scale: 7,
+    tag: 'A baby elephant with big ears and a trunk that never sits still.',
+    palette: { b: '#a7a0c4', d: '#7d75a0', B: '#d3cee6', p: '#ffb3c7', k: '#17121f' },
+    frames: [0, 1.4, 2.8, 1.4].map(frame),
+    eyes: [{ x: 8, y: 6, w: 2, h: 3 }, { x: 14, y: 6, w: 2, h: 3 }],
+    pupil: { w: 2, h: 2 }
   });
 })();
 
@@ -4986,6 +5073,34 @@ defineBehavior('wire', (a, [el], host) => {
   });
 })();
 
+/* ---- sprites/big-gpu.js ---- */
+/* GPU (big): a graphics card whose two fans are its eyes. RGB strip included, obviously. */
+(() => {
+  const frame = f => art.volume(art.paint(26, 17, (x, y) => {
+    if (x <= 1 && y >= 2 && y <= 15) return 'm';                                          /* the bracket */
+    if (y >= 15 && x >= 6 && x <= 20) return x % 2 ? 'g' : null;                          /* gold contacts */
+    if (!art.rrect(x, y, 2, 2, 25, 14, 2)) return null;
+    if (y === 3 && x >= 4 && x <= 23) return 'rGu'[(x + f) % 3];                             /* RGB strip */
+    for (const cx of [9, 18]) {
+      if (art.ellipse(x, y, cx, 9, 4.2, 4.2)) {
+        if (art.ellipse(x, y, cx, 9, 1.6, 1.6)) return 'h';
+        const a = Math.atan2(y + .5 - 9, x + .5 - cx);
+        return Math.floor((a / Math.PI * 3 + 6 + f * .5)) % 2 ? 'F' : 'f';                /* spinning blades */
+      }
+    }
+    return 'b';
+  }));
+  defineFigure('gpu', {
+    ...BIG, w: 26, h: 17, fps: 8, scale: 7,
+    tag: 'A graphics card whose two fans are its eyes. RGB strip included, obviously.',
+    palette: { b: '#3b3550', d: '#25213a', B: '#5c5470', m: '#9aa3b5', g: '#ffd23f', f: '#2d2838', F: '#6e6585', h: '#c9c3d6',
+      r: '#ff4d6d', G: '#c6f432', u: '#58c8ff', k: '#17121f' },
+    frames: [0, 1, 2].map(frame),
+    eyes: [{ x: 8, y: 8, w: 2, h: 2 }, { x: 17, y: 8, w: 2, h: 2 }],
+    pupil: { w: 1, h: 1 }, glint: null, lid: 'h'
+  });
+})();
+
 /* ---- sprites/big-hops.js ---- */
 /* HOPS (big): long ears, short attention span. One ear never quite stays up. */
 (() => {
@@ -5033,6 +5148,47 @@ defineBehavior('wire', (a, [el], host) => {
   });
 })();
 
+/* ---- sprites/big-keycap.js ---- */
+/* KEYCAP (big): a chunky mechanical keycap. Thocky. Click it for a satisfying press. */
+(() => {
+  const body = art.volume(art.paint(18, 16, (x, y) => {
+    if (art.rrect(x, y, 3, 1, 14, 9, 2)) return 't';                          /* the dished top */
+    if (art.rrect(x, y, 1, 3, 16, 14, 2)) return 'b';                         /* the skirt */
+    return null;
+  }), 'b', 'd', 'B');
+  defineFigure('keycap', {
+    ...BIG, w: 18, h: 16, scale: 8,
+    tag: 'A chunky mechanical keycap. Thocky. Click it for a satisfying press.',
+    palette: { b: '#c6f432', d: '#8fb81a', B: '#ecffb0', t: '#dcff6e', k: '#17121f', m: '#17121f' },
+    frames: [art.put(body, 8, 7, ['mm'])],
+    eyes: [{ x: 5, y: 3, w: 3, h: 3 }, { x: 10, y: 3, w: 3, h: 3 }],
+    pupil: { w: 2, h: 2 }, lid: 't',
+    recolor: { b: 0, d: -.25, B: .5, t: .22 }
+  });
+})();
+
+/* ---- sprites/big-llama.js ---- */
+/* LLAMA (big): a fluffy llama with a long neck and a calm, knowing look. */
+(() => {
+  const frame = ear => art.volume(art.paint(20, 26, (x, y) => {
+    if ((x === 9 || x === 10 + ear) && y >= 0 && y <= 2) return 'b';                          /* ears */
+    if ((x === 14 || x === 15 - ear) && y >= 0 && y <= 2) return 'b';
+    if (art.rrect(x, y, 8, 2, 17, 9, 3)) return x >= 15 && y >= 6 ? 'c' : 'b';              /* head + muzzle */
+    if (art.rrect(x, y, 9, 8, 14, 17, 2)) return 'b';                                         /* neck */
+    if (art.ellipse(x, y, 9, 19, 8.6, 4.4)) return (x + y) % 3 === 0 ? 'B' : 'b';             /* fluffy body */
+    if (y >= 23 && [3, 6, 12, 15].includes(x)) return 'd';                                    /* legs */
+    return null;
+  }));
+  defineFigure('llama', {
+    ...BIG, w: 20, h: 26, fps: 1.2, scale: 7,
+    tag: 'A fluffy llama with a long neck and a calm, knowing look.',
+    palette: { b: '#f3ead8', d: '#c9b896', B: '#ffffff', c: '#e8dcc2', k: '#17121f', m: '#17121f' },
+    frames: [0, 0, 1, 0].map(e => art.put(frame(e), 16, 7, ['m'])),
+    eyes: [{ x: 11, y: 4, w: 2, h: 2 }, { x: 14, y: 4, w: 2, h: 2 }],
+    pupil: { w: 1, h: 2 }
+  });
+})();
+
 /* ---- sprites/big-mumu.js ---- */
 /* MUMU (big): a round little bear who would like a snack, please. Ears wiggle. */
 (() => {
@@ -5051,6 +5207,29 @@ defineBehavior('wire', (a, [el], host) => {
     palette: { b: '#e0a46a', d: '#b87a42', B: '#f6d2ad', p: '#ff9cc2', s: '#fff1de', k: '#17121f' },
     frames: [face(frame(0)), face(frame(0)), face(frame(1))],
     eyes: [{ x: 5, y: 7, w: 3, h: 3 }, { x: 14, y: 7, w: 3, h: 3 }],
+    pupil: { w: 2, h: 2 }
+  });
+})();
+
+/* ---- sprites/big-server.js ---- */
+/* SERVER (big): a server rack keeping your site alive. Its drive lights never stop. */
+(() => {
+  const BAYS = [9, 13, 17];
+  const frame = f => art.volume(art.paint(16, 24, (x, y) => {
+    if (!art.rrect(x, y, 1, 0, 14, 21, 2)) return (y >= 22 && (x === 3 || x === 12)) ? 'd' : null;
+    for (const by of BAYS) if (y >= by && y <= by + 2 && x >= 3 && x <= 12) {
+      if (y === by + 1 && x === 11) return ((f + by) % 3) ? 'g' : 'o';                     /* blinking LEDs */
+      if (y === by + 1 && x >= 4 && x <= 8) return 'v';                                     /* vents */
+      return 's';
+    }
+    return 'b';
+  }));
+  defineFigure('server', {
+    ...BIG, w: 16, h: 24, fps: 5, scale: 7,
+    tag: 'A server rack keeping your site alive. Its drive lights never stop.',
+    palette: { b: '#c9d3ea', d: '#8f9bb8', B: '#eef2ff', s: '#2d2838', v: '#5c5470', g: '#c6f432', o: '#ff7a2f', k: '#17121f', m: '#17121f' },
+    frames: [0, 1, 2].map(f => art.put(frame(f), 7, 6, ['mm'])),
+    eyes: [{ x: 3, y: 2, w: 4, h: 3 }, { x: 9, y: 2, w: 4, h: 3 }],
     pupil: { w: 2, h: 2 }
   });
 })();
@@ -5099,6 +5278,29 @@ defineBehavior('wire', (a, [el], host) => {
     frames: [0, 1, 2, 3].map(s => face(frame(s))),
     eyes: [{ x: 4, y: 5, w: 4, h: 4 }, { x: 12, y: 5, w: 4, h: 4 }],
     pupil: { w: 2, h: 3 }
+  });
+})();
+
+/* ---- sprites/big-unicorn.js ---- */
+/* UNICORN (big): the startup kind. A golden horn, a rainbow mane, a billion-dollar smile. */
+(() => {
+  const RAINBOW = 'roygbv';
+  const frame = f => art.volume(art.paint(22, 22, (x, y) => {
+    if (y <= 4 && x >= 13 && x <= 15 && Math.abs(x - 14) <= (y + 1) / 3) return 'h';             /* horn */
+    if (art.ellipse(x, y, 14, 9, 5.6, 4.8)) return 'b';                                          /* head */
+    if (x >= 7 && x <= 10 && y >= 3 && y <= 14 && y - 3 <= (x - 6) * 3) return RAINBOW[(y + f) % 6];   /* mane */
+    if (art.ellipse(x, y, 10, 15, 7.6, 4.4)) return 'b';                                         /* body */
+    if (y >= 18 && [5, 8, 12, 15].includes(x)) return 'd';                                       /* legs */
+    if (x <= 2 && y >= 12 && y <= 16) return RAINBOW[(y + f + 2) % 6];                           /* tail */
+    return null;
+  }));
+  defineFigure('unicorn', {
+    ...BIG, w: 22, h: 22, fps: 4, scale: 7,
+    tag: 'The startup kind. A golden horn, a rainbow mane, a billion-dollar smile.',
+    palette: { b: '#f6f0ff', d: '#cbbfe6', B: '#ffffff', h: '#ffd23f', r: '#ff4d6d', o: '#ff9a2f', y: '#ffd23f', g: '#7bd63a', v: '#6b4cff', k: '#17121f', m: '#17121f', p: '#ffb3c7' },
+    frames: [0, 1, 2, 3, 4, 5].map(f => art.compose(frame(f), [17, 11, ['m']], [18, 10, ['p']])),
+    eyes: [{ x: 13, y: 7, w: 2, h: 3 }],
+    pupil: { w: 2, h: 2 }
   });
 })();
 
