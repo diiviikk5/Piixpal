@@ -1342,6 +1342,183 @@ defineBehavior('perch', (a, targets, host) => {
   });
 })();
 
+/* ---- elements/sprite.js ---- */
+/* <piix-sprite name="mochi" size="96"></piix-sprite>
+ * Small, self-contained pixel characters you can paste anywhere: they sit inline like an
+ * image. Eyes follow the cursor, they blink, breathe a pixel, hop when clicked and nap
+ * when nobody's around.
+ *
+ *   name         which sprite (see Piixpal.figures)
+ *   size         width in px (snapped to whole sprite pixels)   default: 5 × sprite width
+ *   scale        or give the pixel size directly
+ *   hue          recolour, degrees
+ *   look         mouse | wander | none                          default: mouse
+ *   shy          leans away when the cursor gets close
+ *   tilt         leans toward the cursor
+ *   still        no breathing or hopping
+ *   sleep-after  seconds of no input before napping, 0 = never  default: 25
+ *
+ * Figure spec: { w, h, palette, frames:[rows…], fps, eyes:[{x,y,w,h}], pupil:{w,h}, lid:'b' } */
+const FIGURES = {};
+const defineFigure = (name, spec) => {
+  spec.name = name;
+  spec.pupil = spec.pupil || { w: 1, h: 1 };
+  spec._baked = null;
+  FIGURES[name] = spec;
+  return spec;
+};
+const bakeFigure = spec => {
+  if (!spec._baked) {
+    const pal = {};
+    for (const k in spec.palette) pal[k] = hexRGBA(spec.palette[k]);
+    spec._baked = spec.frames.map(rows => bake(rows, pal, spec.w, spec.h));
+  }
+  return spec._baked;
+};
+const HEAD = 3; /* rows of headroom above the sprite for breathing and z's */
+
+class PiixSpriteElement extends HTMLElement {
+  static get observedAttributes() { return ['name', 'size', 'scale', 'hue']; }
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    this._tick = this._tick.bind(this);
+    this._down = this._down.bind(this);
+    this._vis = true;
+  }
+  connectedCallback() {
+    this._build();
+    this._io = new IntersectionObserver(es => { this._vis = es[es.length - 1].isIntersecting; }, { rootMargin: '120px' });
+    this._io.observe(this);
+    this.addEventListener('pointerdown', this._down);
+    sub(this._tick);
+  }
+  disconnectedCallback() {
+    unsub(this._tick);
+    if (this._io) this._io.disconnect();
+    this.removeEventListener('pointerdown', this._down);
+  }
+  attributeChangedCallback(n) {
+    if (!this.isConnected || !this._cv) return;
+    if (n === 'hue') { this._cv.style.filter = this.getAttribute('hue') ? `hue-rotate(${+this.getAttribute('hue')}deg)` : ''; return; }
+    this._build();
+  }
+  /* make it hop from code */
+  poke() { this._down(); }
+
+  _build() {
+    const spec = this._spec = FIGURES[this.getAttribute('name')] || FIGURES[Object.keys(FIGURES)[0]];
+    if (!spec) return;
+    this._frames = bakeFigure(spec);
+    const size = +this.getAttribute('size');
+    const s = this._s = +this.getAttribute('scale') || (size ? Math.max(1, Math.round(size / spec.w)) : 5);
+    const W = spec.w, H = spec.h + HEAD;
+    this.shadowRoot.innerHTML = `<style>
+:host{display:inline-block;line-height:0;vertical-align:bottom;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.w{display:block;transform-origin:50% 100%;will-change:transform}
+canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;margin-top:${-HEAD * s}px}
+</style><div class="w"><canvas width="${W}" height="${H}" style="width:${W * s}px;height:${H * s}px"></canvas></div>`;
+    this._wrap = this.shadowRoot.querySelector('.w');
+    this._cv = this.shadowRoot.querySelector('canvas');
+    if (this.getAttribute('hue')) this._cv.style.filter = `hue-rotate(${+this.getAttribute('hue')}deg)`;
+    this._g = this._cv.getContext('2d');
+    this._key = '';
+    this._fi = 0; this._ox = 0; this._oy = 0; this._tilt = 0;
+    this._blinkEnd = 0; this._nextBlink = now() + rnd(1200, 3600);
+    this._look = { x: 0, y: 0, until: 0 };
+    this._lastPoke = now();
+    if (!this.hasAttribute('aria-label')) this.setAttribute('aria-hidden', 'true');
+    else this.setAttribute('role', 'img');
+  }
+
+  _down() {
+    this._hop = now(); this._happy = now() + 650; this._lastPoke = now();
+    this.dispatchEvent(new CustomEvent('piix:poke', { bubbles: true }));
+  }
+
+  _tick(dt, t) {
+    if (!this._vis || !this._cv) return;
+    const spec = this._spec, s = this._s, R = reduced();
+    const r = this.getBoundingClientRect();
+    const cx = r.left + r.width / 2, cy = r.top + r.height * .45;
+    const idle = t - Math.max(ptr.last, this._lastPoke);
+    const nap = this.hasAttribute('sleep-after') ? +this.getAttribute('sleep-after') : 25;
+    const asleep = nap > 0 && idle > nap * 1000;
+    const mode = this.getAttribute('look') || 'mouse';
+    const vx = ptr.cx - cx, vy = ptr.cy - cy;
+    const tracking = mode === 'mouse' && ptr.seen && idle < 4000;
+
+    /* gaze, -1..1 on both axes */
+    let gx = 0, gy = 0;
+    if (tracking) { const k = Math.max(r.width, 40) * 1.4; gx = clamp(vx / k, -1, 1); gy = clamp(vy / k, -1, 1); }
+    else if (mode !== 'none') {
+      if (t > this._look.until) this._look = { x: rnd(-1, 1), y: rnd(-.7, .7), until: t + rnd(1200, 3000) };
+      gx = this._look.x; gy = this._look.y;
+    }
+    if (t > this._nextBlink) { this._blinkEnd = t + 130; this._nextBlink = t + rnd(2400, 6000); }
+    const eyes = asleep ? 'shut' : t < this._happy ? 'happy' : t < this._blinkEnd ? 'shut' : 'open';
+
+    /* idle frames and a one-pixel breath */
+    const fps = spec.fps || 2;
+    const fi = R || spec.frames.length < 2 ? 0 : Math.floor(t / 1000 * fps * (asleep ? .4 : 1)) % spec.frames.length;
+    const still = R || this.hasAttribute('still');
+    const breath = still ? 0 : Math.floor(t / (asleep ? 1400 : 760)) % 2;
+    const z = asleep && !R ? Math.floor(t / 700) % 3 : -1;
+    const px = Math.round((gx + 1) / 2 * (spec.eyes[0] ? spec.eyes[0].w - spec.pupil.w : 0));
+    const py = Math.round((gy + 1) / 2 * (spec.eyes[0] ? spec.eyes[0].h - spec.pupil.h : 0));
+    const key = [fi, breath, eyes, px, py, z].join();
+    if (key !== this._key) { this._key = key; this._draw(fi, breath, eyes, px, py, z); }
+
+    /* body motion */
+    let tx = 0, ty = 0, sx = 1, sy = 1, tilt = 0;
+    if (!still) {
+      if (this.hasAttribute('tilt') && tracking && !asleep) tilt = clamp(vx / (innerWidth * .4), -1, 1) * 8;
+      if (this.hasAttribute('shy') && ptr.seen && !asleep) {
+        const d = Math.hypot(vx, vy) || 1, lim = r.width * 1.2;
+        if (d < lim) { const k = (1 - d / lim) * r.width * .18; tx = -vx / d * k; ty = -vy / d * k; }
+      }
+      if (this._hop) {
+        const p = (t - this._hop) / 460;
+        if (p >= 1) this._hop = 0;
+        else { ty -= Math.sin(Math.PI * p) * spec.h * s * .35; const q = Math.sin(Math.PI * p * 2) * .08; sx = 1 - q * .6; sy = 1 + q; }
+      }
+    }
+    this._ox += (tx - this._ox) * .18; this._oy += (ty - this._oy) * .18; this._tilt += (tilt - this._tilt) * .1;
+    const oy = this._hop ? ty : this._oy;
+    this._wrap.style.transform = `translate(${this._ox.toFixed(1)}px,${oy.toFixed(1)}px) rotate(${this._tilt.toFixed(1)}deg) scale(${sx.toFixed(3)},${sy.toFixed(3)})`;
+  }
+
+  _draw(fi, breath, eyes, px, py, z) {
+    const spec = this._spec, g = this._g, y0 = HEAD - breath;
+    g.clearRect(0, 0, spec.w, spec.h + HEAD);
+    g.drawImage(this._frames[fi], 0, y0);
+    const ink = spec.palette.k || '#17121f', lid = spec.palette[spec.lid] || ink;
+    for (const e of spec.eyes) {
+      const x = e.x, y = e.y + y0;
+      if (eyes === 'open') {
+        g.fillStyle = spec.palette[spec.pupilKey || 'k'] || ink;
+        g.fillRect(x + px, y + py, spec.pupil.w, spec.pupil.h);
+      } else {
+        g.fillStyle = lid; g.fillRect(x, y, e.w, e.h);
+        g.fillStyle = ink;
+        if (eyes === 'shut') g.fillRect(x, y + e.h - 1, e.w, 1);
+        else { /* happy: an upside-down U */
+          const top = y + Math.max(0, e.h - 2);
+          g.fillRect(x, top, e.w, 1); g.fillRect(x, y + e.h - 1, 1, 1); g.fillRect(x + e.w - 1, y + e.h - 1, 1, 1);
+        }
+      }
+    }
+    if (z >= 0) {
+      /* a little "z" drifting up in the headroom */
+      g.fillStyle = ink;
+      const zx = spec.w - 4 + (z > 1 ? 1 : 0), zy = 2 - z;
+      g.fillRect(zx, zy + 0, 3, 1); g.fillRect(zx + 1, zy + 1, 1, 1); g.fillRect(zx, zy + 2, 3, 1);
+    }
+  }
+}
+Piixpal.figures = FIGURES;
+Piixpal.figure = defineFigure;
+
 /* ---- elements/type.js ---- */
 /* <piix-type text="PIIXPAL" rows="18" cell="8" color="#16111f" shade="#c6f432" depth="1" fit>
  * Any font, rasterised into chunky blocks with an extruded shadow.
@@ -1559,6 +1736,328 @@ canvas{display:block;pointer-events:none;image-rendering:pixelated}
   }
 }
 
+/* ---- sprites/cactus.js ---- */
+/* CACTUS: a potted cactus who blooms when it's in a good mood. Do not hug. */
+(() => {
+  const body = [
+    '....kkkkkkkk....',
+    '...kgGggggggk...',
+    '...kgGggggggk.k.',
+    '.k.kgwwggwwgkkgk',
+    'kgkkgwwggwwgkkgk',
+    'kgkkgggkkgggkkgk',
+    'kggggggggggggggk',
+    '.kkkggggggggkkk.',
+    '...kggggggggk...',
+    '..kkkkkkkkkkkk..',
+    '..kooooooooook..',
+    '...kooooooook...',
+    '...kodoooodok...',
+    '....kkkkkkkk....'
+  ];
+  defineFigure('cactus', {
+    w: 16, h: 15, fps: .5,
+    tag: 'A potted cactus who blooms when it is in a good mood. Do not hug.',
+    palette: { k: '#17121f', g: '#4fc46a', G: '#9be57a', w: '#ffffff', o: '#e8784a', d: '#c45a30', f: '#ff7aa8' },
+    frames: [['................'].concat(body), ['.......ff.......'].concat(art.put(body, 6, 0, ['_kffk_']))],
+    eyes: [{ x: 5, y: 4, w: 2, h: 2 }, { x: 9, y: 4, w: 2, h: 2 }],
+    lid: 'g'
+  });
+})();
+
+/* ---- sprites/candle.js ---- */
+/* CANDLE: a little candle with a flame that never sits still. */
+(() => {
+  const body = [
+    '....k.....',
+    '.kkkkkkkk.',
+    'kcCcccccck',
+    'kcwwccwwck',
+    'kcwwccwwck',
+    'kccckkccck',
+    'kcCccccccck'.slice(0, 10),
+    'kcccccccck',
+    'kdccccccdk',
+    'kddddddddk',
+    '.kkkkkkkk.'
+  ];
+  const flames = [
+    ['....y.....', '...yyy....', '...yoy....', '..yoooy...', '...yoy....'],
+    ['.....y....', '....yy....', '...yyoy...', '...yooy...', '...yoy....'],
+    ['..........', '....y.....', '...yyy....', '...yoy....', '...yoy....']
+  ];
+  defineFigure('candle', {
+    w: 10, h: 16, fps: 7,
+    tag: 'A little candle with a flame that never sits still.',
+    palette: { k: '#17121f', y: '#ffd23f', o: '#ff7a2f', c: '#ffe1ec', C: '#ffffff', d: '#f2b5cc', w: '#ffffff' },
+    frames: flames.map(f => f.concat(body)),
+    eyes: [{ x: 2, y: 8, w: 2, h: 2 }, { x: 6, y: 8, w: 2, h: 2 }],
+    lid: 'c'
+  });
+})();
+
+/* ---- sprites/cloud.js ---- */
+/* CLOUD: a little cloud with a light, cheerful drizzle. */
+(() => {
+  const base = [
+    '.....kkkk.......',
+    '...kkccCCk.kk...',
+    '..kccccCCCkcck..',
+    '.kccccccccccCCk.',
+    'kcccccccccccccck',
+    'kcccccccccccccck',
+    'kcpccccKKccccpck',
+    'kdccccccccccccdk',
+    '.kddddddddddddk.',
+    '..kkkkkkkkkkkk..'
+  ];
+  defineFigure('cloud', {
+    w: 16, h: 12, fps: 3,
+    tag: 'A little cloud with a light, cheerful drizzle.',
+    palette: { k: '#17121f', c: '#f4f6ff', C: '#ffffff', d: '#c9d0ea', p: '#ffb3c7', K: '#17121f', b: '#58c8ff' },
+    frames: [
+      base.concat(['....b......b....', '................']),
+      base.concat(['.......b.......b', '....b......b....']),
+      base.concat(['................', '.......b.......b'])
+    ],
+    eyes: [{ x: 4, y: 4, w: 2, h: 2 }, { x: 10, y: 4, w: 2, h: 2 }],
+    lid: 'c'
+  });
+})();
+
+/* ---- sprites/egg.js ---- */
+/* EGG: an egg with a crack and a lot of questions. */
+defineFigure('egg', {
+  w: 12, h: 14,
+  tag: 'An egg with a crack and a lot of questions.',
+  palette: { k: '#17121f', e: '#fff4dc', E: '#ffffff', d: '#ead6ad', w: '#ffffff', b: '#ffb3a0' },
+  frames: [[
+    '....kkkk....',
+    '...keeeek...',
+    '..keEeeeek..',
+    '.keEekeeek..',
+    '.keeeekekek.',
+    'keewweewweek',
+    'keewweewweek',
+    'keeeeeeeeeek',
+    'kebeeeeeebek',
+    'keeeeeeeeeek',
+    '.keeeeeeeek.',
+    '.kdeeeeeedk.',
+    '..kddddddk..',
+    '...kkkkkk...'
+  ]],
+  eyes: [{ x: 3, y: 5, w: 2, h: 2 }, { x: 7, y: 5, w: 2, h: 2 }],
+  pupilKey: 'k',
+  lid: 'e'
+});
+
+/* ---- sprites/loaf.js ---- */
+/* LOAF: a ginger cat in its most efficient shape. Ears twitch when you're not looking. */
+(() => {
+  const base = [
+    '.kk....kk.......',
+    '.kok..kok.......',
+    '.kbbbbbbbk......',
+    'kbbbbbbbbbkkkkk.',
+    'kbwwbbwwbbsbsbbk',
+    'kbwwbbwwbbbbbbbk',
+    'kbbbkpkbbbsbsbbk',
+    'kbbbbbbbbbbbbbbk',
+    'kdbbbbbbbbbbbdkk',
+    '.kkkkkkkkkkkkkk.'
+  ];
+  defineFigure('loaf', {
+    w: 16, h: 10, fps: 1.5,
+    tag: 'A ginger cat in its most efficient shape. Ears twitch when you are not looking.',
+    palette: { k: '#17121f', b: '#ffa94d', s: '#e07a1f', d: '#d9822b', o: '#ff9cc2', p: '#ff7aa8', w: '#ffffff' },
+    frames: [base, base, base, art.put(base, 6, 0, ['...', 'kkk'])],
+    eyes: [{ x: 2, y: 4, w: 2, h: 2 }, { x: 6, y: 4, w: 2, h: 2 }],
+    lid: 'b'
+  });
+})();
+
+/* ---- sprites/mochi.js ---- */
+/* MOCHI: a soft pink rice cake. Squishy, blushy, easily delighted. */
+defineFigure('mochi', {
+  w: 14, h: 10,
+  tag: 'A soft pink rice cake. Squishy, blushy, easily delighted.',
+  palette: { k: '#17121f', b: '#ffc9dc', B: '#fff2f7', d: '#f39bbd', w: '#ffffff', p: '#ff7aa8' },
+  frames: [[
+    '....kkkkkk....',
+    '..kkbbbbbbkk..',
+    '.kbBBbbbbbbbk.',
+    'kbBbbbbbbbbbbk',
+    'kbbwwbbbbwwbbk',
+    'kbbwwbbbbwwbbk',
+    'kbpbbbkkbbbpbk',
+    'kdbbbbbbbbbbdk',
+    '.kddbbbbbbddk.',
+    '..kkkkkkkkkk..'
+  ]],
+  eyes: [{ x: 3, y: 4, w: 2, h: 2 }, { x: 9, y: 4, w: 2, h: 2 }],
+  lid: 'b'
+});
+
+/* ---- sprites/onigiri.js ---- */
+/* ONIGIRI: a rice ball in a seaweed jacket. Calm, round-ish, triangular. */
+defineFigure('onigiri', {
+  w: 14, h: 12,
+  tag: 'A rice ball in a seaweed jacket. Calm, round-ish, triangular.',
+  palette: { k: '#17121f', w: '#ffffff', W: '#f1ece2', n: '#1f3b2c', N: '#2f5a43', p: '#ffb3c7' },
+  frames: [[
+    '......kk......',
+    '.....kwwk.....',
+    '....kwwwwk....',
+    '...kwwwwwwk...',
+    '..kwwwwwwwwk..',
+    '..kwwwwwwwwk..',
+    '.kwwwwwwwwwwk.',
+    '.kwpwwwwwwpwk.',
+    'kwwwwwkkwwwwwk',
+    'kWwnNnnnnnnwWk',
+    'kWwnnnnnnnnwWk',
+    '.kkkkkkkkkkkk.'
+  ]],
+  eyes: [{ x: 3, y: 5, w: 3, h: 2 }, { x: 8, y: 5, w: 3, h: 2 }],
+  pupil: { w: 2, h: 2 },
+  lid: 'w'
+});
+
+/* ---- sprites/planet.js ---- */
+/* PLANET: a small ringed planet. Spins slowly, shines a little, thinks big. */
+(() => {
+  const base = [
+    '.....kkkkkk.....',
+    '...kkppppppkk...',
+    '..kpPPpppppppk..',
+    '.kpPppppppppppk.',
+    '.kppwwppppwwppk.',
+    '.kppwwppppwwppk.',
+    'kRRrrrrrrrrrrRRk',
+    '.kkrrrrrrrrrrkk.',
+    '..kdppppppppdk..',
+    '...kddddddddk...',
+    '.....kkkkkk.....'
+  ];
+  defineFigure('planet', {
+    w: 16, h: 11, fps: 3,
+    tag: 'A small ringed planet. Spins slowly, shines a little, thinks big.',
+    palette: { k: '#17121f', p: '#a991ff', P: '#ddd3ff', d: '#7a5fe0', w: '#ffffff', r: '#ffd23f', R: '#fff0a0' },
+    frames: [base, art.put(base, 5, 6, ['R']), art.put(base, 10, 6, ['R'])],
+    eyes: [{ x: 4, y: 4, w: 2, h: 2 }, { x: 10, y: 4, w: 2, h: 2 }],
+    lid: 'p'
+  });
+})();
+
+/* ---- sprites/pudding.js ---- */
+/* PUDDING: a caramel pudding on a plate. Cannot stop jiggling. */
+(() => {
+  const base = [
+    '....kkkkkk....',
+    '..kkcccccckk..',
+    '.kcCCccccccck.',
+    'kucccuucccuuuk',
+    'kuuuuuuuuuuuuk',
+    'kuuwwuuuuwwuuk',
+    'kuuwwuuuuwwuuk',
+    'kupuuukkuuupuk',
+    'kduuuuuuuuuudk',
+    'kdduuuuuuuuddk',
+    '.kkkkkkkkkkkk.',
+    'kssssssssssssk',
+    '.kkkkkkkkkkkk.'
+  ];
+  /* jiggle: the caramel top slides a pixel one way, then the other */
+  const jig = n => base.map((r, i) => i < 3 ? (n > 0 ? '.' + r.slice(0, -1) : r.slice(1) + '.') : r);
+  defineFigure('pudding', {
+    w: 14, h: 13, fps: 5,
+    tag: 'A caramel pudding on a plate. Cannot stop jiggling.',
+    palette: { k: '#17121f', c: '#b85c1f', C: '#e8964a', u: '#ffe08a', d: '#f0c25a', w: '#ffffff', p: '#ffb3a0', s: '#ece6f5' },
+    frames: [base, base, jig(1), base, jig(-1), base, base, base],
+    eyes: [{ x: 3, y: 5, w: 2, h: 2 }, { x: 9, y: 5, w: 2, h: 2 }],
+    lid: 'u'
+  });
+})();
+
+/* ---- sprites/robo.js ---- */
+/* ROBO: a tiny robot head. Its antenna light blinks when it's thinking (always). */
+(() => {
+  const base = [
+    '......rr......',
+    '......kk......',
+    '..kkkkkkkkkk..',
+    '.kmmmmmmmmmmk.',
+    '.kmMMmmmmmmmk.',
+    'kkmwwwmmwwwmkk',
+    'kkmwwwmmwwwmkk',
+    '.kmmmmmmmmmmk.',
+    '.kmmmkkkkmmmk.',
+    '.kmmmmmmmmmmk.',
+    '..kkkkkkkkkk..'
+  ];
+  defineFigure('robo', {
+    w: 14, h: 11, fps: 2,
+    tag: 'A tiny robot head. The antenna light means it is thinking. It is always thinking.',
+    palette: { k: '#17121f', m: '#b8c4e0', M: '#eef2ff', w: '#e9fff7', r: '#ff4d6d', y: '#c6f432' },
+    frames: [base, art.put(base, 6, 0, ['yy'])],
+    eyes: [{ x: 3, y: 5, w: 3, h: 2 }, { x: 8, y: 5, w: 3, h: 2 }],
+    pupil: { w: 2, h: 2 },
+    lid: 'm'
+  });
+})();
+
+/* ---- sprites/toast.js ---- */
+/* TOAST: a slice of toast with a pat of butter slowly giving up. */
+(() => {
+  const base = [
+    '..kkkk..kkkk..',
+    '.kcccckkcccck.',
+    'kcttttyyttttck',
+    'kcttttyyttttck',
+    'kcttwwttwwttck',
+    'kcttwwttwwttck',
+    'kctpttkkttptck',
+    'kcttttttttttck',
+    'kcttttttttttck',
+    'kcttttttttttck',
+    '.kcccccccccck.',
+    '..kkkkkkkkkk..'
+  ];
+  defineFigure('toast', {
+    w: 14, h: 12, fps: 1,
+    tag: 'A slice of toast with a pat of butter slowly giving up.',
+    palette: { k: '#17121f', c: '#c97a35', t: '#ffdca0', y: '#fff36b', w: '#ffffff', p: '#ffa06b' },
+    frames: [base, art.put(base, 7, 4, ['y']), art.compose(base, [7, 4, ['y']], [7, 5, ['y']])],
+    eyes: [{ x: 4, y: 4, w: 2, h: 2 }, { x: 8, y: 4, w: 2, h: 2 }],
+    lid: 't'
+  });
+})();
+
+/* ---- sprites/ufo.js ---- */
+/* UFO: a very small visitor. Came in peace, stayed for the cursor. */
+(() => {
+  const base = [
+    '......kkkk......',
+    '....kkggggkk....',
+    '...kgwwggwwgk...',
+    '...kgwwggwwgk...',
+    '..kkggggggggkk..',
+    '.kssSSssssssssk.',
+    'kssssssssssssssk',
+    'kdldddldddldddlk',
+    '.kkkkkkkkkkkkkk.'
+  ];
+  defineFigure('ufo', {
+    w: 16, h: 9, fps: 4,
+    tag: 'A very small visitor. Came in peace, stayed for the cursor.',
+    palette: { k: '#17121f', g: '#8ff0d8', w: '#ffffff', s: '#cbc4dc', S: '#f3f0f8', d: '#8a82a3', l: '#ffd23f' },
+    frames: [base, art.put(base, 0, 7, ['kdddldddldddlddk'])],
+    eyes: [{ x: 5, y: 2, w: 2, h: 2 }, { x: 9, y: 2, w: 2, h: 2 }],
+    lid: 'g'
+  });
+})();
+
 /* ---- boot.js ---- */
 /* <piix-pal pal="bitbug" do="crawl" on="#title" scale="4" hue="0">
  * Put it inside the element it should live on, or point at one with on="css selector".
@@ -1640,4 +2139,5 @@ class PiixPalElement extends HTMLElement {
 const define = (n, c) => { if (!customElements.get(n)) customElements.define(n, c); };
 define('piix-pal', PiixPalElement);
 if (typeof PiixTypeElement !== 'undefined') define('piix-type', PiixTypeElement);
+if (typeof PiixSpriteElement !== 'undefined') define('piix-sprite', PiixSpriteElement);
 })();
