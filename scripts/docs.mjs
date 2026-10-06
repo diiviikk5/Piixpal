@@ -75,7 +75,7 @@ const sidebar = active => {
   </aside>`;
 };
 
-const page = ({ key, title: t, desc, body, extra = '' }) => `<!doctype html>
+const page = ({ key, title: t, desc, body, extra = '', fonts = '' }) => `<!doctype html>
 <html lang="en">
 <head>
 <script>(()=>{const d=document.documentElement;d.classList.add('js');let t;try{t=localStorage.getItem('piix-theme')}catch(e){}d.dataset.theme=t||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'white')})()</script>
@@ -88,7 +88,7 @@ const page = ({ key, title: t, desc, body, extra = '' }) => `<!doctype html>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@400;600&family=Silkscreen&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../site/site.css">
+${fonts}<link rel="stylesheet" href="../site/site.css">
 <link rel="stylesheet" href="../site/docs.css">
 </head>
 <body data-page="${key}">
@@ -275,6 +275,22 @@ const typeBody = `<header class="doc-head">
         <label class="ctl"><span>Block</span><input type="range" id="t-cell" min="4" max="18" value="12"><output id="t-cell-o">12</output></label>
         <label class="ctl"><span>Depth</span><input type="range" id="t-depth" min="0" max="3" step=".5" value="1"><output id="t-depth-o">1</output></label>
         <label class="ctl"><span>Gap</span><input type="range" id="t-gap" min="0" max=".4" step=".02" value=".1"><output id="t-gap-o">.1</output></label>
+        <div class="ctl wide"><span>Shape</span>
+          <div class="seg" id="t-shape" role="group" aria-label="Block shape">
+            <button type="button" data-v="square" aria-pressed="true">Square</button>
+            <button type="button" data-v="dot" aria-pressed="false">Dot</button>
+            <button type="button" data-v="round" aria-pressed="false">Round</button>
+            <button type="button" data-v="plus" aria-pressed="false">Plus</button>
+            <button type="button" data-v="diamond" aria-pressed="false">Diamond</button>
+          </div>
+        </div>
+        <label class="ctl wide"><span>Font</span><select id="t-font" class="sel">
+          <option value="">Bricolage Grotesque (page font)</option>
+          <option value="'Geist Mono', monospace">Geist Mono</option>
+          <option value="'Silkscreen', monospace">Silkscreen</option>
+          <option value="'Instrument Serif', serif">Instrument Serif</option>
+          <option value="'Pacifico', cursive">Pacifico</option>
+        </select></label>
         <div class="ctl wide"><span>Shadow</span>
           <div class="seg" id="t-shade" role="group" aria-label="Shadow colour">
             <button type="button" data-v="#c6f432" aria-pressed="true">Lime</button>
@@ -299,7 +315,8 @@ const typeBody = `<header class="doc-head">
     ['color / shade', 'block colour / shadow colour', 'currentColor / none'],
     ['depth', 'shadow depth, in blocks', '1'],
     ['gap', 'gap between blocks, as a fraction of a block', '0.1'],
-    ['font / weight', 'font family and weight to rasterise', 'inherited / 800'],
+    ['shape', '<code>square</code> <code>dot</code> <code>round</code> <code>plus</code> <code>diamond</code>: how each block is drawn', 'square'],
+    ['font / weight', 'font family and weight to rasterise; any loaded font works', 'inherited / 800'],
     ['align', '<code>left</code> <code>center</code> <code>right</code> for multi-line text', 'left'],
     ['intro', '<code>none</code> skips the rain-in', 'on']
   ])}
@@ -331,7 +348,7 @@ const pages = [
   ['index.html', { key: 'index', title: 'Components', desc: 'Every Piixpal component: sprites, pals and pixel type.', body: indexBody }],
   ['sprites.html', { key: 'sprites', title: 'Sprites', desc: `${sprites.length} inline pixel sprites with cursor-following eyes. Copy a tag, paste it anywhere.`, body: spritesBody }],
   ['pals.html', { key: 'pals', title: 'Pals', desc: 'Pixel characters that live on your page: crawl, bounce, peek, perch, hang, follow, creep.', body: palsBody }],
-  ['type.html', { key: 'type', title: 'Pixel type', desc: 'Chunky extruded pixel lettering that pals can walk on.', body: typeBody }]
+  ['type.html', { key: 'type', title: 'Pixel type', desc: 'Chunky extruded pixel lettering that pals can walk on.', body: typeBody, fonts: '<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@800&family=Instrument+Serif&family=Pacifico&display=swap" rel="stylesheet">\n' }]
 ];
 for (const [file, p] of pages) writeFileSync(join(out, file), page(p));
 console.log(`components/  ${pages.length} pages, ${sprites.length} sprites, ${PALS.length} pals`);

@@ -11,6 +11,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@400;600&family=Silkscreen&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@800&family=Instrument+Serif&family=Pacifico&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../site/site.css">
 <link rel="stylesheet" href="../site/docs.css">
 </head>
@@ -85,6 +86,22 @@
         <label class="ctl"><span>Block</span><input type="range" id="t-cell" min="4" max="18" value="12"><output id="t-cell-o">12</output></label>
         <label class="ctl"><span>Depth</span><input type="range" id="t-depth" min="0" max="3" step=".5" value="1"><output id="t-depth-o">1</output></label>
         <label class="ctl"><span>Gap</span><input type="range" id="t-gap" min="0" max=".4" step=".02" value=".1"><output id="t-gap-o">.1</output></label>
+        <div class="ctl wide"><span>Shape</span>
+          <div class="seg" id="t-shape" role="group" aria-label="Block shape">
+            <button type="button" data-v="square" aria-pressed="true">Square</button>
+            <button type="button" data-v="dot" aria-pressed="false">Dot</button>
+            <button type="button" data-v="round" aria-pressed="false">Round</button>
+            <button type="button" data-v="plus" aria-pressed="false">Plus</button>
+            <button type="button" data-v="diamond" aria-pressed="false">Diamond</button>
+          </div>
+        </div>
+        <label class="ctl wide"><span>Font</span><select id="t-font" class="sel">
+          <option value="">Bricolage Grotesque (page font)</option>
+          <option value="'Geist Mono', monospace">Geist Mono</option>
+          <option value="'Silkscreen', monospace">Silkscreen</option>
+          <option value="'Instrument Serif', serif">Instrument Serif</option>
+          <option value="'Pacifico', cursive">Pacifico</option>
+        </select></label>
         <div class="ctl wide"><span>Shadow</span>
           <div class="seg" id="t-shade" role="group" aria-label="Shadow colour">
             <button type="button" data-v="#c6f432" aria-pressed="true">Lime</button>
@@ -109,7 +126,8 @@
 <tr><td><code>color / shade</code></td><td>block colour / shadow colour</td><td>currentColor / none</td></tr>
 <tr><td><code>depth</code></td><td>shadow depth, in blocks</td><td>1</td></tr>
 <tr><td><code>gap</code></td><td>gap between blocks, as a fraction of a block</td><td>0.1</td></tr>
-<tr><td><code>font / weight</code></td><td>font family and weight to rasterise</td><td>inherited / 800</td></tr>
+<tr><td><code>shape</code></td><td><code>square</code> <code>dot</code> <code>round</code> <code>plus</code> <code>diamond</code>: how each block is drawn</td><td>square</td></tr>
+<tr><td><code>font / weight</code></td><td>font family and weight to rasterise; any loaded font works</td><td>inherited / 800</td></tr>
 <tr><td><code>align</code></td><td><code>left</code> <code>center</code> <code>right</code> for multi-line text</td><td>left</td></tr>
 <tr><td><code>intro</code></td><td><code>none</code> skips the rain-in</td><td>on</td></tr>
 </tbody></table></div>

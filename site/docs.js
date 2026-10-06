@@ -64,14 +64,18 @@
   /* ---------- type customiser ---------- */
   const ty = $('#t-demo');
   if (ty) {
-    const st = { text: 'hello', cell: 12, depth: 1, gap: .1, shade: '#c6f432' };
+    const st = { text: 'hello', cell: 12, depth: 1, gap: .1, shade: '#c6f432', shape: 'square', font: '' };
     const render = () => {
       ty.setAttribute('text', st.text || ' ');
       ty.setAttribute('cell', st.cell);
       ty.setAttribute('depth', st.depth);
       ty.setAttribute('gap', st.gap);
       st.shade ? ty.setAttribute('shade', st.shade) : ty.removeAttribute('shade');
+      ty.setAttribute('shape', st.shape);
+      st.font ? ty.setAttribute('font', st.font) : ty.removeAttribute('font');
       const a = [`text="${st.text}"`, `cell="${st.cell}"`];
+      if (st.shape !== 'square') a.push(`shape="${st.shape}"`);
+      if (st.font) a.push(`font="${st.font.replace(/"/g, "'")}"`);
       if (st.depth !== 1) a.push(`depth="${st.depth}"`);
       if (st.gap !== .1) a.push(`gap="${st.gap}"`);
       if (st.shade) a.push(`shade="${st.shade}"`);
@@ -83,6 +87,8 @@
     $('#t-depth').addEventListener('input', e => { st.depth = +e.target.value; $('#t-depth-o').value = st.depth; render(); });
     $('#t-gap').addEventListener('input', e => { st.gap = +e.target.value; $('#t-gap-o').value = st.gap; render(); });
     seg($('#t-shade'), 'v', v => { st.shade = v; render(); });
+    seg($('#t-shape'), 'v', v => { st.shape = v; render(); });
+    $('#t-font').addEventListener('change', e => { st.font = e.target.value; render(); });
     $('#t-replay').addEventListener('click', () => ty.replay && ty.replay());
     render();
   }
