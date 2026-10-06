@@ -131,3 +131,19 @@ document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click'
     clear.hidden = false;
   }));
 })();
+
+/* ---------- scatter twinkling sparkles across the hero ---------- */
+(() => {
+  const hero = document.querySelector('.hero');
+  if (!hero) return;
+  const box = document.createElement('div');
+  box.className = 'sparks'; box.setAttribute('aria-hidden', 'true');
+  const colors = ['var(--ink)', 'var(--lime-2)', 'var(--coral)', 'var(--violet)', 'var(--sky)'];
+  for (let i = 0; i < 16; i++) {
+    const s = document.createElement('i');
+    const size = [4, 5, 6][i % 3];
+    s.style.cssText = `left:${(Math.random() * 96 + 2).toFixed(1)}%;top:${(Math.random() * 90 + 4).toFixed(1)}%;--s:${size}px;--c:${colors[i % colors.length]};--t:${(2.6 + Math.random() * 3).toFixed(2)}s;--d:${(-Math.random() * 5).toFixed(2)}s`;
+    box.appendChild(s);
+  }
+  hero.prepend(box);
+})();
