@@ -4823,6 +4823,27 @@ defineBehavior('wire', (a, [el], host) => {
   });
 })();
 
+/* ---- sprites/alien.js ---- */
+/* ALIEN: a tiny visitor with three eyes and one antenna. Has questions about your CSS. */
+(() => {
+  const body = ant => art.outline(art.paint(14, 15, (x, y) => {
+    if (x === 7 && y >= 1 && y <= 3) return 'g';
+    if (art.ellipse(x, y, 7 + ant, 1, 1.3, 1.3)) return 'p';                               /* antenna bulb */
+    if (art.ellipse(x, y, 7, 8, 5.8, 5.6)) return y < 6 && x < 6 ? 'G' : 'g';
+    if (y >= 13 && (x === 4 || x === 9)) return 'g';
+    return null;
+  }));
+  const face = rows => art.compose(rows, [3, 7, ['ww.ww.ww'.replace(/\./g, 'g')]], [3, 8, ['ww.ww.ww'.replace(/\./g, 'g')]], [6, 11, ['kk']]);
+  defineFigure('alien', {
+    w: 14, h: 15, fps: 2,
+    tag: 'A tiny visitor with three eyes and one antenna. Has questions about your CSS.',
+    palette: { k: '#17121f', g: '#7bd63a', G: '#c8f58a', p: '#ff7aa8', w: '#ffffff' },
+    frames: [face(body(0)), face(body(1)), face(body(0)), face(body(-1))],
+    eyes: [{ x: 3, y: 7, w: 2, h: 2 }, { x: 6, y: 7, w: 2, h: 2 }, { x: 9, y: 7, w: 2, h: 2 }],
+    lid: 'g'
+  });
+})();
+
 /* ---- sprites/avocado.js ---- */
 /* AVOCADO: half an avocado, proudly showing off its pit. Ripe for exactly one day. */
 (() => {
@@ -4840,6 +4861,26 @@ defineBehavior('wire', (a, [el], host) => {
     frames: [art.compose(body, [3, 5, ['ww']], [3, 6, ['ww']], [8, 5, ['ww']], [8, 6, ['ww']])],
     eyes: [{ x: 3, y: 5, w: 2, h: 2 }, { x: 8, y: 5, w: 2, h: 2 }],
     lid: 'a'
+  });
+})();
+
+/* ---- sprites/battery.js ---- */
+/* BATTERY: a battery that is always charging and always at 1%. Brave. */
+(() => {
+  const shell = art.outline(art.paint(18, 11, (x, y) => art.rrect(x, y, 1, 1, 14, 9, 1) ? 'w' : (x >= 15 && x <= 16 && y >= 4 && y <= 6 ? 'm' : null)));
+  const level = n => {
+    let r = shell;
+    for (let i = 0; i < n; i++) r = art.compose(r, [3 + i * 3, 7, ['gg']], [3 + i * 3, 8, ['gg']]);   /* charge bars along the bottom */
+    return r;
+  };
+  const face = rows => art.compose(rows, [5, 3, ['ww']], [5, 4, ['ww']], [9, 3, ['ww']], [9, 4, ['ww']], [7, 5, ['kk']]);
+  defineFigure('battery', {
+    w: 18, h: 11, fps: 3,
+    tag: 'A battery that is always charging and always at one percent. Brave.',
+    palette: { k: '#17121f', w: '#f3f0fa', m: '#9aa3b5', g: '#7bd63a' },
+    frames: [0, 1, 2, 3, 4, 0].map(n => face(level(n))),
+    eyes: [{ x: 5, y: 3, w: 2, h: 2 }, { x: 9, y: 3, w: 2, h: 2 }],
+    lid: 'w'
   });
 })();
 
@@ -5301,6 +5342,34 @@ defineBehavior('wire', (a, [el], host) => {
   });
 })();
 
+/* ---- sprites/dragon.js ---- */
+/* DRAGON: a pocket dragon. Flaps its little wings. Breathes a little fire now and then. */
+(() => {
+  const body = (wing, fire) => {
+    let rows = art.outline(art.paint(18, 14, (x, y) => {
+      if (art.ellipse(x, y, 7, 9, 4.6, 3.6)) return y >= 10 && x >= 5 && x <= 9 ? 'c' : 'g';      /* belly */
+      if (art.ellipse(x, y, 12.5, 5, 3.4, 3)) return 'g';                                         /* head */
+      if (x >= 14 && x <= 15 && y >= 5 && y <= 6) return 'g';                                      /* snout */
+      if (y >= 7 && y <= 9 && x >= 0 && x <= 3 && y - 7 >= 3 - x) return 'g';                      /* tail */
+      if ((x === 11 || x === 13) && y === 1) return 'G';                                          /* horns */
+      /* wing up or down */
+      if (wing ? (y >= 1 && y <= 5 && x >= 3 && x <= 8 && y >= 6 - (x - 3) * .9) : (y >= 4 && y <= 7 && x >= 2 && x <= 6 && y <= 3 + (6 - x))) return 'G';
+      if (y === 13 && (x === 5 || x === 9)) return 'g';
+      return null;
+    }));
+    if (fire) rows = art.compose(rows, [16, 4, ['y.']], [16, 5, ['oy']], [16, 6, ['y.']]);
+    return rows;
+  };
+  defineFigure('dragon', {
+    w: 18, h: 14, fps: 5,
+    tag: 'A pocket dragon. Flaps its little wings. Breathes a little fire now and then.',
+    palette: { k: '#17121f', g: '#25b89a', G: '#9be0c8', c: '#fff1de', y: '#ffd23f', o: '#ff7a2f', w: '#ffffff' },
+    frames: [body(1), body(0), body(1), body(0), body(1), body(0), body(1, 1), body(0, 1)],
+    eyes: [{ x: 12, y: 4, w: 2, h: 2 }],
+    lid: 'g'
+  });
+})();
+
 /* ---- sprites/egg.js ---- */
 /* EGG: an egg with a crack and a lot of questions. */
 defineFigure('egg', {
@@ -5327,6 +5396,75 @@ defineFigure('egg', {
   pupilKey: 'k',
   lid: 'e'
 });
+
+/* ---- sprites/floppy.js ---- */
+/* FLOPPY: a floppy disk who remembers when 1.44 MB was a lot. Also, the save icon. */
+defineFigure('floppy', {
+  w: 14, h: 14,
+  tag: 'A floppy disk who remembers when 1.44 MB was a lot. Also, the save icon.',
+  palette: { k: '#17121f', b: '#58c8ff', s: '#d9dde8', S: '#9aa3b5', l: '#ffffff', w: '#ffffff', p: '#ff9cc2' },
+  frames: [[
+    'kkkkkkkkkkkkk.',
+    'kbbksssssskbbk',
+    'kbbksSSssskbbk',
+    'kbbksSSssskbbk',
+    'kbbksssssskbbk',
+    'kbbbkkkkkkbbbk',
+    'kbbbbbbbbbbbbk',
+    'kbbkkkkkkkkbbk',
+    'kbbklllllllbbk'.slice(0, 14),
+    'kbbklwwllwwlbk'.slice(0, 13) + 'k',
+    'kbbklwwllwwlbk'.slice(0, 13) + 'k',
+    'kbbklpllllplbk'.slice(0, 13) + 'k',
+    'kbbklllkklllbk'.slice(0, 13) + 'k',
+    'kkkkkkkkkkkkkk'
+  ]],
+  eyes: [{ x: 5, y: 9, w: 2, h: 2 }, { x: 9, y: 9, w: 2, h: 2 }],
+  lid: 'l'
+});
+
+/* ---- sprites/heart.js ---- */
+/* HEART: a like button with feelings. Beats. Gets a little bigger when you hover nearby. */
+(() => {
+  const heart = (big) => art.outline(art.paint(15, 13, (x, y) => {
+    const s = big ? 1 : .9, cx = 7.5, cy = 7;
+    const X = (x + .5 - cx) / (5.9 * s), Y = -(y + .5 - cy) / (5.4 * s);
+    /* the classic implicit heart curve */
+    const v = (X * X + Y * Y - 1) ** 3 - X * X * Y * Y * Y * 1.4;
+    return v <= 0 ? ((x < 6 && y < 5) ? 'H' : 'r') : null;
+  }));
+  defineFigure('heart', {
+    w: 15, h: 13, fps: 2.5,
+    tag: 'A like button with feelings. Beats steadily, blushes easily.',
+    palette: { k: '#17121f', r: '#ff4d6d', H: '#ffb3c0', w: '#ffffff' },
+    frames: [heart(true), heart(false), heart(true), heart(true)].map(rows => art.compose(rows, [4, 6, ['ww']], [4, 7, ['ww']], [9, 6, ['ww']], [9, 7, ['ww']])),
+    eyes: [{ x: 4, y: 6, w: 2, h: 2 }, { x: 9, y: 6, w: 2, h: 2 }],
+    lid: 'r'
+  });
+})();
+
+/* ---- sprites/inbox.js ---- */
+/* INBOX: an envelope with a notification badge it cannot stop checking. */
+(() => {
+  const env = art.outline(art.paint(16, 13, (x, y) => {
+    if (art.rrect(x, y, 1, 3, 14, 11, 1)) {
+      /* the flap: a V from the top corners */
+      const v = Math.abs(x - 7.5) * .62 + 3;
+      return y <= v + .4 && y >= v - .6 ? 'k' : y < v ? 'E' : 'e';
+    }
+    return null;
+  }));
+  /* a red badge with a white 1 in it */
+  const badge = () => art.compose(env, [12, 0, ['.rr.', 'rrrr', 'rrrr', '.rr.']], [13, 1, ['w', 'w']]);
+  defineFigure('inbox', {
+    w: 16, h: 13, fps: .8,
+    tag: 'An envelope with a notification badge it cannot stop checking.',
+    palette: { k: '#17121f', e: '#fff7ec', E: '#ffe3c2', r: '#ff4d6d', w: '#ffffff' },
+    frames: [env, badge(), badge(), badge()],
+    eyes: [{ x: 5, y: 8, w: 2, h: 2 }, { x: 9, y: 8, w: 2, h: 2 }],
+    lid: 'e'
+  });
+})();
 
 /* ---- sprites/loaf.js ---- */
 /* LOAF: a ginger cat in its most efficient shape. Ears twitch when you're not looking. */
@@ -5374,6 +5512,21 @@ defineFigure('mochi', {
   eyes: [{ x: 3, y: 4, w: 2, h: 2 }, { x: 9, y: 4, w: 2, h: 2 }],
   lid: 'b'
 });
+
+/* ---- sprites/modem.js ---- */
+/* MODEM: a dial-up modem. Its lights blink in a pattern only it understands. */
+(() => {
+  const body = art.outline(art.paint(18, 10, (x, y) => art.rrect(x, y, 1, 2, 16, 8, 1) ? (y <= 3 ? 'M' : 'm') : (y === 9 && (x === 3 || x === 14) ? 'm' : null)));
+  const lights = pattern => [4, 7, 10, 13].reduce((r, x, i) => art.put(r, x, 7, [pattern[i] ? 'g' : 'd']), body);
+  defineFigure('modem', {
+    w: 18, h: 10, fps: 6,
+    tag: 'A dial-up modem. Its lights blink in a pattern only it understands.',
+    palette: { k: '#17121f', m: '#c9c3d6', M: '#ece8f3', g: '#c6f432', d: '#5c5470', w: '#ffffff' },
+    frames: [[1, 0, 1, 0], [0, 1, 1, 0], [1, 1, 0, 1], [0, 0, 1, 1], [1, 0, 0, 1], [1, 1, 1, 1]].map(lights),
+    eyes: [{ x: 5, y: 4, w: 2, h: 2 }, { x: 11, y: 4, w: 2, h: 2 }],
+    lid: 'm', pupilKey: 'k'
+  });
+})();
 
 /* ---- sprites/onigiri.js ---- */
 /* ONIGIRI: a rice ball in a seaweed jacket. Calm, round-ish, triangular. */
@@ -5423,6 +5576,26 @@ defineFigure('onigiri', {
     frames: [base, art.put(base, 5, 6, ['R']), art.put(base, 10, 6, ['R'])],
     eyes: [{ x: 4, y: 4, w: 2, h: 2 }, { x: 10, y: 4, w: 2, h: 2 }],
     lid: 'p'
+  });
+})();
+
+/* ---- sprites/prompty.js ---- */
+/* PROMPTY: a chat bubble who is always just about to reply. Thinking… thinking… */
+(() => {
+  const body = art.outline(art.paint(16, 13, (x, y) => {
+    if (art.rrect(x, y, 1, 1, 14, 9, 3)) return 'b';
+    if (y >= 10 && y <= 11 && x >= 3 && x <= 5 - (y - 10)) return 'b';                   /* the tail */
+    return null;
+  }));
+  const dots = n => [4, 7, 10].reduce((r, x, i) => art.put(r, x, 7, [i < n ? 'kk' : 'BB']), body);
+  defineFigure('prompty', {
+    w: 16, h: 13, fps: 3,
+    tag: 'A chat bubble who is always just about to reply. Thinking… thinking…',
+    palette: { k: '#17121f', b: '#6b4cff', B: '#a995ff', w: '#ffffff' },
+    frames: [0, 1, 2, 3].map(dots),
+    eyes: [{ x: 4, y: 3, w: 3, h: 3 }, { x: 9, y: 3, w: 3, h: 3 }],
+    pupil: { w: 2, h: 2 },
+    lid: 'b', pupilKey: 'w', glint: null
   });
 })();
 
@@ -5558,6 +5731,22 @@ defineFigure('onigiri', {
   });
 })();
 
+/* ---- sprites/token.js ---- */
+/* TOKEN: a little gold token that spins. Every model wants it. Context is everything. */
+(() => {
+  /* a spinning coin: the same disc squashed to different widths */
+  const coin = w => art.outline(art.paint(14, 14, (x, y) => art.ellipse(x, y, 7, 7, Math.max(.8, 5.8 * w), 5.8) ? (Math.abs(x + .5 - 7) < 5.8 * w - 1.6 ? 'y' : 'd') : null));
+  const face = rows => art.compose(rows, [5, 6, ['ww']], [5, 7, ['ww']], [8, 6, ['ww']], [8, 7, ['ww']]);
+  defineFigure('token', {
+    w: 14, h: 14, fps: 7,
+    tag: 'A little gold token that spins. Every model wants it. Context is everything.',
+    palette: { k: '#17121f', y: '#ffd23f', d: '#e09a12', w: '#ffffff' },
+    frames: [face(coin(1)), face(coin(1)), face(coin(1)), coin(.7), coin(.35), coin(.12), coin(.35), coin(.7)],
+    eyes: [{ x: 5, y: 6, w: 2, h: 2 }, { x: 8, y: 6, w: 2, h: 2 }],
+    lid: 'y'
+  });
+})();
+
 /* ---- sprites/ufo.js ---- */
 /* UFO: a very small visitor. Came in peace, stayed for the cursor. */
 (() => {
@@ -5579,6 +5768,28 @@ defineFigure('onigiri', {
     frames: [base, art.put(base, 0, 7, ['kdddldddldddlddk'])],
     eyes: [{ x: 5, y: 2, w: 2, h: 2 }, { x: 9, y: 2, w: 2, h: 2 }],
     lid: 'g'
+  });
+})();
+
+/* ---- sprites/wizard.js ---- */
+/* WIZARD: a very small wizard whose hat does most of the work. Sparkles on request. */
+(() => {
+  const body = art.outline(art.paint(16, 18, (x, y) => {
+    /* a tall, slightly bent hat */
+    if (y <= 7 && Math.abs(x + .5 - (8 + (7 - y) * .25)) <= y * .55 + .6) return (x + y) % 5 === 0 ? 'S' : 'h';
+    if (y === 8 && x >= 2 && x <= 13) return 'h';
+    if (art.ellipse(x, y, 8, 11, 3.6, 2.8)) return 'f';                                        /* face */
+    if (art.ellipse(x, y, 8, 15, 4.8, 2.8)) return y < 14 ? 'w' : 'r';                        /* beard + robe */
+    return null;
+  }));
+  const sparkle = pts => pts.reduce((r, [x, y]) => art.put(r, x, y, ['S']), body);
+  defineFigure('wizard', {
+    w: 16, h: 18, fps: 3,
+    tag: 'A very small wizard whose hat does most of the work. Sparkles on request.',
+    palette: { k: '#17121f', h: '#6b4cff', S: '#ffd23f', f: '#ffd9b5', w: '#f3f0fa', r: '#6b4cff' },
+    frames: [body, sparkle([[1, 2], [14, 6]]), sparkle([[0, 6], [15, 1]]), body],
+    eyes: [{ x: 6, y: 10, w: 1, h: 2 }, { x: 9, y: 10, w: 1, h: 2 }],
+    lid: 'f'
   });
 })();
 
