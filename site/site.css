@@ -30,3 +30,45 @@ code,kbd,pre{font-family:var(--f-mono)}
 .pix{font-family:var(--f-pix);font-weight:400;letter-spacing:.02em;text-transform:uppercase}
 .sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 :focus-visible{outline:var(--px) solid var(--violet);outline-offset:3px;border-radius:6px}
+
+/* ---------- buttons: chunky, with a pixel-press ---------- */
+.btn{
+  --bg:var(--card); --fg:var(--ink); --sh:var(--ink);
+  position:relative;display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  height:50px;padding:0 22px;border:2px solid var(--ink);border-radius:12px;
+  background:var(--bg);color:var(--fg);font:650 16px/1 var(--f-sans);letter-spacing:-.01em;
+  text-decoration:none;cursor:pointer;white-space:nowrap;user-select:none;
+  box-shadow:0 4px 0 0 var(--sh);transform:translateY(0);
+  transition:transform .22s var(--spring),box-shadow .22s var(--spring),background-color .2s,color .2s;
+}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 0 var(--sh)}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 0 var(--sh);transition-duration:.05s}
+.btn-lime{--bg:var(--lime)}
+.btn-ink{--bg:var(--ink);--fg:var(--paper);--sh:var(--lime-2)}
+.btn-ghost{--bg:transparent;box-shadow:none}
+.btn-ghost:hover{--bg:var(--paper-2);box-shadow:none;transform:none}
+.btn-sm{height:40px;padding:0 16px;font-size:14.5px;border-radius:10px;box-shadow:0 3px 0 0 var(--sh)}
+.btn-sm:hover{box-shadow:0 5px 0 0 var(--sh)}
+.btn .k{font:500 13px/1 var(--f-mono);opacity:.75}
+.btn svg{width:18px;height:18px;flex:none}
+
+/* ---------- nav ---------- */
+.nav{position:sticky;top:0;z-index:50;background:color-mix(in oklab,var(--paper) 84%,transparent);
+  backdrop-filter:saturate(1.4) blur(12px);-webkit-backdrop-filter:saturate(1.4) blur(12px);
+  border-bottom:2px solid transparent;transition:border-color .3s,background-color .3s}
+.nav.scrolled{border-bottom-color:var(--ink)}
+.nav-in{display:flex;align-items:center;gap:28px;height:72px}
+.logo{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font:800 24px/1 var(--f-sans);letter-spacing:-.04em}
+.logo svg{width:30px;height:30px;transition:transform .35s var(--spring)}
+.logo:hover svg{transform:rotate(-8deg) scale(1.08)}
+.logo .i{position:relative;display:inline-block}
+.logo .i::after{content:"";position:absolute;left:50%;top:-.02em;width:.2em;height:.2em;margin-left:-.1em;background:var(--lime-2);
+  box-shadow:0 0 0 1.5px var(--ink)}
+.logo .i:nth-of-type(2)::after{background:var(--coral);animation:dot-hop 3.6s steps(2) infinite}
+@keyframes dot-hop{0%,86%,100%{transform:translateY(0)}90%{transform:translateY(-.14em)}}
+.links{display:flex;gap:4px;margin-left:auto}
+.links a{position:relative;text-decoration:none;font-weight:550;font-size:15.5px;padding:8px 12px;border-radius:9px;color:var(--ink-2);transition:background-color .2s,color .2s}
+.links a:hover{background:var(--paper-2);color:var(--ink)}
+.nav .btn{margin-left:4px}
+.stars{font:600 12.5px/1 var(--f-mono);padding:3px 6px;border-radius:6px;background:color-mix(in oklab,var(--paper) 16%,transparent)}
+@media (max-width:820px){.links{display:none}.nav .btn{margin-left:auto}}
