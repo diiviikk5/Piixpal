@@ -290,6 +290,19 @@ const art = {
 };
 Piixpal.art = art;
 
+/* ---------- testing hook: run the simulation forward without waiting for frames ---------- */
+Piixpal.advance = (seconds = 1, fps = 60) => {
+  const dt = 1 / fps;
+  let t = lastT || now();
+  for (let i = 0, n = Math.round(seconds * fps); i < n; i++) {
+    t += dt * 1000;
+    scroll.v = lerp(scroll.v, (scrollY - scroll.y) / dt, .25); scroll.y = scrollY;
+    layerOrigin();
+    subs.forEach(fn => fn(dt, t));
+  }
+  lastT = 0;
+};
+
 /* ---- icons.js ---- */
 /* Tiny glyphs for speech bubbles. Drawn, not typed: no fonts are loaded. */
 const ICON_PAL = { k: '#1b1226', r: '#ff4d6d', b: '#3fc8ff', y: '#ffc93f', g: '#7bd63a' };
@@ -356,6 +369,103 @@ const drag = (actor, e, { move, end }) => {
   cv.addEventListener('pointerup', up);
   cv.addEventListener('pointercancel', up);
 };
+
+/* ---- behaviors/bounce.js ---- */
+/* bounce: hop happily along the top of an element. Leaps at the cursor if it hovers
+ * close. Grab it and throw it; it squashes on landing and gets dizzy if you overdo it.
+ * Click (without dragging) for a big jump. */
+defineBehavior('bounce', (a, [el], host) => {
+  const S = a.s / 4;
+  const G = 2400 * S;                       /* gravity, px/s² */
+  const energy = +host.getAttribute('energy') || 1;
+  let vx = 0, vy = 0, state = 'air', wait = 0, placed = false, spin = 0;
+  let sq = 0, sqv = 0;                      /* squash spring: + is tall, - is flat */
+  let dizzy = 0, combo = 0;
+
+  const floor = r => r.t;
+  const jump = (power = 1, toward = null) => {
+    vy = -rnd(560, 760) * Math.sqrt(S) * power * energy;
+    vx = toward != null ? clamp((toward - a.x) * 1.6, -380 * S, 380 * S) : rnd(-110, 110) * S;
+    if (Math.abs(vx) > 8) a.face = vx > 0 ? 1 : -1;
+    sqv += 9; state = 'air';
+  };
+
+  return {
+    tick(dt) {
+      const r = rectOf(el);
+      if (!placed) {
+        const at = host.getAttribute('at');
+        a.x = r.l + r.w * (at != null ? clamp(+at, 0, 1) : rnd(.2, .8));
+        a.y = floor(r) - 200 * S; state = 'air'; placed = true;
+      }
+      if (reduced()) { a.y = floor(r); a.play('idle'); return; }
+      if (state === 'held') return;
+
+      const L = r.l + a.w / 2, R = r.r - a.w / 2;
+      if (state === 'air') {
+        vy += G * dt;
+        a.x += vx * dt; a.y += vy * dt;
+        if (a.x < L) { a.x = L; vx = Math.abs(vx) * .7; sqv -= 4; }
+        if (a.x > R) { a.x = R; vx = -Math.abs(vx) * .7; sqv -= 4; }
+        spin *= Math.pow(.2, dt);
+        a.rot += spin * dt;
+        a.play(vy < 0 ? 'rise' : 'air');
+        sq = lerp(sq, clamp(Math.abs(vy) / 2600, 0, .22), .3);
+        if (a.y >= floor(r)) {
+          const impact = vy;
+          a.y = floor(r); a.rot = 0; spin = 0;
+          sq = -clamp(impact / 2200, .12, .42); sqv = 0;
+          if (impact > 2100 * Math.sqrt(S) || combo > 2) {
+            dizzy = 2.2; combo = 0; a.say('star', 1800); a.play('dizzy');
+            state = 'ground'; wait = 2.2; vx = 0;
+          } else if (impact > 600 * Math.sqrt(S)) {
+            /* a bouncy landing keeps some of its speed */
+            vy = -impact * .45; vx *= .8; state = 'air'; a.play('land');
+          } else {
+            state = 'ground'; wait = rnd(.15, .9); vx = 0; combo = 0;
+            a.play('land');
+          }
+        }
+      } else {
+        a.y = floor(r);
+        a.x = clamp(a.x, L, R);
+        wait -= dt;
+        if (dizzy > 0) { dizzy -= dt; a.play('dizzy'); }
+        else if (wait < .1) a.play('land');
+        else a.play('idle');
+        /* the cursor is a toy */
+        const d = ptrDist(a.x, a.y - a.h / 2);
+        if (dizzy <= 0 && ptr.seen && d < 170 * S && ptr.y < a.y && wait > .05 && chance(dt * 5)) {
+          jump(clamp((a.y - ptr.y) / (200 * S), .8, 1.5), ptr.x); a.say(chance(.5) ? 'heart' : 'note', 700);
+        } else if (wait <= 0 && dizzy <= 0) {
+          jump(chance(.15) ? 1.35 : rnd(.55, 1));
+        }
+      }
+
+      /* squash & stretch spring */
+      sqv += (-sq * 260 - sqv * 14) * dt;
+      sq += sqv * dt;
+      a.sy = 1 + sq; a.sx = 1 - sq * .7;
+    },
+    grab(e) {
+      const was = state;
+      drag(a, e, {
+        move: (x, y) => { state = 'held'; a.x = x; a.y = y + a.h * .35; a.rot = 0; a.play('held'); },
+        end: ({ moved, vx: tx, vy: ty }) => {
+          if (!moved) {
+            if (was === 'held') return;
+            if (state === 'ground' || state === 'air') { jump(1.6); spin = (chance(.5) ? 1 : -1) * 720; a.say('!', 600); }
+            return;
+          }
+          vx = tx; vy = ty; state = 'air';
+          spin = clamp(tx * .9, -900, 900);
+          if (Math.hypot(tx, ty) > 1600) { combo = 3; a.say('!?', 800); }
+        }
+      });
+    },
+    poke() { jump(1.6); }
+  };
+});
 
 /* ---- behaviors/crawl.js ---- */
 /* crawl: walk along the top of an element's text, hop over gaps and letter steps,
@@ -525,6 +635,352 @@ defineBehavior('crawl', (a, [el], host) => {
   };
 });
 
+/* ---- behaviors/hang.js ---- */
+/* hang: dangles from the bottom edge of an element on a silk thread. Swings when the
+ * page scrolls or the cursor brushes past, zips up when you reach for it, then lowers
+ * itself back down, legs wiggling. Poke it and it yo-yos. */
+defineBehavior('hang', (a, [el], host) => {
+  const S = a.s / 3;
+  const at = host.getAttribute('at') != null ? clamp(+host.getAttribute('at'), 0, 1) : .82;
+  const rest = (+host.getAttribute('length') || 70) * S;
+  let L = 0, Lv = 0, goal = rest;            /* thread length and its spring */
+  let th = 0, w = 0;                         /* pendulum angle (rad) and angular speed */
+  let state = 'lower', timer = 0, lastV = 0;
+
+  const silk = document.createElement('div');
+  silk.className = 'thread';
+  silk.style.width = Math.max(1, Math.round(a.s / 2)) + 'px';
+  silk.style.color = host.getAttribute('silk') || '#1b1226';
+  a.node.parentNode.insertBefore(silk, a.node);
+  a.cv.style.transformOrigin = '50% 0';
+  a.node.classList.add('nograb');
+
+  return {
+    tick(dt, t) {
+      const r = rectOf(el);
+      const ax = r.l + r.w * at, ay = r.b;
+      if (reduced()) { L = rest; th = 0; }
+      else {
+        /* scroll gives the spider a shove (it lags behind the page) */
+        const acc = (scroll.v - lastV) / Math.max(dt, .001);
+        lastV = scroll.v;
+        w += clamp(acc * .00002, -2, 2) + (chance(dt * .4) ? rnd(-.15, .15) : 0);
+        /* the cursor sweeping past the spider pushes it */
+        const px = a.x, py = a.y - a.h / 2;
+        if (ptr.seen && Math.abs(ptr.x - px) < 40 * S && Math.abs(ptr.y - py) < 60 * S) w += clamp(ptr.vx * .00009, -.25, .25);
+
+        const g = 9.8 * 160;
+        w += (-g / Math.max(L, 20) * Math.sin(th) - w * 1.1) * dt;
+        th = clamp(th + w * dt, -1.2, 1.2);
+
+        const near = ptr.seen && ptrDist(px, py) < 75 * S;
+        timer -= dt;
+        switch (state) {
+          case 'lower':
+            goal = rest + Math.sin(t / 1600) * 10 * S;
+            a.play(Math.abs(Lv) > 30 ? 'wiggle' : 'idle');
+            if (near) { state = 'flee'; a.play('scared'); a.say(chance(.5) ? '!' : 'sweat', 700); }
+            break;
+          case 'flee':
+            goal = 10 * S;
+            a.play('scared');
+            if (!near) { state = 'wait'; timer = rnd(1.2, 2.2); }
+            break;
+          case 'wait':
+            goal = 10 * S;
+            a.play('idle');
+            if (near) state = 'flee';
+            else if (timer <= 0) state = 'lower';
+            break;
+        }
+        /* fast up, slow down */
+        const k = goal < L ? 140 : 18;
+        Lv += ((goal - L) * k - Lv * (goal < L ? 18 : 6)) * dt;
+        L = Math.max(4, L + Lv * dt);
+      }
+      const ex = ax + Math.sin(th) * L, ey = ay + Math.cos(th) * L;
+      a.x = ex; a.y = ey + a.h;
+      a.rot = -th * 57.3;
+      /* render() turns the canvas around its top, so pivot the foot point to match */
+      silk.style.height = Math.round(L + 2) + 'px';
+      silk.style.transform = `translate3d(${Math.round(ax - origin.x)}px,${Math.round(ay - origin.y)}px,0) rotate(${(-th * 57.3).toFixed(2)}deg)`;
+    },
+    poke() {
+      Lv += 520 * S; w += rnd(-1.2, 1.2);
+      a.say(pick(['!', 'heart', '!?']), 700);
+    },
+    destroy() { silk.remove(); }
+  };
+});
+
+/* ---- behaviors/mind.js ---- */
+/* mind: minds its own business. Sits on an element and reads, flips pages, dozes off.
+ * Hover nearby for a while and it glances up at you. Poke it and it turns its back.
+ * Poke it three times and it packs up and hops somewhere quieter. */
+defineBehavior('mind', (a, [el], host) => {
+  const S = a.s / 3;
+  let at = host.getAttribute('at') != null ? clamp(+host.getAttribute('at'), 0, 1) : .85;
+  let state = 'read', timer = rnd(4, 8), stare = 0, pokes = [], hop = null, readFor = 0;
+  const has = c => a.has(c);
+  const go = (s, t, clip) => { state = s; timer = t; if (clip && has(clip)) a.play(clip, { reset: true }); };
+  const cache = {};
+  /* where to sit: on the tallest glyph under it if the element has text, else the top edge */
+  const spot = r => {
+    if (typeof el.piixSurface === 'function') { const x = r.l + a.w / 2 + (r.w - a.w) * at; return { x, y: el.piixSurface(x) ?? r.t }; }
+    const tp = host.getAttribute('edge') !== 'box' && textProfile(el, cache);
+    if (tp) {
+      const x = tp.l + a.w / 2 + Math.max(0, tp.r - tp.l - a.w) * at, half = a.w * .3;
+      const under = tp.segs.filter(g => g.r > x - half && g.l < x + half);
+      return { x, y: under.length ? Math.min(...under.map(g => g.t)) : tp.t };
+    }
+    return { x: r.l + a.w / 2 + (r.w - a.w) * at, y: r.t };
+  };
+
+  return {
+    tick(dt) {
+      const r = rectOf(el);
+      if (hop) {
+        hop.p = Math.min(1, hop.p + dt / hop.d);
+        const p = hop.p, q = 1 - p, s = spot(r);
+        a.x = lerp(hop.x0, s.x, p);
+        a.y = q * q * hop.y0 + 2 * q * p * (Math.min(hop.y0, s.y) - 50 * S) + p * p * s.y;
+        a.sy = 1.1; a.sx = .92;
+        if (p >= 1) { hop = null; a.sy = .82; a.sx = 1.15; hop = null; go('back', 1.2, 'back'); }
+        return;
+      }
+      const s = spot(r);
+      a.x = s.x; a.y = s.y;
+      a.sx = lerp(a.sx, 1, .2); a.sy = lerp(a.sy, 1, .2);
+      if (reduced()) { a.play('read'); return; }
+
+      timer -= dt;
+      readFor += dt;
+      const close = ptr.seen && ptrDist(a.x, a.y - a.h / 2) < 110 * S;
+      stare = close ? stare + dt : Math.max(0, stare - dt * 2);
+
+      switch (state) {
+        case 'read':
+          a.play('read');
+          if (stare > 1.1) { go('look', 1.4, 'look'); a.say('...', 1300); stare = -2; }
+          else if (timer <= 0) {
+            if (readFor > 18 && chance(.5)) { go('doze', rnd(5, 9), 'doze'); a.say('zz', 0); readFor = 0; }
+            else go('flip', .5, 'flip');
+          }
+          break;
+        case 'flip':
+          if (timer <= 0) go('read', rnd(4, 9), 'read');
+          break;
+        case 'doze':
+          if (close && stare > .6) { a.hush(); go('look', 1, 'look'); a.say('!', 700); stare = -2; }
+          else if (timer <= 0) { a.hush(); go('read', rnd(4, 8), 'read'); }
+          break;
+        case 'look':
+          if (timer <= 0) go('read', rnd(4, 8), 'read');
+          break;
+        case 'annoyed':
+          if (timer <= 0) go('back', rnd(3, 4.5), 'back');
+          break;
+        case 'back':
+          if (timer <= 0) { a.say('...', 900); go('read', rnd(4, 8), 'read'); }
+          break;
+      }
+    },
+    poke() {
+      if (hop) return;
+      const t = now();
+      pokes = pokes.filter(p => t - p < 4000).concat(t);
+      a.hush();
+      if (pokes.length >= 3) {
+        /* that's it, moving */
+        pokes = [];
+        a.say('grr', 900);
+        const r = rectOf(el);
+        const old = at;
+        at = old > .5 ? rnd(.05, .35) : rnd(.65, .95);
+        a.face = at > old ? 1 : -1;
+        hop = { x0: a.x, y0: a.y, p: 0, d: clamp(Math.abs(at - old) * r.w / 700, .45, .9) };
+        a.play('back');
+        return;
+      }
+      a.say(pokes.length === 1 ? '!?' : 'vein', 900);
+      go('annoyed', .7, 'annoyed');
+    }
+  };
+});
+
+/* ---- behaviors/peek.js ---- */
+/* peek: hides behind an element and peeks over its top edge. Ears first, then eyes,
+ * then the whole face. Eyes follow the cursor from a safe distance. Get close and it
+ * ducks, then pops up somewhere else along the edge. Poke it: "eep!" */
+defineBehavior('peek', (a, [el], host) => {
+  const S = a.s / 4;
+  const H = a.h;
+  let at = host.getAttribute('at') != null ? clamp(+host.getAttribute('at'), .05, .95) : rnd(.15, .85);
+  let state = 'hidden', timer = rnd(.6, 1.6), depth = H, goal = H, blinkAt = now() + rnd(2000, 5000), eep = 0;
+  const STEPS = { hidden: H, ears: H - 3 * a.s, eyes: H - 7 * a.s, out: 0 };
+  const shy = 95 * S + a.w / 2;
+  const go = (s, t) => { state = s; timer = t; goal = STEPS[s] ?? goal; };
+  a.node.style.clipPath = `inset(-400px -400px ${H}px -400px)`;
+
+  const look = () => {
+    const dx = ptr.x - a.x, dy = ptr.y - (a.y - H * .6);
+    if (!ptr.seen) return 'c';
+    const h = dx < -40 ? 'l' : dx > 40 ? 'r' : '';
+    const v = dy < -40 ? 'u' : dy > 60 ? 'd' : '';
+    const k = v === 'd' ? 'd' : (v + h) || 'c';
+    return a.has(k) ? k : 'c';
+  };
+
+  return {
+    tick(dt) {
+      const r = rectOf(el);
+      a.x = r.l + a.w / 2 + (r.w - a.w) * at;
+      a.y = r.t;
+      if (reduced()) { depth = STEPS.eyes; a.oy = depth; a.play('c'); a.node.style.clipPath = `inset(-400px -400px ${Math.round(depth)}px -400px)`; return; }
+
+      const d = ptr.seen ? ptrDist(a.x, a.y) : 1e9;
+      timer -= dt;
+      if (d < shy && state !== 'hidden' && state !== 'duck') {
+        if (state === 'out' && chance(.35)) a.say('eep', 600);
+        eep = .2; go('duck', rnd(1.4, 2.6)); goal = H;
+      }
+
+      switch (state) {
+        case 'hidden':
+          if (timer <= 0 && d > shy * 1.4) go('ears', rnd(.5, 1.1));
+          break;
+        case 'ears':
+          if (timer <= 0) go('eyes', rnd(.5, 1));
+          break;
+        case 'eyes':
+          if (timer <= 0) go('out', rnd(4, 9));
+          break;
+        case 'out':
+          if (timer <= 0) { go('duck', rnd(1, 3)); goal = H; }
+          break;
+        case 'duck':
+          if (timer <= 0 && d > shy * 1.6) {
+            /* reappear somewhere else along the edge */
+            at = clamp(at + (chance(.5) ? 1 : -1) * rnd(.2, .5), .06, .94);
+            go('hidden', rnd(.3, 1));
+          }
+          break;
+      }
+
+      /* ducking is fast, rising is cautious */
+      const speed = goal > depth ? 14 : 3.2;
+      depth = lerp(depth, goal, 1 - Math.exp(-speed * dt));
+      if (Math.abs(depth - goal) < .5) depth = goal;
+      /* rise in whole sprite-pixels so it stays crisp */
+      const shown = Math.round(depth / a.s) * a.s;
+      a.oy = shown;
+      a.node.style.clipPath = `inset(-400px -400px ${shown}px -400px)`;
+
+      if (eep > 0) { eep -= dt; a.play('eep'); }
+      else if (state !== 'duck') {
+        const t = now();
+        if (t > blinkAt) { a.play('blink'); if (t > blinkAt + 140) blinkAt = t + rnd(2200, 5200); }
+        else a.play(look());
+      }
+    },
+    poke() {
+      if (state === 'hidden' || state === 'duck') return;
+      eep = .35; a.say('eep', 800);
+      go('duck', rnd(2.5, 4)); goal = H;
+    }
+  };
+});
+
+/* ---- behaviors/perch.js ---- */
+/* perch: sits on top of a button or link. Looks around, pecks, sings.
+ * Hover its perch and it takes off, circles, and lands on another perch once the
+ * coast is clear. Give it several perches with on=".btn" and it hops between them. */
+defineBehavior('perch', (a, targets, host) => {
+  const S = a.s / 3;
+  const MAX = 560 * S;
+  let perch = targets[0], frac = rnd(.25, .75), state = 'sit', timer = rnd(2, 4);
+  let vx = 0, vy = 0, goal = null, orbit = 0, cx = 0, cy = 0, calm = 0, placed = false;
+
+  const seat = (el, f) => { const r = rectOf(el); return { x: r.l + r.w * f, y: r.t, r }; };
+  const threatened = el => {
+    if (!ptr.seen) return false;
+    const r = rectOf(el), m = 26 * S;
+    return ptr.x > r.l - m && ptr.x < r.r + m && ptr.y > r.t - a.h - m && ptr.y < r.b + m;
+  };
+  const visible = el => { const r = rectOf(el); return r.w > 0 && r.t > scrollY + a.h && r.b < scrollY + innerHeight; };
+  const choose = () => {
+    const free = targets.filter(el => !threatened(el));
+    const seen = free.filter(visible);
+    const pool = seen.length ? seen : free.length ? free : targets;
+    const others = pool.filter(el => el !== perch);
+    return pick(others.length && chance(.75) ? others : pool);
+  };
+  const takeoff = () => {
+    state = 'fly'; calm = 0; orbit = rnd(0, 6.28);
+    const r = rectOf(perch);
+    cx = clamp(a.x + rnd(-120, 120) * S, 60, docW() - 60);
+    cy = Math.max(scrollY + 60, r.t - rnd(110, 190) * S);
+    vy = -320 * S; vx = (ptr.x > a.x ? -1 : 1) * 160 * S;
+    a.play('fly');
+  };
+
+  return {
+    tick(dt) {
+      if (!placed) { const s = seat(perch, frac); a.x = s.x; a.y = s.y; a.face = chance(.5) ? 1 : -1; placed = true; }
+      if (reduced()) { const s = seat(perch, frac); a.x = s.x; a.y = s.y; a.play('idle'); return; }
+
+      if (state === 'sit') {
+        const s = seat(perch, frac);
+        a.x = s.x; a.y = s.y; a.rot = 0;
+        a.sx = lerp(a.sx, 1, .2); a.sy = lerp(a.sy, 1, .2);
+        if (threatened(perch) || ptrDist(a.x, a.y - a.h / 2) < 50 * S) { takeoff(); if (chance(.4)) a.say('!', 500); return; }
+        timer -= dt;
+        if (a.done || a.clip === 'idle') {
+          if (timer <= 0) {
+            const r = Math.random();
+            if (r < .35) a.play('peck', { loop: false, reset: true });
+            else if (r < .6) a.play('look', { loop: false, reset: true });
+            else if (r < .75) { a.face = -a.face; }
+            else if (r < .85) a.say('note', 1100);
+            timer = rnd(1.5, 4);
+          }
+          if (a.done) a.play('idle', { reset: true });
+        }
+        return;
+      }
+
+      /* flying */
+      const threat = threatened(perch);
+      if (state === 'fly') {
+        orbit += dt * 2.4;
+        goal = { x: cx + Math.cos(orbit) * 70 * S, y: cy + Math.sin(orbit * 2) * 22 * S };
+        calm = threat ? 0 : calm + dt;
+        if (calm > 1.1) { perch = choose(); frac = rnd(.2, .8); state = 'land'; }
+      }
+      if (state === 'land') {
+        const s = seat(perch, frac);
+        goal = { x: s.x, y: s.y };
+        if (threatened(perch)) { cx = a.x; cy = a.y - 60 * S; state = 'fly'; calm = 0; }
+      }
+      const dx = goal.x - a.x, dy = goal.y - a.y, dist = Math.hypot(dx, dy) || 1;
+      const want = state === 'land' ? Math.min(MAX, dist * 5 + 40) : MAX * .7;
+      vx = lerp(vx, dx / dist * want, 1 - Math.exp(-4.5 * dt));
+      vy = lerp(vy, dy / dist * want, 1 - Math.exp(-4.5 * dt));
+      a.x += vx * dt; a.y += vy * dt;
+      if (Math.abs(vx) > 20) a.face = vx > 0 ? 1 : -1;
+      a.rot = clamp(vy / MAX * 12, -12, 12) * a.face;
+      a.play('fly', { fps: vy < -40 ? 16 : 11 });
+      if (state === 'land' && dist < 4 * S) {
+        const s = seat(perch, frac);
+        a.x = s.x; a.y = s.y; vx = vy = 0; a.rot = 0;
+        a.sy = .8; a.sx = 1.15;
+        state = 'sit'; timer = rnd(1, 2.5); a.play('idle', { reset: true });
+      }
+    },
+    poke() { if (state === 'sit') { takeoff(); a.say('!', 600); } }
+  };
+});
+
 /* ---- pals/bitbug.js ---- */
 /* BITBUG — a lime beetle with one very curious antenna.
  * Job: crawls along the top of your text, climbs over letters, scurries if you get close,
@@ -583,6 +1039,243 @@ defineBehavior('crawl', (a, [el], host) => {
       flip: [belly('a'), belly('b')]
     },
     fps: { walk: 10, idle: 3, look: 2, sniff: 4, alarm: 12, flip: 12, hop: 1 }
+  });
+})();
+
+/* ---- pals/boing.js ---- */
+/* BOING — a coral jelly drop with more energy than sense.
+ * Job: bounces on top of an element (footers love it). Grab it, throw it, watch it wobble.
+ * Throw it too hard and it gets dizzy. */
+(() => {
+  const body = [
+    '.....kkkk.....',
+    '...kkcccckk...',
+    '..kcHHccccck..',
+    '.kcHHccccccck.',
+    '.kcHcccccccck.',
+    'kcccccccccccck',
+    'kcccccccccccck',
+    'kcpcccccccccpk',
+    'kdccccccccccdk',
+    'kddccccccccddk',
+    '.kddddddddddk.',
+    '..kkkkkkkkkk..'
+  ];
+  /* eyes: two 2x2 patches at (4,5) and (8,5) */
+  const EYE = {
+    open: ['wk', 'kk'],
+    blink: ['cc', 'kk'],
+    happy: ['kk', 'cc'],
+    dizzy: ['kc', 'ck'],
+    up: ['kk', 'wk']
+  };
+  /* mouth: 4x2 patch at (5,7) */
+  const MOUTH = {
+    flat: ['_kk_', '____'],
+    smile: ['k__k', '_kk_'],
+    open: ['_kk_', '_kk_'],
+    wobble: ['_k_k', 'k_k_']
+  };
+  const jelly = (eye, mouth) => art.compose(body, [4, 5, EYE[eye]], [8, 5, EYE[eye]], [5, 7, MOUTH[mouth]]);
+
+  defineSprite('boing', {
+    w: 14, h: 12, scale: 4,
+    does: 'bounce',
+    palette: {
+      k: '#1b1226', c: '#ff6b4a', H: '#ffd4c4', d: '#cf3f22', p: '#ffb3a0', w: '#ffffff'
+    },
+    frames: {
+      idle: [jelly('open', 'smile'), jelly('open', 'smile'), jelly('open', 'smile'), jelly('blink', 'smile')],
+      air: [jelly('open', 'open')],
+      rise: [jelly('up', 'smile')],
+      land: [jelly('happy', 'flat')],
+      held: [jelly('open', 'wobble'), jelly('blink', 'wobble')],
+      dizzy: [jelly('dizzy', 'wobble'), jelly('dizzy', 'flat')],
+      happy: [jelly('happy', 'smile')]
+    },
+    fps: { idle: 3, held: 8, dizzy: 6 }
+  });
+})();
+
+/* ---- pals/lurk.js ---- */
+/* LURK — big eyes, little hands, zero courage.
+ * Job: hides behind an element and peeks over its edge. Eyes follow you from a distance;
+ * come close and it ducks. Pops up somewhere else along the edge a moment later. */
+(() => {
+  const head = [
+    '...kk......kk...',
+    '..kpuk....kupk..',
+    '..kuuukkkkuuuk..',
+    '.kuuuuuuuuuuuuk.',
+    '.kuuwwwuuwwwuuk.',
+    '.kuuwwwuuwwwuuk.',
+    '.kuuwwwuuwwwuuk.',
+    '.kuuuuuuuuuuuuk.',
+    'khhhkuuuuuukhhhk',
+    'kkkkkkkkkkkkkkkk'
+  ];
+  /* pupil position inside each 3x3 eye (eyes start at col 4 and col 9, row 4) */
+  const pupil = (dx, dy) => art.compose(head, [4 + dx, 4 + dy, ['k']], [9 + dx, 4 + dy, ['k']]);
+  const shut = art.compose(head, [4, 4, ['uuu', 'kkk', 'uuu']], [9, 4, ['uuu', 'kkk', 'uuu']]);
+  const wide = art.compose(head, [4, 4, ['www', 'wkw', 'www']], [9, 4, ['www', 'wkw', 'www']], [2, 3, ['k']], [13, 3, ['k']]);
+
+  defineSprite('lurk', {
+    w: 16, h: 10, scale: 4,
+    does: 'peek',
+    palette: { k: '#1b1226', u: '#58c8ff', h: '#2f97d6', w: '#ffffff', p: '#ff9cc2' },
+    frames: {
+      c: [pupil(1, 1)],
+      l: [pupil(0, 1)],
+      r: [pupil(2, 1)],
+      u: [pupil(1, 0)],
+      ul: [pupil(0, 0)],
+      ur: [pupil(2, 0)],
+      d: [pupil(1, 2)],
+      blink: [shut],
+      eep: [wide]
+    }
+  });
+})();
+
+/* ---- pals/moss.js ---- */
+/* MOSS — a mushroom with a book. Has no interest in you whatsoever.
+ * Job: sits on an element and reads. Dozes off sometimes. Glances up if you hover too long.
+ * Poke it and it turns its back on you. Keep poking and it moves somewhere quieter. */
+(() => {
+  const cap = [
+    '....kkkkkkkk....',
+    '..kkvvvvvvvvkk..',
+    '.kvvVVvvvvwwvvk.',
+    'kvvVVvvvvvwwvvvk',
+    'kvwwvvvvvvvvvvvk',
+    'kvwwvvvvvwwvvvvk',
+    'kkkkkkkkkkkkkkkk'
+  ];
+  const face = {
+    read: ['..kbbbbbbbbbbk..', '..kbkkbbbbkkbk..'],
+    look: ['..kbbbbbbbbbbk..', '..kbwkbbbbwkbk..'],
+    cross: ['..kbkbbbbbbkbk..', '..kbbkbbbbkbbk..'],
+    doze: ['..kbbbbbbbbbbk..', '..kbbbbbbbbbbk..'],
+    back: ['..kbbbbbbbbbbk..', '..kbbbbbbbbbbk..']
+  };
+  const book = [
+    '.kkkkkkkkkkkkkk.',
+    'bkRRRRRRRRRRRRkb',
+    'bkRyyyyyRRRRRRkb',
+    '.kRRRRRRRRRRRRk.',
+    '.kkkkkkkkkkkkkk.'
+  ];
+  const bookLow = [
+    '..kbbbbbbbbbbk..',
+    '.kkkkkkkkkkkkkk.',
+    'bkRRRRRRRRRRRRkb',
+    'bkRyyyyyRRRRRRkb',
+    '.kkkkkkkkkkkkkk.'
+  ];
+  const back = [
+    '..kbbbbbbbbbbk..',
+    '..kbbbbbbbbbbk..',
+    '.bkbbbbbbbbbbkb.',
+    '..kbbbbbbbbbbk..',
+    '..kbbbbbbbbbbk..'
+  ];
+  const legs = ['...kbbbbbbbbk...', '..kkkk....kkkk..'];
+  const moss = (f, b = book) => cap.concat(face[f], b, legs);
+  /* page flip: a corner of paper pops up over the book */
+  const flip = (n) => art.put(moss('read'), 7, 8, n ? ['_ww'] : ['ww_']);
+
+  defineSprite('moss', {
+    w: 16, h: 16, scale: 3,
+    does: 'mind',
+    palette: {
+      k: '#1b1226', v: '#8a6bff', V: '#cbbcff', w: '#fffdf5', b: '#ffe6c4',
+      R: '#25b89a', y: '#ffd23f'
+    },
+    frames: {
+      read: [moss('read'), moss('read'), moss('read'), moss('read'), moss('read'), moss('read')],
+      flip: [flip(0), flip(1), moss('read')],
+      look: [moss('look', bookLow)],
+      doze: [moss('doze', bookLow)],
+      annoyed: [moss('cross', bookLow)],
+      back: [cap.concat(face.back, back, legs)]
+    },
+    fps: { read: 1, flip: 7, doze: 1 }
+  });
+})();
+
+/* ---- pals/pip.js ---- */
+/* PIP — a round little bird who loves a good button.
+ * Job: perches on top of buttons and links. Hover the button and it flies off,
+ * loops around, and lands on another perch when the coast is clear. */
+(() => {
+  const body = [
+    '......kkkk....',
+    '.....kyyyyk...',
+    '....kyyyyyyk..',
+    '....kyyyywkk..',
+    '...kyyyyyykkoo',
+    '..kyyyyyyyyoo.',
+    'kkyyWWWyyyyk..',
+    'kyyWWWWWyyyk..',
+    '.kyyWWWyyyyk..',
+    '..kyyyyyyyk...',
+    '...kkkkkkk....',
+    '....o..o......'
+  ];
+  const blink = art.put(body, 8, 3, ['yyk']);
+  const peck = art.compose(art.shift(body, 0), [11, 4, ['k..']], [11, 5, ['koo']], [11, 6, ['_oo']]);
+  const lookUp = art.compose(body, [8, 3, ['wk']], [9, 2, ['k']]);
+  /* flying: legs tucked, wing up or down */
+  const tucked = art.put(body, 0, 11, ['..............']);
+  const wingUp = art.compose(tucked, [3, 6, ['yyy']], [3, 7, ['yyyyy']], [4, 8, ['yyy']], [2, 2, ['.kk..', 'kWWk.', 'kWWWk', '.kWWk']]);
+  const wingDown = art.compose(tucked, [3, 6, ['yyy']], [3, 7, ['yyyyy']], [4, 8, ['yyy']], [3, 9, ['kWWWk']], [4, 10, ['kWk', '.k.']]);
+
+  defineSprite('pip', {
+    w: 14, h: 13, scale: 3,
+    does: 'perch',
+    palette: { k: '#1b1226', y: '#ffd23f', W: '#e89b12', w: '#ffffff', o: '#ff7a2f' },
+    frames: {
+      idle: [body, body, body, blink, body, body],
+      look: [lookUp, lookUp, body],
+      peck: [peck, body, peck, body],
+      fly: [wingUp, wingDown]
+    },
+    fps: { idle: 3, look: 2, peck: 8, fly: 12 }
+  });
+})();
+
+/* ---- pals/thread.js ---- */
+/* THREAD — a small spider on a long string. Mostly harmless, entirely dramatic.
+ * Job: dangles from the bottom of an element (navs, banners). Sways when you scroll,
+ * zips up if you reach for it, yo-yos when poked, and lowers itself back down. */
+(() => {
+  const body = [
+    '......kk......',
+    '....kkkkkk....',
+    'k..kPPppppk..k',
+    '.k.kpppppppkk.',
+    '.kkpwkppwkpkk.',
+    'k.kpppppppppk.',
+    '.kkpprppprpk.k',
+    '.k.kkpppppkk..',
+    'k..k.kkkkk.k..',
+    '...k.......k..'
+  ];
+  const legsB = art.compose(body,
+    [0, 2, ['.k']], [12, 2, ['k.']], [0, 5, ['.']], [13, 5, ['k']], [0, 8, ['.k']], [12, 8, ['.k']]);
+  const blink = art.compose(body, [5, 4, ['kk']], [8, 4, ['kk']]);
+  const scared = art.compose(body, [5, 4, ['ww']], [8, 4, ['ww']], [5, 6, ['_kkk_']]);
+
+  defineSprite('thread', {
+    w: 14, h: 10, scale: 3,
+    does: 'hang',
+    palette: { k: '#1b1226', p: '#43306a', P: '#7a63b3', w: '#ffffff', r: '#ff7aa8' },
+    frames: {
+      idle: [body, body, body, blink],
+      wiggle: [body, legsB],
+      scared: [scared, legsB]
+    },
+    fps: { idle: 2, wiggle: 9, scared: 14 }
   });
 })();
 
