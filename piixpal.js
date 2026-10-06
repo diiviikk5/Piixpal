@@ -159,7 +159,9 @@ class Actor {
     const root = getLayer();
     this.spec = spec;
     this.frames = baked(spec);
-    this.s = Math.max(1, Math.round(opts.scale || spec.scale || 4));
+    /* a little smaller on phones, unless asked not to */
+    const base = opts.scale || spec.scale || 4;
+    this.s = Math.max(1, Math.round(innerWidth < 640 && !opts.fixed ? Math.max(2, base * .75) : base));
     this.x = 0; this.y = 0;            /* foot point, document coords */
     this.face = 1;                     /* 1 = right, -1 = left (sprites are drawn facing right) */
     this.sx = 1; this.sy = 1; this.rot = 0; this.ox = 0; this.oy = 0;
@@ -1526,7 +1528,7 @@ class PiixPalElement extends HTMLElement {
     const make = BEHAVIORS[this.getAttribute('do')] || BEHAVIORS[spec.does];
     if (!make) { console.warn('[piixpal] unknown behaviour', this.getAttribute('do') || spec.does); return; }
 
-    const actor = this._actor = new Actor(spec, { scale: +this.getAttribute('scale') || 0, hue: this.getAttribute('hue') });
+    const actor = this._actor = new Actor(spec, { scale: +this.getAttribute('scale') || 0, hue: this.getAttribute('hue'), fixed: this.hasAttribute('fixed-scale') });
     actor.host = this;
     const ctl = this._ctl = make(actor, targets, this) || {};
     if (!ctl.grab) actor.node.classList.add('nograb');

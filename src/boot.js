@@ -38,7 +38,7 @@ class PiixPalElement extends HTMLElement {
     const make = BEHAVIORS[this.getAttribute('do')] || BEHAVIORS[spec.does];
     if (!make) { console.warn('[piixpal] unknown behaviour', this.getAttribute('do') || spec.does); return; }
 
-    const actor = this._actor = new Actor(spec, { scale: +this.getAttribute('scale') || 0, hue: this.getAttribute('hue') });
+    const actor = this._actor = new Actor(spec, { scale: +this.getAttribute('scale') || 0, hue: this.getAttribute('hue'), fixed: this.hasAttribute('fixed-scale') });
     actor.host = this;
     const ctl = this._ctl = make(actor, targets, this) || {};
     if (!ctl.grab) actor.node.classList.add('nograb');
