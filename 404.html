@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script>document.documentElement.classList.add('js')</script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>404 · Piixpal</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/Piixpal/site/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Silkscreen&display=swap" rel="stylesheet">
+<style>
+  :root{--paper:#f3eee3;--ink:#17121f;--lime:#c6f432;--muted:#6c6477;--piix-z:10}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100svh;display:grid;place-items:center;background:var(--paper);color:var(--ink);
+    font:400 18px/1.5 "Bricolage Grotesque",system-ui,sans-serif;text-align:center;padding:40px 20px;
+    background-image:radial-gradient(rgba(23,18,31,.2) 1.1px,transparent 1.4px);background-size:22px 22px}
+  main{width:min(720px,100%)}
+  .code{margin:0 auto 18px;max-width:560px}
+  h1{font:780 clamp(30px,5vw,46px)/1.05 "Bricolage Grotesque",sans-serif;letter-spacing:-.04em;margin:24px 0 10px}
+  p{color:var(--muted);margin:0 0 28px}
+  a.btn{display:inline-flex;align-items:center;height:50px;padding:0 22px;border:2px solid var(--ink);border-radius:12px;background:var(--lime);
+    color:var(--ink);font:650 16px/1 "Bricolage Grotesque",sans-serif;text-decoration:none;box-shadow:0 4px 0 var(--ink);transition:transform .2s,box-shadow .2s}
+  a.btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--ink)}
+  .tag{font:400 12px/1 "Silkscreen",monospace;text-transform:uppercase;color:var(--muted)}
+</style>
+</head>
+<body>
+<main>
+  <span class="tag">error · page not found</span>
+  <div class="code"><piix-type id="four" text="404" rows="20" cell="16" shade="#c6f432" fit></piix-type></div>
+  <piix-pal pal="bitbug" on="#four" scale="4"></piix-pal>
+  <piix-pal pal="boing" on="#four" scale="4" at=".8"></piix-pal>
+  <h1 id="lost">This page wandered off.<piix-pal pal="moss" at="1"></piix-pal></h1>
+  <p>The pals looked everywhere. Nothing here but them.</p>
+  <a class="btn" href="/Piixpal/">Take me home</a>
+  <piix-pal pal="pip" on=".btn"></piix-pal>
+</main>
+<script src="/Piixpal/piixpal.min.js"></script>
+</body>
+</html>
