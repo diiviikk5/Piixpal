@@ -101,8 +101,8 @@ export const PALS = [
     hab: "<div class=\"h-form\"><input id=\"d-peeper\" type=\"email\" placeholder=\"type an email…\" required></div><piix-pal pal=\"peeper\" on=\"#d-peeper\"></piix-pal>", code: "<label>\n  Email <input type=\"email\" required>\n  <piix-pal pal=\"peeper\"></piix-pal>\n</label>" },
   { id: 'scrolly', kind: 'play', does: 'progress', accent: 'var(--lime)', where: 'body', lives: "a reading-progress bar at the bottom of the screen", scared: "nothing, it loves a long read", poke: "scrolls you back to the top",
     desc: "A tiny runner on a reading-progress bar. It keeps pace as you scroll, idles when you stop, and celebrates when you reach the end. It is running along the bottom of this page right now.",
-    attrs: [["side","\"bottom\" or \"top\""],["color","bar colour"]],
-    hab: "<p class=\"h-line\" style=\"bottom:auto;top:40px\">Scroll this page: Scrolly runs along the bar at the bottom of your screen.</p><piix-pal pal=\"scrolly\"></piix-pal>", code: "<piix-pal pal=\"scrolly\"></piix-pal>" },
+    attrs: [["side","\"bottom\" or \"top\""],["color","bar colour"],["box","CSS selector: run along that element instead of the screen"]],
+    hab: "<p class=\"h-line\" style=\"bottom:auto;top:40px\">Scroll this page: Scrolly runs along the bar at the bottom of this box.</p><piix-pal pal=\"scrolly\"></piix-pal>", code: "<piix-pal pal=\"scrolly\"></piix-pal>" },
   { id: 'echo', kind: 'play', does: 'mimic', accent: 'var(--lime)', where: 'body', lives: "the whole page, half a second behind you", scared: "nothing", poke: "cannot be poked: it never catches clicks",
     desc: "Your cursor’s little shadow. Replays the exact path your cursor took and clicks wherever you clicked, half a second late. Stop and it catches up and dances.",
     attrs: [["delay","seconds behind (default 0.5)"],["box","CSS selector to only follow inside one element"]],
@@ -197,6 +197,8 @@ export const PALS = [
     hab: '<div class="h-hive" id="d-bees">hive</div><piix-pal pal="bees" on="#d-bees"></piix-pal>', code: '<div class="hive">\n  <piix-pal pal="bees"></piix-pal>\n</div>' }
 ];
 
+/* on the docs page every pal stays inside its own habitat */
+const boxed = h => h.replace(/<piix-pal(?![^>]*sbox=)/g, '<piix-pal box=".habitat"');
 const kinds = { pal: PALS.filter(p => !p.kind), play: PALS.filter(p => p.kind === 'play'), toy: PALS.filter(p => p.kind === 'toy'), group: PALS.filter(p => p.kind === 'group') };
 
 /* ---------- layout ---------- */
@@ -438,7 +440,7 @@ const palSection = p => `
   <h2 id="${p.id}-h">${title(p.id)} <span class="pal-no">do="${p.does}"</span></h2>
   <p>${p.desc}</p>
   <div class="pal-doc">
-    <div class="habitat">${p.hab}</div>
+    <div class="habitat">${boxed(p.hab)}</div>
     <div class="info">
       <dl class="kv">
         <dt>lives on</dt><dd>${p.lives}</dd>
