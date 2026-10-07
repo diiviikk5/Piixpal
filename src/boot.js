@@ -69,13 +69,25 @@ class PiixPalElement extends HTMLElement {
         if (ctl.grab) ctl.grab(e, c); else if (ctl.poke) ctl.poke(e, c);
       });
     };
+    /* box="selector": the cursor only counts while it's inside the box, and nothing leaves it */
+    const boxEl = boxOf(this);
+    const keep = (c, b) => {
+      c.x = clamp(c.x, b.l + c.w / 2, Math.max(b.l + c.w / 2, b.r - c.w / 2));
+      c.y = clamp(c.y, b.t + c.h, Math.max(b.t + c.h, b.b - 2));
+    };
     let first = true;
     this._tick = (dt, t) => {
       /* sleep when far off-screen, but always draw the first frame */
       const awake = first || (ctl.awake ? ctl.awake() : Math.abs(actor.y - (scrollY + innerHeight / 2)) < innerHeight * 1.5) || actor.held;
       if (!awake) return;
       first = false;
-      ctl.tick(dt, t);
+      const b = boxEl && rectOf(boxEl);
+      if (b && !(ptr.x >= b.l && ptr.x <= b.r && ptr.y >= b.t && ptr.y <= b.b)) {
+        const cx = ptr.cx, cy = ptr.cy;
+        ptr.cx = ptr.cy = -1e5;
+        try { ctl.tick(dt, t); } finally { ptr.cx = cx; ptr.cy = cy; }
+      } else ctl.tick(dt, t);
+      if (b && !ctl.boxed) { keep(actor, b); if (ctl.crew) for (const c of ctl.crew) keep(c, b); }
       actor.step(dt);
       actor.render();
       if (ctl.crew) for (const c of ctl.crew) { wire(c); c.step(dt); c.render(); }
