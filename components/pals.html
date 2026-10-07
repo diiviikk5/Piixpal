@@ -1793,13 +1793,14 @@ Piixpal.add(&quot;scrolly&quot;, &quot;body&quot;);</pre>
   <h2 id="echo-h">Echo <span class="pal-no">do="mimic"</span></h2>
   <p>Your cursor’s little shadow. Replays the exact path your cursor took and clicks wherever you clicked, half a second late. Stop and it catches up and dances.</p>
   <div class="pal-doc">
-    <div class="habitat"><p class="h-line" style="bottom:auto;top:40px">Move around and click anywhere: Echo is following you on this whole page.</p><piix-pal pal="echo"></piix-pal></div>
+    <div class="habitat"><p class="h-line" style="bottom:auto;top:40px">Move around and click inside this box: Echo follows you half a second late.</p><piix-pal pal="echo" box=".habitat"></piix-pal></div>
     <div class="info">
       <dl class="kv">
         <dt>lives on</dt><dd>the whole page, half a second behind you</dd>
         <dt>scared of</dt><dd>nothing</dd>
         <dt>poke it</dt><dd>cannot be poked: it never catches clicks</dd>
         <dt>delay</dt><dd>seconds behind (default 0.5)</dd>
+        <dt>box</dt><dd>CSS selector to only follow inside one element</dd>
       </dl>
       <div class="tabs" data-tabs>
   <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
@@ -2398,7 +2399,7 @@ Piixpal.add(&quot;rocket&quot;, &quot;.btn&quot;);</pre>
   <h2 id="ball-h">Ball <span class="pal-no">do="toss"</span></h2>
   <p>A beach ball. Bouncy, rolly, slightly smug. Rolls a long way. Drag and throw it, or bat it with a fast swipe of the cursor.</p>
   <div class="pal-doc">
-    <div class="habitat"><p class="h-text" id="d-ball" style="font-size:30px">Throw me</p><piix-pal pal="ball" on="#d-ball"></piix-pal></div>
+    <div class="habitat"><p class="h-text" id="d-ball" style="font-size:30px">Throw me</p><piix-pal pal="ball" on="#d-ball" box=".habitat"></piix-pal></div>
     <div class="info">
       <dl class="kv">
         <dt>lives on</dt><dd>wherever it lands: headings, paragraphs, buttons, cards</dd>
@@ -2406,6 +2407,7 @@ Piixpal.add(&quot;rocket&quot;, &quot;.btn&quot;);</pre>
         <dt>poke it</dt><dd>a little kick into the air</dd>
         <dt>land</dt><dd>CSS selector for surfaces it can land on</dd>
         <dt>at</dt><dd>starting spot, 0–1</dd>
+        <dt>box</dt><dd>CSS selector to keep it inside one element (leave out to roam the whole page)</dd>
       </dl>
       <div class="tabs" data-tabs>
   <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
@@ -2481,7 +2483,7 @@ Piixpal.add(&quot;ball&quot;, &quot;h1&quot;);</pre>
   <h2 id="duck-h">Duck <span class="pal-no">do="toss"</span></h2>
   <p>A rubber duck. Squeaks when it lands. Drag and throw it, or bat it with a fast swipe of the cursor.</p>
   <div class="pal-doc">
-    <div class="habitat"><p class="h-text" id="d-duck" style="font-size:30px">Throw me</p><piix-pal pal="duck" on="#d-duck"></piix-pal></div>
+    <div class="habitat"><p class="h-text" id="d-duck" style="font-size:30px">Throw me</p><piix-pal pal="duck" on="#d-duck" box=".habitat"></piix-pal></div>
     <div class="info">
       <dl class="kv">
         <dt>lives on</dt><dd>wherever it lands: headings, paragraphs, buttons, cards</dd>
@@ -2489,6 +2491,7 @@ Piixpal.add(&quot;ball&quot;, &quot;h1&quot;);</pre>
         <dt>poke it</dt><dd>a little kick into the air</dd>
         <dt>land</dt><dd>CSS selector for surfaces it can land on</dd>
         <dt>at</dt><dd>starting spot, 0–1</dd>
+        <dt>box</dt><dd>CSS selector to keep it inside one element (leave out to roam the whole page)</dd>
       </dl>
       <div class="tabs" data-tabs>
   <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
@@ -2564,7 +2567,7 @@ Piixpal.add(&quot;duck&quot;, &quot;h1&quot;);</pre>
   <h2 id="dice-h">Dice <span class="pal-no">do="toss"</span></h2>
   <p>Lands on a random face, every time. Every throw is a decision. Drag and throw it, or bat it with a fast swipe of the cursor.</p>
   <div class="pal-doc">
-    <div class="habitat"><p class="h-text" id="d-dice" style="font-size:30px">Throw me</p><piix-pal pal="dice" on="#d-dice"></piix-pal></div>
+    <div class="habitat"><p class="h-text" id="d-dice" style="font-size:30px">Throw me</p><piix-pal pal="dice" on="#d-dice" box=".habitat"></piix-pal></div>
     <div class="info">
       <dl class="kv">
         <dt>lives on</dt><dd>wherever it lands: headings, paragraphs, buttons, cards</dd>
@@ -2572,6 +2575,7 @@ Piixpal.add(&quot;duck&quot;, &quot;h1&quot;);</pre>
         <dt>poke it</dt><dd>a little kick into the air</dd>
         <dt>land</dt><dd>CSS selector for surfaces it can land on</dd>
         <dt>at</dt><dd>starting spot, 0–1</dd>
+        <dt>box</dt><dd>CSS selector to keep it inside one element (leave out to roam the whole page)</dd>
       </dl>
       <div class="tabs" data-tabs>
   <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
@@ -2647,7 +2651,7 @@ Piixpal.add(&quot;dice&quot;, &quot;h1&quot;);</pre>
   <h2 id="pebble-h">Pebble <span class="pal-no">do="toss"</span></h2>
   <p>A heavy little rock. Does not bounce. Lands with a thud every other pal hears. Drag and throw it, or bat it with a fast swipe of the cursor.</p>
   <div class="pal-doc">
-    <div class="habitat"><p class="h-text" id="d-pebble" style="font-size:30px">Throw me</p><piix-pal pal="pebble" on="#d-pebble"></piix-pal></div>
+    <div class="habitat"><p class="h-text" id="d-pebble" style="font-size:30px">Throw me</p><piix-pal pal="pebble" on="#d-pebble" box=".habitat"></piix-pal></div>
     <div class="info">
       <dl class="kv">
         <dt>lives on</dt><dd>wherever it lands: headings, paragraphs, buttons, cards</dd>
@@ -2655,6 +2659,7 @@ Piixpal.add(&quot;dice&quot;, &quot;h1&quot;);</pre>
         <dt>poke it</dt><dd>a little kick into the air</dd>
         <dt>land</dt><dd>CSS selector for surfaces it can land on</dd>
         <dt>at</dt><dd>starting spot, 0–1</dd>
+        <dt>box</dt><dd>CSS selector to keep it inside one element (leave out to roam the whole page)</dd>
       </dl>
       <div class="tabs" data-tabs>
   <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
@@ -2730,7 +2735,7 @@ Piixpal.add(&quot;pebble&quot;, &quot;h1&quot;);</pre>
   <h2 id="cube-h">Cube <span class="pal-no">do="toss"</span></h2>
   <p>A jelly cube. Bounces high and wobbles after every landing. Drag and throw it, or bat it with a fast swipe of the cursor.</p>
   <div class="pal-doc">
-    <div class="habitat"><p class="h-text" id="d-cube" style="font-size:30px">Throw me</p><piix-pal pal="cube" on="#d-cube"></piix-pal></div>
+    <div class="habitat"><p class="h-text" id="d-cube" style="font-size:30px">Throw me</p><piix-pal pal="cube" on="#d-cube" box=".habitat"></piix-pal></div>
     <div class="info">
       <dl class="kv">
         <dt>lives on</dt><dd>wherever it lands: headings, paragraphs, buttons, cards</dd>
@@ -2738,6 +2743,7 @@ Piixpal.add(&quot;pebble&quot;, &quot;h1&quot;);</pre>
         <dt>poke it</dt><dd>a little kick into the air</dd>
         <dt>land</dt><dd>CSS selector for surfaces it can land on</dd>
         <dt>at</dt><dd>starting spot, 0–1</dd>
+        <dt>box</dt><dd>CSS selector to keep it inside one element (leave out to roam the whole page)</dd>
       </dl>
       <div class="tabs" data-tabs>
   <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
@@ -2813,7 +2819,7 @@ Piixpal.add(&quot;cube&quot;, &quot;h1&quot;);</pre>
   <h2 id="can-h">Can <span class="pal-no">do="toss"</span></h2>
   <p>A soda can. Rolls off the edge of everything. Drag and throw it, or bat it with a fast swipe of the cursor.</p>
   <div class="pal-doc">
-    <div class="habitat"><p class="h-text" id="d-can" style="font-size:30px">Throw me</p><piix-pal pal="can" on="#d-can"></piix-pal></div>
+    <div class="habitat"><p class="h-text" id="d-can" style="font-size:30px">Throw me</p><piix-pal pal="can" on="#d-can" box=".habitat"></piix-pal></div>
     <div class="info">
       <dl class="kv">
         <dt>lives on</dt><dd>wherever it lands: headings, paragraphs, buttons, cards</dd>
@@ -2821,6 +2827,7 @@ Piixpal.add(&quot;cube&quot;, &quot;h1&quot;);</pre>
         <dt>poke it</dt><dd>a little kick into the air</dd>
         <dt>land</dt><dd>CSS selector for surfaces it can land on</dd>
         <dt>at</dt><dd>starting spot, 0–1</dd>
+        <dt>box</dt><dd>CSS selector to keep it inside one element (leave out to roam the whole page)</dd>
       </dl>
       <div class="tabs" data-tabs>
   <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
