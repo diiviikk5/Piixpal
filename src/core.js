@@ -58,6 +58,12 @@ const rectOf = el => {
   return { l: r.left + scrollX, t: r.top + scrollY, r: r.right + scrollX, b: r.bottom + scrollY, w: r.width, h: r.height };
 };
 const docW = () => document.documentElement.clientWidth;
+/* box="selector": the element a pal is kept inside (its closest match, else the first on the page) */
+const boxOf = host => {
+  const sel = host.getAttribute('box');
+  if (!sel) return null;
+  try { return host.closest(sel) || document.querySelector(sel); } catch (_) { return null; }
+};
 const onScreen = (r, m = 200) => r.b > scrollY - m && r.t < scrollY + innerHeight + m && r.r > -m && r.l < docW() + m;
 /* The y a pal stands on at doc-x. Elements can offer a custom contour via piixSurface(x). */
 const surfaceAt = (el, x, r = rectOf(el)) => {
