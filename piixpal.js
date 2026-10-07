@@ -1381,13 +1381,25 @@ class PiixPalElement extends HTMLElement {
         if (ctl.grab) ctl.grab(e, c); else if (ctl.poke) ctl.poke(e, c);
       });
     };
+    /* box="selector": the cursor only counts while it's inside the box, and nothing leaves it */
+    const boxEl = boxOf(this);
+    const keep = (c, b) => {
+      c.x = clamp(c.x, b.l + c.w / 2, Math.max(b.l + c.w / 2, b.r - c.w / 2));
+      c.y = clamp(c.y, b.t + c.h, Math.max(b.t + c.h, b.b - 2));
+    };
     let first = true;
     this._tick = (dt, t) => {
       /* sleep when far off-screen, but always draw the first frame */
       const awake = first || (ctl.awake ? ctl.awake() : Math.abs(actor.y - (scrollY + innerHeight / 2)) < innerHeight * 1.5) || actor.held;
       if (!awake) return;
       first = false;
-      ctl.tick(dt, t);
+      const b = boxEl && rectOf(boxEl);
+      if (b && !(ptr.x >= b.l && ptr.x <= b.r && ptr.y >= b.t && ptr.y <= b.b)) {
+        const cx = ptr.cx, cy = ptr.cy;
+        ptr.cx = ptr.cy = -1e5;
+        try { ctl.tick(dt, t); } finally { ptr.cx = cx; ptr.cy = cy; }
+      } else ctl.tick(dt, t);
+      if (b && !ctl.boxed) { keep(actor, b); if (ctl.crew) for (const c of ctl.crew) keep(c, b); }
       actor.step(dt);
       actor.render();
       if (ctl.crew) for (const c of ctl.crew) { wire(c); c.step(dt); c.render(); }
@@ -2395,14 +2407,19 @@ defineBehavior('hang', (a, [el], host) => {
 /* ---- behaviors/launch.js ---- */
 /* launch: sits on an element (a deploy button, say). Click it: countdown 3-2-1, it
  * blasts off the top of the screen trailing smoke, then drops back down on its
- * retro-rockets and lands where it started. */
+ * retro-rockets and lands where it started. With box="selector" it leaves through the
+ * top of that element instead of the screen. */
 defineBehavior('launch', (a, [el], host) => {
   const S = a.s / 3;
   const at = host.getAttribute('at') != null ? clamp(+host.getAttribute('at'), 0, 1) : .85;
   let state = 'pad', t = 0, alt = 0, v = 0, count = 0;
   const puffs = [];
+  const boxEl = boxOf(host);
+  /* how high it climbs before it's gone: off the top of the box, or of the screen */
+  const ceiling = s => boxEl ? s.y - rectOf(boxEl).t + a.h + 20 * S : s.y + 300 * S;
   const spot = () => { const r = rectOf(el); return { x: r.l + a.w / 2 + (r.w - a.w) * at, y: r.t }; };
   const puff = () => {
+    if (a.node.style.opacity === '0') return; /* no smoke while it's out of the box */
     const p = document.createElement('div');
     const s = Math.round(a.s * rnd(2, 4));
     p.style.cssText = `position:absolute;left:0;top:0;width:${s}px;height:${s}px;background:#d9d4e3;border-radius:2px;pointer-events:none`;
@@ -2411,6 +2428,7 @@ defineBehavior('launch', (a, [el], host) => {
   };
 
   return {
+    boxed: true,
     awake: () => true,
     tick(dt) {
       const s = spot();
@@ -2423,7 +2441,7 @@ defineBehavior('launch', (a, [el], host) => {
         } else if (state === 'up') {
           v += 1500 * S * dt; alt += v * dt;
           if (chance(dt * 40)) puff();
-          if (alt > s.y + 300 * S) { state = 'away'; t = 1.2; }
+          if (alt > ceiling(s)) { state = 'away'; t = 1.2; }
         } else if (state === 'away') {
           t -= dt; if (t <= 0) { state = 'down'; v = 420 * S; }
         } else if (state === 'down') {
@@ -2434,6 +2452,7 @@ defineBehavior('launch', (a, [el], host) => {
         }
       }
       a.y = s.y - alt;
+      if (boxEl) a.node.style.opacity = a.y - a.h * .5 < rectOf(boxEl).t ? '0' : '';
       a.play(state === 'up' || state === 'down' ? 'burn' : 'idle');
       a.sx = lerp(a.sx, 1, .2); a.sy = lerp(a.sy, 1, .2);
       for (let i = puffs.length - 1; i >= 0; i--) {
@@ -2986,7 +3005,8 @@ defineBehavior('pop', (a, [el], host) => {
 /* ---- behaviors/progress.js ---- */
 /* progress: a reading-progress bar with a runner on it. The bar fills as you scroll;
  * the runner keeps pace, idles when you stop, and celebrates at the end of the page.
- *   side="bottom|top"   where the bar sits (default bottom)   color="#c6f432" */
+ *   side="bottom|top"   where the bar sits (default bottom)   color="#c6f432"
+ *   box="selector"   draw the bar along that element's edge instead of the screen's */
 defineBehavior('progress', (a, targets, host) => {
   const S = a.s / 3;
   const side = host.getAttribute('side') === 'top' ? 'top' : 'bottom';
@@ -2995,9 +3015,17 @@ defineBehavior('progress', (a, targets, host) => {
   bar.setAttribute('aria-hidden', 'true');
   bar.style.cssText = `position:fixed;left:0;${side}:0;height:${H}px;width:0;z-index:var(--piix-z,2147482000);pointer-events:none;` +
     `background:${host.getAttribute('color') || '#c6f432'};box-shadow:0 0 0 1px rgba(23,18,31,.25);transition:width .08s linear`;
-  document.body.appendChild(bar);
-  /* the runner rides the fixed bar, so pin it to the viewport too */
-  a.node.style.position = 'fixed';
+  const boxEl = boxOf(host);
+  if (boxEl) {
+    if (getComputedStyle(boxEl).position === 'static') boxEl.style.position = 'relative';
+    bar.style.position = 'absolute'; bar.style.zIndex = '1';
+    if (side === 'bottom') bar.style.borderRadius = '0 0 0 12px';
+    boxEl.appendChild(bar);
+  } else {
+    document.body.appendChild(bar);
+    /* the runner rides the fixed bar, so pin it to the viewport too */
+    a.node.style.position = 'fixed';
+  }
   let x = 0, done = false, lastY = scrollY;
 
   return {
@@ -3006,16 +3034,23 @@ defineBehavior('progress', (a, targets, host) => {
       const max = Math.max(1, document.documentElement.scrollHeight - innerHeight);
       const p = clamp(scrollY / max, 0, 1);
       bar.style.width = (p * 100).toFixed(2) + '%';
-      const vw = document.documentElement.clientWidth;
+      const bx = boxEl && rectOf(boxEl);
+      const vw = bx ? boxEl.clientWidth : document.documentElement.clientWidth;
       const want = clamp(p * vw, a.w / 2, vw - a.w / 2);
       const moving = Math.abs(scrollY - lastY) > .5;
       if (moving) a.face = scrollY > lastY ? 1 : -1;
       lastY = scrollY;
       x = reduced() ? want : lerp(x, want, 1 - Math.exp(-10 * dt));
-      /* viewport coords, offset by the layer origin so render() lands them right */
-      a.x = x + origin.x;
-      a.y = (side === 'top' ? H + a.h : innerHeight - H) + origin.y;
-      if (side === 'top') a.y = H + a.h + origin.y;
+      if (bx) {
+        /* along the box's edge, in doc coords */
+        const bl = bx.l + boxEl.clientLeft, bt = bx.t + boxEl.clientTop;
+        a.x = bl + x;
+        a.y = side === 'top' ? bt + H + a.h : bt + boxEl.clientHeight - H;
+      } else {
+        /* viewport coords, offset by the layer origin so render() lands them right */
+        a.x = x + origin.x;
+        a.y = (side === 'top' ? H + a.h : innerHeight - H) + origin.y;
+      }
       if (p > .995 && !done) { done = true; a.say('star', 1600); a.play('cheer'); }
       if (p < .97) done = false;
       if (done) a.play('cheer');
