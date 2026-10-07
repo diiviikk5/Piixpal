@@ -66,6 +66,12 @@ const rectOf = el => {
   return { l: r.left + scrollX, t: r.top + scrollY, r: r.right + scrollX, b: r.bottom + scrollY, w: r.width, h: r.height };
 };
 const docW = () => document.documentElement.clientWidth;
+/* box="selector": the element a pal is kept inside (its closest match, else the first on the page) */
+const boxOf = host => {
+  const sel = host.getAttribute('box');
+  if (!sel) return null;
+  try { return host.closest(sel) || document.querySelector(sel); } catch (_) { return null; }
+};
 const onScreen = (r, m = 200) => r.b > scrollY - m && r.t < scrollY + innerHeight + m && r.r > -m && r.l < docW() + m;
 /* The y a pal stands on at doc-x. Elements can offer a custom contour via piixSurface(x). */
 const surfaceAt = (el, x, r = rectOf(el)) => {
@@ -1460,10 +1466,10 @@ Object.assign(Piixpal, {
   clear: () => document.querySelectorAll('piix-pal,piix-sprite').forEach(e => e.remove())
 });
 
-Piixpal._k = { reduceMQ, reduced, clamp, rnd, chance, pick, lerp, now, hexRGBA, ptr, ptrDist, scroll, subs, raf, frame, sub, unsub, rectOf, docW, onScreen, surfaceAt, LAYER_CSS, layer, origin, getLayer, layerOrigin, SPRITES, bake, defineSprite, baked, ACTORS, shout, Actor, recruit, BEHAVIORS, defineBehavior, Piixpal, art, ICON_PAL, ICONS, DIGITS, numberIcon, iconCache, iconPal, bakeIcon, measureCtx, glyphTop, textProfile, segAt, drag, BLIP, CROWD_COLORS, PiixCrowdElement, FIGURES, defineFigure, mixHex, figurePalette, bakeFigure, HEAD, PiixSpriteElement, RENDERS, lum, BAYER, ASCII, TEXTURES, BIG, PiixTypeElement, CELL_SHAPES, PiixPalElement, define, add, autoAttach, SCRIPT, start };
+Piixpal._k = { reduceMQ, reduced, clamp, rnd, chance, pick, lerp, now, hexRGBA, ptr, ptrDist, scroll, subs, raf, frame, sub, unsub, rectOf, docW, boxOf, onScreen, surfaceAt, LAYER_CSS, layer, origin, getLayer, layerOrigin, SPRITES, bake, defineSprite, baked, ACTORS, shout, Actor, recruit, BEHAVIORS, defineBehavior, Piixpal, art, ICON_PAL, ICONS, DIGITS, numberIcon, iconCache, iconPal, bakeIcon, measureCtx, glyphTop, textProfile, segAt, drag, BLIP, CROWD_COLORS, PiixCrowdElement, FIGURES, defineFigure, mixHex, figurePalette, bakeFigure, HEAD, PiixSpriteElement, RENDERS, lum, BAYER, ASCII, TEXTURES, BIG, PiixTypeElement, CELL_SHAPES, PiixPalElement, define, add, autoAttach, SCRIPT, start };
 return Piixpal._k;
 })();
-const { reduceMQ, reduced, clamp, rnd, chance, pick, lerp, now, hexRGBA, ptr, ptrDist, scroll, subs, raf, frame, sub, unsub, rectOf, docW, onScreen, surfaceAt, LAYER_CSS, layer, origin, getLayer, layerOrigin, SPRITES, bake, defineSprite, baked, ACTORS, shout, Actor, recruit, BEHAVIORS, defineBehavior, Piixpal, art, ICON_PAL, ICONS, DIGITS, numberIcon, iconCache, iconPal, bakeIcon, measureCtx, glyphTop, textProfile, segAt, drag, BLIP, CROWD_COLORS, PiixCrowdElement, FIGURES, defineFigure, mixHex, figurePalette, bakeFigure, HEAD, PiixSpriteElement, RENDERS, lum, BAYER, ASCII, TEXTURES, BIG, PiixTypeElement, CELL_SHAPES, PiixPalElement, define, add, autoAttach, SCRIPT, start } = K;
+const { reduceMQ, reduced, clamp, rnd, chance, pick, lerp, now, hexRGBA, ptr, ptrDist, scroll, subs, raf, frame, sub, unsub, rectOf, docW, boxOf, onScreen, surfaceAt, LAYER_CSS, layer, origin, getLayer, layerOrigin, SPRITES, bake, defineSprite, baked, ACTORS, shout, Actor, recruit, BEHAVIORS, defineBehavior, Piixpal, art, ICON_PAL, ICONS, DIGITS, numberIcon, iconCache, iconPal, bakeIcon, measureCtx, glyphTop, textProfile, segAt, drag, BLIP, CROWD_COLORS, PiixCrowdElement, FIGURES, defineFigure, mixHex, figurePalette, bakeFigure, HEAD, PiixSpriteElement, RENDERS, lum, BAYER, ASCII, TEXTURES, BIG, PiixTypeElement, CELL_SHAPES, PiixPalElement, define, add, autoAttach, SCRIPT, start } = K;
 
 /* ---- behaviors/beeline.js ---- */
 /* beeline: a little line of worker bees buzzing round their element. Come close and
@@ -2535,17 +2541,19 @@ defineBehavior('march', (a, [el], host) => {
 /* ---- behaviors/mimic.js ---- */
 /* mimic: a copycat cursor. Replays the exact path your cursor took a moment ago and
  * clicks wherever you clicked. Stop moving and it catches up and dances. It never
- * catches clicks itself.   delay="0.5" seconds behind */
+ * catches clicks itself.   delay="0.5" seconds behind   box="selector" only inside that element */
 defineBehavior('mimic', (a, targets, host) => {
   const delay = (+host.getAttribute('delay') || .5) * 1000;
   const path = [], clicks = [];
+  const boxEl = boxOf(host);
+  const inside = (x, y) => { if (!boxEl) return true; const b = rectOf(boxEl); return x >= b.l && x <= b.r && y >= b.t && y <= b.b; };
   let lx = null, ly = null, ripple = 0;
   a.node.classList.add('ghost');
   const ring = document.createElement('div');
   ring.style.cssText = 'position:absolute;left:0;top:0;width:24px;height:24px;margin:-12px 0 0 -12px;border:3px solid #c6f432;border-radius:50%;pointer-events:none;opacity:0';
   a.node.parentNode.insertBefore(ring, a.node);
-  const mv = () => { path.push({ t: now(), x: ptr.x, y: ptr.y }); if (path.length > 600) path.shift(); };
-  const dn = e => { if (e.button === 0) clicks.push({ t: now(), x: e.clientX + scrollX, y: e.clientY + scrollY }); };
+  const mv = () => { if (!inside(ptr.x, ptr.y)) return; path.push({ t: now(), x: ptr.x, y: ptr.y }); if (path.length > 600) path.shift(); };
+  const dn = e => { if (e.button === 0 && inside(e.clientX + scrollX, e.clientY + scrollY)) clicks.push({ t: now(), x: e.clientX + scrollX, y: e.clientY + scrollY }); };
   addEventListener('pointermove', mv, { passive: true });
   addEventListener('pointerdown', dn, { passive: true });
 
@@ -2563,7 +2571,7 @@ defineBehavior('mimic', (a, targets, host) => {
         ly = ly == null ? ty : lerp(ly, ty, idle ? 1 - Math.exp(-4 * dt) : 1);
       }
       if (lx == null) { a.node.style.opacity = '0'; return; }
-      a.node.style.opacity = ptr.seen && ptr.cx > -1e4 ? '1' : '0';
+      a.node.style.opacity = ptr.seen && ptr.cx > -1e4 && inside(ptr.x, ptr.y) ? '1' : '0';
       /* the arrow's tip is its top-left pixel */
       a.x = lx + a.w / 2; a.y = ly + a.h;
       while (clicks.length && clicks[0].t <= t) {
@@ -3326,7 +3334,13 @@ defineBehavior('toss', (a, [el], host) => {
   let state = 'rest', vx = 0, vy = 0, on = null, offset = 0, placed = false, settle = 0;
   if (spin) a.cv.style.transformOrigin = '50% 50%';
 
-  const floorY = () => document.documentElement.scrollHeight - 1;
+  /* box="selector" keeps it inside one element: its walls, ceiling and floor */
+  const boxEl = boxOf(host);
+  const B = () => boxEl ? rectOf(boxEl) : null;
+  const floorY = () => { const b = B(); return b ? b.b - 3 : document.documentElement.scrollHeight - 1; };
+  const minX = () => { const b = B(); return (b ? b.l : 0) + a.w / 2; };
+  const maxX = () => { const b = B(); return (b ? b.r : docW()) - a.w / 2; };
+  const inBox = p => { const b = B(); return !b || (p.t > b.t && p.t < b.b && p.r > b.l && p.l < b.r); };
   const fly = (nvx, nvy) => { state = 'air'; vx = nvx; vy = nvy; on = null; if (a.has('roll')) a.play('roll'); };
   const land = (p, impact) => {
     a.y = p ? p.t : floorY();
@@ -3378,7 +3392,7 @@ defineBehavior('toss', (a, [el], host) => {
         if (Math.abs(vx) < 4) vx = 0;
         if (spin) a.rot += vx * dt / (a.w / 2) * 57.3 * spin;
         else a.rot = lerp(a.rot, 0, .2);
-        a.x = clamp(a.x, a.w / 2, docW() - a.w / 2);
+        a.x = clamp(a.x, minX(), maxX());
         return;
       }
 
@@ -3386,13 +3400,15 @@ defineBehavior('toss', (a, [el], host) => {
       const y0 = a.y;
       vy = Math.min(vy + G * dt, 3200);
       a.x += vx * dt; a.y += vy * dt;
-      if (a.x < a.w / 2) { a.x = a.w / 2; vx = Math.abs(vx) * .6; }
-      if (a.x > docW() - a.w / 2) { a.x = docW() - a.w / 2; vx = -Math.abs(vx) * .6; }
+      if (a.x < minX()) { a.x = minX(); vx = Math.abs(vx) * .6; }
+      if (a.x > maxX()) { a.x = maxX(); vx = -Math.abs(vx) * .6; }
+      const bx = B();
+      if (bx && a.y - a.h < bx.t) { a.y = bx.t + a.h; vy = Math.abs(vy) * .5; }
       a.rot += (spin ? vx * dt / (a.w / 2) * 57.3 * spin : vx * dt * .6);
       if (vy > 0) {
         let best = null;
         for (const p of platforms(sel, el)) {
-          if (a.x < p.l + 2 || a.x > p.r - 2) continue;
+          if (a.x < p.l + 2 || a.x > p.r - 2 || !inBox(p)) continue;
           if (p.t >= y0 - 1 && p.t <= a.y && (!best || p.t < best.t)) best = p;
         }
         if (best) land(best, vy);
@@ -3402,7 +3418,10 @@ defineBehavior('toss', (a, [el], host) => {
     },
     grab(e) {
       drag(a, e, {
-        move: (x, y) => { state = 'held'; a.x = x; a.y = y + a.h * .4; vx = vy = 0; if (a.has('held')) a.play('held'); },
+        move: (x, y) => {
+          state = 'held'; a.x = x; a.y = y + a.h * .4;
+          const b = B(); if (b) { a.x = clamp(a.x, minX(), maxX()); a.y = clamp(a.y, b.t + a.h, floorY()); }
+          vx = vy = 0; if (a.has('held')) a.play('held'); },
         end: ({ moved, vx: tx, vy: ty }) => {
           if (!moved) { fly(rnd(-160, 160) * S, -rnd(520, 700) * Math.sqrt(S)); if (P.squeak) a.say('note', 500); return; }
           fly(tx, ty);
