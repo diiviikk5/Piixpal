@@ -127,6 +127,7 @@ document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click'
     p.setAttribute('pal', kind === 'toy' ? TOYS[(Math.random() * TOYS.length) | 0] : kind);
     p.setAttribute('on', kind === 'bitbug' && Math.random() < .6 ? '#mark' : homes[kind][(Math.random() * homes[kind].length) | 0]);
     if (kind !== 'toy') p.setAttribute('hue', String(((Math.random() * 12) | 0) * 30));
+    else p.setAttribute('box', '.hero');
     document.body.appendChild(p);
     spawned.push(p);
     clear.hidden = false;
