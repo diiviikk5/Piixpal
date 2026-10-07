@@ -46,7 +46,13 @@ defineBehavior('toss', (a, [el], host) => {
   let state = 'rest', vx = 0, vy = 0, on = null, offset = 0, placed = false, settle = 0;
   if (spin) a.cv.style.transformOrigin = '50% 50%';
 
-  const floorY = () => document.documentElement.scrollHeight - 1;
+  /* box="selector" keeps it inside one element: its walls, ceiling and floor */
+  const boxEl = boxOf(host);
+  const B = () => boxEl ? rectOf(boxEl) : null;
+  const floorY = () => { const b = B(); return b ? b.b - 3 : document.documentElement.scrollHeight - 1; };
+  const minX = () => { const b = B(); return (b ? b.l : 0) + a.w / 2; };
+  const maxX = () => { const b = B(); return (b ? b.r : docW()) - a.w / 2; };
+  const inBox = p => { const b = B(); return !b || (p.t > b.t && p.t < b.b && p.r > b.l && p.l < b.r); };
   const fly = (nvx, nvy) => { state = 'air'; vx = nvx; vy = nvy; on = null; if (a.has('roll')) a.play('roll'); };
   const land = (p, impact) => {
     a.y = p ? p.t : floorY();
@@ -98,7 +104,7 @@ defineBehavior('toss', (a, [el], host) => {
         if (Math.abs(vx) < 4) vx = 0;
         if (spin) a.rot += vx * dt / (a.w / 2) * 57.3 * spin;
         else a.rot = lerp(a.rot, 0, .2);
-        a.x = clamp(a.x, a.w / 2, docW() - a.w / 2);
+        a.x = clamp(a.x, minX(), maxX());
         return;
       }
 
@@ -106,13 +112,15 @@ defineBehavior('toss', (a, [el], host) => {
       const y0 = a.y;
       vy = Math.min(vy + G * dt, 3200);
       a.x += vx * dt; a.y += vy * dt;
-      if (a.x < a.w / 2) { a.x = a.w / 2; vx = Math.abs(vx) * .6; }
-      if (a.x > docW() - a.w / 2) { a.x = docW() - a.w / 2; vx = -Math.abs(vx) * .6; }
+      if (a.x < minX()) { a.x = minX(); vx = Math.abs(vx) * .6; }
+      if (a.x > maxX()) { a.x = maxX(); vx = -Math.abs(vx) * .6; }
+      const bx = B();
+      if (bx && a.y - a.h < bx.t) { a.y = bx.t + a.h; vy = Math.abs(vy) * .5; }
       a.rot += (spin ? vx * dt / (a.w / 2) * 57.3 * spin : vx * dt * .6);
       if (vy > 0) {
         let best = null;
         for (const p of platforms(sel, el)) {
-          if (a.x < p.l + 2 || a.x > p.r - 2) continue;
+          if (a.x < p.l + 2 || a.x > p.r - 2 || !inBox(p)) continue;
           if (p.t >= y0 - 1 && p.t <= a.y && (!best || p.t < best.t)) best = p;
         }
         if (best) land(best, vy);
@@ -122,7 +130,10 @@ defineBehavior('toss', (a, [el], host) => {
     },
     grab(e) {
       drag(a, e, {
-        move: (x, y) => { state = 'held'; a.x = x; a.y = y + a.h * .4; vx = vy = 0; if (a.has('held')) a.play('held'); },
+        move: (x, y) => {
+          state = 'held'; a.x = x; a.y = y + a.h * .4;
+          const b = B(); if (b) { a.x = clamp(a.x, minX(), maxX()); a.y = clamp(a.y, b.t + a.h, floorY()); }
+          vx = vy = 0; if (a.has('held')) a.play('held'); },
         end: ({ moved, vx: tx, vy: ty }) => {
           if (!moved) { fly(rnd(-160, 160) * S, -rnd(520, 700) * Math.sqrt(S)); if (P.squeak) a.say('note', 500); return; }
           fly(tx, ty);
