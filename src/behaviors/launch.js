@@ -1,13 +1,18 @@
 /* launch: sits on an element (a deploy button, say). Click it: countdown 3-2-1, it
  * blasts off the top of the screen trailing smoke, then drops back down on its
- * retro-rockets and lands where it started. */
+ * retro-rockets and lands where it started. With box="selector" it leaves through the
+ * top of that element instead of the screen. */
 defineBehavior('launch', (a, [el], host) => {
   const S = a.s / 3;
   const at = host.getAttribute('at') != null ? clamp(+host.getAttribute('at'), 0, 1) : .85;
   let state = 'pad', t = 0, alt = 0, v = 0, count = 0;
   const puffs = [];
+  const boxEl = boxOf(host);
+  /* how high it climbs before it's gone: off the top of the box, or of the screen */
+  const ceiling = s => boxEl ? s.y - rectOf(boxEl).t + a.h + 20 * S : s.y + 300 * S;
   const spot = () => { const r = rectOf(el); return { x: r.l + a.w / 2 + (r.w - a.w) * at, y: r.t }; };
   const puff = () => {
+    if (a.node.style.opacity === '0') return; /* no smoke while it's out of the box */
     const p = document.createElement('div');
     const s = Math.round(a.s * rnd(2, 4));
     p.style.cssText = `position:absolute;left:0;top:0;width:${s}px;height:${s}px;background:#d9d4e3;border-radius:2px;pointer-events:none`;
@@ -16,6 +21,7 @@ defineBehavior('launch', (a, [el], host) => {
   };
 
   return {
+    boxed: true,
     awake: () => true,
     tick(dt) {
       const s = spot();
@@ -28,7 +34,7 @@ defineBehavior('launch', (a, [el], host) => {
         } else if (state === 'up') {
           v += 1500 * S * dt; alt += v * dt;
           if (chance(dt * 40)) puff();
-          if (alt > s.y + 300 * S) { state = 'away'; t = 1.2; }
+          if (alt > ceiling(s)) { state = 'away'; t = 1.2; }
         } else if (state === 'away') {
           t -= dt; if (t <= 0) { state = 'down'; v = 420 * S; }
         } else if (state === 'down') {
@@ -39,6 +45,7 @@ defineBehavior('launch', (a, [el], host) => {
         }
       }
       a.y = s.y - alt;
+      if (boxEl) a.node.style.opacity = a.y - a.h * .5 < rectOf(boxEl).t ? '0' : '';
       a.play(state === 'up' || state === 'down' ? 'burn' : 'idle');
       a.sx = lerp(a.sx, 1, .2); a.sy = lerp(a.sy, 1, .2);
       for (let i = puffs.length - 1; i >= 0; i--) {
