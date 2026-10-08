@@ -112,3 +112,98 @@ const scoutCard = (s, i, n, go, end) => {
   return card;
 };
 
+/* tour: hop from stop to stop, spotlight each one, explain it on a card */
+defineBehavior('tour', (a, [el], host) => {
+  const S = a.s / 3;
+  const boxEl = boxOf(host);
+  let steps = [], i = -1, card = null, from = null, hopT = 1, hole = null, homeAt = null, lastFocus = null;
+  const veil = document.createElement('div');
+  veil.setAttribute('aria-hidden', 'true');
+  veil.style.cssText = `position:${boxEl ? 'absolute' : 'fixed'};left:0;top:0;width:0;height:0;background:rgba(23,18,31,.46);pointer-events:none;opacity:0;transition:opacity .25s`;
+  a.node.parentNode.insertBefore(veil, a.node.parentNode.firstChild.nextSibling);
+  const home = () => {
+    const r = surfaceOf(el) || rectOf(el), at = host.getAttribute('at') != null ? clamp(+host.getAttribute('at'), 0, 1) : .5;
+    return { x: r.l + (r.r - r.l) * at, y: r.t };
+  };
+  const show = () => {
+    const s = steps[i];
+    if (!s) return end(true);
+    if (!boxEl) {
+      const r = s.el.getBoundingClientRect();
+      if (r.top < 80 || r.bottom > innerHeight - 80) s.el.scrollIntoView({ block: 'center', behavior: reduced() ? 'auto' : 'smooth' });
+    }
+    from = { x: a.x, y: a.y }; hopT = 0;
+    if (card) uiClose(card);
+    card = scoutCard(s, i, steps.length, go, end);
+    uiAnnounce(`Step ${i + 1} of ${steps.length}. ${s.title ? s.title + '. ' : ''}${s.text}`);
+    host.dispatchEvent(new CustomEvent('piix:tour-step', { bubbles: true, detail: { index: i, total: steps.length, target: s.el } }));
+  };
+  const go = d => { i = Math.max(0, i + d); show(); };
+  const start = list => {
+    steps = scoutStops(list, host, boxEl);
+    if (!steps.length) { a.say('?', 900); return; }
+    if (i < 0) lastFocus = document.activeElement;
+    i = 0; veil.style.opacity = '1'; show();
+  };
+  const end = done => {
+    if (i < 0) return;
+    i = -1; uiClose(card); card = null; veil.style.opacity = '0'; hole = null;
+    from = { x: a.x, y: a.y }; hopT = 0;
+    if (done) a.say('star', 1400);
+    try { localStorage.setItem('piix-tour:' + location.pathname, '1'); } catch (_) { /* private mode */ }
+    host.dispatchEvent(new CustomEvent('piix:tour-end', { bubbles: true, detail: { done } }));
+    if (lastFocus && lastFocus.focus) try { lastFocus.focus({ preventScroll: true }); } catch (_) { /* gone */ }
+  };
+  const kd = e => {
+    if (i < 0 || e.metaKey || e.ctrlKey || e.altKey) return;
+    const t = e.target;
+    if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+    if (e.key === 'Escape') { e.preventDefault(); end(false); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
+    else if (e.key === 'ArrowLeft' && i > 0) { e.preventDefault(); go(-1); }
+  };
+  addEventListener('keydown', kd);
+  let auto = host.getAttribute('start') === 'auto';
+  try { if (auto && localStorage.getItem('piix-tour:' + location.pathname)) auto = false; } catch (_) { /* private mode */ }
+  let autoT = auto ? 1.2 : -1;
+
+  return {
+    awake: () => i >= 0 || hopT < 1,
+    start, end, next: () => go(1), back: () => go(-1),
+    tick(dt) {
+      if (autoT > 0) { autoT -= dt; if (autoT <= 0) start(); }
+      const want = i >= 0 && steps[i] ? scoutSpot(steps[i].el, a, S) : home();
+      if (!homeAt) { homeAt = want; a.x = want.x; a.y = want.y; }
+      if (hopT < 1) {
+        hopT = Math.min(1, hopT + dt / (reduced() ? .01 : .55));
+        const e = hopT < .5 ? 2 * hopT * hopT : 1 - Math.pow(-2 * hopT + 2, 2) / 2;
+        a.x = lerp(from.x, want.x, e);
+        a.y = lerp(from.y, want.y, e) - Math.sin(Math.PI * hopT) * Math.max(30 * S, Math.abs(want.x - from.x) * .25);
+        a.face = want.x < from.x ? -1 : 1;
+        a.play('walk');
+        if (hopT >= 1) { a.sy = .8; a.sx = 1.2; }
+      } else {
+        a.x = want.x; a.y = want.y;
+        a.play(i >= 0 ? 'point' : 'idle');
+        if (i < 0 && ptr.seen && a.near(30 * S)) a.say('?', 600);
+      }
+      a.sx = lerp(a.sx, 1, .2); a.sy = lerp(a.sy, 1, .2);
+      if (i >= 0 && steps[i]) {
+        const r = steps[i].el.getBoundingClientRect(), pad = 8;
+        const tgt = { l: r.left - pad, t: r.top - pad, r: r.right + pad, b: r.bottom + pad };
+        hole = hole && !reduced() ? { l: lerp(hole.l, tgt.l, .25), t: lerp(hole.t, tgt.t, .25), r: lerp(hole.r, tgt.r, .25), b: lerp(hole.b, tgt.b, .25) } : tgt;
+        scoutVeil(veil, hole, boxEl);
+        if (card) {
+          /* above Scout if it fits, otherwise under the stop, never off the edge of the box */
+          const B = boxEl ? rectOf(boxEl) : { l: scrollX, r: scrollX + docW(), t: scrollY, b: scrollY + innerHeight };
+          const above = a.y - a.h - 4 * S, tr = rectOf(steps[i].el);
+          if (above - card.offsetHeight - 12 >= B.t) uiPlace(card, a.x, above, { area: B });
+          else uiPlace(card, a.x, tr.b + 2, { below: true, area: B });
+          card.style.visibility = '';
+        }
+      }
+    },
+    poke() { if (i < 0) start(); else go(1); },
+    destroy() { removeEventListener('keydown', kd); veil.remove(); if (card) card.remove(); }
+  };
+});
