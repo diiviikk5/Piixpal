@@ -87,7 +87,8 @@ export const POWERS = [
     where: "header",
     uses: "<code>data-tour</code> attributes on your own elements",
     support: "every modern browser · keyboard: → next, ← back, Esc ends",
-    try: "click Scout to start the tour"
+    try: "click Scout to start the tour",
+    desc: "Onboarding, guided by a tiny explorer. Mark the stops with <code>data-tour=\"what this is\"</code>; Scout hops from one to the next, stands on each and raises its flag while a spotlight dims everything else and a card explains. Keyboard friendly, announced to screen readers, and it can start by itself once per visitor."
   }
   // new powers go above this line
 ];
