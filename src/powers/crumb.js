@@ -61,3 +61,12 @@ const crumbCopy = el => {
   return { el: c, fixed, x: r.left + (fixed ? 0 : scrollX), y: r.top + (fixed ? 0 : scrollY), w: r.width, h: r.height };
 };
 
+/* the bites: punched out of a mask with jagged, pixel-round edges */
+const crumbBite = (g, x, y, r) => {
+  g.globalCompositeOperation = 'destination-out';
+  for (let dy = -r; dy <= r; dy++) {
+    const half = Math.round(Math.sqrt(Math.max(0, r * r - dy * dy)) + (Math.random() < .5 ? 0 : -1));
+    g.fillRect(Math.round(x - half), Math.round(y + dy), half * 2 + 1, 1);
+  }
+};
+
