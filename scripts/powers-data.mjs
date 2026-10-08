@@ -259,7 +259,8 @@ export const POWERS = [
     desc: "A treasure hunt across your whole site. Hide gems anywhere, on any page: tucked on a heading, behind a button, down in the footer. Visitors who spot one click it and it flies into a little jar in the corner that remembers every gem they have found, page to page. Find them all and the jar bursts with sparkles and, if you like, hands over a reward code. Great for launches.",
     attrs: [["hunt","the name of the hunt (gems of one hunt share a jar)"],["gem","this gem’s id within the hunt"],["total","how many gems there are"],["reward","a code to show when the jar is full"],["color","the gem’s colour"]],
     api: "el.ctl.reset()",
-    events: "piix:gem { hunt, found, total }, piix:hunt-done { hunt, reward }"
+    events: "piix:gem { hunt, found, total }, piix:hunt-done { hunt, reward }",
+    hab: "<button type=\"button\" class=\"h-btn\" style=\"position:absolute;right:20px;top:20px\" onclick=\"document.querySelectorAll('#gem piix-pal').forEach(p => p.ctl && p.ctl.reset())\">Hide them again</button><h4 class=\"lv-h\" id=\"d-gem1\" style=\"position:absolute;left:24px;top:40px;margin:0\">Treasure</h4><p class=\"h-line\" id=\"d-gem2\" style=\"bottom:auto;top:110px\">Gems hide on headings, on lines of text, on buttons, anywhere.</p><div class=\"h-btns\" style=\"bottom:70px\"><span class=\"h-btn\" id=\"d-gem3\">A button</span></div><piix-pal pal=\"gem\" hunt=\"docs\" gem=\"1\" total=\"3\" reward=\"PIXPAL\" on=\"#d-gem1\" at=\".9\"></piix-pal><piix-pal pal=\"gem\" hunt=\"docs\" gem=\"2\" total=\"3\" color=\"#ff4d6d\" on=\"#d-gem2\" at=\".7\"></piix-pal><piix-pal pal=\"gem\" hunt=\"docs\" gem=\"3\" total=\"3\" color=\"#7bd63a\" on=\"#d-gem3\" at=\".2\"></piix-pal>"
   }
   // new powers go above this line
 ];
