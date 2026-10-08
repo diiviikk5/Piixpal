@@ -241,3 +241,15 @@ defineBehavior('pet', (a, [el], host) => {
   };
 });
 
+/* <piix-avatar seed="…">: the same creatures, inline like an image, from any word */
+class PiixAvatarElement extends PiixSpriteElement {
+  static get observedAttributes() { return ['seed', 'size', 'scale', 'hue', 'render', 'depth']; }
+  _figureName() {
+    const seed = this.getAttribute('seed') || 'piixpal', name = 'seed:' + seed;
+    if (!FIGURES[name]) defineFigure(name, hatchFigure(seed));
+    if (!this.hasAttribute('aria-label') && !this.hasAttribute('aria-hidden')) this.setAttribute('aria-label', FIGURES[name].petName);
+    return name;
+  }
+}
+define('piix-avatar', PiixAvatarElement);
+ELEMENTS.avatar = 'piix-avatar';
