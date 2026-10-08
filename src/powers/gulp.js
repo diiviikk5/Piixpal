@@ -54,3 +54,76 @@ defineSprite('_file', {
 /* a file size people can read */
 const gulpSize = n => n < 1024 ? n + ' B' : n < 1048576 ? Math.round(n / 1024) + ' KB' : (n / 1048576).toFixed(1) + ' MB';
 
+/* dropzone: watch files being dragged about, open up over the zone, gulp what lands */
+defineBehavior('dropzone', (a, [zone], host) => {
+  const S = a.s / 3;
+  const accept = host.hasAttribute('accept');
+  const input = zone.matches('input[type=file]') ? zone : zone.querySelector('input[type=file]');
+  const file = recruit(a, '_file');
+  file.node.style.opacity = '0';
+  let dragging = false, over = false, gx = 0, gy = 0, moodT = 0, mood = '', fly = -1, from = null, card = null, cardT = 0;
+  const hasFiles = e => e.dataTransfer && [...(e.dataTransfer.types || [])].includes('Files');
+  const onOver = e => {
+    if (!hasFiles(e)) return;
+    dragging = true; gx = e.clientX + scrollX; gy = e.clientY + scrollY;
+    over = zone.contains(e.target);
+    if (over && accept) { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; }
+  };
+  const onLeave = e => { if (!e.relatedTarget) { dragging = false; over = false; } };
+  const swallow = (files, x, y) => {
+    const list = [...(files || [])];
+    dragging = false; over = false;
+    if (!list.length) return;
+    from = { x, y }; fly = 0;
+    host.dispatchEvent(new CustomEvent('piix:gulp', { bubbles: true, detail: { files: list } }));
+    if (card) uiClose(card);
+    card = uiCard({ tip: true, width: 260, attrs: { role: 'status' } });
+    card.append(uiEl('h4', { text: 'Gulp!' }), uiEl('p', { text: list.slice(0, 3).map(f => `${f.name} (${gulpSize(f.size)})`).join(', ') + (list.length > 3 ? ` and ${list.length - 3} more` : '') }));
+    card.style.visibility = 'hidden'; cardT = 3.4;
+    uiAnnounce(`Got ${list.length} file${list.length > 1 ? 's' : ''}`);
+  };
+  const onDrop = e => { if (zone.contains(e.target) && hasFiles(e)) { if (accept) e.preventDefault(); swallow(e.dataTransfer.files, e.clientX + scrollX, e.clientY + scrollY); } else { dragging = false; over = false; } };
+  const onPick = () => { const r = rectOf(input || zone); swallow(input.files, r.l + r.w / 2, r.t + r.h / 2); };
+  addEventListener('dragover', onOver, true);
+  addEventListener('dragleave', onLeave, true);
+  addEventListener('drop', onDrop, true);
+  if (input) input.addEventListener('change', onPick);
+
+  return {
+    crew: [file],
+    tick(dt) {
+      const r = rectOf(zone);
+      const at = host.getAttribute('at') != null ? clamp(+host.getAttribute('at'), 0, 1) : .88;
+      a.x = r.l + a.w / 2 + Math.max(0, r.w - a.w) * at; a.y = r.t;
+      if (fly >= 0) {
+        /* the file arcs into the open beak and the pouch fills */
+        fly = Math.min(1, fly + dt / (reduced() ? .01 : .45));
+        const mx = a.x + a.face * a.w * .35, my = a.y - a.h * .55;
+        file.x = lerp(from.x, mx, fly); file.y = lerp(from.y, my, fly) - Math.sin(Math.PI * fly) * 50 * S;
+        file.sx = file.sy = 1 - fly * .6; file.node.style.opacity = '1';
+        a.play('open');
+        if (fly >= 1) { fly = -1; file.node.style.opacity = '0'; mood = 'full'; moodT = 1; a.sy = 1.15; a.sx = .9; }
+      } else if (moodT > 0) {
+        moodT -= dt;
+        a.play(mood);
+        if (moodT <= 0 && mood === 'full') { mood = 'happy'; moodT = 1.4; a.say('heart', 1000); }
+      } else if (dragging) {
+        a.face = gx < a.x ? -1 : 1;
+        a.play(over ? 'open' : 'look');
+      } else a.play('idle');
+      a.sx = lerp(a.sx, 1, .15); a.sy = lerp(a.sy, 1, .15);
+      if (card) {
+        cardT -= dt;
+        uiPlace(card, a.x, a.y - a.h - 2, { under: a.y + 2, area: boxOf(host) ? rectOf(boxOf(host)) : undefined });
+        card.style.visibility = fly >= 0 ? 'hidden' : '';
+        if (cardT <= 0) { uiClose(card); card = null; }
+      }
+    },
+    poke() { a.say(dragging ? '!' : '?', 700); },
+    destroy() {
+      removeEventListener('dragover', onOver, true); removeEventListener('dragleave', onLeave, true); removeEventListener('drop', onDrop, true);
+      if (input) input.removeEventListener('change', onPick);
+      if (card) card.remove();
+    }
+  };
+});
