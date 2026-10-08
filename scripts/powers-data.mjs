@@ -122,7 +122,9 @@ export const POWERS = [
     uses: "your cookie banner and its own Accept / Reject buttons",
     support: "every modern browser · your banner code runs untouched",
     try: "press Accept or Reject, then Bring it back",
-    desc: "The cookie banner everyone has, finally fun. Crumb the mouse sits on your banner sniffing at it. The moment a visitor presses Accept or Reject, it tucks in and eats the whole thing, bite by jagged bite, crumbs flying, then pats its belly and waddles off. Your own buttons still do their job: Crumb eats a stand-in copy, so your code can hide the real banner straight away."
+    desc: "The cookie banner everyone has, finally fun. Crumb the mouse sits on your banner sniffing at it. The moment a visitor presses Accept or Reject, it tucks in and eats the whole thing, bite by jagged bite, crumbs flying, then pats its belly and waddles off. Your own buttons still do their job: Crumb eats a stand-in copy, so your code can hide the real banner straight away.",
+    attrs: [["on","the banner (or put the tag inside it)"],["at","where it sits on the banner, 0–1 (default .82)"]],
+    events: "piix:eaten"
   }
   // new powers go above this line
 ];
