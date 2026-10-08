@@ -22,3 +22,18 @@ defineSprite('gem', {
   fps: { idle: 8 }
 });
 
+/* the jar that collects them: glass, a lid, and one gem-coloured pixel row per gem inside */
+const gemJar = (n, total) => {
+  let rows = ['.kkkkkkkk.', '.kbbbbbbk.', 'kkkkkkkkkk', 'k........k', 'k........k', 'k........k', 'k........k', 'k........k', 'k........k', 'k........k', '.kkkkkkkk.'];
+  rows = rows.map((r, y) => y > 2 && y < 10 ? 'k' + 'g'.repeat(8) + 'k' : r);
+  const filled = Math.round(Math.min(1, total ? n / total : 0) * 7);
+  for (let i = 0; i < filled; i++) rows = art.put(rows, 1, 9 - i, [i % 2 ? 'lLlLlLlL' : 'LlLlLlLl']);
+  return art.put(rows, 2, 3, ['w', 'w']);
+};
+/* the jar: up to twelve fill levels */
+defineSprite('_jar', {
+  w: 10, h: 11, scale: 3,
+  palette: { k: '#17121f', b: '#ff6b4a', g: '#eaf6ff', l: '#58c8ff', L: '#b8e6ff', w: '#ffffff' },
+  frames: Object.fromEntries(Array.from({ length: 13 }, (_, i) => ['j' + i, [gemJar(i, 12)]]))
+});
+
