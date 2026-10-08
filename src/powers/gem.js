@@ -37,3 +37,7 @@ defineSprite('_jar', {
   frames: Object.fromEntries(Array.from({ length: 13 }, (_, i) => ['j' + i, [gemJar(i, 12)]]))
 });
 
+/* what each hunt has found so far, kept in the visitor's browser */
+const gemLoad = hunt => { try { return JSON.parse(localStorage.getItem('piix-hunt:' + hunt)) || []; } catch (_) { return []; } };
+const gemSave = (hunt, list) => { try { localStorage.setItem('piix-hunt:' + hunt, JSON.stringify(list)); } catch (_) { /* private mode */ } };
+
