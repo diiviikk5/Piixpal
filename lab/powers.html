@@ -70,6 +70,13 @@
   <div class="cookie" id="cookie-banner"><p>We use cookies to remember your theme. That's it.</p><button type="button" class="ok">Accept</button><button type="button">Reject</button><piix-pal pal="crumb"></piix-pal></div>
 </div>
 <script>document.getElementById('cookie-banner').addEventListener('click', e => { if (e.target.closest('button')) e.currentTarget.style.display = 'none'; });</script>
+<article id="story" style="max-width:640px;margin:60px 0">
+  <h2>Listen to this</h2>
+  <p>Polly reads the page out loud. It hops along the words as it says them, and each word lights up as it goes. Press the button, or click the parrot.</p>
+  <p>It uses the speech built into your browser, so there is nothing to download and no account to make.</p>
+  <button type="button" id="listen" class="btn">Listen</button>
+  <piix-pal pal="polly" button="#listen"></piix-pal>
+</article>
 <script src="../piixpal.js"></script>
 </body>
 </html>
