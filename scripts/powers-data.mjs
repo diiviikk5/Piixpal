@@ -44,6 +44,28 @@ export const POWERS = [
     api: 'el.clear()',
     hab: '<p class="h-text" style="bottom:auto;top:96px;font-size:56px">Let it snow</p><div class="h-btns" style="bottom:22px;gap:10px"><button type="button" class="h-btn" data-call="#d-wx:setAttribute" data-args=\'["kind","snow"]\'>Snow</button><button type="button" class="h-btn" data-call="#d-wx:setAttribute" data-args=\'["kind","rain"]\'>Rain</button><button type="button" class="h-btn" data-call="#d-wx:setAttribute" data-args=\'["kind","leaves"]\'>Leaves</button><button type="button" class="h-btn" data-call="#d-wx:setAttribute" data-args=\'["kind","petals"]\'>Petals</button></div><piix-weather id="d-wx" kind="snow" amount="2"></piix-weather>',
     code: '<!-- the whole page -->\n<piix-weather kind="snow"></piix-weather>\n\n<!-- or just inside one element -->\n<header class="hero">\n  <h1>Happy holidays</h1>\n  <piix-weather kind="snow" amount="2"></piix-weather>\n</header>'
+  },
+  {
+    id: 'pidge', fam: 'jobs', accent: 'var(--violet)', kind: 'pal', does: 'courier', where: 'body',
+    uses: 'a JavaScript call from anywhere: <code>Piixpal.toast("Saved!")</code>',
+    support: 'every modern browser · notes are announced to screen readers',
+    try: 'press the buttons; hover a note to keep it open',
+    desc: 'Toast notifications, delivered by pigeon. Call <code>Piixpal.toast()</code> from anywhere and Pidge flies in with an envelope, the note pops open in the corner, and it perches on top of the pile until every note has been read, then flies off. Hovering a note pauses it, errors get a red stamp, and each note is announced to screen readers.',
+    attrs: [['type', '<code>{ type: "ok" | "error" | "info" }</code>'], ['title', '<code>{ title: "Mia" }</code> a bold first line'], ['time', '<code>{ time: 6000 }</code> ms on screen, 0 = until dismissed (default 4200)']],
+    api: 'Piixpal.toast(msg, opts)  el.ctl.toast(msg, opts)  el.ctl.clear()',
+    hab: '<div class="h-btns" style="top:26px;bottom:auto;justify-content:flex-start;padding-left:22px;gap:10px;flex-wrap:wrap;right:22px"><button type="button" class="h-btn lime" data-call="#d-pidge:toast" data-args=\'["Saved your changes",{"type":"ok"}]\'>Save</button><button type="button" class="h-btn" data-call="#d-pidge:toast" data-args=\'["Could not reach the server",{"type":"error","title":"Upload failed"}]\'>Fail</button><button type="button" class="h-btn" data-call="#d-pidge:toast" data-args=\'["Mia liked your post",{"type":"info"}]\'>Notify</button></div><piix-pal pal="pidge" id="d-pidge"></piix-pal>',
+    code: '<script src="https://cdn.jsdelivr.net/gh/diiviikk5/Piixpal@main/dist/c/pidge.min.js"></script>\n<script>\n  Piixpal.toast("Saved!", { type: "ok" });\n</script>'
+  },
+  {
+    id: 'plane', fam: 'jobs', accent: 'var(--coral)', kind: 'pal', does: 'banner', where: 'body', query: 'text=v2 is out',
+    uses: 'a banner link towed across the top of your page',
+    support: 'every modern browser · parks instead of flying for reduced motion',
+    try: 'hover the banner to hold the plane still; click the plane for a loop',
+    desc: 'Announcements, by air. A little propeller plane tows your banner across the top of the page, letters rippling in the wind. The banner is a real link, and the plane hangs about while you hover it so it is easy to click. It flies once per visit unless you ask for more.',
+    attrs: [['text', 'what the banner says'], ['href', 'makes the banner a link'], ['top', 'px from the top of the screen (default 90)'], ['repeat', 'seconds between passes, 0 = once (default 0)'], ['always', 'fly on every page view, not once per session']],
+    api: 'el.ctl.fly()',
+    hab: '<p class="h-line" style="bottom:40px">Banners are real links, so they work with keyboards and screen readers too.</p><piix-pal pal="plane" text="Piixpal v0.4 is out →" top="34" repeat="1.5" always></piix-pal>',
+    code: '<piix-pal pal="plane"\n  text="v2 is out! Read the post →"\n  href="/blog/v2"></piix-pal>'
   }
   // new powers go above this line
 ];
