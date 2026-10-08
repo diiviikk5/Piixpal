@@ -22,3 +22,17 @@ const tabbyHead = oy => art.outline(art.paint(16, 16, (x, y) => {
   return null;
 }));
 
+/* eyes: open, looking left or right, blinking, asleep or happy; and a little pink nose */
+const tabbyEyes = (rows, oy, eyes) => {
+  const y = 8 + oy;
+  const E = {
+    open: [[4, y, ['ew', 'ee']], [10, y, ['ew', 'ee']]],
+    left: [[4, y, ['we', 'ee']], [10, y, ['we', 'ee']]],
+    right: [[5, y, ['ew', 'ee']], [11, y, ['ew', 'ee']]],
+    blink: [[4, y + 1, ['ee']], [10, y + 1, ['ee']]],
+    sleep: [[4, y + 1, ['e..e', '.ee.']].map((v, i) => i === 0 ? 3 : v), [10, y + 1, ['e..e', '.ee.']]],
+    happy: [[4, y, ['.ee.', 'e..e']].map((v, i) => i === 0 ? 3 : v), [10, y, ['.ee.', 'e..e']]]
+  }[eyes];
+  return art.compose(rows, ...E, [7, 11 + oy, ['pp']], [6, 12 + oy, ['e..e']], [7, 13 + oy, ['ee']]);
+};
+
