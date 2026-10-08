@@ -416,7 +416,8 @@ Piixpal.icons = ICONS;
 /* Real words for pals that need them: toasts, tour cards, tooltips, summaries.
  * Cards live in their own shadow root, above the pals and NOT aria-hidden, so screen
  * readers and keyboards can use them. They look like the pixel speech bubbles. */
-const UI_INK = '#1b1226', UI_PAPER = '#fffdf5';
+const UI_INK = '#1b1226';
+const UI_PAPER = '#fffdf5';
 const UI_FONT = 'system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif';
 const UI_MONO = 'ui-monospace,SFMono-Regular,Menlo,Consolas,monospace';
 const UI_CSS = `
@@ -466,6 +467,13 @@ const uiRoot = () => {
   uiShadow.append(st, uiLive);
   document.body.appendChild(uiHost);
   return uiShadow;
+};
+/* extra card styles for one component, added once: uiStyle('toast', '.toast{…}') */
+const uiStyles = new Set();
+const uiStyle = (key, css) => {
+  if (uiStyles.has(key)) return;
+  uiStyles.add(key);
+  uiRoot().appendChild(uiEl('style', { text: css }));
 };
 /* uiEl('p', { text, cls, attrs, on, style }, ...children) */
 const uiEl = (tag, o = {}, ...kids) => {
@@ -1653,10 +1661,10 @@ Object.assign(Piixpal, {
   clear: () => document.querySelectorAll(['piix-pal', 'piix-sprite', ...Object.values(ELEMENTS)].join()).forEach(e => e.remove())
 });
 
-Piixpal._k = { reduceMQ, reduced, clamp, rnd, chance, pick, lerp, now, hexRGBA, ptr, ptrDist, scroll, subs, raf, frame, sub, unsub, rectOf, docW, boxOf, pin, areaOf, onScreen, surfaceAt, LAYER_CSS, layer, origin, getLayer, layerOrigin, SPRITES, bake, defineSprite, baked, ACTORS, shout, Actor, recruit, BEHAVIORS, defineBehavior, Piixpal, art, ICON_PAL, ICONS, DIGITS, numberIcon, iconCache, iconPal, bakeIcon, UI_INK, UI_FONT, UI_MONO, UI_CSS, uiHost, uiRoot, uiEl, uiIcon, uiCard, uiPlace, uiAt, uiClose, uiAnnounce, measureCtx, glyphTop, textProfile, segAt, LAND, platCache, TEXTY, surfaceOf, platforms, drag, BLIP, CROWD_COLORS, PiixCrowdElement, FIGURES, defineFigure, mixHex, figurePalette, bakeFigure, HEAD, PiixSpriteElement, RENDERS, lum, BAYER, ASCII, TEXTURES, BIG, PiixTypeElement, CELL_SHAPES, PiixPalElement, define, ELEMENTS, add, autoAttach, SCRIPT, start };
+Piixpal._k = { reduceMQ, reduced, clamp, rnd, chance, pick, lerp, now, hexRGBA, ptr, ptrDist, scroll, subs, raf, frame, sub, unsub, rectOf, docW, boxOf, pin, areaOf, onScreen, surfaceAt, LAYER_CSS, layer, origin, getLayer, layerOrigin, SPRITES, bake, defineSprite, baked, ACTORS, shout, Actor, recruit, BEHAVIORS, defineBehavior, Piixpal, art, ICON_PAL, ICONS, DIGITS, numberIcon, iconCache, iconPal, bakeIcon, UI_INK, UI_PAPER, UI_FONT, UI_MONO, UI_CSS, uiHost, uiRoot, uiStyles, uiStyle, uiEl, uiIcon, uiCard, uiPlace, uiAt, uiClose, uiAnnounce, measureCtx, glyphTop, textProfile, segAt, LAND, platCache, TEXTY, surfaceOf, platforms, drag, BLIP, CROWD_COLORS, PiixCrowdElement, FIGURES, defineFigure, mixHex, figurePalette, bakeFigure, HEAD, PiixSpriteElement, RENDERS, lum, BAYER, ASCII, TEXTURES, BIG, PiixTypeElement, CELL_SHAPES, PiixPalElement, define, ELEMENTS, add, autoAttach, SCRIPT, start };
 return Piixpal._k;
 })();
-const { reduceMQ, reduced, clamp, rnd, chance, pick, lerp, now, hexRGBA, ptr, ptrDist, scroll, subs, raf, frame, sub, unsub, rectOf, docW, boxOf, pin, areaOf, onScreen, surfaceAt, LAYER_CSS, layer, origin, getLayer, layerOrigin, SPRITES, bake, defineSprite, baked, ACTORS, shout, Actor, recruit, BEHAVIORS, defineBehavior, Piixpal, art, ICON_PAL, ICONS, DIGITS, numberIcon, iconCache, iconPal, bakeIcon, UI_INK, UI_FONT, UI_MONO, UI_CSS, uiHost, uiRoot, uiEl, uiIcon, uiCard, uiPlace, uiAt, uiClose, uiAnnounce, measureCtx, glyphTop, textProfile, segAt, LAND, platCache, TEXTY, surfaceOf, platforms, drag, BLIP, CROWD_COLORS, PiixCrowdElement, FIGURES, defineFigure, mixHex, figurePalette, bakeFigure, HEAD, PiixSpriteElement, RENDERS, lum, BAYER, ASCII, TEXTURES, BIG, PiixTypeElement, CELL_SHAPES, PiixPalElement, define, ELEMENTS, add, autoAttach, SCRIPT, start } = K;
+const { reduceMQ, reduced, clamp, rnd, chance, pick, lerp, now, hexRGBA, ptr, ptrDist, scroll, subs, raf, frame, sub, unsub, rectOf, docW, boxOf, pin, areaOf, onScreen, surfaceAt, LAYER_CSS, layer, origin, getLayer, layerOrigin, SPRITES, bake, defineSprite, baked, ACTORS, shout, Actor, recruit, BEHAVIORS, defineBehavior, Piixpal, art, ICON_PAL, ICONS, DIGITS, numberIcon, iconCache, iconPal, bakeIcon, UI_INK, UI_PAPER, UI_FONT, UI_MONO, UI_CSS, uiHost, uiRoot, uiStyles, uiStyle, uiEl, uiIcon, uiCard, uiPlace, uiAt, uiClose, uiAnnounce, measureCtx, glyphTop, textProfile, segAt, LAND, platCache, TEXTY, surfaceOf, platforms, drag, BLIP, CROWD_COLORS, PiixCrowdElement, FIGURES, defineFigure, mixHex, figurePalette, bakeFigure, HEAD, PiixSpriteElement, RENDERS, lum, BAYER, ASCII, TEXTURES, BIG, PiixTypeElement, CELL_SHAPES, PiixPalElement, define, ELEMENTS, add, autoAttach, SCRIPT, start } = K;
 
 /* ---- behaviors/beeline.js ---- */
 /* beeline: a little line of worker bees buzzing round their element. Come close and
@@ -6408,6 +6416,185 @@ defineBehavior('cord', (a, targets, host) => {
   };
 });
 
+/* ---- powers/pidge.js ---- */
+/* PIDGE: a pigeon that delivers your toast notifications.
+ *
+ *   Piixpal.toast('Saved!')                                   anywhere, no markup needed
+ *   Piixpal.toast('Could not save', { type: 'error' })        ok | error | info
+ *   Piixpal.toast('New message', { title: 'Mia', time: 6000 }) time 0 = until dismissed
+ *
+ * It flies in with an envelope, the note pops open in the corner, and it perches on top
+ * of the pile until every note is read, then flies off. Hovering a note pauses it.
+ * <piix-pal pal="pidge" box="…"> gives you a pigeon for one area: el.ctl.toast(…) */
+(() => {
+  const W = 16, H = 12;
+  const bird = ({ hx = 0, hy = 0, wing = 'fold', feet = true }) => {
+    let rows = art.paint(W, H, (x, y) => {
+      if (art.ellipse(x, y, 12 + hx, 3 + hy, 2.3, 2.2)) return 'g';                     /* head */
+      if (art.ellipse(x, y, 10.6 + hx * .5, 5.4 + hy * .5, 2.2, 1.9)) return (x + y) % 2 ? 't' : 'v';   /* shiny neck */
+      if (wing === 'up' && art.ellipse(x, y, 6.5, 2.6, 3.6, 2.3)) return x < 5 ? 'G' : 'w';
+      if (wing === 'down' && art.ellipse(x, y, 6.5, 9.6, 3.4, 1.8)) return x < 5 ? 'G' : 'w';
+      if (art.ellipse(x, y, 7, 6.8, 5.4, 3)) {
+        if (wing === 'fold' && art.ellipse(x, y, 6.4, 6.4, 3.4, 1.7)) return y === 6 && x > 4 && x < 9 ? 'w' : 'G';
+        if (wing === 'mid' && y >= 6 && y <= 7 && x > 1) return 'G';
+        return y > 7 ? 'w' : 'g';
+      }
+      if (x <= 2 && y >= 6 && y <= 8 && y - 6 <= 2 - x * .7) return 'G';                   /* tail */
+      return null;
+    });
+    rows = art.outline(rows);
+    rows = art.compose(rows, [12 + hx, 2 + hy, ['o']], [14 + hx, 3 + hy, ['bb']]);
+    if (feet) rows = art.compose(rows, [6, 10, ['f..f']], [6, 11, ['f..f']]);
+    return rows;
+  };
+  const PAL = { k: '#17121f', g: '#9aa3b5', G: '#6c7590', w: '#d4d9e4', t: '#33b89a', v: '#8a5fc4', o: '#ff9a2f', b: '#3a3f4f', f: '#ff8fa3' };
+  defineSprite('pidge', {
+    w: W, h: H, scale: 3, does: 'courier',
+    palette: PAL,
+    frames: {
+      idle: [bird({}), bird({}), bird({ hx: 1 }), bird({})],
+      peck: [bird({ hx: 1, hy: 2 }), bird({ hx: 1, hy: 3 })],
+      fly: [bird({ wing: 'up', feet: false }), bird({ wing: 'mid', feet: false }), bird({ wing: 'down', feet: false }), bird({ wing: 'mid', feet: false })]
+    },
+    fps: { idle: 2, peck: 8, fly: 12 }
+  });
+  /* the envelope it carries (crew only) */
+  defineSprite('_note', {
+    w: 9, h: 7, scale: 3,
+    palette: { k: '#17121f', w: '#fffdf5', W: '#e9e2d0', r: '#ff4d6d' },
+    frames: { idle: [['kkkkkkkkk', 'kkwwwwwkk', 'kwkwwwkwk', 'kwwkwkwwk', 'kwwwkwwrk', 'kWWWWWWWk', 'kkkkkkkkk']] }
+  });
+})();
+
+/* courier: flies notes in, perches on the pile, flies off when it's read */
+const PIDGE_CSS = `
+.toast{transition:top .25s cubic-bezier(.2,.8,.2,1);padding-right:34px}
+.toast .ic{align-items:flex-start}
+.toast .ic > div{min-width:0;overflow-wrap:anywhere}
+.toast b{display:block;margin-bottom:1px}
+.toast.ok{--tone:#2fa36b}.toast.error{--tone:#e5484d}.toast.info{--tone:#6b4cff}
+.toast::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--tone,#1b1226)}`;
+defineBehavior('courier', (a, targets, host) => {
+  const S = a.s / 3;
+  const boxEl = boxOf(host);
+  const area = areaOf(host, a);
+  uiStyle('toast', PIDGE_CSS);
+  const note = recruit(a, '_note');
+  if (!boxEl) pin(note);
+  const cards = [], queue = [];
+  let state = 'away', t = 0, from = null, to = null, peckT = rnd(2, 5), dropT = 0;
+  a.node.style.opacity = '0'; note.node.style.opacity = '0';
+
+  const perch = () => {
+    const r = area();
+    const top = cards.length ? cards[cards.length - 1] : null;
+    if (!top) return { x: r.r - 60 * S, y: r.b - 20 * S };
+    return { x: top._x + top.offsetWidth - 38 * S, y: top._y };
+  };
+  /* stack the notes in the bottom-right corner, newest at the bottom */
+  const layout = () => {
+    const r = area();
+    let y = r.b - 14;
+    for (let i = 0; i < cards.length; i++) {
+      const c = cards[i];
+      const w = c.offsetWidth, h = c.offsetHeight;
+      y -= h;
+      c._x = Math.max(r.l + 8, r.r - 14 - w); c._y = y;
+      uiAt(c, c._x, c._y);
+      y -= 10;
+    }
+  };
+  const close = c => {
+    const i = cards.indexOf(c);
+    if (i < 0) return;
+    cards.splice(i, 1);
+    uiClose(c);
+    if (!cards.length && !queue.length) fly('out');
+  };
+  const deliver = m => {
+    const c = uiCard({ fixed: !boxEl, cls: 'toast ' + m.type, width: 300, attrs: { role: m.type === 'error' ? 'alert' : 'status' } });
+    c.append(
+      uiEl('div', { cls: 'ic' }, uiIcon(m.type === 'error' ? 'x' : m.type === 'ok' ? 'check' : '!', 3),
+        uiEl('div', {}, m.title ? uiEl('b', { text: m.title }) : null, uiEl('span', { text: m.msg }))),
+      uiEl('button', { cls: 'x', text: '×', attrs: { type: 'button', 'aria-label': 'Dismiss' }, on: { click: () => close(c) } })
+    );
+    c._until = m.time > 0 ? now() + m.time : Infinity;
+    c.addEventListener('pointerenter', () => { c._hover = now(); });
+    c.addEventListener('pointerleave', () => { if (c._hover && c._until !== Infinity) c._until += now() - c._hover; c._hover = 0; });
+    cards.unshift(c);
+    layout();
+    uiAnnounce((m.title ? m.title + ': ' : '') + m.msg);
+  };
+  const fly = to2 => {
+    if (to2 === 'in') {
+      const r = area();
+      from = state === 'away' ? { x: r.r + 40 * S, y: r.b - 150 * S } : { x: a.x, y: a.y };
+      state = 'in'; t = 0;
+      a.node.style.opacity = ''; note.node.style.opacity = '';
+    } else { from = { x: a.x, y: a.y }; state = 'out'; t = 0; }
+  };
+  const toast = (msg, opts = {}) => {
+    const m = { msg: String(msg), type: ['ok', 'error', 'info'].includes(opts.type) ? opts.type : 'info', title: opts.title || '', time: opts.time != null ? +opts.time : 4200 };
+    if (state === 'perch') { deliver(m); dropT = .3; a.say('note', 500); }
+    else { queue.push(m); if (state !== 'in') fly('in'); }
+    return m;
+  };
+  host._pending && host._pending.splice(0).forEach(([m, o]) => toast(m, o));
+
+  return {
+    crew: [note],
+    boxed: true,
+    awake: () => true,
+    toast,
+    clear() { cards.slice().forEach(close); },
+    tick(dt) {
+      const R = reduced();
+      /* notes time out (not while hovered) */
+      for (const c of cards.slice()) if (!c._hover && now() > c._until) close(c);
+      if (cards.length) layout();
+      t += dt;
+      if (state === 'in') {
+        to = cards.length ? perch() : (() => { const r = area(); return { x: r.r - 70 * S, y: r.b - 24 * S }; })();
+        const k = R ? 1 : Math.min(1, t / .6), e = 1 - Math.pow(1 - k, 3);
+        a.x = lerp(from.x, to.x, e); a.y = lerp(from.y, to.y, e) - Math.sin(Math.PI * k) * 40 * S;
+        a.face = to.x < from.x ? -1 : 1;
+        a.play('fly');
+        note.x = a.x; note.y = a.y + note.h + 2 * S; note.node.style.opacity = '';
+        if (k >= 1) {
+          state = 'perch'; note.node.style.opacity = '0';
+          queue.splice(0).forEach(deliver);
+          a.sy = .8; a.sx = 1.2;
+        }
+      } else if (state === 'out') {
+        const r = area();
+        const k = R ? 1 : Math.min(1, t / .7), e = k * k;
+        a.x = lerp(from.x, r.r + 50 * S, e); a.y = lerp(from.y, r.t + 30 * S, e);
+        a.face = 1; a.play('fly');
+        if (k >= 1) { state = 'away'; a.node.style.opacity = '0'; }
+      } else if (state === 'perch') {
+        const p = perch();
+        a.x = lerp(a.x, p.x, R ? 1 : .3); a.y = lerp(a.y, p.y, R ? 1 : .3);
+        a.face = -1;
+        dropT -= dt; peckT -= dt;
+        if (dropT > 0) a.oy = -Math.sin(Math.PI * dropT / .3) * 8 * S; else a.oy = 0;
+        if (peckT < 0) { a.play('peck', { loop: false, reset: true }); peckT = rnd(2.5, 6); }
+        else if (a.clip !== 'peck' || a.done) a.play('idle');
+      }
+      a.sx = lerp(a.sx, 1, .2); a.sy = lerp(a.sy, 1, .2);
+    },
+    poke() { if (state === 'perch') { a.say('heart', 700); dropT = .3; } },
+    destroy() { cards.slice().forEach(c => c.remove()); cards.length = 0; }
+  };
+});
+
+/* Piixpal.toast(msg, opts): uses a page-wide pigeon, making one the first time */
+Piixpal.toast = (msg, opts) => {
+  let el = [...document.querySelectorAll('piix-pal[pal=pidge]')].find(e => !e.hasAttribute('box'));
+  if (!el) { el = document.createElement('piix-pal'); el.setAttribute('pal', 'pidge'); document.body.appendChild(el); }
+  if (el.ctl && el.ctl.toast) return el.ctl.toast(msg, opts);
+  (el._pending = el._pending || []).push([msg, opts]);
+};
+
 /* ---- powers/pix.js ---- */
 /* PIX: play your page. A tiny hero in a red headband who can run and jump on your
  * headings, paragraphs, buttons and images. Click Pix to take control:
@@ -6818,6 +7005,133 @@ defineBehavior('player', (a, [el], host) => {
       me.stop(); PIX_PLAYERS.delete(me);
       removeEventListener('keydown', kd); removeEventListener('keyup', ku); removeEventListener('blur', blur);
     }
+  };
+});
+
+/* ---- powers/plane.js ---- */
+/* PLANE: a little propeller plane that tows your announcement across the top of the
+ * page, banner waving behind it. The banner is a real link: hover it and the plane
+ * hangs about so you can click.
+ *
+ *   <piix-pal pal="plane" text="v2 is out! Read the post →" href="/blog/v2"></piix-pal>
+ *
+ *   text      what the banner says
+ *   href      makes the banner a link
+ *   top       px from the top of the screen (or box)        default 90
+ *   repeat    seconds between passes; 0 = fly once            default 0
+ *   always    fly on every visit (default: once per browser session)
+ *
+ * Click the plane for a loop-the-loop. el.ctl.fly() sends it round again. */
+(() => {
+  const W = 22, H = 12;
+  const plane = prop => {
+    let rows = art.paint(W, H, (x, y) => {
+      if (x >= 2 && x <= 4 && y >= 1 && y <= 5 && y >= 5 - (x - 1) * 1.6) return 'r';            /* tail fin */
+      if (art.ellipse(x, y, 11, 6, 8.6, 2.4)) return y < 5 ? 'r' : y === 5 ? 'w' : 'R';           /* fuselage */
+      if (y >= 7 && y <= 8 && x >= 8 && x <= 14) return 'R';                                      /* wing */
+      if (art.ellipse(x, y, 11.5, 3.2, 1.7, 1.5)) return y < 3 ? 'h' : 'h';                         /* pilot */
+      return null;
+    });
+    rows = art.outline(rows);
+    rows = art.compose(rows, [11, 3, ['gg']], [10, 9, ['k..k']], [10, 10, ['k..k']]);
+    rows = art.compose(rows, prop ? [20, 3, ['p', 'p', 'k', 'p', 'p', 'p']] : [20, 5, ['p', 'k', 'p']]);
+    return rows;
+  };
+  defineSprite('plane', {
+    w: W, h: H, scale: 3, does: 'banner',
+    palette: { k: '#17121f', r: '#ff4d6d', R: '#c92a4b', w: '#fffdf5', h: '#ffd9b5', g: '#58c8ff', p: '#b9b3c4' },
+    frames: { fly: [plane(true), plane(false)] },
+    fps: { fly: 16 }
+  });
+})();
+
+const PLANE_CSS = `
+.banner{position:absolute;left:0;top:0;display:flex;align-items:center;height:30px;padding:0 14px 0 18px;white-space:nowrap;
+  font:800 13px/1 ${UI_FONT};letter-spacing:.06em;text-transform:uppercase;color:${UI_INK};background:${UI_PAPER};text-decoration:none;
+  border:3px solid ${UI_INK};border-left:0;box-sizing:border-box;height:34px;
+  clip-path:polygon(0 0,100% 0,100% 100%,0 100%,6px 75%,0 50%,6px 25%);pointer-events:auto}
+.banner.fixed{position:fixed}
+a.banner:hover{background:#c6f432}
+a.banner:focus-visible{outline:3px solid #6b4cff;outline-offset:3px}
+.banner span{display:inline-block;white-space:pre}
+.rope{position:absolute;left:0;top:0;height:2px;background:${UI_INK};transform-origin:0 50%;pointer-events:none}
+.rope.fixed{position:fixed}`;
+defineBehavior('banner', (a, targets, host) => {
+  const S = a.s / 3;
+  const boxEl = boxOf(host);
+  const area = areaOf(host, a);
+  uiStyle('banner', PLANE_CSS);
+  const text = host.getAttribute('text') || 'Hello from Piixpal!';
+  const href = host.getAttribute('href');
+  const fixed = !boxEl;
+  const flag = uiEl(href ? 'a' : 'span', { cls: 'banner' + (fixed ? ' fixed' : ''), attrs: href ? { href } : { role: 'note' } });
+  const letters = [...text].map(ch => uiEl('span', { text: ch }));
+  flag.append(...letters);
+  const rope = uiEl('div', { cls: 'rope' + (fixed ? ' fixed' : ''), attrs: { 'aria-hidden': 'true' } });
+  uiRoot().append(rope, flag);
+  const key = 'piix-plane:' + text;
+  let seen = false;
+  try { seen = !host.hasAttribute('always') && !boxEl && sessionStorage.getItem(key) === '1'; } catch (_) { /* private mode */ }
+  const repeat = +host.getAttribute('repeat') || 0;
+  let x = 0, state = seen ? 'done' : 'wait', t = 0, wait = boxEl ? .4 : 1.2, loop = 0, hover = false, bw = 0, speed = 150 * S;
+  flag.addEventListener('pointerenter', () => { hover = true; });
+  flag.addEventListener('pointerleave', () => { hover = false; });
+  flag.addEventListener('focus', () => { hover = true; });
+  flag.addEventListener('blur', () => { hover = false; });
+  const show = on => { a.node.style.opacity = on ? '' : '0'; flag.style.visibility = rope.style.visibility = on ? '' : 'hidden'; };
+  show(false);
+  const fly = () => {
+    bw = flag.offsetWidth;
+    const r = area();
+    x = r.l - 40 * S - bw;
+    state = 'fly'; t = 0; show(true);
+    try { if (!boxEl) sessionStorage.setItem(key, '1'); } catch (_) { /* private mode */ }
+  };
+
+  return {
+    boxed: true,
+    awake: () => state !== 'done',
+    fly,
+    tick(dt) {
+      const r = area();
+      const top = r.t + (host.hasAttribute('top') ? +host.getAttribute('top') : boxEl ? 30 * S : 90);
+      t += dt;
+      if (state === 'wait') { wait -= dt; if (wait <= 0) fly(); return; }
+      if (state === 'gap') { wait -= dt; if (wait <= 0) fly(); return; }
+      if (state === 'done') return;
+      if (reduced()) {
+        /* no flying: park it at the right, banner beside it, for a while */
+        a.x = r.r - a.w; a.y = top + a.h / 2; a.rot = 0;
+        if (t > 8 && !hover) { state = repeat ? 'gap' : 'done'; wait = repeat; show(false); }
+      } else {
+        if (!hover) x += speed * dt * (loop > 0 ? 1.5 : 1);
+        const bob = Math.sin(t * 2.2) * 5 * S;
+        a.x = x + bw + 40 * S + a.w / 2;
+        a.y = top + a.h / 2 + bob;
+        if (loop > 0) {
+          loop = Math.max(0, loop - dt / 1.1);
+          const ang = (1 - loop) * Math.PI * 2;
+          a.x += Math.sin(ang) * 30 * S; a.y -= (1 - Math.cos(ang)) * 30 * S;
+          a.rot = -(1 - loop) * 360;
+          if (!loop) a.rot = 0;
+        } else a.rot = Math.cos(t * 2.2) * -3;
+        if (x > r.r + 20) { state = repeat ? 'gap' : 'done'; wait = repeat; show(false); }
+      }
+      a.cv.style.transformOrigin = '50% 50%';
+      a.play('fly');
+      /* banner trails behind the tail; letters ripple */
+      const tailX = a.x - a.w / 2 + 3 * S, tailY = a.y - a.h * .45;
+      const fx = reduced() ? r.r - a.w * 1.5 - bw - 30 * S : x;
+      const fy = (reduced() ? tailY : top + a.h * .2 + Math.sin(t * 2.2 - .6) * 5 * S) - 17;
+      uiAt(flag, fx, fy);
+      letters.forEach((s, i) => { s.style.transform = reduced() ? '' : `translateY(${(Math.sin(t * 7 - i * .55) * 2.2).toFixed(1)}px)`; });
+      const rx = fx + bw, ry = fy + 17, dx = tailX - rx, dy = tailY - ry;
+      uiAt(rope, rx, ry);
+      rope.style.width = Math.max(0, Math.hypot(dx, dy)) + 'px';
+      rope.style.transform = `rotate(${Math.atan2(dy, dx)}rad)`;
+    },
+    poke() { if (state === 'fly' && !loop) { loop = 1; a.say('!', 500); } },
+    destroy() { flag.remove(); rope.remove(); }
   };
 });
 
