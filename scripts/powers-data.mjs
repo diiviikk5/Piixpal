@@ -305,7 +305,8 @@ export const POWERS = [
     where: "label",
     uses: "a range slider, a row of radio buttons (star ratings) or a select",
     support: "every modern browser · keyboard changes count too",
-    try: "drag the slider from one end to the other"
+    try: "drag the slider from one end to the other",
+    desc: "A face for your feedback slider. Meh rides the thumb of a range input, or sits on your star rating, and its face follows the value: red and furious at the bottom, a flat meh in the middle, green and over the moon at the top, with steam, a tear, a blush or heart eyes along the way. It turns “rate us” into something people actually want to play with."
   }
   // new powers go above this line
 ];
