@@ -191,7 +191,8 @@ export const POWERS = [
     desc: "A desktop pet, straight from a website. Sprout is a plant in a pot with a focus timer: it grows a little while you work, blooms when the time is up with a tiny chime, and tells you to rest your eyes. Press Pop out and it leaves the page for its own little window that floats on top of everything else, so it can keep you company while you work in other apps. Close that window and it comes home.",
     attrs: [["minutes","focus length (default 25)"],["break","break length (default 5)"]],
     api: "el.ctl.open()  el.ctl.popout()",
-    events: "piix:bloom, piix:popout"
+    events: "piix:bloom, piix:popout",
+    hab: "<p class=\"h-line\" style=\"bottom:auto;top:30px\">A focus timer that grows. Click the plant.</p><div class=\"h-floor\" id=\"d-sprout\"><i></i><i></i><i></i></div><piix-pal pal=\"sprout\" on=\"#d-sprout\" at=\".5\" minutes=\"1\" break=\".5\"></piix-pal>"
   }
   // new powers go above this line
 ];
