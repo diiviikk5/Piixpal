@@ -175,7 +175,8 @@ export const POWERS = [
     try: "look at this tab’s icon, then switch to another tab for a few seconds and come back",
     desc: "A cat who lives in your browser tab. Tabby’s face becomes the page’s icon, blinking and glancing about, with an optional reading-progress ring around it. Switch to another tab and it curls up asleep while the tab title asks you to come back; come back and it wakes up delighted. A little loaf of Tabby sits on the page too.",
     attrs: [["away","what the tab title says while you are gone (default “Come back! Tabby misses you”)"],["progress","draw a reading-progress ring around the icon"],["preview","also draw the icon on these &lt;canvas&gt; elements"]],
-    hab: "<div class=\"h-tab\"><canvas class=\"d-tabicon\" width=\"32\" height=\"32\"></canvas><span>Superpowers · Piixpal</span><i>×</i></div><canvas class=\"h-fav d-tabicon\" width=\"128\" height=\"128\" aria-label=\"Tabby, as this tab’s icon, close up\"></canvas><div class=\"h-floor\" id=\"d-tabby\"><i></i><i></i><i></i></div><piix-pal pal=\"tabby\" on=\"#d-tabby\" at=\".2\" preview=\".d-tabicon\"></piix-pal>"
+    hab: "<div class=\"h-tab\"><canvas class=\"d-tabicon\" width=\"32\" height=\"32\"></canvas><span>Superpowers · Piixpal</span><i>×</i></div><canvas class=\"h-fav d-tabicon\" width=\"128\" height=\"128\" aria-label=\"Tabby, as this tab’s icon, close up\"></canvas><div class=\"h-floor\" id=\"d-tabby\"><i></i><i></i><i></i></div><piix-pal pal=\"tabby\" on=\"#d-tabby\" at=\".2\" preview=\".d-tabicon\"></piix-pal>",
+    code: "<footer>\n  <piix-pal pal=\"tabby\" progress\n    away=\"Come back! Tabby misses you\"></piix-pal>\n</footer>"
   }
   // new powers go above this line
 ];
