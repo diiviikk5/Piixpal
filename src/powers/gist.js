@@ -36,3 +36,16 @@ const gistFace = (rows, by, look, glasses) => {
   return art.compose(rows, [5, 13, ['Y.Y']]);
 };
 
+/* Gist: blinks, skims (eyes darting), thinks, and presents with its glasses on */
+defineSprite('gist', {
+  w: 13, h: 14, scale: 3, does: 'tldr',
+  palette: { k: '#17121f', b: '#a0673a', B: '#7a4a28', c: '#f0d2ad', C: '#d9b088', w: '#ffffff', e: '#17121f', Y: '#ffb347' },
+  frames: {
+    idle: [gistFace(gistShape(0), 0, 'c'), gistFace(gistShape(0), 0, 'c'), gistFace(gistShape(0), 0, 'shut'), gistFace(gistShape(0), 0, 'c')],
+    skim: [gistFace(gistShape(0), 0, 'l'), gistFace(gistShape(0), 0, 'c'), gistFace(gistShape(0), 0, 'r'), gistFace(gistShape(0), 0, 'c')],
+    present: [gistFace(gistShape(0), 0, 'c', true), gistFace(gistShape(-1), -1, 'c', true)],
+    happy: [gistFace(gistShape(0), 0, 'happy'), gistFace(gistShape(-1), -1, 'happy')]
+  },
+  fps: { idle: 2, skim: 9, present: 2, happy: 5 }
+});
+
