@@ -93,3 +93,16 @@ const pollyRange = (map, i) => {
   return r;
 };
 
+/* light up the word being spoken (CSS Custom Highlight API, where the browser has it) */
+let pollyStyled = false;
+const pollyMark = range => {
+  if (!window.CSS || !CSS.highlights || typeof Highlight === 'undefined') return;
+  if (!pollyStyled) {
+    pollyStyled = true;
+    const st = document.createElement('style');
+    st.textContent = '::highlight(piix-read){background-color:#c6f432;color:#17121f}';
+    document.head.appendChild(st);
+  }
+  if (range) CSS.highlights.set('piix-read', new Highlight(range)); else CSS.highlights.delete('piix-read');
+};
+
