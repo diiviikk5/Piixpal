@@ -134,7 +134,10 @@ export const POWERS = [
     accent: "var(--lime)",
     kind: "pal",
     does: "read",
-    where: "article"
+    where: "article",
+    uses: "the speech built into your browser (Web Speech API) and CSS Custom Highlights",
+    support: "Chrome, Edge, Safari and Firefox speak · word-by-word highlighting where the browser supports it",
+    try: "press Listen (turn your sound on)"
   }
   // new powers go above this line
 ];
