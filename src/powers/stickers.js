@@ -58,3 +58,12 @@ const stickerPath = el => {
 };
 const stickerFind = path => { try { return path ? document.querySelector(path.startsWith('#') ? path : 'body>' + path) : null; } catch (_) { return null; } };
 
+const STICKER_CSS = `
+:host{display:inline-block;vertical-align:middle}
+.sheet{display:grid;grid-template-columns:repeat(3,auto);gap:10px;padding:14px 14px 12px;border-radius:16px;background:#fffdf5;
+  box-shadow:0 0 0 2px #17121f,0 6px 0 rgba(23,18,31,.25);background-image:radial-gradient(#e9e2d0 1px,transparent 1.3px);background-size:10px 10px}
+.t{grid-column:1/-1;font:800 10px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.12em;text-transform:uppercase;color:#6c6477}
+.s{display:grid;place-items:center;cursor:grab;touch-action:none;transition:transform .15s;user-select:none;-webkit-user-select:none}
+.s:hover{transform:translateY(-2px) rotate(-4deg)}
+.s canvas{display:block;image-rendering:pixelated;filter:drop-shadow(0 2px 0 rgba(23,18,31,.25))}`;
+
