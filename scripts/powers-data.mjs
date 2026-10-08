@@ -84,7 +84,10 @@ export const POWERS = [
     accent: "var(--mint)",
     kind: "pal",
     does: "tour",
-    where: "header"
+    where: "header",
+    uses: "<code>data-tour</code> attributes on your own elements",
+    support: "every modern browser · keyboard: → next, ← back, Esc ends",
+    try: "click Scout to start the tour"
   }
   // new powers go above this line
 ];
