@@ -63,3 +63,8 @@ const droneCargo = btn => {
   return { el: c, from: img };
 };
 
+/* the cart's little "got it" bounce */
+const droneBump = el => {
+  try { el.animate([{ transform: 'none' }, { transform: 'translateY(-6px) scale(1.12)' }, { transform: 'translateY(1px) scale(.96)' }, { transform: 'none' }], { duration: 420, easing: 'ease-out' }); } catch (_) { /* old browsers */ }
+};
+
