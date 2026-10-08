@@ -308,7 +308,8 @@ export const POWERS = [
     try: "drag the slider from one end to the other",
     desc: "A face for your feedback slider. Meh rides the thumb of a range input, or sits on your star rating, and its face follows the value: red and furious at the bottom, a flat meh in the middle, green and over the moon at the top, with steam, a tear, a blush or heart eyes along the way. It turns “rate us” into something people actually want to play with.",
     attrs: [["on","the slider, a group of radio buttons, or a select"]],
-    events: "piix:mood { value, level }"
+    events: "piix:mood { value, level }",
+    hab: "<p class=\"h-line\" style=\"bottom:auto;top:30px\">How was your day?</p><div class=\"h-form\" style=\"bottom:70px\"><input id=\"d-rate\" type=\"range\" min=\"0\" max=\"10\" value=\"5\" aria-label=\"How was your day?\"></div><piix-pal pal=\"meh\" on=\"#d-rate\"></piix-pal>"
   }
   // new powers go above this line
 ];
