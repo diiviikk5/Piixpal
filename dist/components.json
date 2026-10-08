@@ -98,5 +98,6 @@
  "pidge": "power",
  "pix": "power",
  "plane": "power",
+ "scout": "power",
  "weather": "power"
 }
