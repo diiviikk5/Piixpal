@@ -68,3 +68,19 @@ const sproutStage = (s, mins) => {
 };
 const sproutClock = sec => `${String(Math.floor(sec / 60)).padStart(2, '0')}:${String(Math.floor(sec % 60)).padStart(2, '0')}`;
 
+/* a little two-note chime, made on the spot */
+const sproutChime = win => {
+  try {
+    const A = win.AudioContext || win.webkitAudioContext, ac = new A();
+    [660, 990].forEach((f, i) => {
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.type = 'square'; o.frequency.value = f;
+      g.gain.setValueAtTime(.0001, ac.currentTime + i * .16);
+      g.gain.exponentialRampToValueAtTime(.08, ac.currentTime + i * .16 + .02);
+      g.gain.exponentialRampToValueAtTime(.0001, ac.currentTime + i * .16 + .3);
+      o.connect(g).connect(ac.destination); o.start(ac.currentTime + i * .16); o.stop(ac.currentTime + i * .16 + .32);
+    });
+    setTimeout(() => ac.close(), 900);
+  } catch (_) { /* no audio */ }
+};
+
