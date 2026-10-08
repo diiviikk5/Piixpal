@@ -160,7 +160,8 @@ export const POWERS = [
     attrs: [["on","what to summarise (or put the tag inside it)"],["points","how many points (default 3)"],["button","a real button that asks for the summary"]],
     api: "el.ctl.summarize()",
     events: "piix:gist { points, source }",
-    hab: "<article class=\"h-article\" id=\"d-gist\"><h4>Why pixel pals?</h4><p>Websites got very serious. Every page looks like every other page. Pixel pals give a site a little life without getting in the way. They never block a click and they stay out of the way of screen readers. They are small, free and made for anyone.</p></article><piix-pal pal=\"gist\" on=\"#d-gist\" points=\"2\"></piix-pal>"
+    hab: "<article class=\"h-article\" id=\"d-gist\"><h4>Why pixel pals?</h4><p>Websites got very serious. Every page looks like every other page. Pixel pals give a site a little life without getting in the way. They never block a click and they stay out of the way of screen readers. They are small, free and made for anyone.</p></article><piix-pal pal=\"gist\" on=\"#d-gist\" points=\"2\"></piix-pal>",
+    code: "<article>\n  <piix-pal pal=\"gist\"></piix-pal>\n  <h1>My long post</h1>\n  <p>…</p>\n</article>"
   }
   // new powers go above this line
 ];
