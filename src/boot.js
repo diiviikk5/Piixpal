@@ -22,6 +22,8 @@ class PiixPalElement extends HTMLElement {
     this._unmount(); this._mount();
   }
   get actor() { return this._actor || null; }
+  /* the running behaviour, for pals with an API (el.ctl.toast(…), el.ctl.start()…) */
+  get ctl() { return this._ctl || null; }
   /* poke it from code: el.poke() */
   poke() { if (this._ctl && this._ctl.poke) this._ctl.poke(); }
 
@@ -114,10 +116,19 @@ const define = (n, c) => { if (!customElements.get(n)) customElements.define(n, 
  * Piixpal.add('pip', '.btn')                       one bird, every .btn a perch
  * Piixpal.add('mochi', '#card', { size: 120 })     sprites go inside the element
  * Piixpal.add('kitty', someElement)                or pass an element directly */
+/* components that are their own element rather than a pal or sprite: { weather: 'piix-weather' } */
+const ELEMENTS = {};
 const add = (name, where = 'body', attrs = {}) => {
   name = String(name).toLowerCase();
+  if (ELEMENTS[name]) {
+    const el = document.createElement(ELEMENTS[name]);
+    for (const k in attrs) if (attrs[k] !== false && attrs[k] != null && k !== '_tries') el.setAttribute(k, attrs[k] === true ? '' : attrs[k]);
+    const host = typeof where === 'string' ? document.querySelector(where) : where;
+    (host || document.body).appendChild(el);
+    return el;
+  }
   /* not registered yet (its file is still loading)? wait to find out if it's a pal or a sprite */
-  if (!attrs.type && !SPRITES[name] && !FIGURES[name] && (attrs._tries || 0) < 80) {
+  if (!attrs.type && !SPRITES[name] && !FIGURES[name] && !ELEMENTS[name] && (attrs._tries || 0) < 80) {
     setTimeout(() => add(name, where, { ...attrs, _tries: (attrs._tries || 0) + 1 }), 125);
     return null;
   }
@@ -162,6 +173,6 @@ const start = (script = SCRIPT) => {
 Object.assign(Piixpal, {
   add,
   /* every pal, sprite and behaviour currently registered */
-  list: () => ({ pals: Object.keys(SPRITES), sprites: Object.keys(FIGURES), behaviors: Object.keys(BEHAVIORS) }),
-  clear: () => document.querySelectorAll('piix-pal,piix-sprite').forEach(e => e.remove())
+  list: () => ({ pals: Object.keys(SPRITES).filter(n => n[0] !== '_'), sprites: Object.keys(FIGURES), behaviors: Object.keys(BEHAVIORS), elements: Object.keys(ELEMENTS) }),
+  clear: () => document.querySelectorAll(['piix-pal', 'piix-sprite', ...Object.values(ELEMENTS)].join()).forEach(e => e.remove())
 });
