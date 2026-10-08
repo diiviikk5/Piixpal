@@ -210,3 +210,15 @@ document.querySelectorAll('[data-tabs]').forEach(box => {
   });
   render();
 })();
+
+/* ---------- demo buttons that call a pal's API: data-call="#selector:method" data-args='["a",1]' ---------- */
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-call]');
+  if (!b) return;
+  const [sel, method] = b.dataset.call.split(':');
+  const el = document.querySelector(sel);
+  const t = el && (el.ctl || el);
+  let args = [];
+  try { args = b.dataset.args ? JSON.parse(b.dataset.args) : []; } catch (_) { /* bad JSON */ }
+  if (t && typeof t[method] === 'function') t[method](...args);
+});
