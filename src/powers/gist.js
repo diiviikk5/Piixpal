@@ -72,3 +72,16 @@ const gistPick = (sents, n) => {
   }).sort((p, q) => q.sc - p.sc).slice(0, n).sort((p, q) => p.i - q.i).map(o => o.s);
 };
 
+/* the browser's own AI, if it's there and ready (never starts a download on its own) */
+const gistAI = async (text, context) => {
+  try {
+    if (!('Summarizer' in self)) return null;
+    if ((await Summarizer.availability()) !== 'available') return null;
+    const sm = await Summarizer.create({ type: 'key-points', format: 'plain-text', length: 'short', sharedContext: context });
+    const out = await sm.summarize(text.slice(0, 6000));
+    if (sm.destroy) sm.destroy();
+    const pts = String(out).split(/\n+/).map(l => l.replace(/^[\s*•\-–\d.)]+/, '').trim()).filter(Boolean);
+    return pts.length ? pts.slice(0, 6) : null;
+  } catch (_) { return null; }
+};
+
