@@ -155,7 +155,8 @@ export const POWERS = [
     tall: true,
     uses: "your browser’s built-in AI summarizer when it has one ready (Chrome), or a sentence picker that runs anywhere",
     support: "every modern browser · on-device AI in Chrome when the model is already there · never downloads anything itself",
-    try: "click the owl for the TL;DR"
+    try: "click the owl for the TL;DR",
+    desc: "TL;DR, from a wise old owl. Click Gist and it skims your article, eyes darting along the lines, then puts on its reading glasses and hands you the key points with a copy button. When the browser has its own AI summarizer ready, Gist uses it, on the device, so nothing is sent anywhere. Otherwise it picks the sentences that share the most with the rest of the text."
   }
   // new powers go above this line
 ];
