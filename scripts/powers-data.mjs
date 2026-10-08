@@ -325,7 +325,8 @@ export const POWERS = [
     desc: "A character counter you can feel. Squish the marshmallow sits on the corner of your text box, perfectly comfy, until the text gets near the limit. Then it starts getting squashed, sweats, holds up how many characters are left, and at the limit it is flat as a pancake. Delete a few and it pops right back up.",
     attrs: [["on","the textarea or input (or put the tag inside its label)"],["limit","the limit, if the field has no maxlength (default 280)"]],
     events: "piix:limit { length, limit, left }",
-    hab: "<p class=\"h-line\" style=\"bottom:auto;top:30px\">Write a very short bio:</p><div class=\"h-form\" style=\"bottom:40px\"><textarea id=\"d-bio\" maxlength=\"40\" rows=\"3\" placeholder=\"Hi! I make…\" aria-label=\"Bio\"></textarea></div><piix-pal pal=\"squish\" on=\"#d-bio\"></piix-pal>"
+    hab: "<p class=\"h-line\" style=\"bottom:auto;top:30px\">Write a very short bio:</p><div class=\"h-form\" style=\"bottom:40px\"><textarea id=\"d-bio\" maxlength=\"40\" rows=\"3\" placeholder=\"Hi! I make…\" aria-label=\"Bio\"></textarea></div><piix-pal pal=\"squish\" on=\"#d-bio\"></piix-pal>",
+    code: "<label>\n  Bio\n  <textarea maxlength=\"140\"></textarea>\n  <piix-pal pal=\"squish\"></piix-pal>\n</label>"
   }
   // new powers go above this line
 ];
