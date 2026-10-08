@@ -302,7 +302,10 @@ export const POWERS = [
     accent: "var(--sun)",
     kind: "pal",
     does: "mood",
-    where: "label"
+    where: "label",
+    uses: "a range slider, a row of radio buttons (star ratings) or a select",
+    support: "every modern browser · keyboard changes count too",
+    try: "drag the slider from one end to the other"
   }
   // new powers go above this line
 ];
