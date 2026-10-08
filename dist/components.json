@@ -93,5 +93,6 @@
  "token": "sprite",
  "ufo": "sprite",
  "wizard": "sprite",
+ "bulb": "power",
  "pix": "power"
 }
