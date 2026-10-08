@@ -81,7 +81,8 @@ class PiixSpriteElement extends HTMLElement {
   _on(attr) { return this.hasAttribute(attr) || (!!this._spec[attr] && !this.hasAttribute('no-' + attr)); }
 
   _build() {
-    const want = this.getAttribute('name');
+    /* which figure: the name attribute, or one a subclass makes up (avatars do) */
+    const want = this._figureName ? this._figureName() : this.getAttribute('name');
     /* its file may still be loading: wait for it rather than showing someone else */
     if (want && !FIGURES[want]) {
       this._tries = (this._tries || 0) + 1;
