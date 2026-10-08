@@ -1,7 +1,8 @@
 /* Real words for pals that need them: toasts, tour cards, tooltips, summaries.
  * Cards live in their own shadow root, above the pals and NOT aria-hidden, so screen
  * readers and keyboards can use them. They look like the pixel speech bubbles. */
-const UI_INK = '#1b1226', UI_PAPER = '#fffdf5';
+const UI_INK = '#1b1226';
+const UI_PAPER = '#fffdf5';
 const UI_FONT = 'system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif';
 const UI_MONO = 'ui-monospace,SFMono-Regular,Menlo,Consolas,monospace';
 const UI_CSS = `
@@ -51,6 +52,13 @@ const uiRoot = () => {
   uiShadow.append(st, uiLive);
   document.body.appendChild(uiHost);
   return uiShadow;
+};
+/* extra card styles for one component, added once: uiStyle('toast', '.toast{…}') */
+const uiStyles = new Set();
+const uiStyle = (key, css) => {
+  if (uiStyles.has(key)) return;
+  uiStyles.add(key);
+  uiRoot().appendChild(uiEl('style', { text: css }));
 };
 /* uiEl('p', { text, cls, attrs, on, style }, ...children) */
 const uiEl = (tag, o = {}, ...kids) => {
