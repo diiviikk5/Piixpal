@@ -137,7 +137,8 @@ export const POWERS = [
     where: "article",
     uses: "the speech built into your browser (Web Speech API) and CSS Custom Highlights",
     support: "Chrome, Edge, Safari and Firefox speak · word-by-word highlighting where the browser supports it",
-    try: "press Listen (turn your sound on)"
+    try: "press Listen (turn your sound on)",
+    desc: "Read-aloud for any page, with a guide you can watch. Polly speaks your text with the voice built into the browser and hops along the words as it says them, each one lighting up. It reads in sentence-sized pieces so long articles never cut off, keeps the current line on screen, and pauses and resumes right where it was. Hook it to a real button and it is keyboard friendly too."
   }
   // new powers go above this line
 ];
