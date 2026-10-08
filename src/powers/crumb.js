@@ -32,3 +32,16 @@ const crumbFace = (rows, by, { nose = 0, chew = false, eyes = 'open' }) => {
 /* little feet, apart or together */
 const crumbFeet = (rows, step) => art.compose(rows, step ? [4, 10, ['p']] : [5, 10, ['p']], step ? [10, 10, ['p']] : [9, 10, ['p']]);
 
+/* Crumb: sniffs, walks, chews, and sits back full and happy */
+defineSprite('crumb', {
+  w: 16, h: 11, scale: 3, does: 'munch',
+  palette: { k: '#17121f', b: '#b9b3c4', d: '#8d8699', B: '#e6e2ee', p: '#ff9fb5', q: '#d98aa3', e: '#17121f' },
+  frames: {
+    idle: [crumbFeet(crumbFace(crumbShape(0), 0, {}), 0), crumbFeet(crumbFace(crumbShape(0), 0, { nose: 1 }), 0), crumbFeet(crumbFace(crumbShape(0), 0, {}), 0), crumbFeet(crumbFace(crumbShape(0), 0, { eyes: 'shut' }), 0)],
+    walk: [crumbFeet(crumbFace(crumbShape(-1), -1, {}), 1), crumbFeet(crumbFace(crumbShape(0), 0, {}), 0)],
+    chew: [crumbFeet(crumbFace(crumbShape(0), 0, { chew: true }), 0), crumbFeet(crumbFace(crumbShape(0), 0, { chew: true, nose: 1, eyes: 'shut' }), 0)],
+    full: [crumbFeet(crumbFace(crumbShape(0, true), 0, { eyes: 'happy' }), 0), crumbFeet(crumbFace(crumbShape(-1, true), -1, { eyes: 'happy' }), 0)]
+  },
+  fps: { idle: 3, walk: 10, chew: 12, full: 3 }
+});
+
