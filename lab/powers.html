@@ -16,6 +16,9 @@
   .stage h3{position:absolute;left:40px;top:150px;margin:0;font-size:40px}
   .stage p{position:absolute;left:300px;top:90px;margin:0;width:260px}
   .stage .btn{position:absolute}
+  html.dark body{background:#17121f;color:#eee}
+  .room{transition:background-color .3s,color .3s}
+  .room.dark{background:#17121f;color:#fff}
 </style>
 </head>
 <body>
@@ -35,6 +38,8 @@
   <a class="btn" href="#e" style="left:640px;top:170px">High</a>
   <piix-pal pal="pix" on="#stage h3" box="#stage" coins="5"></piix-pal>
 </div>
+<div class="stage room" id="room"><h3 style="top:240px">Pull the chain</h3><piix-pal pal="bulb" box="#room" target="#room" at=".5"></piix-pal></div>
+<piix-pal pal="bulb" at=".95"></piix-pal>
 <script src="../piixpal.js"></script>
 </body>
 </html>
