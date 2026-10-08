@@ -275,7 +275,8 @@ export const POWERS = [
     try: "drag a sticker off the sheet onto the box; drag it again to move it, double-click to peel it off",
     desc: "A sheet of pixel stickers your visitors can peel off and slap anywhere on the page: on a heading, a photo, the footer. Each one gets a proper die-cut white border, lands with a little slap at a jaunty angle, and stays stuck to the element it landed on, even when the layout shifts. It is still there next time they visit. Use the built-in stickers or any sprite from the library.",
     attrs: [["names","which stickers, comma separated: heart, star, bolt, smile, crown, wow, or any sprite’s name"],["box","only let them stick inside one element"]],
-    api: "el.clear()"
+    api: "el.clear()",
+    hab: "<button type=\"button\" class=\"h-btn\" style=\"position:absolute;right:20px;top:20px\" data-call=\"#d-stickers:clear\">Peel them all</button><p class=\"h-text\" style=\"bottom:auto;top:110px;left:210px;right:20px;font-size:40px\">Stick it here</p><div style=\"position:absolute;left:20px;top:20px\"><piix-stickers id=\"d-stickers\" box=\".habitat\" names=\"heart,star,bolt,smile,crown,wow,mochi,ufo,toast\"></piix-stickers></div>"
   }
   // new powers go above this line
 ];
