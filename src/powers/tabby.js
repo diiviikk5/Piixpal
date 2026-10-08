@@ -36,3 +36,15 @@ const tabbyEyes = (rows, oy, eyes) => {
   return art.compose(rows, ...E, [7, 11 + oy, ['pp']], [6, 12 + oy, ['e..e']], [7, 13 + oy, ['ee']]);
 };
 
+/* the loaf: a round little body tucked under the head, and a tail that flicks */
+const tabbyLoaf = (eyes, tail, oy = 0) => {
+  let rows = art.outline(art.paint(22, 19, (x, y) => {
+    if (art.ellipse(x, y, 11, 14.6, 8.4, 3.6)) return (x % 4 === 1 && y < 15) ? 'O' : 'o';
+    if (tail === 0 && x >= 19 && x <= 20 && y >= 10 && y <= 15) return 'O';
+    if (tail === 1 && ((x >= 19 && x <= 20 && y >= 12 && y <= 15) || (x === 21 && y === 11))) return 'O';
+    return null;
+  }));
+  const head = tabbyEyes(tabbyHead(0), 0, eyes);
+  return art.compose(rows, ...head.map((r, i) => [2, i + oy, [r.replace(/\./g, '_')]]));
+};
+
