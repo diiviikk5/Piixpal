@@ -59,3 +59,21 @@ defineSprite('buff', {
 /* passwords everybody tries first */
 const BUFF_COMMON = ['password', '123456', 'qwerty', 'letmein', 'iloveyou', 'admin', 'welcome', 'monkey', 'dragon', 'football', 'abc123', '111111', 'sunshine', 'princess', 'passw0rd', 'master', 'hello', 'freedom', 'whatever', 'trustno1', 'starwars', 'login', 'baseball', 'shadow'];
 
+/* how strong a password is, 0 (nothing yet) to 4 (beast) */
+const buffScore = pw => {
+  if (!pw) return 0;
+  const low = pw.toLowerCase();
+  if (pw.length < 14 && BUFF_COMMON.some(c => low.includes(c))) return 1;
+  const kinds = [/[a-z]/, /[A-Z]/, /\d/, /[^A-Za-z0-9]/].filter(r => r.test(pw)).length;
+  let s = 0;
+  if (pw.length >= 8) s++;
+  if (pw.length >= 12) s++;
+  if (pw.length >= 16) s++;
+  if (kinds >= 3) s++;
+  if (kinds === 4 && pw.length >= 10) s++;
+  if (/(.)\1\1/.test(pw)) s--;
+  if (/0123|1234|2345|3456|4567|5678|6789|abcd|bcde|cdef|qwer|asdf|zxcv/i.test(pw)) s--;
+  return clamp(s, 1, 4);
+};
+const BUFF_LABELS = ['', 'weak', 'okay', 'strong', 'beast'];
+
