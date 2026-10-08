@@ -62,3 +62,18 @@ defineSprite('scout', {
   fps: { idle: 2.5, walk: 10, point: 6, happy: 6 }
 });
 
+/* where the stops come from: a list from code, the steps="" attribute, or data-tour attributes */
+const scoutStops = (list, host, boxEl) => {
+  if (list) return list.map(s => ({ el: typeof s.el === 'string' ? document.querySelector(s.el) : s.el, text: s.text || '', title: s.title || '' })).filter(s => s.el);
+  const attr = host.getAttribute('steps');
+  if (attr) return attr.split('|').map(p => {
+    const k = p.indexOf(': ');
+    let e = null;
+    try { e = document.querySelector(p.slice(0, k).trim()); } catch (_) { /* bad selector */ }
+    return { el: e, text: p.slice(k + 2).trim() };
+  }).filter(s => s.el && s.text);
+  return [...(boxEl || document).querySelectorAll('[data-tour]')]
+    .map((e, n) => ({ el: e, text: e.getAttribute('data-tour'), title: e.getAttribute('data-tour-title') || '', o: +e.getAttribute('data-tour-step') || 1e6 + n }))
+    .sort((p, q) => p.o - q.o);
+};
+
