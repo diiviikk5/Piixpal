@@ -295,6 +295,14 @@ export const POWERS = [
     events: "piix:strength { score, label }",
     hab: "<p class=\"h-line\" style=\"bottom:auto;top:30px\">Choose a password:</p><div class=\"h-form\"><input id=\"d-pw\" type=\"password\" placeholder=\"type a password…\" aria-label=\"Password\" autocomplete=\"new-password\"></div><piix-pal pal=\"buff\" on=\"#d-pw\"></piix-pal>",
     code: "<label>\n  Password\n  <input type=\"password\">\n  <piix-pal pal=\"buff\"></piix-pal>\n</label>"
+  },
+  {
+    id: "meh",
+    fam: "jobs",
+    accent: "var(--sun)",
+    kind: "pal",
+    does: "mood",
+    where: "label"
   }
   // new powers go above this line
 ];
