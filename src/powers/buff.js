@@ -45,3 +45,14 @@ const buffPose = (level, pose) => {
   return buffBar(buffBody(0, 'flex', 'happy'), 2, level, true);
 };
 
+/* Buff: for each strength, a resting pose and a lifting one */
+defineSprite('buff', {
+  w: 18, h: 19, scale: 3, does: 'strength',
+  palette: { k: '#17121f', b: '#ff9a8a', d: '#d9705f', B: '#ffd0c7', h: '#ff4d6d', e: '#17121f', q: '#7d768a', P: '#3a3247' },
+  frames: Object.assign({}, ...[0, 1, 2, 3, 4].map(l => ({
+    ['rest' + l]: [buffPose(l, 'chest')],
+    ['lift' + l]: l <= 1 ? [buffPose(l, 'strain'), buffPose(l, 'chest')] : l === 4 ? [buffPose(l, 'flex'), buffPose(l, 'lift')] : [buffPose(l, 'chest'), buffPose(l, 'lift')]
+  }))),
+  fps: Object.fromEntries([0, 1, 2, 3, 4].map(l => ['lift' + l, [10, 9, 2.4, 3.4, 2][l]]))
+});
+
