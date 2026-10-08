@@ -49,3 +49,16 @@ const scoutFrame = ({ by = 0, legs = 'stand', flag = 0, arm = false, eyes = 'ope
   return scoutFlag(rows, by, flag, arm);
 };
 
+/* Scout: idles with a flapping flag, walks, points the flag at things, cheers at the end */
+defineSprite('scout', {
+  w: 17, h: 17, scale: 3, does: 'tour',
+  palette: { k: '#17121f', q: '#7d768a', h: '#e8d48a', H: '#b89a48', f: '#ffd9b5', e: '#17121f', p: '#ff9fb5', b: '#a0673a', g: '#6fa35a', B: '#4a3a24', r: '#ff4d6d' },
+  frames: {
+    idle: [scoutFrame({ flag: 0 }), scoutFrame({ flag: 1 }), scoutFrame({ flag: 2, eyes: 'shut' }), scoutFrame({ flag: 1 })],
+    walk: [scoutFrame({ legs: 'a', by: -1, flag: 1 }), scoutFrame({ legs: 'b', flag: 2 }), scoutFrame({ legs: 'c', by: -1, flag: 1 }), scoutFrame({ legs: 'b', flag: 0 })],
+    point: [scoutFrame({ arm: true, flag: 0 }), scoutFrame({ arm: true, flag: 1 }), scoutFrame({ arm: true, flag: 2 })],
+    happy: [scoutFrame({ arm: true, flag: 1, eyes: 'happy' }), scoutFrame({ arm: true, flag: 2, eyes: 'happy', by: -1 })]
+  },
+  fps: { idle: 2.5, walk: 10, point: 6, happy: 6 }
+});
+
