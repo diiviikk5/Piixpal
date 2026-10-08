@@ -293,7 +293,8 @@ export const POWERS = [
     attrs: [["on","the password input (or put the tag inside its label)"],["at","where it stands on the field, 0–1 (default .9)"]],
     api: "el.ctl.score",
     events: "piix:strength { score, label }",
-    hab: "<p class=\"h-line\" style=\"bottom:auto;top:30px\">Choose a password:</p><div class=\"h-form\"><input id=\"d-pw\" type=\"password\" placeholder=\"type a password…\" aria-label=\"Password\" autocomplete=\"new-password\"></div><piix-pal pal=\"buff\" on=\"#d-pw\"></piix-pal>"
+    hab: "<p class=\"h-line\" style=\"bottom:auto;top:30px\">Choose a password:</p><div class=\"h-form\"><input id=\"d-pw\" type=\"password\" placeholder=\"type a password…\" aria-label=\"Password\" autocomplete=\"new-password\"></div><piix-pal pal=\"buff\" on=\"#d-pw\"></piix-pal>",
+    code: "<label>\n  Password\n  <input type=\"password\">\n  <piix-pal pal=\"buff\"></piix-pal>\n</label>"
   }
   // new powers go above this line
 ];
