@@ -491,19 +491,19 @@ ${family('groups', 'Groups', 'One tag, a whole crew: families, flocks, lines and
 const powerSection = p => `
 <section class="doc-sec power" id="${p.id}" aria-labelledby="${p.id}-h" style="--accent:${p.accent}">
   <h2 id="${p.id}-h">${title(p.id)} <span class="pal-no">${p.kind === 'element' ? '&lt;' + p.tag + '&gt;' : 'do="' + p.does + '"'}</span></h2>
-  <p>${p.desc}</p>
+  <p>${p.desc || ''}</p>
   <div class="pal-doc">
-    <div class="habitat${p.tall ? ' tall' : ''}">${boxed(p.hab)}</div>
+    <div class="habitat${p.tall ? ' tall' : ''}">${boxed(p.hab || '')}</div>
     <div class="info">
       <dl class="kv">
-        <dt>uses</dt><dd>${p.uses}</dd>
-        <dt>works in</dt><dd>${p.support}</dd>
-        <dt>try it</dt><dd>${p.try}</dd>
-        ${p.attrs.map(([a, d]) => `<dt>${a}</dt><dd>${d}</dd>`).join('\n        ')}
+        ${p.uses ? `<dt>uses</dt><dd>${p.uses}</dd>` : ''}
+        ${p.support ? `<dt>works in</dt><dd>${p.support}</dd>` : ''}
+        ${p.try ? `<dt>try it</dt><dd>${p.try}</dd>` : ''}
+        ${(p.attrs || []).map(([a, d]) => `<dt>${a}</dt><dd>${d}</dd>`).join('\n        ')}
         ${p.api ? `<dt>api</dt><dd><code>${esc(p.api)}</code></dd>` : ''}
         ${p.events ? `<dt>events</dt><dd>${p.events}</dd>` : ''}
       </dl>
-      ${installTabs(p.id, p.kind === 'element' ? 'element' : 'pal', p.code, p.where || 'body', p.query || '')}
+      ${p.code ? installTabs(p.id, p.kind === 'element' ? 'element' : 'pal', p.code, p.where || 'body', p.query || '') : ''}
     </div>
   </div>
 </section>`;
