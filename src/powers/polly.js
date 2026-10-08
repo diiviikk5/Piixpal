@@ -114,3 +114,110 @@ const pollyVoice = (lang, want) => {
   return vs.find(v => v.lang.toLowerCase() === L && v.localService) || vs.find(v => v.lang.toLowerCase().startsWith(L.slice(0, 2))) || null;
 };
 
+/* read: speak the element, standing on each word as it's said */
+defineBehavior('read', (a, [el], host) => {
+  const S = a.s / 3;
+  const can = 'speechSynthesis' in window && typeof SpeechSynthesisUtterance !== 'undefined';
+  let map = null, chunks = [], ci = 0, word = -1, state = 'idle', from = null, hop = 1, guessT = 0, gotBoundary = false, chunkT = 0, userScrolled = 0;
+  const btn = host.getAttribute('button') ? document.querySelector(host.getAttribute('button')) : null;
+  const rate = +host.getAttribute('rate') || 1, pitch = +host.getAttribute('pitch') || 1.15;
+  const label = t => { if (btn) btn.setAttribute('aria-pressed', String(t)); };
+  const onScroll = () => { userScrolled = now(); };
+  addEventListener('wheel', onScroll, { passive: true });
+  addEventListener('touchmove', onScroll, { passive: true });
+  const speak = (k, fromChar = 0) => {
+    const c = chunks[k];
+    if (!c) return finish(true);
+    ci = k;
+    const u = new SpeechSynthesisUtterance(c.text.slice(fromChar));
+    const v = pollyVoice(document.documentElement.lang, host.getAttribute('voice'));
+    if (v) u.voice = v;
+    u.lang = (v && v.lang) || document.documentElement.lang || 'en';
+    u.rate = rate; u.pitch = pitch;
+    u.onboundary = e => { if (e.name && e.name !== 'word') return; gotBoundary = true; word = c.start + fromChar + e.charIndex; };
+    u.onstart = () => { chunkT = 0; guessT = 0; gotBoundary = false; word = c.start + fromChar; };
+    u.onend = () => { if (state === 'reading' && u === cur) speak(k + 1); };
+    u.onerror = e => { if (state === 'reading' && u === cur && e.error !== 'interrupted' && e.error !== 'canceled') finish(false); };
+    cur = u;
+    speechSynthesis.speak(u);
+  };
+  let cur = null;
+  const read = () => {
+    if (!can) { a.say('x', 1200); uiAnnounce('This browser cannot read aloud'); return; }
+    if (state === 'paused') { state = 'reading'; label(true); speak(ci, Math.max(0, word - chunks[ci].start)); return; }
+    map = pollyText(el);
+    chunks = pollyChunks(map.text);
+    if (!chunks.length) return;
+    speechSynthesis.cancel();
+    state = 'reading'; label(true); word = 0;
+    host.dispatchEvent(new CustomEvent('piix:read-start', { bubbles: true }));
+    speak(0);
+  };
+  const pause = () => { if (state !== 'reading') return; state = 'paused'; cur = null; speechSynthesis.cancel(); label(false); };
+  const finish = done => {
+    state = 'idle'; cur = null; word = -1; pollyMark(null); label(false);
+    if (can) speechSynthesis.cancel();
+    from = { x: a.x, y: a.y }; hop = 0;
+    if (done) a.say('heart', 1200);
+    host.dispatchEvent(new CustomEvent('piix:read-end', { bubbles: true, detail: { done } }));
+  };
+  const toggle = () => state === 'reading' ? pause() : read();
+  if (btn) btn.addEventListener('click', toggle);
+  let lastWord = -2;
+
+  return {
+    awake: () => state !== 'idle' || hop < 1,
+    read, pause, stop: () => finish(false),
+    tick(dt) {
+      /* no word timings from this voice? walk the words at a speaking pace instead */
+      if (state === 'reading') {
+        chunkT += dt;
+        if (!gotBoundary && chunkT > .6 && map) {
+          guessT += dt * 14 * rate;
+          const c = chunks[ci];
+          if (c) {
+            let i = Math.min(c.start + c.text.length - 1, c.start + Math.floor(guessT));
+            while (i > c.start && !/\s/.test(map.text[i - 1])) i--;
+            word = Math.max(word, i);
+          }
+        }
+      }
+      const range = state !== 'idle' && map && word >= 0 ? pollyRange(map, word) : null;
+      let target;
+      const rr = range && range.getClientRects()[0];
+      if (rr) target = { x: rr.left + scrollX + rr.width / 2, y: rr.top + scrollY + 2 * S };
+      else {
+        /* waiting: perched on the very first word */
+        const first = pollyRange(map || (map = pollyText(el)), 0), fr = first && first.getClientRects()[0];
+        if (fr) target = { x: fr.left + scrollX + a.w * .4, y: fr.top + scrollY + 2 * S };
+        else { const r = rectOf(el); target = { x: r.l + a.w / 2, y: r.t }; }
+      }
+      if (word !== lastWord) {
+        lastWord = word;
+        if (range) pollyMark(range);
+        from = { x: a.x || target.x, y: a.y || target.y }; hop = 0;
+        /* keep the word on screen, unless the reader is scrolling themselves */
+        if (rr && state === 'reading' && now() - userScrolled > 2500 && (rr.bottom > innerHeight - 70 || rr.top < 70) && !boxOf(host)) {
+          scrollBy({ top: rr.top - innerHeight * .4, behavior: reduced() ? 'auto' : 'smooth' });
+        }
+      }
+      if (hop < 1) {
+        hop = Math.min(1, hop + dt / (reduced() ? .01 : .16));
+        a.x = lerp(from.x, target.x, hop);
+        a.y = lerp(from.y, target.y, hop) - Math.sin(Math.PI * hop) * Math.min(24 * S, 8 * S + Math.abs(target.y - from.y) * .4);
+        a.face = target.x < from.x ? -1 : 1;
+        a.play('hop');
+      } else {
+        a.x = target.x; a.y = target.y;
+        a.play(state === 'reading' ? 'talk' : 'idle');
+      }
+      if (state === 'idle' && ptr.seen && a.near(20 * S)) a.say('note', 600);
+    },
+    poke: toggle,
+    destroy() {
+      if (state !== 'idle') { speechSynthesis.cancel(); pollyMark(null); }
+      if (btn) btn.removeEventListener('click', toggle);
+      removeEventListener('wheel', onScroll); removeEventListener('touchmove', onScroll);
+    }
+  };
+});
