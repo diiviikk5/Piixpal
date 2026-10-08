@@ -52,3 +52,8 @@ defineSprite('gist', {
 /* small words that say nothing on their own */
 const GIST_STOP = new Set(('the and for are but not you all any can had her was one our out has have his how its may new now old see two way who did get let put say she too use that with this from they will would there their what about which when your said each than then them these some could into more other were been like just only over also very such most even much many make made well back where after before while because should through being both does here those under same why yet ever often upon still between however again every across within without around another really something').split(' '));
 
+/* the sentences of a text, line by line (so a heading never glues onto its paragraph), tidied */
+const gistSentences = text => text.split(/\n+/)
+  .flatMap(line => line.replace(/\s+/g, ' ').match(/[^.!?]+[.!?]+["')\]]*|[^.!?]+$/g) || [])
+  .map(s => s.trim()).filter(s => s.split(' ').length >= 5);
+
