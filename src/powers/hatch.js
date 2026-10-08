@@ -91,9 +91,9 @@ const hatchPaint = (G, { eyes = 'open', by = 0, step = 0, whites = false }) => {
   if (whites) rows = art.compose(rows, [l, ey, ['ww', 'ww'].slice(0, 2)], [rx, ey, ['ww', 'ww'].slice(0, 2)]);
   else if (eyes === 'open') rows = art.compose(rows, [l, ey, G.bigEyes ? ['we', 'ee'] : ['e', 'e']], [rx + (G.bigEyes ? 0 : 1), ey, G.bigEyes ? ['we', 'ee'] : ['e', 'e']]);
   else if (eyes === 'shut') rows = art.compose(rows, [l, ey + eh, ['ee']], [rx, ey + eh, ['ee']]);
-  else if (eyes === 'happy') rows = art.compose(rows, [l, ey, ['.e.', 'e.e'].map(s => s.slice(0, 3))].map((v, i) => i === 0 ? l - 0 : v), [rx, ey, ['.e.', 'e.e']]);
+  else if (eyes === 'happy') rows = art.compose(rows, [l, ey, ['_e_', 'e_e'].map(s => s.slice(0, 3))].map((v, i) => i === 0 ? l - 0 : v), [rx, ey, ['_e_', 'e_e']]);
   const my = ey + 2 + (G.bigEyes ? 1 : 0);
-  const M = { smile: [[7, my, ['e..e', '.ee.']]], cat: [[6, my, ['e.e.e', '.e.e.']]], fang: [[7, my, ['eeee', '.w..']]], o: [[7, my, ['.e', 'e.e'.slice(0, 2)]]], none: [] }[G.mouth];
+  const M = { smile: [[7, my, ['e__e', '_ee_']]], cat: [[6, my, ['e_e_e', '_e_e_']]], fang: [[7, my, ['eeee', '_w__']]], o: [[7, my, ['_e', 'e_e'.slice(0, 2)]]], none: [] }[G.mouth];
   rows = art.compose(rows, ...M);
   if (G.mark === 'blush' || G.mark === 'belly') rows = art.compose(rows, [l - 1, my, ['p']], [rx + 2, my, ['p']]);
   /* feet: together, or one lifted for a step */
