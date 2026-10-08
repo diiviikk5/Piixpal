@@ -173,7 +173,8 @@ export const POWERS = [
     uses: "your page’s icon in the browser tab, the tab’s title, and the Page Visibility API",
     support: "Chrome, Edge, Firefox and Safari show the live icon · puts your own icon and title back when removed",
     try: "look at this tab’s icon, then switch to another tab for a few seconds and come back",
-    desc: "A cat who lives in your browser tab. Tabby’s face becomes the page’s icon, blinking and glancing about, with an optional reading-progress ring around it. Switch to another tab and it curls up asleep while the tab title asks you to come back; come back and it wakes up delighted. A little loaf of Tabby sits on the page too."
+    desc: "A cat who lives in your browser tab. Tabby’s face becomes the page’s icon, blinking and glancing about, with an optional reading-progress ring around it. Switch to another tab and it curls up asleep while the tab title asks you to come back; come back and it wakes up delighted. A little loaf of Tabby sits on the page too.",
+    attrs: [["away","what the tab title says while you are gone (default “Come back! Tabby misses you”)"],["progress","draw a reading-progress ring around the icon"],["preview","also draw the icon on these &lt;canvas&gt; elements"]]
   }
   // new powers go above this line
 ];
