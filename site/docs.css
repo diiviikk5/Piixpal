@@ -194,3 +194,7 @@
 .h-tab canvas{width:24px;height:24px;image-rendering:pixelated}
 .h-tab i{font-style:normal;color:var(--muted);margin-left:8px}
 .h-fav{position:absolute;right:28px;top:30px;width:128px;height:128px;image-rendering:pixelated;border:2px dashed color-mix(in oklab,var(--ink) 30%,transparent);border-radius:14px;background:var(--card)}
+.h-comments{position:absolute;left:22px;right:22px;top:24px;display:grid;gap:12px}
+.h-c{display:flex;align-items:center;gap:12px}
+.h-c p{margin:0;padding:10px 14px;border:2px solid var(--ink);border-radius:12px;background:var(--card);font:500 14.5px/1.35 var(--f-sans)}
+.h-c b{margin-right:6px}
