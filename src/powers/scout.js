@@ -83,3 +83,14 @@ const scoutSpot = (e, a, S) => {
   return { x: clamp(r.l + Math.min(r.w * .5, 70 * S), r.l + a.w / 2, Math.max(r.l + a.w / 2, r.r - a.w / 2)), y: sf ? sf.t : r.t };
 };
 
+/* the dimmed spotlight: a veil over the page (or box) with a hole cut around the stop */
+const scoutVeil = (veil, hole, boxEl) => {
+  let V, o;
+  if (boxEl) { const b = boxEl.getBoundingClientRect(); V = { l: b.left, t: b.top, w: b.width, h: b.height }; o = { x: b.left + scrollX - origin.x, y: b.top + scrollY - origin.y }; }
+  else { V = { l: 0, t: 0, w: docW(), h: innerHeight }; o = { x: 0, y: 0 }; }
+  veil.style.width = V.w + 'px'; veil.style.height = V.h + 'px';
+  veil.style.transform = `translate3d(${Math.round(o.x)}px,${Math.round(o.y)}px,0)`;
+  const L = Math.max(0, hole.l - V.l), T = Math.max(0, hole.t - V.t), R = Math.min(V.w, hole.r - V.l), B = Math.min(V.h, hole.b - V.t);
+  veil.style.clipPath = `polygon(evenodd,0 0,${V.w}px 0,${V.w}px ${V.h}px,0 ${V.h}px,0 0,${L}px ${T}px,${R}px ${T}px,${R}px ${B}px,${L}px ${B}px,${L}px ${T}px)`;
+};
+
