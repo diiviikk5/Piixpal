@@ -33,3 +33,16 @@ const sproutPlant = (rows, stage, sway) => {
   return art.compose(rows, ...parts);
 };
 
+/* Sprout: each stage sways; it can be happy, asleep (on a break), or away on your desktop */
+defineSprite('sprout', {
+  w: 16, h: 21, scale: 3, does: 'desk',
+  palette: { k: '#17121f', r: '#e07b4f', R: '#c4683f', d: '#6b4226', e: '#17121f', p: '#ff9fb5', g: '#3fa34d', l: '#7bd63a', b: '#ff7aa2', f: '#ff9fb5', y: '#ffd23f' },
+  frames: Object.assign(
+    Object.fromEntries([0, 1, 2, 3, 4].map(n => ['s' + n, [sproutPlant(sproutPot(), n, 0), sproutPlant(sproutPot(), n, 1), sproutPlant(sproutPot(), n, 0), sproutPlant(sproutPot(), n, -1)]])),
+    Object.fromEntries([0, 1, 2, 3, 4].map(n => ['h' + n, [sproutPlant(sproutPot('happy'), n, 0)]])),
+    Object.fromEntries([0, 1, 2, 3, 4].map(n => ['z' + n, [sproutPlant(sproutPot('shut'), n, 0)]])),
+    { away: [sproutPot('up')] }
+  ),
+  fps: Object.fromEntries([0, 1, 2, 3, 4].map(n => ['s' + n, 1.5]))
+});
+
