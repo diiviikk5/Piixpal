@@ -60,3 +60,6 @@ defineSprite('tabby', {
   fps: { idle: 1.6, happy: 6 }
 });
 
+/* the same face, 16 pixels square, for the browser tab */
+const TABBY_ICON = Object.fromEntries(['open', 'left', 'right', 'blink', 'sleep', 'happy'].map(k => [k, tabbyEyes(tabbyHead(0), 0, k)]));
+
