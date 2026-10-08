@@ -77,6 +77,14 @@ export const POWERS = [
     api: 'Piixpal.busy(promise)',
     hab: '<div class="h-btns" style="top:26px;bottom:auto;gap:10px"><button type="button" class="h-btn lime" onclick="fetch(\'../dist/components.json?\'+Date.now())">Fetch</button><button type="button" class="h-btn" onclick="Piixpal.busy(new Promise(r=>setTimeout(r,2200)))">Slow job</button><button type="button" class="h-btn" onclick="fetch(\'../nothing-here-\'+Date.now()).catch(()=>{})">Broken link</button></div><div class="h-floor" id="d-fetch"><i></i><i></i><i></i></div><piix-pal pal="fetch" on="#d-fetch" at=".5"></piix-pal>',
     code: '<footer>\n  …\n  <piix-pal pal="fetch" match="/api/"></piix-pal>\n</footer>'
+  },
+  {
+    id: "scout",
+    fam: "jobs",
+    accent: "var(--mint)",
+    kind: "pal",
+    does: "tour",
+    where: "header"
   }
   // new powers go above this line
 ];
