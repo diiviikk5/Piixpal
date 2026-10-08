@@ -194,6 +194,14 @@ export const POWERS = [
     events: "piix:bloom, piix:popout",
     hab: "<p class=\"h-line\" style=\"bottom:auto;top:30px\">A focus timer that grows. Click the plant.</p><div class=\"h-floor\" id=\"d-sprout\"><i></i><i></i><i></i></div><piix-pal pal=\"sprout\" on=\"#d-sprout\" at=\".5\" minutes=\"1\" break=\".5\"></piix-pal>",
     code: "<footer>\n  <piix-pal pal=\"sprout\" minutes=\"25\" break=\"5\"></piix-pal>\n</footer>"
+  },
+  {
+    id: "nomad",
+    fam: "beyond",
+    accent: "var(--coral)",
+    kind: "pal",
+    does: "roam",
+    where: "body"
   }
   // new powers go above this line
 ];
