@@ -41,7 +41,7 @@
     <h4>Components</h4>
     <a href="sprites.html">Sprites <span class="n">49</span></a>
     <a href="pals.html">Pals <span class="n">42</span></a>
-    <a href="powers.html" aria-current="page">Superpowers <span class="n">8</span></a>
+    <a href="powers.html" aria-current="page">Superpowers <span class="n">9</span></a>
     <a href="crowd.html">Crowd <span class="n">3</span></a>
     <a href="type.html">Pixel type</a>
     <h4>Superpowers</h4>
@@ -53,6 +53,7 @@
     <a href="powers.html#fetch" style="--dot:var(--sun)"><i></i>Fetch</a>
     <a href="powers.html#scout" style="--dot:var(--mint)"><i></i>Scout</a>
     <a href="powers.html#drone" style="--dot:var(--sky)"><i></i>Drone</a>
+    <a href="powers.html#crumb" style="--dot:var(--sun)"><i></i>Crumb</a>
     <h4>Big sprites</h4>
     <a href="sprites.html#s-astronaut" style="--dot:var(--sky)"><i></i>Astronaut</a>
     <a href="sprites.html#s-bolt" style="--dot:var(--sun)"><i></i>Bolt</a>
@@ -156,12 +157,12 @@
   <div class="crumbs"><a href="./">Components</a><span>/</span><span>Superpowers</span></div>
   <h1>Superpowers</h1>
   <p>Pals that go further than the page. Some step out of it, into your browser tab, your other windows, your desktop and your speakers. Some do real interface jobs. Some turn your site into a game. Every one works with a single tag, and on this page every one stays inside its own box.</p>
-  <div class="pills"><a class="pill" href="#beyond">Beyond the page · 0</a><a class="pill" href="#jobs">Pals with jobs · 6</a><a class="pill" href="#play">Play your site · 2</a><span class="pill">uses the browser itself</span></div>
+  <div class="pills"><a class="pill" href="#beyond">Beyond the page · 0</a><a class="pill" href="#jobs">Pals with jobs · 7</a><a class="pill" href="#play">Play your site · 2</a><span class="pill">uses the browser itself</span></div>
 </header>
 
 
 <section class="doc-sec family" id="jobs" aria-labelledby="jobs-h">
-  <h2 id="jobs-h" class="fam-h">Pals with jobs <span class="pill">6</span></h2>
+  <h2 id="jobs-h" class="fam-h">Pals with jobs <span class="pill">7</span></h2>
   <p>Real interface work, done by pals: notifications, tours, uploads, passwords, carts, cookie banners, theme switches.</p>
 </section>
 <section class="doc-sec power" id="bulb" aria-labelledby="bulb-h" style="--accent:var(--sun)">
@@ -690,6 +691,99 @@ Piixpal.add(&quot;drone&quot;, &quot;#cart&quot;);</pre>
 &lt;Piixpal /&gt;
 
 &lt;h1&gt;Hello &lt;piix-pal pal=&quot;drone&quot;&gt;&lt;/piix-pal&gt;&lt;/h1&gt;</pre>
+</div>
+    </div>
+  </div>
+</section>
+
+<section class="doc-sec power" id="crumb" aria-labelledby="crumb-h" style="--accent:var(--sun)">
+  <h2 id="crumb-h">Crumb <span class="pal-no">do="munch"</span></h2>
+  <p>The cookie banner everyone has, finally fun. Crumb the mouse sits on your banner sniffing at it. The moment a visitor presses Accept or Reject, it tucks in and eats the whole thing, bite by jagged bite, crumbs flying, then pats its belly and waddles off. Your own buttons still do their job: Crumb eats a stand-in copy, so your code can hide the real banner straight away.</p>
+  <div class="pal-doc">
+    <div class="habitat"><button type="button" class="h-btn" style="position:absolute;left:18px;top:18px" onclick="const h=this.closest('.habitat');h.querySelector('.h-cookie').style.display='';const p=h.querySelector('piix-pal');p.replaceWith(p.cloneNode(true))">Bring it back</button><div class="h-cookie" id="d-cookie"><p>We use cookies to remember your theme. That is all.</p><button type="button" class="h-btn lime" onclick="this.closest('.h-cookie').style.display='none'">Accept</button><button type="button" class="h-btn" onclick="this.closest('.h-cookie').style.display='none'">Reject</button></div><piix-pal box=".habitat" pal="crumb" on="#d-cookie"></piix-pal></div>
+    <div class="info">
+      <dl class="kv">
+        <dt>uses</dt><dd>your cookie banner and its own Accept / Reject buttons</dd>
+        <dt>works in</dt><dd>every modern browser · your banner code runs untouched</dd>
+        <dt>try it</dt><dd>press Accept or Reject, then Bring it back</dd>
+        <dt>on</dt><dd>the banner (or put the tag inside it)</dd>
+        <dt>at</dt><dd>where it sits on the banner, 0–1 (default .82)</dd>
+        
+        <dt>events</dt><dd>piix:eaten</dd>
+      </dl>
+      <div class="tabs" data-tabs>
+  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
+  <pre class="codebox tab-pane"><button class="copy" type="button" data-copy="&lt;!-- once, anywhere on the page --&gt;
+&lt;script src=&quot;https://cdn.jsdelivr.net/gh/diiviikk5/Piixpal@main/piixpal.min.js&quot;&gt;&lt;/script&gt;
+
+&lt;div id=&quot;cookie-banner&quot;&gt;
+  We use cookies…
+  &lt;button&gt;Accept&lt;/button&gt;
+  &lt;button&gt;Reject&lt;/button&gt;
+  &lt;piix-pal pal=&quot;crumb&quot;&gt;&lt;/piix-pal&gt;
+&lt;/div&gt;">Copy</button>&lt;!-- once, anywhere on the page --&gt;
+&lt;script src=&quot;https://cdn.jsdelivr.net/gh/diiviikk5/Piixpal@main/piixpal.min.js&quot;&gt;&lt;/script&gt;
+
+&lt;div id=&quot;cookie-banner&quot;&gt;
+  We use cookies…
+  &lt;button&gt;Accept&lt;/button&gt;
+  &lt;button&gt;Reject&lt;/button&gt;
+  &lt;piix-pal pal=&quot;crumb&quot;&gt;&lt;/piix-pal&gt;
+&lt;/div&gt;</pre>
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="&lt;!-- just crumb (the shared engine loads itself, once) --&gt;
+&lt;script src=&quot;https://cdn.jsdelivr.net/gh/diiviikk5/Piixpal@main/dist/c/crumb.min.js&quot;&gt;&lt;/script&gt;
+
+&lt;div id=&quot;cookie-banner&quot;&gt;
+  We use cookies…
+  &lt;button&gt;Accept&lt;/button&gt;
+  &lt;button&gt;Reject&lt;/button&gt;
+  &lt;piix-pal pal=&quot;crumb&quot;&gt;&lt;/piix-pal&gt;
+&lt;/div&gt;">Copy</button>&lt;!-- just crumb (the shared engine loads itself, once) --&gt;
+&lt;script src=&quot;https://cdn.jsdelivr.net/gh/diiviikk5/Piixpal@main/dist/c/crumb.min.js&quot;&gt;&lt;/script&gt;
+
+&lt;div id=&quot;cookie-banner&quot;&gt;
+  We use cookies…
+  &lt;button&gt;Accept&lt;/button&gt;
+  &lt;button&gt;Reject&lt;/button&gt;
+  &lt;piix-pal pal=&quot;crumb&quot;&gt;&lt;/piix-pal&gt;
+&lt;/div&gt;</pre>
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="&lt;!-- attaches itself to the first #cookie-banner: nothing else to add --&gt;
+&lt;script src=&quot;https://cdn.jsdelivr.net/gh/diiviikk5/Piixpal@main/dist/c/crumb.min.js&quot;
+  data-pals=&quot;crumb@#cookie-banner&quot;&gt;&lt;/script&gt;">Copy</button>&lt;!-- attaches itself to the first #cookie-banner: nothing else to add --&gt;
+&lt;script src=&quot;https://cdn.jsdelivr.net/gh/diiviikk5/Piixpal@main/dist/c/crumb.min.js&quot;
+  data-pals=&quot;crumb@#cookie-banner&quot;&gt;&lt;/script&gt;</pre>
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="await import(&quot;https://cdn.jsdelivr.net/gh/diiviikk5/Piixpal@main/dist/c/crumb.min.js&quot;);
+Piixpal.add(&quot;crumb&quot;, &quot;#cookie-banner&quot;);">Copy</button>await import(&quot;https://cdn.jsdelivr.net/gh/diiviikk5/Piixpal@main/dist/c/crumb.min.js&quot;);
+Piixpal.add(&quot;crumb&quot;, &quot;#cookie-banner&quot;);</pre>
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+
+&lt;h1&gt;
+  Hello
+  &lt;PiixPal pal=&quot;crumb&quot; /&gt;
+&lt;/h1&gt;">Copy</button>import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+
+&lt;h1&gt;
+  Hello
+  &lt;PiixPal pal=&quot;crumb&quot; /&gt;
+&lt;/h1&gt;</pre>
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// main.js: app.use(Piixpal) from &quot;piixpal/vue&quot;
+
+&lt;h1&gt;
+  Hello
+  &lt;piix-pal pal=&quot;crumb&quot; /&gt;
+&lt;/h1&gt;">Copy</button>// main.js: app.use(Piixpal) from &quot;piixpal/vue&quot;
+
+&lt;h1&gt;
+  Hello
+  &lt;piix-pal pal=&quot;crumb&quot; /&gt;
+&lt;/h1&gt;</pre>
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="&lt;script&gt;import Piixpal from &quot;piixpal/svelte&quot;;&lt;/script&gt;
+&lt;Piixpal /&gt;
+
+&lt;h1&gt;Hello &lt;piix-pal pal=&quot;crumb&quot;&gt;&lt;/piix-pal&gt;&lt;/h1&gt;">Copy</button>&lt;script&gt;import Piixpal from &quot;piixpal/svelte&quot;;&lt;/script&gt;
+&lt;Piixpal /&gt;
+
+&lt;h1&gt;Hello &lt;piix-pal pal=&quot;crumb&quot;&gt;&lt;/piix-pal&gt;&lt;/h1&gt;</pre>
 </div>
     </div>
   </div>
