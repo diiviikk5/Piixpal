@@ -36,3 +36,11 @@ defineSprite('meh', {
   frames: Object.fromEntries(Array.from({ length: 11 }, (_, i) => ['m' + i, [mehFace(i)]]))
 });
 
+/* read the value as 0…1 from a slider, a set of radio buttons, or a select */
+const mehValue = (el, radios) => {
+  if (el.type === 'range') { const lo = +el.min || 0, hi = el.max === '' ? 100 : +el.max; return clamp(((+el.value) - lo) / ((hi - lo) || 1), 0, 1); }
+  if (el.tagName === 'SELECT') return el.options.length > 1 ? el.selectedIndex / (el.options.length - 1) : 0;
+  const i = radios.findIndex(r => r.checked);
+  return i < 0 ? .5 : radios.length > 1 ? i / (radios.length - 1) : 1;
+};
+
