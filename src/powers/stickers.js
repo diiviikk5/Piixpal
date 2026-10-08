@@ -17,3 +17,16 @@ const STICKER_ART = {
   wow: { pal: { a: '#fffdf5', b: '#ff4d6d', w: '#e9e2d0' }, rows: ['.kkkkkkkk.', 'kaaaaaaaak', 'kabababbak', 'kabababbak', 'kaabbabbak', 'kaaaaaaaak', '.kkkkkkkk.', '...kk.....', '..kk......'] }
 };
 
+/* the pixels of a sticker as a canvas: a built-in, or any registered sprite's first frame */
+const stickerArt = name => {
+  if (STICKER_ART[name]) {
+    const { pal, rows } = STICKER_ART[name], w = Math.max(...rows.map(r => r.length));
+    const rgba = { k: hexRGBA('#17121f') };
+    for (const k in pal) rgba[k] = hexRGBA(pal[k]);
+    return bake(rows, rgba, w, rows.length);
+  }
+  if (FIGURES[name]) return bakeFigure(FIGURES[name], figurePalette(FIGURES[name]))[0];
+  if (SPRITES[name]) { const f = baked(SPRITES[name]); return f[Object.keys(f)[0]][0]; }
+  return null;
+};
+
