@@ -37,3 +37,11 @@ const buffBar = (rows, y, level, oneHand) => {
   return rows;
 };
 
+/* one pose: bar at the belly, overhead, shaking, or a one-armed flex */
+const buffPose = (level, pose) => {
+  if (pose === 'chest') return buffBar(buffBody(0, 'chest', 'open'), 13, level);
+  if (pose === 'strain') return buffBar(buffBody(0, 'chest', 'strain'), 12, level);
+  if (pose === 'lift') return buffBar(buffBody(0, 'up', 'open'), 2, level);
+  return buffBar(buffBody(0, 'flex', 'happy'), 2, level, true);
+};
+
