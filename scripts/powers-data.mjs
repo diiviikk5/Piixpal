@@ -327,6 +327,14 @@ export const POWERS = [
     events: "piix:limit { length, limit, left }",
     hab: "<p class=\"h-line\" style=\"bottom:auto;top:30px\">Write a very short bio:</p><div class=\"h-form\" style=\"bottom:40px\"><textarea id=\"d-bio\" maxlength=\"40\" rows=\"3\" placeholder=\"Hi! I make…\" aria-label=\"Bio\"></textarea></div><piix-pal pal=\"squish\" on=\"#d-bio\"></piix-pal>",
     code: "<label>\n  Bio\n  <textarea maxlength=\"140\"></textarea>\n  <piix-pal pal=\"squish\"></piix-pal>\n</label>"
+  },
+  {
+    id: "gulp",
+    fam: "jobs",
+    accent: "var(--sun)",
+    kind: "pal",
+    does: "dropzone",
+    where: "#drop"
   }
   // new powers go above this line
 ];
