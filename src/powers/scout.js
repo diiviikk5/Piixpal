@@ -10,3 +10,14 @@
  *   el.ctl.start([{ el, text, title }])   el.ctl.end()
  *   Keyboard: → next, ← back, Esc ends. Events: piix:tour-step { index, total }, piix:tour-end { done } */
 
+/* the explorer from the hat down: pith helmet, brim, face, backpack, shirt and belt */
+const scoutShape = by => art.outline(art.paint(17, 17, (x, y) => {
+  const yy = y - by;
+  if (art.ellipse(x, yy, 7.5, 3.6, 4.7, 2.7) && yy <= 4) return 'h';
+  if (yy === 5 && x >= 2 && x <= 13) return 'H';
+  if (art.ellipse(x, yy, 7.5, 7.6, 3.7, 2.6)) return 'f';
+  if (x >= 2 && x <= 4 && yy >= 9 && yy <= 13) return 'b';
+  if (x >= 5 && x <= 10 && yy >= 10 && yy <= 13) return yy === 12 ? 'B' : 'g';
+  return null;
+}));
+
