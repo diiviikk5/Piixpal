@@ -22,7 +22,7 @@
       return null;
     });
     rows = art.outline(rows);
-    rows = art.compose(rows, [11, 3, ['gg']], [10, 9, ['k..k']], [10, 10, ['k..k']]);
+    rows = art.compose(rows, [11, 3, ['gg']], [10, 9, ['k__k']], [10, 10, ['k__k']]);
     rows = art.compose(rows, prop ? [20, 3, ['p', 'p', 'k', 'p', 'p', 'p']] : [20, 5, ['p', 'k', 'p']]);
     return rows;
   };
