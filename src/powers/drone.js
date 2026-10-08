@@ -23,7 +23,7 @@ const droneShape = (fast, blink, shut) => {
   rows = art.compose(rows, [2, 2, ['k']], [15, 2, ['k']]);
   rows = art.compose(rows, fast ? [0, 1, ['rrrrr']] : [1, 1, ['rrr']], fast ? [13, 1, ['rrrrr']] : [14, 1, ['rrr']]);
   rows = art.compose(rows, blink ? [7, 5, ['kkk', '___']] : [7, 5, ['eew', 'eee']], [11, 4, [blink ? 'k' : 'g']]);
-  return art.compose(rows, shut ? [7, 9, ['k..k', '.kk.']] : [6, 9, ['k....k', 'k....k']]);
+  return art.compose(rows, shut ? [7, 9, ['k__k', '_kk_']] : [6, 9, ['k____k', 'k____k']]);
 };
 
 /* Drone: rotors always spinning, a blink now and then, claws open or holding on */
