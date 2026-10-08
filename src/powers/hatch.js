@@ -26,3 +26,12 @@ const HATCH_COLORS = [
   ['#9aa8bf', '#6f7d96', '#c9d2e2', '#f0f3f8', '#ffd23f'], ['#c49a74', '#9a7250', '#e3c7ab', '#f7ece1', '#7bd6b8']
 ];
 
+/* body shapes */
+const HATCH_SHAPES = {
+  round: (x, y) => art.ellipse(x, y, 8, 9.6, 6, 5.2),
+  tall: (x, y) => art.ellipse(x, y, 8, 9.2, 4.8, 6),
+  bean: (x, y) => art.ellipse(x, y, 8, 10.2, 6.6, 4.4),
+  blob: (x, y) => art.rrect(x, y, 2, 5, 13, 14, 4),
+  pear: (x, y) => art.ellipse(x, y, 8, 7.6, 4.2, 3.6) || art.ellipse(x, y, 8, 11.2, 6, 3.6)
+};
+
