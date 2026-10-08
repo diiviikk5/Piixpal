@@ -52,3 +52,38 @@ const mehSpot = (el, radios, v) => {
   return { x: r.l + r.w / 2, y: r.t };
 };
 
+/* mood: wear the face that matches the value, and ride along with it */
+defineBehavior('mood', (a, [el], host) => {
+  const S = a.s / 3;
+  const input = el.matches && el.matches('input,select') ? el : el.querySelector('input[type=range],select') || el;
+  const radios = [...el.querySelectorAll('input[type=radio]')];
+  let level = -1, hop = 0, x = null;
+  const read = () => {
+    const v = mehValue(input, radios), L = Math.round(v * 10);
+    if (L !== level) {
+      if (level >= 0 && Math.abs(L - level) >= 3) hop = .3;
+      if (L === 10) a.say('heart', 900); else if (L === 0) a.say('vein', 900);
+      level = L;
+      a.cv.style.filter = '';
+      host.dispatchEvent(new CustomEvent('piix:mood', { bubbles: true, detail: { value: v, level: L } }));
+    }
+    return v;
+  };
+  const evs = ['input', 'change'];
+  evs.forEach(ev => (radios.length ? el : input).addEventListener(ev, read));
+
+  return {
+    tick(dt) {
+      const v = read(), p = mehSpot(input, radios, v);
+      x = x == null || reduced() ? p.x : lerp(x, p.x, 1 - Math.exp(-14 * dt));
+      a.x = x; a.y = p.y;
+      hop = Math.max(0, hop - dt);
+      a.oy = -Math.sin(Math.PI * hop / .3) * 12 * S;
+      a.play('m' + level);
+      /* tilt with the slider's direction of travel */
+      a.rot = clamp((p.x - x) * .4, -12, 12);
+    },
+    poke() { hop = .3; a.say(level >= 5 ? 'heart' : '...', 700); },
+    destroy() { evs.forEach(ev => (radios.length ? el : input).removeEventListener(ev, read)); }
+  };
+});
