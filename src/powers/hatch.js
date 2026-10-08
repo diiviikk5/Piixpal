@@ -136,3 +136,10 @@ const hatchEgg = cracks => {
   return art.compose(rows, ...C);
 };
 
+/* Hatch, before it hatches: an egg that wobbles and cracks */
+defineSprite('hatch', {
+  w: 13, h: 15, scale: 3, does: 'pet',
+  palette: { k: '#17121f', w: '#fff7ec', s: '#7bd6b8' },
+  frames: { egg0: [hatchEgg(0)], egg1: [hatchEgg(1)], egg2: [hatchEgg(2)], egg3: [hatchEgg(3)] }
+});
+
