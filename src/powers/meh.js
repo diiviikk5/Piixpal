@@ -6,3 +6,6 @@
  *   on="#stars"   or a group of radio buttons (star ratings), or a <select>
  *   Event: piix:mood { value, level }  (level 0…10) */
 
+/* the face's skin: cross red at the bottom, sunny yellow in the middle, happy green at the top */
+const MEH_SKIN = level => level <= 2 ? ['x', 'X', 'y'] : level >= 8 ? ['g', 'G', 'h'] : ['b', 'd', 'B'];
+
