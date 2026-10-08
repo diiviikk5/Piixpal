@@ -20,8 +20,8 @@ const dir = d => existsSync(join(src, d))
 const read = f => `/* ---- ${f.split(sep).join('/')} ---- */\n` + readFileSync(join(src, f), 'utf8').trim();
 
 /* listed on every call, so a long-running dev server picks up new files */
-const CORE_LIST = () => ['core.js', 'icons.js', 'text.js', 'drag.js', ...dir('elements'), 'boot.js'].filter(f => existsSync(join(src, f)));
-const COMPONENT_LIST = () => [...dir('behaviors'), ...dir('pals'), ...dir('sprites')];
+const CORE_LIST = () => ['core.js', 'icons.js', 'ui.js', 'text.js', 'drag.js', ...dir('elements'), 'boot.js'].filter(f => existsSync(join(src, f)));
+const COMPONENT_LIST = () => [...dir('behaviors'), ...dir('pals'), ...dir('sprites'), ...dir('powers')];
 
 /* everything the core declares at the top level becomes part of the shared toolkit */
 const coreNames = () => {
@@ -100,10 +100,14 @@ export function components() {
   const behaviorFile = {};
   for (const f of dir('behaviors')) for (const m of readFileSync(join(src, f), 'utf8').matchAll(/defineBehavior\('(\w+)'/g)) behaviorFile[m[1]] = f;
   const out = {};
-  for (const f of [...dir('pals'), ...dir('sprites')]) {
+  for (const f of [...dir('pals'), ...dir('sprites'), ...dir('powers')]) {
     const text = readFileSync(join(src, f), 'utf8');
     const needs = [...new Set([...text.matchAll(/does: '(\w+)'/g)].map(m => behaviorFile[m[1]]).filter(Boolean))];
-    for (const m of text.matchAll(/define(Sprite|Figure)\('([\w-]+)'/g)) out[m[2]] = { kind: m[1] === 'Sprite' ? 'pal' : 'sprite', files: [...needs, f] };
+    const power = f.startsWith('powers');
+    /* names starting with _ are crew-only (coins, balloons…): they ship inside their pal's file */
+    for (const m of text.matchAll(/define(Sprite|Figure)\('([\w-]+)'/g)) if (m[2][0] !== '_') out[m[2]] = { kind: power ? 'power' : m[1] === 'Sprite' ? 'pal' : 'sprite', files: [...needs, f] };
+    /* elements that aren't pals declare themselves with a "@component name" line */
+    for (const m of text.matchAll(/@component ([\w-]+)/g)) out[m[1]] = { kind: 'power', files: [...needs, f] };
   }
   return out;
 }
