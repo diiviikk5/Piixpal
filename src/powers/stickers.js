@@ -30,3 +30,20 @@ const stickerArt = name => {
   return null;
 };
 
+/* die-cut: the art scaled up (all about the same size), a thick white border following its outline, a soft grey edge */
+const stickerCut = (src, s = Math.max(1, Math.round(28 / Math.max(src.width, src.height)))) => {
+  const B = 3, w = src.width * s + B * 4, h = src.height * s + B * 4;
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  const g = c.getContext('2d'); g.imageSmoothingEnabled = false;
+  const stamp = (color, r) => {
+    const t = document.createElement('canvas'); t.width = w; t.height = h;
+    const tg = t.getContext('2d'); tg.imageSmoothingEnabled = false;
+    for (let dy = -r; dy <= r; dy++) for (let dx = -r; dx <= r; dx++) if (dx * dx + dy * dy <= r * r + 1) tg.drawImage(src, B * 2 + dx, B * 2 + dy, src.width * s, src.height * s);
+    tg.globalCompositeOperation = 'source-in'; tg.fillStyle = color; tg.fillRect(0, 0, w, h);
+    g.drawImage(t, 0, 0);
+  };
+  stamp('#d9d4e3', B * 2); stamp('#ffffff', B * 2 - 1);
+  g.drawImage(src, B * 2, B * 2, src.width * s, src.height * s);
+  return c;
+};
+
