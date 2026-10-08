@@ -29,7 +29,7 @@
       [17, ty + 2, ['n']],                                                                     /* nose */
       [11, 6 + by, ['r', 'r']], [12, 7 + by, ['y']]);                                         /* collar + tag */
     if (face === 'open') rows = art.put(rows, 14, ty + 1, ['e']);
-    if (face === 'happy') rows = art.compose(rows, [13, ty + 1, ['e.e']], [14, ty, ['e']], [15, ty + 4, ['p', 'p']]);
+    if (face === 'happy') rows = art.compose(rows, [13, ty + 1, ['e_e']], [14, ty, ['e']], [15, ty + 4, ['p', 'p']]);
     if (face === 'squint') rows = art.put(rows, 13, ty + 1, ['ee']);
     return rows;
   };
