@@ -41,3 +41,37 @@ const textProfile = (el, cache) => {
   return v;
 };
 const segAt = (segs, x) => { for (const s of segs) if (x >= s.l && x <= s.r) return s.t; return null; };
+
+/* ---------- surfaces: the top edges things can stand or land on ---------- */
+/* what counts as a surface by default (toys, the platformer, weather…) */
+const LAND = 'h1,h2,h3,h4,p,li,button,.btn,img,pre,blockquote,figure,footer,nav,header,table,.card,[data-piix-land]';
+const platCache = { at: -1, sel: '', list: [] };
+/* a surface: text elements use their first line's glyph tops, everything else its box */
+const TEXTY = /^(H[1-6]|P|LI|BLOCKQUOTE|DT|DD|FIGCAPTION|LABEL)$/;
+const surfaceOf = el => {
+  const r = el.getBoundingClientRect();
+  if (r.width <= 8 || r.height <= 2 || r.bottom < -400 || r.top > innerHeight + 2000) return null;
+  if (TEXTY.test(el.tagName)) {
+    const rg = document.createRange();
+    rg.selectNodeContents(el);
+    const rs = [...rg.getClientRects()].filter(q => q.width > 1);
+    if (rs.length) {
+      const top = rs[0].top, line = rs.filter(q => q.top - top < 4);
+      const fs = parseFloat(getComputedStyle(el).fontSize) || 16;
+      return { el, l: Math.min(...line.map(q => q.left)) + scrollX, r: Math.max(...line.map(q => q.right)) + scrollX, t: top + scrollY + (line[0].height - fs) / 2 + fs * .26 };
+    }
+  }
+  return { el, l: r.left + scrollX, r: r.right + scrollX, t: r.top + scrollY };
+};
+/* every surface's top edge in doc coords, measured at most once per frame for everyone */
+const platforms = (sel, extra) => {
+  const t = Math.floor(now() / 16);
+  if (platCache.at !== t || platCache.sel !== sel) {
+    platCache.at = t; platCache.sel = sel;
+    let els = [];
+    try { els = [...document.querySelectorAll(sel)]; } catch (_) { /* bad selector */ }
+    platCache.list = els.map(surfaceOf).filter(Boolean);
+  }
+  if (extra) { const p = surfaceOf(extra); return p ? platCache.list.concat(p) : platCache.list; }
+  return platCache.list;
+};
