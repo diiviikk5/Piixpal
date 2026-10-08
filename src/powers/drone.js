@@ -12,3 +12,17 @@
  * The picture comes from the button's card (nearest article, li, .card or [data-product]).
  * Event: piix:delivered { button } on the pal and on the cart */
 
+/* the drone: a boxy little quadcopter with one big round lens and a blinking light */
+const droneShape = (fast, blink, shut) => {
+  let rows = art.paint(18, 12, (x, y) => {
+    if (y === 4 && ((x >= 2 && x <= 4) || (x >= 13 && x <= 15))) return 'a';
+    if (art.rrect(x, y, 4, 3, 13, 8, 2)) return 'b';
+    return null;
+  });
+  rows = art.outline(art.volume(rows));
+  rows = art.compose(rows, [2, 2, ['k']], [15, 2, ['k']]);
+  rows = art.compose(rows, fast ? [0, 1, ['rrrrr']] : [1, 1, ['rrr']], fast ? [13, 1, ['rrrrr']] : [14, 1, ['rrr']]);
+  rows = art.compose(rows, blink ? [7, 5, ['kkk', '___']] : [7, 5, ['eew', 'eee']], [11, 4, [blink ? 'k' : 'g']]);
+  return art.compose(rows, shut ? [7, 9, ['k..k', '.kk.']] : [6, 9, ['k....k', 'k....k']]);
+};
+
