@@ -288,7 +288,8 @@ export const POWERS = [
     where: "label",
     uses: "your password field: length, mixed kinds of characters, repeats, keyboard runs and the passwords everybody tries first",
     support: "every modern browser · the field gets data-strength=\"0…4\" for your own styles",
-    try: "type a password: try “password1”, then something long and odd"
+    try: "type a password: try “password1”, then something long and odd",
+    desc: "A password-strength meter that does reps. Buff stands on your password field with a barbell, and the stronger the password, the bigger the plates. A weak one makes it strain and sweat; a strong one goes straight up over its head; a really good one gets a one-armed flex and a sparkle. It knows the usual suspects, too: “password”, “qwerty”, “1234” never get past weak."
   }
   // new powers go above this line
 ];
