@@ -337,7 +337,8 @@ export const POWERS = [
     where: "#drop",
     uses: "drag and drop (and file inputs): it only watches, your upload code stays in charge",
     support: "every modern browser · drag and drop on desktop, the file picker everywhere",
-    try: "drag a file from your computer over the box (or pick one)"
+    try: "drag a file from your computer over the box (or pick one)",
+    desc: "A pelican for your file drop zone. Drag a file anywhere over the page and Gulp perks up and watches it; bring it over the drop zone and it opens its beak wide; let go and it gulps the file down, pouch bulging, then tells you what it swallowed. Works with a plain file input too."
   }
   // new powers go above this line
 ];
