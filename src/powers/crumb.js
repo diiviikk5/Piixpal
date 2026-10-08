@@ -70,3 +70,13 @@ const crumbBite = (g, x, y, r) => {
   }
 };
 
+/* where the bites go: along the top from the nearest end, then the next row back the other way */
+const crumbPath = (w, h, R, fromRight) => {
+  const pts = [], rows = Math.max(1, Math.ceil(h / (R * 1.6)));
+  for (let k = 0; k < rows; k++) {
+    const y = Math.min(h, k * R * 1.6 + R * .4), n = Math.max(2, Math.ceil(w / (R * 1.4)));
+    for (let i = 0; i <= n; i++) { const u = (k % 2 ? n - i : i) / n; pts.push({ x: (fromRight ? 1 - u : u) * w, y }); }
+  }
+  return pts;
+};
+
