@@ -55,3 +55,99 @@ const nomadNeighbour = (me, peers, dir) => {
   return best;
 };
 
+/* roam: walk the floor of this window; at an edge, hand Nomad to the window over there */
+defineBehavior('roam', (a, targets, host) => {
+  const S = a.s / 3;
+  const boxEl = boxOf(host);
+  const area = areaOf(host, a);
+  const id = Math.random().toString(36).slice(2, 10);
+  const peers = new Map();
+  /* has: Nomad belongs to this window now. vis: what we see it doing here */
+  let has = false, vis = 'gone', x = 0, dir = 1, t = 0, pause = 0, sent = 0, handoff = null;
+  const ch = 'BroadcastChannel' in window ? new BroadcastChannel('piix-nomad') : null;
+  const rect = () => (host._screen || nomadScreen)();
+  const say = msg => { if (ch) ch.postMessage(Object.assign({ from: id, boxed: !!boxEl }, msg)); };
+  const hello = ask => say({ t: 'hi', rect: rect(), has, ask });
+  const show = on => { a.node.style.opacity = on ? '' : '0'; };
+  const enter = side => {
+    const r = area();
+    has = true; vis = 'walk'; dir = side === 'left' ? 1 : -1;
+    x = side === 'left' ? r.l - a.w / 2 : r.r + a.w / 2;
+    show(true); a.say('hi', 1000);
+    host.dispatchEvent(new CustomEvent('piix:arrive', { bubbles: true }));
+    hello();
+  };
+  const onMsg = e => {
+    const m = e.data;
+    if (!m || m.from === id) return;
+    if (m.t === 'hi') {
+      peers.set(m.from, { id: m.from, rect: m.rect, has: m.has, boxed: m.boxed, seen: now() });
+      /* two windows holding Nomad at once (they woke together)? the older id keeps it */
+      if (m.has && has && m.from < id) { has = false; vis = 'gone'; show(false); }
+      if (!m.ask) hello(1);
+    } else if (m.t === 'bye') peers.delete(m.from);
+    else if (m.t === 'go' && m.to === id) { enter(m.side); say({ t: 'got', to: m.from }); }
+    else if (m.t === 'got' && m.to === id) handoff = null;
+  };
+  if (ch) ch.addEventListener('message', onMsg);
+  /* closing this window? Nomad moves on to another one */
+  const bye = () => {
+    if (has) { const p = [...peers.values()].sort((q, w) => w.seen - q.seen)[0]; if (p) say({ t: 'go', to: p.id, side: 'left' }); }
+    say({ t: 'bye' });
+  };
+  addEventListener('pagehide', bye);
+  show(false);
+  hello();
+
+  return {
+    boxed: true,
+    awake: () => true,
+    /* open a second window just to the right of this one */
+    invite() {
+      const w = Math.round(Math.min(560, screen.availWidth / 2)), h = Math.round(Math.min(440, screen.availHeight * .6));
+      const left = Math.round(Math.min(screen.availWidth - w, screenX + outerWidth)), top = Math.round(screenY + Math.max(0, outerHeight - h) / 2);
+      window.open(host.getAttribute('window') || location.href, 'piix-nomad-' + id, `popup,width=${w},height=${h},left=${left},top=${top}`);
+    },
+    /* where things stand, for tests and the curious */
+    info: () => ({ id, has, vis, x, dir, peers: [...peers.values()].map(p => ({ id: p.id, has: p.has, x: p.rect && p.rect.x })), handing: !!handoff }),
+    tick(dt) {
+      const r = area();
+      t += dt; sent += dt;
+      if (sent > .5) { sent = 0; hello(); }
+      for (const [k, p] of peers) if (now() - p.seen > 2500) peers.delete(k);
+      /* nobody holds Nomad? after a moment, the oldest window takes it */
+      if (!has && !handoff && t > 1 && ![...peers.values()].some(p => p.has) && [...peers.keys()].every(k => k > id)) { enter('left'); x = r.l + a.w; }
+      /* handed over but no reply (the other window closed)? it comes back */
+      if (handoff && now() - handoff.at > 1200) { handoff = null; enter(dir > 0 ? 'right' : 'left'); }
+      if (vis === 'walk') {
+        x += dir * 48 * S * dt * (reduced() ? 2 : 1);
+        a.face = dir; a.play('walk');
+        const edge = dir > 0 ? r.r - a.w / 2 : r.l + a.w / 2;
+        if ((dir > 0 && x >= edge) || (dir < 0 && x <= edge)) {
+          /* the edge: is there a window over there? (in a box, any other window will do) */
+          const list = [...peers.values()];
+          const geo = !boxEl && list.every(p => !p.boxed);
+          const next = geo ? nomadNeighbour(rect(), list, dir) : list.sort((p, q) => q.seen - p.seen)[0];
+          if (next) {
+            has = false; handoff = { at: now() }; vis = 'out';
+            say({ t: 'go', to: next.id, side: dir > 0 ? 'left' : 'right' });
+            hello();
+            host.dispatchEvent(new CustomEvent('piix:depart', { bubbles: true }));
+          } else { vis = 'peek'; pause = 1.4; x = edge; }
+        }
+      } else if (vis === 'peek') {
+        pause -= dt; a.play('look'); a.face = dir;
+        if (pause <= 0) { dir = -dir; vis = 'walk'; if (chance(.5)) a.say('...', 700); }
+      } else if (vis === 'out') {
+        /* walk out of sight; it's already the other window's turn */
+        x += dir * 48 * S * dt; a.face = dir; a.play('walk');
+        if ((dir > 0 && x > r.r + a.w / 2) || (dir < 0 && x < r.l - a.w / 2)) { vis = 'gone'; show(false); }
+      }
+      if (vis === 'gone') return;
+      a.x = x; a.y = r.b - 4 * S;
+      if (boxEl) a.node.style.opacity = clamp(Math.min(x - r.l, r.r - x) / (a.w * .6), 0, 1).toFixed(2);
+    },
+    poke() { a.say(peers.size ? 'heart' : '?', 900); },
+    destroy() { bye(); removeEventListener('pagehide', bye); if (ch) { ch.removeEventListener('message', onMsg); ch.close(); } }
+  };
+});
