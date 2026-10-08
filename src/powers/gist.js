@@ -25,3 +25,14 @@ const gistShape = by => art.outline(art.paint(13, 14, (x, y) => {
   return null;
 }));
 
+/* the face: two big eye discs, pupils looking about, a little beak, and glasses for reading */
+const gistFace = (rows, by, look, glasses) => {
+  rows = art.compose(rows, [3, 4 + by, ['www', 'www']], [7, 4 + by, ['www', 'www']], [6, 6 + by, ['Y']]);
+  const px = { l: 0, c: 1, r: 2 }[look];
+  if (look === 'shut') rows = art.compose(rows, [3, 5 + by, ['eee']], [7, 5 + by, ['eee']]);
+  else if (look === 'happy') rows = art.compose(rows, [3, 4 + by, ['_e_', 'e_e']], [7, 4 + by, ['_e_', 'e_e']]);
+  else rows = art.compose(rows, [3 + px, 4 + by, ['e', 'e']], [7 + px, 4 + by, ['e', 'e']]);
+  if (glasses) rows = art.compose(rows, [2, 3 + by, ['kkkkkkkkkk']], [2, 6 + by, ['k___k_k___k']]);
+  return art.compose(rows, [5, 13, ['Y.Y']]);
+};
+
