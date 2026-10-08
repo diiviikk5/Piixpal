@@ -178,3 +178,9 @@
 .pal-doc .habitat.dark{--ink:#f2eef8;--ink-2:#cdc6da;background:radial-gradient(rgba(255,255,255,.08) 1px,transparent 1.3px) 0 0/16px 16px,#17121f;color:#f2eef8}
 .h-search{position:absolute;width:190px;height:40px;padding:0 12px;border:2px solid var(--ink);border-radius:10px;background:var(--card);color:var(--ink);font:500 14px var(--f-sans)}
 .h-avatar{position:absolute;display:grid;place-items:center;width:40px;height:40px;border-radius:50%;border:2px solid var(--ink);background:var(--sun);font:700 13px var(--f-sans);color:#17121f}
+.h-cart{position:absolute;right:18px;top:16px;display:flex;align-items:center;gap:8px;height:38px;padding:0 12px;border:2px solid var(--ink);border-radius:10px;background:var(--card);font:650 14px var(--f-sans)}
+.h-cart b{display:grid;place-items:center;min-width:22px;height:22px;padding:0 5px;border-radius:11px;background:var(--coral);color:#fff;font:700 12px var(--f-sans)}
+.prods{position:absolute;left:18px;right:18px;bottom:18px;display:flex;gap:10px}
+.prod{flex:1;display:grid;gap:8px;justify-items:center;padding:10px 8px;border:2px solid var(--ink);border-radius:12px;background:var(--card)}
+.prod img{width:64px;height:64px;image-rendering:pixelated;border-radius:8px}
+.prod .h-btn{padding:8px 10px;font-size:13px}
