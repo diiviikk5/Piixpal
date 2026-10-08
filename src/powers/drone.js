@@ -68,3 +68,12 @@ const droneBump = el => {
   try { el.animate([{ transform: 'none' }, { transform: 'translateY(-6px) scale(1.12)' }, { transform: 'translateY(1px) scale(.96)' }, { transform: 'none' }], { duration: 420, easing: 'ease-out' }); } catch (_) { /* old browsers */ }
 };
 
+/* add one to the cart's counter, if it has one */
+const droneCount = (cart, sel) => {
+  let n = null;
+  try { n = cart.querySelector(sel || '.count,[data-count]'); } catch (_) { /* bad selector */ }
+  if (!n) return;
+  const v = parseInt(n.textContent, 10);
+  if (!isNaN(v)) n.textContent = String(v + 1);
+};
+
