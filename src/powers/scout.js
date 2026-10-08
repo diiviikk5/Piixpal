@@ -94,3 +94,21 @@ const scoutVeil = (veil, hole, boxEl) => {
   veil.style.clipPath = `polygon(evenodd,0 0,${V.w}px 0,${V.w}px ${V.h}px,0 ${V.h}px,0 0,${L}px ${T}px,${R}px ${T}px,${R}px ${B}px,${L}px ${B}px,${L}px ${T}px)`;
 };
 
+/* the card for one stop: step count, words, Skip / Back / Next */
+const scoutCard = (s, i, n, go, end) => {
+  const card = uiCard({ tip: true, width: 290, attrs: { role: 'dialog', 'aria-label': `Tour, step ${i + 1} of ${n}` } });
+  const next = uiEl('button', { text: i + 1 < n ? 'Next' : 'Done', attrs: { type: 'button' }, on: { click: () => go(1) } });
+  card.append(...[
+    uiEl('h4', { text: `Step ${i + 1} of ${n}` }),
+    s.title ? uiEl('b', { text: s.title, style: 'display:block;margin-bottom:3px' }) : null,
+    uiEl('p', { text: s.text }),
+    uiEl('div', { cls: 'row' },
+      uiEl('button', { cls: 'ghost', text: 'Skip', attrs: { type: 'button' }, style: 'margin-right:auto', on: { click: () => end(false) } }),
+      i > 0 ? uiEl('button', { cls: 'ghost', text: 'Back', attrs: { type: 'button' }, on: { click: () => go(-1) } }) : null,
+      next)
+  ].filter(Boolean));
+  card.style.visibility = 'hidden';
+  setTimeout(() => { try { next.focus({ preventScroll: true }); } catch (_) { /* old browsers */ } }, 60);
+  return card;
+};
+
