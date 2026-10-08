@@ -45,3 +45,19 @@ defineSprite('crumb', {
   fps: { idle: 3, walk: 10, chew: 12, full: 3 }
 });
 
+/* a stand-in copy of the banner, pinned where the real one was, that Crumb can eat */
+const crumbCopy = el => {
+  const r = el.getBoundingClientRect();
+  const fixed = getComputedStyle(el).position === 'fixed';
+  const c = el.cloneNode(true);
+  c.querySelectorAll('[id]').forEach(n => n.removeAttribute('id'));
+  c.querySelectorAll('piix-pal').forEach(n => n.remove());
+  c.removeAttribute('id');
+  c.setAttribute('aria-hidden', 'true');
+  c.inert = true;
+  c.style.cssText += `;position:fixed;margin:0;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;box-sizing:border-box;` +
+    'pointer-events:none;z-index:calc(var(--piix-z,2147482000) - 1);transform:none;transition:none;animation:none';
+  (el.parentNode || document.body).insertBefore(c, el.nextSibling);
+  return { el: c, fixed, x: r.left + (fixed ? 0 : scrollX), y: r.top + (fixed ? 0 : scrollY), w: r.width, h: r.height };
+};
+
