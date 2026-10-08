@@ -118,7 +118,10 @@ export const POWERS = [
     accent: "var(--sun)",
     kind: "pal",
     does: "munch",
-    where: "#cookie-banner"
+    where: "#cookie-banner",
+    uses: "your cookie banner and its own Accept / Reject buttons",
+    support: "every modern browser · your banner code runs untouched",
+    try: "press Accept or Reject, then Bring it back"
   }
   // new powers go above this line
 ];
