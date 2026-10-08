@@ -47,3 +47,21 @@ const HATCH_TOPS = {
   crest: (x, y) => ((x === 6 || x === 8 || x === 10) && y >= 3 && y <= 4) ? 'a' : null
 };
 
+/* everything a pet is, decided once from its seed */
+const hatchGenes = seed => {
+  const r = hatchRng(seed), pickR = list => list[Math.floor(r() * list.length)];
+  const syl = ['mo', 'bi', 'pu', 'ka', 'lu', 'zi', 'to', 'ne', 'ri', 'fa', 'po', 'gu', 'yo', 'ta', 'mi', 'ba', 'ko', 'su', 'pi', 'do', 'chi', 'wa'];
+  const name = pickR(syl) + pickR(syl) + pickR(['', '', 'n', 'x', 'o', 'y']);
+  return {
+    name: name[0].toUpperCase() + name.slice(1),
+    colors: pickR(HATCH_COLORS),
+    shape: pickR(Object.keys(HATCH_SHAPES)),
+    top: pickR(Object.keys(HATCH_TOPS)),
+    eyeGap: pickR([2, 3, 3]), eyeY: pickR([8, 9, 9]), bigEyes: r() < .35,
+    mouth: pickR(['smile', 'cat', 'fang', 'o', 'none']),
+    mark: pickR(['belly', 'spots', 'stripes', 'blush', 'blush', 'none']),
+    tail: pickR(['none', 'curl', 'puff', 'spike']),
+    spots: [0, 1, 2].map(() => [Math.floor(3 + r() * 10), Math.floor(10 + r() * 4)])
+  };
+};
+
