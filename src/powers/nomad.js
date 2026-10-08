@@ -27,3 +27,15 @@ const nomadShape = (by, step, look) => {
   return rows;
 };
 
+/* Nomad: strolls, stops to look out, and waves hello when it arrives */
+defineSprite('nomad', {
+  w: 15, h: 17, scale: 3, does: 'roam',
+  palette: { k: '#17121f', h: '#ff6b4a', H: '#c94a2f', f: '#ffd9b5', e: '#17121f', p: '#ff9fb5', b: '#58c8ff', B: '#2f8fc4', c: '#ffd23f', s: '#a0673a', r: '#7bd63a' },
+  frames: {
+    walk: [nomadShape(-1, 1, 0), nomadShape(0, 2, 0), nomadShape(-1, 3, 0), nomadShape(0, 2, 0)],
+    idle: [nomadShape(0, 0, 0), nomadShape(0, 0, 1), nomadShape(0, 0, 1), nomadShape(0, 0, 0)],
+    look: [nomadShape(0, 0, 1)]
+  },
+  fps: { walk: 7, idle: 1.5 }
+});
+
