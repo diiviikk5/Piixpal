@@ -13,6 +13,17 @@ export const FAMILIES = [
 
 export const POWERS = [
   {
+    id: 'bulb', fam: 'jobs', accent: 'var(--sun)', kind: 'pal', does: 'cord', where: 'body',
+    uses: 'your theme: a class or attribute on &lt;html&gt; (or any element)',
+    support: 'every modern browser · mouse and touch',
+    try: 'pull the chain down and let go, or just click the bulb',
+    desc: 'A pull-chain light switch for dark mode. A beaded chain hangs from the top of the screen with a little bulb on the end; pull it and the lights go out. Real rope physics, a bulb that glows while the lights are on, and a moth that keeps it company. It reads your theme, so if your own switch changes it, the bulb follows.',
+    attrs: [['toggle', '<code>class:dark</code> (default) or an attribute cycle like <code>data-theme:dark|light</code>; the first value is lights-off'], ['target', 'what to toggle (default &lt;html&gt;)'], ['at', 'where across the screen it hangs, 0–1 (default .9)'], ['length', 'chain length in px (default 120)'], ['top', 'px from the top, to clear a sticky header']],
+    events: 'piix:toggle { dark, value }',
+    hab: '<div class="h-nav"><i></i><i></i><i></i></div><p class="h-text" style="bottom:56px">Lights?</p><piix-pal pal="bulb" target=".habitat" at=".8" top="46" length="96"></piix-pal>',
+    code: '<!-- anywhere: it hangs from the top of the screen -->\n<piix-pal pal="bulb" toggle="data-theme:dark|light"></piix-pal>'
+  },
+  {
     id: 'pix', fam: 'play', accent: 'var(--lime)', kind: 'pal', does: 'player', tall: true, where: 'h1',
     uses: 'your page as a level: every line of text, button, image and card is a platform',
     support: 'every modern browser · keyboard, touch pad and gamepad',
@@ -23,4 +34,5 @@ export const POWERS = [
     hab: '<div class="lv"><h4 class="lv-h" id="d-pix" style="left:26px;top:178px">Play me</h4><p class="lv-p" style="left:196px;top:92px;width:220px">Every line of text is a platform. Bump the buttons from below.</p><button type="button" class="h-btn lime lv-b" style="left:40px;top:292px">Jump</button><button type="button" class="h-btn lv-b" style="left:236px;top:236px">Coin</button><button type="button" class="h-btn lv-b" style="left:340px;top:176px">Higher</button></div><piix-pal pal="pix" on="#d-pix" coins="5"></piix-pal>',
     code: '<h1>\n  Welcome to my site\n  <piix-pal pal="pix"></piix-pal>\n</h1>'
   }
+  // new powers go above this line
 ];

@@ -174,3 +174,5 @@
 .lv-h{font:760 34px/1 var(--f-sans);letter-spacing:-.03em}
 .lv-p{font:500 15.5px/1.5 var(--f-sans);color:var(--ink-2)}
 .power .kv dd code{white-space:nowrap}
+.pal-doc .habitat{transition:background-color .35s,color .35s}
+.pal-doc .habitat.dark{--ink:#f2eef8;--ink-2:#cdc6da;background:radial-gradient(rgba(255,255,255,.08) 1px,transparent 1.3px) 0 0/16px 16px,#17121f;color:#f2eef8}
