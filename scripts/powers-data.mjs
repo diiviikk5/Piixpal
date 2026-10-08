@@ -159,7 +159,8 @@ export const POWERS = [
     desc: "TL;DR, from a wise old owl. Click Gist and it skims your article, eyes darting along the lines, then puts on its reading glasses and hands you the key points with a copy button. When the browser has its own AI summarizer ready, Gist uses it, on the device, so nothing is sent anywhere. Otherwise it picks the sentences that share the most with the rest of the text.",
     attrs: [["on","what to summarise (or put the tag inside it)"],["points","how many points (default 3)"],["button","a real button that asks for the summary"]],
     api: "el.ctl.summarize()",
-    events: "piix:gist { points, source }"
+    events: "piix:gist { points, source }",
+    hab: "<article class=\"h-article\" id=\"d-gist\"><h4>Why pixel pals?</h4><p>Websites got very serious. Every page looks like every other page. Pixel pals give a site a little life without getting in the way. They never block a click and they stay out of the way of screen readers. They are small, free and made for anyone.</p></article><piix-pal pal=\"gist\" on=\"#d-gist\" points=\"2\"></piix-pal>"
   }
   // new powers go above this line
 ];
