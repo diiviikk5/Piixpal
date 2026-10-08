@@ -22,3 +22,9 @@ const pollyShape = (by, open, wings) => art.outline(art.paint(13, 15, (x, y) => 
   return null;
 }));
 
+/* its eye and feet */
+const pollyFace = (rows, by, eyes) => {
+  rows = eyes === 'shut' ? art.put(rows, 8, 3 + by, ['ee']) : eyes === 'happy' ? art.compose(rows, [8, 3 + by, ['_e_', 'e_e']]) : art.compose(rows, [8, 3 + by, ['we']]);
+  return art.compose(rows, [5, 13, ['o.o']], [5, 14, ['o.o']]);
+};
+
