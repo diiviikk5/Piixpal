@@ -51,3 +51,15 @@ const droneRect = (el, pinned) => {
   return { l: r.left + ox, t: r.top + oy, r: r.right + ox, b: r.bottom + oy, w: r.width, h: r.height, x: r.left + ox + r.width / 2, y: r.top + oy + r.height / 2 };
 };
 
+/* the picture to carry: the product image from the button's card, cloned */
+const droneCargo = btn => {
+  const card = btn.closest('[data-product],.product,.card,article,li,figure') || btn.parentElement;
+  const img = card && (card.querySelector('[data-product-image]') || card.querySelector('img'));
+  if (!img) return null;
+  const c = document.createElement('img');
+  c.src = img.currentSrc || img.src;
+  c.alt = '';
+  c.style.cssText = 'position:absolute;left:0;top:0;object-fit:cover;border-radius:6px;box-shadow:0 0 0 2px #17121f,0 6px 0 rgba(23,18,31,.25);pointer-events:none;will-change:transform';
+  return { el: c, from: img };
+};
+
