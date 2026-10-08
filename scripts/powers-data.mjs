@@ -102,7 +102,10 @@ export const POWERS = [
     kind: "pal",
     does: "cart",
     where: "#cart",
-    tall: true
+    tall: true,
+    uses: "your own \"add to cart\" buttons and the product pictures next to them",
+    support: "every modern browser · it only adds an animation, your cart logic is untouched",
+    try: "add a few things to the cart"
   }
   // new powers go above this line
 ];
