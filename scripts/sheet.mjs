@@ -33,7 +33,7 @@ const ctx = {
   clamp: (v, a, b) => Math.min(b, Math.max(a, v)), lerp: (a, b, k) => a + (b - a) * k,
   rnd: (a, b) => a + Math.random() * (b - a), pick: a => a[0], chance: () => false,
   document: dummy(), window: dummy(), navigator: dummy(), localStorage: dummy(), matchMedia: dummy(),
-  addEventListener() {}, removeEventListener() {}, HTMLElement: class {}, customElements: dummy(), Piixpal: {}
+  addEventListener() {}, removeEventListener() {}, HTMLElement: class {}, PiixSpriteElement: class {}, customElements: dummy(), Piixpal: {}
 };
 vm.createContext(ctx);
 vm.runInContext(artSrc + '\n' + bigSrc + '\nthis.art = art; this.BIG = BIG;', ctx);
