@@ -218,7 +218,10 @@ export const POWERS = [
     accent: "var(--mint)",
     kind: "pal",
     does: "pet",
-    where: "footer"
+    where: "footer",
+    uses: "a random seed kept in the visitor’s own browser (localStorage), and nothing else",
+    support: "every modern browser · nothing leaves the visitor’s device",
+    try: "tap the egg five times (or come back a few times)"
   }
   // new powers go above this line
 ];
