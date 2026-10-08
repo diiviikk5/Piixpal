@@ -103,3 +103,18 @@ const hatchPaint = (G, { eyes = 'open', by = 0, step = 0, whites = false }) => {
 };
 const hatchPalette = G => ({ k: '#17121f', b: G.colors[0], d: G.colors[1], B: G.colors[2], c: G.colors[3], a: G.colors[4], w: '#ffffff', e: '#17121f', p: '#ff9fb5', g: '#5cbf45' });
 
+/* a whole pal, ready to live on the page */
+const hatchSprite = seed => {
+  const G = hatchGenes(seed);
+  return defineSprite('_pet-' + seed, {
+    w: 16, h: 17, scale: 3, palette: hatchPalette(G), petName: G.name,
+    frames: {
+      idle: [hatchPaint(G, {}), hatchPaint(G, { by: -1 }), hatchPaint(G, { eyes: 'shut' }), hatchPaint(G, { by: -1 })],
+      walk: [hatchPaint(G, { step: 1, by: -1 }), hatchPaint(G, { step: 2 })],
+      happy: [hatchPaint(G, { eyes: 'happy' }), hatchPaint(G, { eyes: 'happy', by: -1 })],
+      sleep: [hatchPaint(G, { eyes: 'shut' })]
+    },
+    fps: { idle: 1.6, walk: 6, happy: 6 }
+  });
+};
+
