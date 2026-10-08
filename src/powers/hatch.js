@@ -150,3 +150,11 @@ defineSprite('_shell', {
   frames: { l: [['.kkk...', 'kwwwk..', 'kwswwk.', 'kwwwwk.', 'kwwk.k.', '.k..k..']], r: [['...kkk.', '..kwwwk', '.kwwswk', '.kwwwwk', '.k.kwwk', '..k..k.']] }
 });
 
+/* turn an actor into a different sprite, keeping its place */
+const hatchBecome = (a, spec, s) => {
+  a.spec = spec; a.frames = baked(spec); if (s) a.s = s;
+  a.cv.width = spec.w; a.cv.height = spec.h;
+  a.cv.style.width = spec.w * a.s + 'px'; a.cv.style.height = spec.h * a.s + 'px';
+  a._drawn = null; a.clip = null; a.play(Object.keys(spec.frames)[0]);
+};
+
