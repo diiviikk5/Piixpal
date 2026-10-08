@@ -318,7 +318,10 @@ export const POWERS = [
     accent: "var(--violet)",
     kind: "pal",
     does: "limit",
-    where: "label"
+    where: "label",
+    uses: "your text box’s maxlength (or a limit you give it)",
+    support: "every modern browser · tells screen readers how many characters are left at a few points",
+    try: "type until you hit the limit (40 here)"
   }
   // new powers go above this line
 ];
