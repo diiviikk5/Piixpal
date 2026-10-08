@@ -255,7 +255,8 @@ export const POWERS = [
     query: "hunt=launch&gem=1&total=5",
     uses: "gems you hide on any of your pages, and the visitor’s own browser to remember what they found",
     support: "every modern browser · progress carries from page to page",
-    try: "three gems are hidden in the box: find them all"
+    try: "three gems are hidden in the box: find them all",
+    desc: "A treasure hunt across your whole site. Hide gems anywhere, on any page: tucked on a heading, behind a button, down in the footer. Visitors who spot one click it and it flies into a little jar in the corner that remembers every gem they have found, page to page. Find them all and the jar bursts with sparkles and, if you like, hands over a reward code. Great for launches."
   }
   // new powers go above this line
 ];
