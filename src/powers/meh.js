@@ -29,3 +29,10 @@ const mehFace = level => {
   return rows;
 };
 
+/* Meh: eleven faces, plus a little bounce at both ends */
+defineSprite('meh', {
+  w: 14, h: 13, scale: 3, does: 'mood',
+  palette: { k: '#17121f', b: '#ffd84d', d: '#d9a52a', B: '#fff1a8', x: '#ff8a6a', X: '#d9583c', y: '#ffc2ae', g: '#a6e35c', G: '#76b52f', h: '#dcf7b0', e: '#17121f', p: '#ff7a9a', r: '#ff4d6d', t: '#58c8ff' },
+  frames: Object.fromEntries(Array.from({ length: 11 }, (_, i) => ['m' + i, [mehFace(i)]]))
+});
+
