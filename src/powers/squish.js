@@ -26,3 +26,42 @@ defineSprite('squish', {
   frames: { calm: [squishShape('calm')], worry: [squishShape('worry')], panic: [squishShape('panic', 'r')], flat: [squishShape('flat', 'r')] }
 });
 
+/* limit: get squashed as the text gets near its limit */
+defineBehavior('limit', (a, [el], host) => {
+  const S = a.s / 3;
+  const field = el.matches && el.matches('textarea,input') ? el : el.querySelector('textarea,input') || el;
+  const max = () => +host.getAttribute('limit') || (field.maxLength > 0 ? field.maxLength : 280);
+  let squash = 0, warned = 0, lastLeft = null;
+  const update = () => {
+    const len = (field.value || '').length, lim = max(), left = lim - len;
+    if (left !== lastLeft) {
+      lastLeft = left;
+      host.dispatchEvent(new CustomEvent('piix:limit', { bubbles: true, detail: { length: len, limit: lim, left } }));
+      /* tell screen readers at a few points, not on every key */
+      const step = left <= 0 ? 3 : left <= lim * .05 ? 2 : left <= lim * .2 ? 1 : 0;
+      if (step > warned) uiAnnounce(left <= 0 ? 'Character limit reached' : `${left} characters left`);
+      warned = step;
+    }
+    return { len, lim, left };
+  };
+  field.addEventListener('input', update);
+
+  return {
+    tick(dt) {
+      const r = rectOf(field);
+      a.x = r.r - a.w * .7; a.y = r.t + 2 * S;
+      const { len, lim, left } = update();
+      const k = len / lim;
+      /* squashed from 60% full, flat at 100% */
+      const want = clamp((k - .6) / .4, 0, 1);
+      squash = reduced() ? want : lerp(squash, want, 1 - Math.exp(-10 * dt));
+      a.sy = 1 - squash * .62; a.sx = 1 + squash * .55;
+      a.play(k >= 1 ? 'flat' : k >= .9 ? 'panic' : k >= .7 ? 'worry' : 'calm');
+      if (k >= .8 && document.activeElement === field) { if (!a._lastSaid || a._lastSaid !== left) { a.say('#' + Math.max(0, left), 0); a._lastSaid = left; } }
+      else if (a._lastSaid != null) { a.hush(); a._lastSaid = null; }
+      a.ox = k >= 1 ? rnd(-1, 1) * S : 0;
+    },
+    poke() { a.say('heart', 700); },
+    destroy() { field.removeEventListener('input', update); }
+  };
+});
