@@ -46,3 +46,25 @@ defineSprite('sprout', {
   fps: Object.fromEntries([0, 1, 2, 3, 4].map(n => ['s' + n, 1.5]))
 });
 
+/* the timer: focus, then a break; saved, so reloads and pop-outs share it */
+const SPROUT_KEY = 'piix-sprout';
+const sproutState = () => {
+  let s = null;
+  try { s = JSON.parse(localStorage.getItem(SPROUT_KEY)); } catch (_) { /* private mode */ }
+  return Object.assign({ mode: 'focus', left: null, running: false, at: 0, blooms: 0 }, s || {});
+};
+const sproutSave = s => { try { localStorage.setItem(SPROUT_KEY, JSON.stringify(s)); } catch (_) { /* private mode */ } };
+/* how much time is left right now, in seconds, given the lengths */
+const sproutLeft = (s, mins) => {
+  const total = (s.mode === 'focus' ? mins.focus : mins.rest) * 60;
+  const left = s.left == null ? total : s.left;
+  return s.running ? Math.max(0, left - (Date.now() - s.at) / 1000) : left;
+};
+/* which plant to show: it grows through the focus time, and stays in bloom over the break */
+const sproutStage = (s, mins) => {
+  if (s.mode === 'rest') return 4;
+  const total = mins.focus * 60, done = 1 - sproutLeft(s, mins) / total;
+  return s.left == null && !s.running ? 1 : Math.min(4, 1 + Math.floor(done * 3.999));
+};
+const sproutClock = sec => `${String(Math.floor(sec / 60)).padStart(2, '0')}:${String(Math.floor(sec % 60)).padStart(2, '0')}`;
+
