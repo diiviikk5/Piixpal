@@ -105,7 +105,8 @@ export const POWERS = [
     tall: true,
     uses: "your own \"add to cart\" buttons and the product pictures next to them",
     support: "every modern browser · it only adds an animation, your cart logic is untouched",
-    try: "add a few things to the cart"
+    try: "add a few things to the cart",
+    desc: "Fly-to-cart, by quadcopter. Click any add-to-cart button and the drone swoops down, lifts a copy of the product picture off its card, flies it over to your cart and drops it in. The cart bounces, its counter goes up, and an event tells your app. No picture? It carries a little cardboard box instead."
   }
   // new powers go above this line
 ];
