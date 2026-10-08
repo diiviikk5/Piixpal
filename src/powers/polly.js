@@ -79,3 +79,17 @@ const pollyChunks = text => {
   return out;
 };
 
+/* the word at a character index, as a Range on the page */
+const pollyRange = (map, i) => {
+  let k = map.nodes.length - 1;
+  while (k > 0 && map.nodes[k].start > i) k--;
+  const { node, start } = map.nodes[k];
+  let a = clamp(i - start, 0, node.data.length), b = a;
+  while (a > 0 && !/\s/.test(node.data[a - 1])) a--;
+  while (b < node.data.length && !/\s/.test(node.data[b])) b++;
+  if (b <= a) return null;
+  const r = document.createRange();
+  r.setStart(node, a); r.setEnd(node, b);
+  return r;
+};
+
