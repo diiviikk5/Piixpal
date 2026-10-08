@@ -127,6 +127,14 @@ export const POWERS = [
     events: "piix:eaten",
     hab: "<button type=\"button\" class=\"h-btn\" style=\"position:absolute;left:18px;top:18px\" onclick=\"const h=this.closest('.habitat');h.querySelector('.h-cookie').style.display='';const p=h.querySelector('piix-pal');p.replaceWith(p.cloneNode(true))\">Bring it back</button><div class=\"h-cookie\" id=\"d-cookie\"><p>We use cookies to remember your theme. That is all.</p><button type=\"button\" class=\"h-btn lime\" onclick=\"this.closest('.h-cookie').style.display='none'\">Accept</button><button type=\"button\" class=\"h-btn\" onclick=\"this.closest('.h-cookie').style.display='none'\">Reject</button></div><piix-pal pal=\"crumb\" on=\"#d-cookie\"></piix-pal>",
     code: "<div id=\"cookie-banner\">\n  We use cookies…\n  <button>Accept</button>\n  <button>Reject</button>\n  <piix-pal pal=\"crumb\"></piix-pal>\n</div>"
+  },
+  {
+    id: "polly",
+    fam: "beyond",
+    accent: "var(--lime)",
+    kind: "pal",
+    does: "read",
+    where: "article"
   }
   // new powers go above this line
 ];
