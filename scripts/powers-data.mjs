@@ -208,7 +208,8 @@ export const POWERS = [
     desc: "A little traveller who walks between your browser windows. Open your site twice, side by side, and Nomad walks off the edge of one window and into the other, right where they meet, as if the windows were one room. Close a window and Nomad moves to another one instead of getting lost. On its own it strolls along the bottom of the screen and peeks out at the edges.",
     attrs: [["window","the page to open with el.ctl.invite() (default: this page)"]],
     api: "el.ctl.invite()",
-    events: "piix:arrive, piix:depart"
+    events: "piix:arrive, piix:depart",
+    hab: "<button type=\"button\" class=\"h-btn lime\" style=\"position:absolute;left:22px;top:22px\" data-call=\"#d-nomad:invite\">Open a second window</button><p class=\"h-line\" style=\"bottom:auto;top:90px\">Nomad walks out of this box and into the other window, then back again.</p><div class=\"h-floor\"><i></i><i></i><i></i></div><piix-pal pal=\"nomad\" id=\"d-nomad\" window=\"nomad.html\"></piix-pal>"
   }
   // new powers go above this line
 ];
