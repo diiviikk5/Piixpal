@@ -141,7 +141,8 @@ export const POWERS = [
     desc: "Read-aloud for any page, with a guide you can watch. Polly speaks your text with the voice built into the browser and hops along the words as it says them, each one lighting up. It reads in sentence-sized pieces so long articles never cut off, keeps the current line on screen, and pauses and resumes right where it was. Hook it to a real button and it is keyboard friendly too.",
     attrs: [["on","what to read (or put the tag inside it)"],["button","a real button that starts and pauses it"],["rate","speaking speed (default 1)"],["pitch","voice pitch (default 1.15, a bit parrot)"],["voice","part of a voice name to prefer, e.g. \"Samantha\""]],
     api: "el.ctl.read()  el.ctl.pause()  el.ctl.stop()",
-    events: "piix:read-start, piix:read-end { done }"
+    events: "piix:read-start, piix:read-end { done }",
+    hab: "<button type=\"button\" class=\"h-btn lime\" id=\"d-listen\" style=\"position:absolute;left:22px;bottom:22px\">Listen</button><article class=\"h-article\" id=\"d-polly\"><h4>A short story</h4><p>Once there was a parrot who loved words. It read every page it could find, out loud, hopping from word to word so nobody lost their place.</p></article><piix-pal pal=\"polly\" on=\"#d-polly\" button=\"#d-listen\"></piix-pal>"
   }
   // new powers go above this line
 ];
