@@ -41,3 +41,6 @@ defineSprite('_jar', {
 const gemLoad = hunt => { try { return JSON.parse(localStorage.getItem('piix-hunt:' + hunt)) || []; } catch (_) { return []; } };
 const gemSave = (hunt, list) => { try { localStorage.setItem('piix-hunt:' + hunt, JSON.stringify(list)); } catch (_) { /* private mode */ } };
 
+/* one jar per hunt, shared by every gem on the page */
+const GEM_JARS = {};
+
