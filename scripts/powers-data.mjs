@@ -144,6 +144,15 @@ export const POWERS = [
     events: "piix:read-start, piix:read-end { done }",
     hab: "<button type=\"button\" class=\"h-btn lime\" id=\"d-listen\" style=\"position:absolute;left:22px;bottom:22px\">Listen</button><article class=\"h-article\" id=\"d-polly\"><h4>A short story</h4><p>Once there was a parrot who loved words. It read every page it could find, out loud, hopping from word to word so nobody lost their place.</p></article><piix-pal pal=\"polly\" on=\"#d-polly\" button=\"#d-listen\"></piix-pal>",
     code: "<button id=\"listen\">Listen</button>\n\n<article>\n  <piix-pal pal=\"polly\" button=\"#listen\"></piix-pal>\n  <h1>My post</h1>\n  <p>…</p>\n</article>"
+  },
+  {
+    id: "gist",
+    fam: "beyond",
+    accent: "var(--violet)",
+    kind: "pal",
+    does: "tldr",
+    where: "article",
+    tall: true
   }
   // new powers go above this line
 ];
