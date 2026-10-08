@@ -66,3 +66,16 @@ const pollyText = el => {
   return { text, nodes };
 };
 
+/* sentence-sized pieces: long speech gets cut off by some browsers */
+const pollyChunks = text => {
+  const out = [];
+  const re = /[^.!?…]+[.!?…]*["')\]]*\s*/g;
+  for (let m; (m = re.exec(text));) {
+    if (!m[0].trim()) continue;
+    const last = out[out.length - 1];
+    if (last && last.text.length + m[0].length < 160) last.text += m[0];
+    else out.push({ start: m.index, text: m[0] });
+  }
+  return out;
+};
+
