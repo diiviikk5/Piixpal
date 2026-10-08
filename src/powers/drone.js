@@ -44,3 +44,10 @@ defineSprite('_parcel', {
   frames: { idle: [['kkkkkkkkk', 'kccctcccC', 'kccctcccC', 'kkkkkkkkk', 'kccctcccC', 'kccctcccC', 'kCCCtCCCC', 'kkkkkkkkk']] }
 });
 
+/* where something is, in the drone's own coordinates (the box's, or the screen's) */
+const droneRect = (el, pinned) => {
+  const r = el.getBoundingClientRect();
+  const ox = pinned ? origin.x : scrollX, oy = pinned ? origin.y : scrollY;
+  return { l: r.left + ox, t: r.top + oy, r: r.right + ox, b: r.bottom + oy, w: r.width, h: r.height, x: r.left + ox + r.width / 2, y: r.top + oy + r.height / 2 };
+};
+
