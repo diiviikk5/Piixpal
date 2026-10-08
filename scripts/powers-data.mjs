@@ -292,7 +292,8 @@ export const POWERS = [
     desc: "A password-strength meter that does reps. Buff stands on your password field with a barbell, and the stronger the password, the bigger the plates. A weak one makes it strain and sweat; a strong one goes straight up over its head; a really good one gets a one-armed flex and a sparkle. It knows the usual suspects, too: “password”, “qwerty”, “1234” never get past weak.",
     attrs: [["on","the password input (or put the tag inside its label)"],["at","where it stands on the field, 0–1 (default .9)"]],
     api: "el.ctl.score",
-    events: "piix:strength { score, label }"
+    events: "piix:strength { score, label }",
+    hab: "<p class=\"h-line\" style=\"bottom:auto;top:30px\">Choose a password:</p><div class=\"h-form\"><input id=\"d-pw\" type=\"password\" placeholder=\"type a password…\" aria-label=\"Password\" autocomplete=\"new-password\"></div><piix-pal pal=\"buff\" on=\"#d-pw\"></piix-pal>"
   }
   // new powers go above this line
 ];
