@@ -187,3 +187,6 @@
 .h-cookie{position:absolute;left:18px;right:18px;bottom:18px;display:flex;align-items:center;gap:10px;padding:12px 14px;border:2px solid var(--ink);border-radius:12px;background:#fff8e7;color:#17121f}
 .h-cookie p{margin:0;flex:1;font:500 14px/1.4 var(--f-sans)}
 .h-cookie .h-btn{padding:9px 12px;font-size:13px;color:#17121f}
+.h-article{position:absolute;left:22px;right:22px;top:26px;margin:0}
+.h-article h4{margin:0 0 8px;font:760 24px/1.1 var(--f-sans);letter-spacing:-.02em}
+.h-article p{margin:0;font:500 16px/1.6 var(--f-sans);color:var(--ink-2)}
