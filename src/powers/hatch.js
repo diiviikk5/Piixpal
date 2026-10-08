@@ -17,3 +17,12 @@ const hatchRng = seed => {
   return () => { h = (h + 0x6D2B79F5) | 0; let t = h; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; };
 };
 
+/* colour sets: body, shade, light, belly, accent */
+const HATCH_COLORS = [
+  ['#7bd6b8', '#4fa98c', '#c4f2e2', '#effff9', '#ff6b4a'], ['#ff8a7a', '#d9604f', '#ffc4ba', '#fff0ea', '#58c8ff'],
+  ['#b9a3ff', '#8c72e0', '#e2d8ff', '#f6f2ff', '#ffd23f'], ['#7cc8ff', '#4f97d1', '#c6e8ff', '#eef8ff', '#ff6b9a'],
+  ['#ffd25c', '#d9a52a', '#fff0b8', '#fffbe8', '#ff6b4a'], ['#ffb38a', '#de8558', '#ffd9c4', '#fff4ec', '#6b4cff'],
+  ['#b8e05c', '#89b12f', '#e1f7ad', '#f8ffe6', '#ff4d6d'], ['#ff9fc6', '#d9709c', '#ffd2e4', '#fff1f7', '#3fb8a0'],
+  ['#9aa8bf', '#6f7d96', '#c9d2e2', '#f0f3f8', '#ffd23f'], ['#c49a74', '#9a7250', '#e3c7ab', '#f7ece1', '#7bd6b8']
+];
+
