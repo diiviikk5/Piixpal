@@ -1,7 +1,7 @@
 // Contact sheet: renders every frame of the pals and sprites in the given files to a PNG,
 // so pixel art can be checked without a browser.
 //
-//   node scripts/sheet.mjs src/powers/pix.js [more files…] [--out sheet.png] [--scale 6]
+//   node scripts/sheet.mjs src/powers/pix.js [more files…] [--out sheet.png] [--scale 6] [--clips idle,run] [--light]
 //
 // Each sprite gets a row: every clip's frames left to right, drawn on white and on ink.
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -12,6 +12,8 @@ const args = process.argv.slice(2);
 const opt = (k, d) => { const i = args.indexOf(k); if (i < 0) return d; const v = args[i + 1]; args.splice(i, 2); return v; };
 const outFile = opt('--out', 'sheet.png');
 const S = +opt('--scale', 6);
+const only = opt('--clips', '');                 /* e.g. --clips idle,run */
+const light = args.includes('--light') ? (args.splice(args.indexOf('--light'), 1), true) : false;   /* skip the dark copies */
 const files = args;
 if (!files.length) { console.log('usage: node scripts/sheet.mjs <files…> [--out sheet.png] [--scale 6]'); process.exit(1); }
 
@@ -42,9 +44,10 @@ for (const f of files) {
 
 /* lay out: one row per sprite, each frame drawn twice (on white, on ink) */
 const hex = h => { h = h.replace('#', ''); if (h.length <= 4) h = [...h].map(c => c + c).join(''); const n = parseInt(h.padEnd(8, 'f'), 16); return [(n >>> 24) & 255, (n >>> 16) & 255, (n >>> 8) & 255, n & 255]; };
-const rowsOf = sp => sp.kind === 'pal' ? Object.entries(sp.spec.frames).flatMap(([clip, fr]) => fr.map(f => ({ clip, rows: f }))) : sp.spec.frames.map(f => ({ clip: 'f', rows: f }));
+const rowsOf = sp => sp.kind === 'pal' ? Object.entries(sp.spec.frames).filter(([clip]) => !only || only.split(',').includes(clip)).flatMap(([clip, fr]) => fr.map(f => ({ clip, rows: f }))) : sp.spec.frames.map(f => ({ clip: 'f', rows: f }));
 const G = 4 * S, list = sprites.map(sp => ({ sp, frames: rowsOf(sp) }));
-const W = Math.max(...list.map(({ sp, frames }) => frames.length * (sp.spec.w * S + G) * 2 + G)) + G;
+const copies = light ? 1 : 2;
+const W = Math.max(...list.map(({ sp, frames }) => frames.length * (sp.spec.w * S + G) * copies + G)) + G;
 const H = list.reduce((h, { sp }) => h + sp.spec.h * S + G * 2, G);
 const px = new Uint8Array(W * H * 4).fill(255);
 const fill = (x0, y0, w, h, c) => { for (let y = y0; y < y0 + h; y++) for (let x = x0; x < x0 + w; x++) { if (x < 0 || y < 0 || x >= W || y >= H) continue; const i = (y * W + x) * 4; const a = c[3] / 255; px[i] = px[i] * (1 - a) + c[0] * a; px[i + 1] = px[i + 1] * (1 - a) + c[1] * a; px[i + 2] = px[i + 2] * (1 - a) + c[2] * a; } };
@@ -53,8 +56,8 @@ for (const { sp, frames } of list) {
   const { w, h, palette } = sp.spec, pal = {};
   for (const k in palette) pal[k] = hex(palette[k]);
   frames.forEach(({ rows }, i) => {
-    for (const bg of [0, 1]) {
-      const x0 = G + (i * 2 + bg) * (w * S + G);
+    for (const bg of light ? [0] : [0, 1]) {
+      const x0 = G + (i * copies + bg) * (w * S + G);
       fill(x0 - 2, y - 2, w * S + 4, h * S + 4, bg ? [23, 18, 31, 255] : [236, 233, 226, 255]);
       const pad = h - rows.length;
       rows.forEach((r, ry) => { for (let x = 0; x < r.length && x < w; x++) { const c = pal[r[x]]; if (c) fill(x0 + x * S, y + (ry + pad) * S, S, S, c); } });
