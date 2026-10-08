@@ -198,3 +198,6 @@
 .h-c{display:flex;align-items:center;gap:12px}
 .h-c p{margin:0;padding:10px 14px;border:2px solid var(--ink);border-radius:12px;background:var(--card);font:500 14.5px/1.35 var(--f-sans)}
 .h-c b{margin-right:6px}
+.h-form input[type=range]{padding:0;border:0;background:none;accent-color:var(--ink)}
+.h-form textarea{width:100%;font:500 16px/1.4 var(--f-sans);padding:12px 14px;border:2px solid var(--ink);border-radius:10px;background:var(--card);color:var(--ink);resize:none}
+.h-form textarea:focus{outline:none;box-shadow:0 0 0 3px var(--lime)}
