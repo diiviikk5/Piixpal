@@ -190,3 +190,7 @@
 .h-article{position:absolute;left:22px;right:22px;top:26px;margin:0}
 .h-article h4{margin:0 0 8px;font:760 24px/1.1 var(--f-sans);letter-spacing:-.02em}
 .h-article p{margin:0;font:500 16px/1.6 var(--f-sans);color:var(--ink-2)}
+.h-tab{position:absolute;left:22px;top:22px;display:flex;align-items:center;gap:10px;height:44px;padding:0 14px 0 12px;border:2px solid var(--ink);border-bottom-width:0;border-radius:12px 12px 0 0;background:var(--card);font:600 14px var(--f-sans)}
+.h-tab canvas{width:24px;height:24px;image-rendering:pixelated}
+.h-tab i{font-style:normal;color:var(--muted);margin-left:8px}
+.h-fav{position:absolute;right:28px;top:30px;width:128px;height:128px;image-rendering:pixelated;border:2px dashed color-mix(in oklab,var(--ink) 30%,transparent);border-radius:14px;background:var(--card)}
