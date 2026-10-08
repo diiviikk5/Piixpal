@@ -85,3 +85,19 @@ const gistAI = async (text, context) => {
   } catch (_) { return null; }
 };
 
+/* the summary card: TL;DR, the points, where they came from, Copy and Close */
+const gistCard = (points, source, close) => {
+  const card = uiCard({ tip: true, width: 340, attrs: { role: 'dialog', 'aria-label': 'Summary' } });
+  const copy = uiEl('button', { cls: 'ghost', text: 'Copy', attrs: { type: 'button' } });
+  copy.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(points.map(p => '• ' + p).join('\n')); copy.textContent = 'Copied'; } catch (_) { copy.textContent = 'Press Ctrl+C'; }
+  });
+  card.append(
+    uiEl('h4', { text: 'TL;DR' }),
+    uiEl('ul', {}, ...points.map(p => uiEl('li', { text: p }))),
+    uiEl('p', { text: source === 'ai' ? 'Summarised on your device by your browser’s built-in AI.' : 'The sentences that say the most, picked by Gist.', style: 'margin-top:8px;font-size:12px;color:#6c6477' }),
+    uiEl('div', { cls: 'row' }, copy, uiEl('button', { text: 'Close', attrs: { type: 'button' }, on: { click: close } }))
+  );
+  return card;
+};
+
