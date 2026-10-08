@@ -98,6 +98,8 @@
  "drone": "power",
  "fetch": "power",
  "gist": "power",
+ "hatch": "power",
+ "avatar": "power",
  "nomad": "power",
  "pidge": "power",
  "pix": "power",
