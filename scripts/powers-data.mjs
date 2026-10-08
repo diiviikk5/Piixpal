@@ -169,7 +169,10 @@ export const POWERS = [
     accent: "var(--sun)",
     kind: "pal",
     does: "tab",
-    where: "footer"
+    where: "footer",
+    uses: "your page’s icon in the browser tab, the tab’s title, and the Page Visibility API",
+    support: "Chrome, Edge, Firefox and Safari show the live icon · puts your own icon and title back when removed",
+    try: "look at this tab’s icon, then switch to another tab for a few seconds and come back"
   }
   // new powers go above this line
 ];
