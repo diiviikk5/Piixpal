@@ -91,7 +91,8 @@ export const POWERS = [
     desc: "Onboarding, guided by a tiny explorer. Mark the stops with <code>data-tour=\"what this is\"</code>; Scout hops from one to the next, stands on each and raises its flag while a spotlight dims everything else and a card explains. Keyboard friendly, announced to screen readers, and it can start by itself once per visitor.",
     attrs: [["data-tour","on any element: the text for that stop (<code>data-tour-step</code> to order, <code>data-tour-title</code> for a heading)"],["steps","or list the stops on the tag: <code>#new: Start here | #search: Find anything</code>"],["start","\"auto\" begins by itself, once per visitor"]],
     api: "el.ctl.start(steps?)  el.ctl.next()  el.ctl.back()  el.ctl.end()",
-    events: "piix:tour-step, piix:tour-end"
+    events: "piix:tour-step, piix:tour-end",
+    hab: "<div class=\"h-nav\" style=\"height:64px\"><i></i></div><button type=\"button\" class=\"h-btn lime\" style=\"position:absolute;left:70px;top:12px\" data-tour=\"Start a new project here\" data-tour-step=\"1\">+ New</button><input class=\"h-search\" aria-label=\"Search\" placeholder=\"Search…\" style=\"left:178px;top:14px\" data-tour=\"Search every project and file\" data-tour-step=\"2\"><span class=\"h-avatar\" style=\"right:20px;top:14px\" data-tour=\"Your profile and settings\" data-tour-step=\"3\">MK</span><p class=\"h-line\" style=\"bottom:auto;top:118px\">Click Scout to take the tour.</p><div class=\"h-floor\" id=\"d-scout\"><i></i><i></i><i></i></div><piix-pal pal=\"scout\" on=\"#d-scout\" at=\".12\"></piix-pal>"
   }
   // new powers go above this line
 ];
