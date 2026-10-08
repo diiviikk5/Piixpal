@@ -19,3 +19,10 @@ const squishShape = (face, color = 'b') => {
   return art.compose(rows, ...F, [2, 6, ['p']], [10, 6, ['p']]);
 };
 
+/* Squish: comfy, worried, panicking, and flattened */
+defineSprite('squish', {
+  w: 13, h: 12, scale: 3, does: 'limit',
+  palette: { k: '#17121f', b: '#fff0f4', d: '#f2c2cf', B: '#ffffff', r: '#ff8fa3', D: '#e5637e', R: '#ffc4cf', e: '#17121f', p: '#ff9fb5', t: '#58c8ff' },
+  frames: { calm: [squishShape('calm')], worry: [squishShape('worry')], panic: [squishShape('panic', 'r')], flat: [squishShape('flat', 'r')] }
+});
+
