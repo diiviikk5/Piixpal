@@ -33,7 +33,7 @@ const gistFace = (rows, by, look, glasses) => {
   else if (look === 'happy') rows = art.compose(rows, [3, 4 + by, ['_e_', 'e_e']], [7, 4 + by, ['_e_', 'e_e']]);
   else rows = art.compose(rows, [3 + px, 4 + by, ['e', 'e']], [7 + px, 4 + by, ['e', 'e']]);
   if (glasses) rows = art.compose(rows, [2, 3 + by, ['kkkkkkkkkk']], [2, 6 + by, ['k___k_k___k']]);
-  return art.compose(rows, [5, 13, ['Y.Y']]);
+  return art.compose(rows, [5, 13, ['Y_Y']]);
 };
 
 /* Gist: blinks, skims (eyes darting), thinks, and presents with its glasses on */
