@@ -44,3 +44,11 @@ const gemSave = (hunt, list) => { try { localStorage.setItem('piix-hunt:' + hunt
 /* one jar per hunt, shared by every gem on the page */
 const GEM_JARS = {};
 
+/* a gem's own colours, from a single colour */
+const gemTint = (a, color) => {
+  if (!color) return;
+  const pal = { ...a.spec.palette, l: color, L: mixHex(color, .55), d: mixHex(color, -.3) };
+  const spec = defineSprite('_gem-' + color.replace('#', ''), { ...a.spec, palette: pal });
+  a.spec = spec; a.frames = baked(spec); a._drawn = null;
+};
+
