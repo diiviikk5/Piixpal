@@ -184,3 +184,6 @@
 .prod{flex:1;display:grid;gap:8px;justify-items:center;padding:10px 8px;border:2px solid var(--ink);border-radius:12px;background:var(--card)}
 .prod img{width:64px;height:64px;image-rendering:pixelated;border-radius:8px}
 .prod .h-btn{padding:8px 10px;font-size:13px}
+.h-cookie{position:absolute;left:18px;right:18px;bottom:18px;display:flex;align-items:center;gap:10px;padding:12px 14px;border:2px solid var(--ink);border-radius:12px;background:#fff8e7;color:#17121f}
+.h-cookie p{margin:0;flex:1;font:500 14px/1.4 var(--f-sans)}
+.h-cookie .h-btn{padding:9px 12px;font-size:13px;color:#17121f}
