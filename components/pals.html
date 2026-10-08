@@ -41,8 +41,11 @@
     <h4>Components</h4>
     <a href="sprites.html">Sprites <span class="n">49</span></a>
     <a href="pals.html" aria-current="page">Pals <span class="n">42</span></a>
+    <a href="powers.html">Superpowers <span class="n">1</span></a>
     <a href="crowd.html">Crowd <span class="n">3</span></a>
     <a href="type.html">Pixel type</a>
+    <h4>Superpowers</h4>
+    <a href="powers.html#pix" style="--dot:var(--lime)"><i></i>Pix</a>
     <h4>Big sprites</h4>
     <a href="sprites.html#s-astronaut" style="--dot:var(--sky)"><i></i>Astronaut</a>
     <a href="sprites.html#s-bolt" style="--dot:var(--sun)"><i></i>Bolt</a>
@@ -1794,7 +1797,7 @@ Piixpal.add(&quot;scrolly&quot;, &quot;body&quot;);</pre>
   <h2 id="echo-h">Echo <span class="pal-no">do="mimic"</span></h2>
   <p>Your cursor’s little shadow. Replays the exact path your cursor took and clicks wherever you clicked, half a second late. Stop and it catches up and dances.</p>
   <div class="pal-doc">
-    <div class="habitat"><p class="h-line" style="bottom:auto;top:40px">Move around and click inside this box: Echo follows you half a second late.</p><piix-pal box=".habitat" pal="echo" box=".habitat"></piix-pal></div>
+    <div class="habitat"><p class="h-line" style="bottom:auto;top:40px">Move around and click inside this box: Echo follows you half a second late.</p><piix-pal pal="echo" box=".habitat"></piix-pal></div>
     <div class="info">
       <dl class="kv">
         <dt>lives on</dt><dd>the whole page, half a second behind you</dd>
@@ -2400,7 +2403,7 @@ Piixpal.add(&quot;rocket&quot;, &quot;.btn&quot;);</pre>
   <h2 id="ball-h">Ball <span class="pal-no">do="toss"</span></h2>
   <p>A beach ball. Bouncy, rolly, slightly smug. Rolls a long way. Drag and throw it, or bat it with a fast swipe of the cursor.</p>
   <div class="pal-doc">
-    <div class="habitat"><p class="h-text" id="d-ball" style="font-size:30px">Throw me</p><piix-pal box=".habitat" pal="ball" on="#d-ball" box=".habitat"></piix-pal></div>
+    <div class="habitat"><p class="h-text" id="d-ball" style="font-size:30px">Throw me</p><piix-pal pal="ball" on="#d-ball" box=".habitat"></piix-pal></div>
     <div class="info">
       <dl class="kv">
         <dt>lives on</dt><dd>wherever it lands: headings, paragraphs, buttons, cards</dd>
@@ -2484,7 +2487,7 @@ Piixpal.add(&quot;ball&quot;, &quot;h1&quot;);</pre>
   <h2 id="duck-h">Duck <span class="pal-no">do="toss"</span></h2>
   <p>A rubber duck. Squeaks when it lands. Drag and throw it, or bat it with a fast swipe of the cursor.</p>
   <div class="pal-doc">
-    <div class="habitat"><p class="h-text" id="d-duck" style="font-size:30px">Throw me</p><piix-pal box=".habitat" pal="duck" on="#d-duck" box=".habitat"></piix-pal></div>
+    <div class="habitat"><p class="h-text" id="d-duck" style="font-size:30px">Throw me</p><piix-pal pal="duck" on="#d-duck" box=".habitat"></piix-pal></div>
     <div class="info">
       <dl class="kv">
         <dt>lives on</dt><dd>wherever it lands: headings, paragraphs, buttons, cards</dd>
@@ -2568,7 +2571,7 @@ Piixpal.add(&quot;duck&quot;, &quot;h1&quot;);</pre>
   <h2 id="dice-h">Dice <span class="pal-no">do="toss"</span></h2>
   <p>Lands on a random face, every time. Every throw is a decision. Drag and throw it, or bat it with a fast swipe of the cursor.</p>
   <div class="pal-doc">
-    <div class="habitat"><p class="h-text" id="d-dice" style="font-size:30px">Throw me</p><piix-pal box=".habitat" pal="dice" on="#d-dice" box=".habitat"></piix-pal></div>
+    <div class="habitat"><p class="h-text" id="d-dice" style="font-size:30px">Throw me</p><piix-pal pal="dice" on="#d-dice" box=".habitat"></piix-pal></div>
     <div class="info">
       <dl class="kv">
         <dt>lives on</dt><dd>wherever it lands: headings, paragraphs, buttons, cards</dd>
@@ -2652,7 +2655,7 @@ Piixpal.add(&quot;dice&quot;, &quot;h1&quot;);</pre>
   <h2 id="pebble-h">Pebble <span class="pal-no">do="toss"</span></h2>
   <p>A heavy little rock. Does not bounce. Lands with a thud every other pal hears. Drag and throw it, or bat it with a fast swipe of the cursor.</p>
   <div class="pal-doc">
-    <div class="habitat"><p class="h-text" id="d-pebble" style="font-size:30px">Throw me</p><piix-pal box=".habitat" pal="pebble" on="#d-pebble" box=".habitat"></piix-pal></div>
+    <div class="habitat"><p class="h-text" id="d-pebble" style="font-size:30px">Throw me</p><piix-pal pal="pebble" on="#d-pebble" box=".habitat"></piix-pal></div>
     <div class="info">
       <dl class="kv">
         <dt>lives on</dt><dd>wherever it lands: headings, paragraphs, buttons, cards</dd>
@@ -2736,7 +2739,7 @@ Piixpal.add(&quot;pebble&quot;, &quot;h1&quot;);</pre>
   <h2 id="cube-h">Cube <span class="pal-no">do="toss"</span></h2>
   <p>A jelly cube. Bounces high and wobbles after every landing. Drag and throw it, or bat it with a fast swipe of the cursor.</p>
   <div class="pal-doc">
-    <div class="habitat"><p class="h-text" id="d-cube" style="font-size:30px">Throw me</p><piix-pal box=".habitat" pal="cube" on="#d-cube" box=".habitat"></piix-pal></div>
+    <div class="habitat"><p class="h-text" id="d-cube" style="font-size:30px">Throw me</p><piix-pal pal="cube" on="#d-cube" box=".habitat"></piix-pal></div>
     <div class="info">
       <dl class="kv">
         <dt>lives on</dt><dd>wherever it lands: headings, paragraphs, buttons, cards</dd>
@@ -2820,7 +2823,7 @@ Piixpal.add(&quot;cube&quot;, &quot;h1&quot;);</pre>
   <h2 id="can-h">Can <span class="pal-no">do="toss"</span></h2>
   <p>A soda can. Rolls off the edge of everything. Drag and throw it, or bat it with a fast swipe of the cursor.</p>
   <div class="pal-doc">
-    <div class="habitat"><p class="h-text" id="d-can" style="font-size:30px">Throw me</p><piix-pal box=".habitat" pal="can" on="#d-can" box=".habitat"></piix-pal></div>
+    <div class="habitat"><p class="h-text" id="d-can" style="font-size:30px">Throw me</p><piix-pal pal="can" on="#d-can" box=".habitat"></piix-pal></div>
     <div class="info">
       <dl class="kv">
         <dt>lives on</dt><dd>wherever it lands: headings, paragraphs, buttons, cards</dd>
