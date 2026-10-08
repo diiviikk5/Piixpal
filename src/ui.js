@@ -94,6 +94,13 @@ const uiPlace = (c, x, y, { below = false, gap = 12, area } = {}) => {
   c.style.left = Math.round(left - ox) + 'px';
   c.style.top = Math.round(top - oy) + 'px';
 };
+/* put a card's top-left corner at (x, y), in the same coordinates as uiPlace */
+const uiAt = (c, x, y) => {
+  const fixed = c.classList.contains('fixed');
+  const o = uiHost.getBoundingClientRect();
+  c.style.left = Math.round(x - (fixed ? origin.x : o.left + scrollX)) + 'px';
+  c.style.top = Math.round(y - (fixed ? origin.y : o.top + scrollY)) + 'px';
+};
 const uiClose = c => {
   if (!c || c._closing) return;
   c._closing = true;
