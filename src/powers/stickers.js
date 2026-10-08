@@ -67,3 +67,117 @@ const STICKER_CSS = `
 .s:hover{transform:translateY(-2px) rotate(-4deg)}
 .s canvas{display:block;image-rendering:pixelated;filter:drop-shadow(0 2px 0 rgba(23,18,31,.25))}`;
 
+class PiixStickersElement extends HTMLElement {
+  connectedCallback() {
+    if (this._ready) return;
+    this._ready = true;
+    const names = (this.getAttribute('names') || 'heart,star,bolt,smile,crown,wow').split(',').map(s => s.trim()).filter(Boolean);
+    const root = this.shadowRoot || this.attachShadow({ mode: 'open' });
+    root.innerHTML = `<style>${STICKER_CSS}</style><div class="sheet" role="group" aria-label="Stickers: drag one onto the page"><div class="t">stickers · peel me</div></div>`;
+    const sheet = root.querySelector('.sheet');
+    this._box = boxOf(this);
+    this._key = 'piix-stickers:' + location.pathname + (this._box ? ':' + (this._box.id || 'box') : '');
+    this._placed = [];
+    this._art = {};
+    for (const n of names) {
+      const art0 = stickerArt(n);
+      if (!art0) continue;
+      this._art[n] = art0;
+      const c = stickerCut(art0);
+      c.style.width = c.width + 'px'; c.style.height = c.height + 'px';
+      const s = document.createElement('div');
+      s.className = 's'; s.title = n; s.appendChild(c);
+      s.addEventListener('pointerdown', e => this._peel(e, n));
+      sheet.appendChild(s);
+    }
+    /* stuck ones come back where they were */
+    let saved = [];
+    try { saved = JSON.parse(localStorage.getItem(this._key)) || []; } catch (_) { /* private mode */ }
+    requestAnimationFrame(() => saved.forEach(st => this._stick(st, false)));
+    this._tick = () => this._placed.forEach(p => this._place(p));
+    sub(this._tick);
+  }
+  disconnectedCallback() { if (this._tick) unsub(this._tick); this._placed.forEach(p => p.el.remove()); this._placed = []; this._ready = false; }
+  clear() { this._placed.slice().forEach(p => this._unstick(p)); }
+  _save() { try { localStorage.setItem(this._key, JSON.stringify(this._placed.map(p => p.st))); } catch (_) { /* private mode */ } }
+  /* a sticker node in the pals' layer */
+  _make(n) {
+    const art0 = this._art[n] || stickerArt(n);
+    if (!art0) return null;
+    const c = stickerCut(art0);
+    c.style.cssText = `display:block;width:${c.width}px;height:${c.height}px;image-rendering:pixelated;pointer-events:auto;cursor:grab;touch-action:none;filter:drop-shadow(0 3px 0 rgba(23,18,31,.25));transition:transform .18s cubic-bezier(.34,1.56,.64,1),filter .18s`;
+    const el = document.createElement('div');
+    el.style.cssText = 'position:absolute;left:0;top:0;pointer-events:none';
+    el.appendChild(c);
+    getLayer().appendChild(el);
+    return { el, c, w: c.width, h: c.height };
+  }
+  /* where a stuck sticker is now: on its element if it's still there, else where it was */
+  _place(p) {
+    const host = stickerFind(p.st.path);
+    let x = p.st.x, y = p.st.y;
+    if (host) { const r = host.getBoundingClientRect(); if (r.width || r.height) { x = r.left + scrollX + p.st.fx * r.width; y = r.top + scrollY + p.st.fy * r.height; } }
+    p.el.style.transform = `translate3d(${Math.round(x - p.w / 2 - origin.x)}px,${Math.round(y - p.h / 2 - origin.y)}px,0)`;
+    p.c.style.transform = `rotate(${p.st.r}deg)` + (p.lift ? ' scale(1.12)' : '');
+  }
+  _stick(st, fresh) {
+    if (this._placed.length >= 40) return;
+    const m = this._make(st.n);
+    if (!m) return;
+    const p = Object.assign(m, { st });
+    this._placed.push(p);
+    p.c.addEventListener('pointerdown', e => this._drag(e, p));
+    p.c.addEventListener('dblclick', () => this._unstick(p));
+    this._place(p);
+    if (fresh && !reduced()) { p.c.style.transform = `rotate(${st.r}deg) scale(1.35)`; requestAnimationFrame(() => requestAnimationFrame(() => this._place(p))); }
+    if (fresh) this._save();
+  }
+  _unstick(p) {
+    this._placed.splice(this._placed.indexOf(p), 1);
+    this._save();
+    if (reduced()) { p.el.remove(); return; }
+    p.c.style.transition = 'transform .25s ease-in,opacity .25s';
+    p.c.style.transform = `rotate(${p.st.r + 30}deg) scale(.4) translateY(-20px)`;
+    p.c.style.opacity = '0';
+    setTimeout(() => p.el.remove(), 260);
+  }
+  /* where it lands: on the element underneath, kept inside the box if there is one */
+  _drop(cx, cy, n, r) {
+    let x = cx + scrollX, y = cy + scrollY;
+    if (this._box) { const b = rectOf(this._box); x = clamp(x, b.l + 20, b.r - 20); y = clamp(y, b.t + 20, b.b - 20); }
+    const under = document.elementsFromPoint(x - scrollX, y - scrollY).find(e => !e.closest('[data-piixpal],[data-piixpal-ui],piix-stickers') && e !== document.documentElement) || document.body;
+    const ur = under.getBoundingClientRect();
+    return { n, r, x, y, path: stickerPath(under), fx: ur.width ? (x - ur.left - scrollX) / ur.width : 0, fy: ur.height ? (y - ur.top - scrollY) / ur.height : 0 };
+  }
+  _peel(e, n) {
+    if (e.button > 0) return;
+    e.preventDefault();
+    const m = this._make(n);
+    if (!m) return;
+    const p = Object.assign(m, { st: { n, r: -8, x: e.clientX + scrollX, y: e.clientY + scrollY, path: '', fx: 0, fy: 0 }, lift: true });
+    p.c.style.filter = 'drop-shadow(0 12px 6px rgba(23,18,31,.3))';
+    this._place(p);
+    const move = ev => { p.st.x = ev.clientX + scrollX; p.st.y = ev.clientY + scrollY; this._place(p); };
+    const up = ev => {
+      removeEventListener('pointermove', move); removeEventListener('pointerup', up); removeEventListener('pointercancel', up);
+      p.el.remove();
+      this._stick(this._drop(ev.clientX, ev.clientY, n, Math.round(rnd(-14, 14))), true);
+    };
+    addEventListener('pointermove', move); addEventListener('pointerup', up); addEventListener('pointercancel', up);
+  }
+  _drag(e, p) {
+    if (e.button > 0) return;
+    e.preventDefault();
+    p.lift = true; p.c.style.filter = 'drop-shadow(0 12px 6px rgba(23,18,31,.3))';
+    const move = ev => { p.st = Object.assign({}, p.st, { x: ev.clientX + scrollX, y: ev.clientY + scrollY, path: '' }); this._place(p); };
+    const up = ev => {
+      removeEventListener('pointermove', move); removeEventListener('pointerup', up); removeEventListener('pointercancel', up);
+      p.lift = false; p.c.style.filter = 'drop-shadow(0 3px 0 rgba(23,18,31,.25))';
+      p.st = this._drop(ev.clientX, ev.clientY, p.st.n, p.st.r);
+      this._place(p); this._save();
+    };
+    addEventListener('pointermove', move); addEventListener('pointerup', up); addEventListener('pointercancel', up);
+  }
+}
+define('piix-stickers', PiixStickersElement);
+ELEMENTS.stickers = 'piix-stickers';
