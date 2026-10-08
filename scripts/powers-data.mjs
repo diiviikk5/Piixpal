@@ -201,7 +201,10 @@ export const POWERS = [
     accent: "var(--coral)",
     kind: "pal",
     does: "roam",
-    where: "body"
+    where: "body",
+    uses: "every window you have open on the same site: BroadcastChannel, plus where each window sits on the screen",
+    support: "every modern browser · works between windows and tabs of the same site, no server",
+    try: "press Open a second window, put it beside this one, and wait for Nomad to reach the edge"
   }
   // new powers go above this line
 ];
