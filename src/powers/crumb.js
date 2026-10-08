@@ -20,3 +20,12 @@ const crumbShape = (by, full) => art.outline(art.volume(art.paint(16, 11, (x, y)
   return null;
 })));
 
+/* its face: an eye, the inside of its ear, a twitchy nose, and cheeks full of banner */
+const crumbFace = (rows, by, { nose = 0, chew = false, eyes = 'open' }) => {
+  rows = art.compose(rows, [9, 2 + by, ['pp', 'p']], [14, 5 + by - nose, ['p']]);
+  if (eyes === 'open') rows = art.put(rows, 12, 4 + by, ['e', 'e']);
+  else if (eyes === 'happy') rows = art.compose(rows, [11, 5 + by, ['e.e']], [12, 4 + by, ['e']]);
+  else rows = art.put(rows, 11, 5 + by, ['ee']);
+  return chew ? art.compose(rows, [12, 6 + by, ['BB']], [13, 7 + by, ['e']]) : rows;
+};
+
