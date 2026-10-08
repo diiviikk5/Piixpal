@@ -29,3 +29,6 @@ const crumbFace = (rows, by, { nose = 0, chew = false, eyes = 'open' }) => {
   return chew ? art.compose(rows, [12, 6 + by, ['BB']], [13, 7 + by, ['e']]) : rows;
 };
 
+/* little feet, apart or together */
+const crumbFeet = (rows, step) => art.compose(rows, step ? [4, 10, ['p']] : [5, 10, ['p']], step ? [10, 10, ['p']] : [9, 10, ['p']]);
+
