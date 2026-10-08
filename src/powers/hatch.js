@@ -35,3 +35,15 @@ const HATCH_SHAPES = {
   pear: (x, y) => art.ellipse(x, y, 8, 7.6, 4.2, 3.6) || art.ellipse(x, y, 8, 11.2, 6, 3.6)
 };
 
+/* what grows on top: ears, horns, an antenna, a leaf, a crest, or nothing */
+const HATCH_TOPS = {
+  none: () => null,
+  cat: (x, y) => ((x >= 3 && x <= 5 && y >= 2 && y <= 5 && y - 2 >= Math.abs(x - 4)) || (x >= 10 && x <= 12 && y >= 2 && y <= 5 && y - 2 >= Math.abs(x - 11))) ? 'b' : null,
+  bunny: (x, y) => (art.ellipse(x, y, 5.5, 3, 1.3, 3) || art.ellipse(x, y, 10.5, 3, 1.3, 3)) ? 'b' : null,
+  bear: (x, y) => (art.ellipse(x, y, 4, 4.6, 1.8, 1.8) || art.ellipse(x, y, 12, 4.6, 1.8, 1.8)) ? 'b' : null,
+  horns: (x, y) => ((x === 4 && y >= 2 && y <= 4) || (x === 5 && y === 4) || (x === 11 && y >= 2 && y <= 4) || (x === 10 && y === 4)) ? 'a' : null,
+  antenna: (x, y) => (x === 8 && y >= 2 && y <= 4) ? 'k' : art.ellipse(x, y, 8.5, 1.5, 1.2, 1.2) ? 'a' : null,
+  leaf: (x, y) => (x === 8 && y >= 3 && y <= 4) ? 'g' : ((x === 9 || x === 10) && y === 2) || (x === 9 && y === 3) ? 'g' : null,
+  crest: (x, y) => ((x === 6 || x === 8 || x === 10) && y >= 3 && y <= 4) ? 'a' : null
+};
+
