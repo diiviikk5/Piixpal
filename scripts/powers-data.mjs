@@ -88,7 +88,10 @@ export const POWERS = [
     uses: "<code>data-tour</code> attributes on your own elements",
     support: "every modern browser · keyboard: → next, ← back, Esc ends",
     try: "click Scout to start the tour",
-    desc: "Onboarding, guided by a tiny explorer. Mark the stops with <code>data-tour=\"what this is\"</code>; Scout hops from one to the next, stands on each and raises its flag while a spotlight dims everything else and a card explains. Keyboard friendly, announced to screen readers, and it can start by itself once per visitor."
+    desc: "Onboarding, guided by a tiny explorer. Mark the stops with <code>data-tour=\"what this is\"</code>; Scout hops from one to the next, stands on each and raises its flag while a spotlight dims everything else and a card explains. Keyboard friendly, announced to screen readers, and it can start by itself once per visitor.",
+    attrs: [["data-tour","on any element: the text for that stop (<code>data-tour-step</code> to order, <code>data-tour-title</code> for a heading)"],["steps","or list the stops on the tag: <code>#new: Start here | #search: Find anything</code>"],["start","\"auto\" begins by itself, once per visitor"]],
+    api: "el.ctl.start(steps?)  el.ctl.next()  el.ctl.back()  el.ctl.end()",
+    events: "piix:tour-step, piix:tour-end"
   }
   // new powers go above this line
 ];
