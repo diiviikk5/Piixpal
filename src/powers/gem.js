@@ -14,3 +14,11 @@ const gemShape = glint => {
   return glint < 0 ? rows : art.put(rows, 2 + glint, glint > 3 ? 2 : 1, ['w']);
 };
 
+/* Gem: sits and glints */
+defineSprite('gem', {
+  w: 9, h: 8, scale: 3, does: 'hunt',
+  palette: { k: '#17121f', l: '#58c8ff', L: '#b8e6ff', d: '#2f8fc4', w: '#ffffff' },
+  frames: { idle: [gemShape(-1), gemShape(-1), gemShape(-1), gemShape(0), gemShape(2), gemShape(4), gemShape(-1), gemShape(-1)] },
+  fps: { idle: 8 }
+});
+
