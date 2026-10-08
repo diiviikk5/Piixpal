@@ -143,3 +143,59 @@ const sproutScene = (root, win, mins, onPop) => {
   return { destroy() { win.cancelAnimationFrame(raf); st0.remove(); box.remove(); } };
 };
 
+/* desk: sit on the page, open the timer, and pop out to the desktop */
+defineBehavior('desk', (a, [el], host) => {
+  const S = a.s / 3;
+  const mins = { focus: clamp(+host.getAttribute('minutes') || 25, .1, 180), rest: clamp(+host.getAttribute('break') || 5, .1, 60) };
+  let card = null, scene = null, pip = null, pipScene = null, bob = 0;
+  const close = () => { if (scene) scene.destroy(); scene = null; uiClose(card); card = null; };
+  const popout = async () => {
+    close();
+    try {
+      let w = null;
+      if (window.documentPictureInPicture) w = await documentPictureInPicture.requestWindow({ width: 230, height: 300 });
+      else w = window.open('', 'piix-sprout', 'popup,width=240,height=320');
+      if (!w) { a.say('x', 900); return; }
+      pip = w;
+      w.document.title = 'Sprout';
+      w.document.body.style.cssText = 'margin:0;display:grid;place-items:center;min-height:100vh;background:#fbf6e9';
+      pipScene = sproutScene(w.document.body, w, mins);
+      host.dispatchEvent(new CustomEvent('piix:popout', { bubbles: true }));
+      w.addEventListener('pagehide', () => { if (pipScene) pipScene.destroy(); pipScene = null; pip = null; a.say('heart', 900); });
+    } catch (_) { a.say('x', 900); }
+  };
+  const open = () => {
+    if (pip) { try { pip.focus(); } catch (_) { /* gone */ } return; }
+    if (card) { close(); return; }
+    card = uiCard({ tip: true, width: 220, attrs: { role: 'dialog', 'aria-label': 'Sprout, a focus timer' } });
+    card.append(uiEl('button', { cls: 'x', text: '×', attrs: { type: 'button', 'aria-label': 'Close' }, on: { click: close } }));
+    const can = !!(window.documentPictureInPicture || window.open);
+    scene = sproutScene(card, window, mins, can ? popout : null);
+  };
+  /* a click (not a pointerdown) opens it: popups and pop-outs need a real click */
+  a.cv.addEventListener('click', open);
+  const esc = e => { if (e.key === 'Escape' && card) close(); };
+  addEventListener('keydown', esc);
+
+  return {
+    open, popout,
+    awake: () => true,
+    tick(dt) {
+      const r = surfaceOf(el) || rectOf(el);
+      const at = host.getAttribute('at') != null ? clamp(+host.getAttribute('at'), 0, 1) : .5;
+      a.x = r.l + a.w / 2 + Math.max(0, (r.r - r.l) - a.w) * at; a.y = r.t;
+      const s = sproutState(), stage = sproutStage(s, mins);
+      if (pip) a.play('away');
+      else if (s.mode === 'rest') a.play(s.running ? 'z' + stage : 'h' + stage);
+      else a.play('s' + stage);
+      bob += dt;
+      if (card) {
+        const B = boxOf(host) ? rectOf(boxOf(host)) : null;
+        uiPlace(card, a.x, a.y - a.h, B ? { area: B, under: a.y + 2 } : { under: a.y + 2 });
+      }
+      if (!card && !pip && ptr.seen && a.near(16 * S) && Math.floor(bob) % 4 === 0) a.say('leaf', 500);
+    },
+    poke() { /* opening happens on click */ },
+    destroy() { close(); removeEventListener('keydown', esc); a.cv.removeEventListener('click', open); if (pip) try { pip.close(); } catch (_) { /* gone */ } }
+  };
+});
