@@ -20,3 +20,16 @@ const sproutPot = (eyes = 'open') => {
   return art.compose(rows, ...E, [4, 17, ['p']], [11, 17, ['p']], [7, 18, ['ee']]);
 };
 
+/* the plant, five stages from a seed to a flower, swaying a pixel either way */
+const sproutPlant = (rows, stage, sway) => {
+  const s = sway;
+  const parts = [
+    [[7, 12, ['gg']]],
+    [[8, 10, ['g', 'g']], [6 + s, 9, ['ll']], [9 + s, 9, ['ll']]],
+    [[8, 6, ['g', 'g', 'g', 'g', 'g', 'g']], [5 + s, 9, ['lll']], [9 + s, 8, ['lll']], [6 + s, 6, ['ll']], [9 + s, 5, ['ll']]],
+    [[8, 4, ['g', 'g', 'g', 'g', 'g', 'g', 'g', 'g']], [5 + s, 9, ['lll']], [9 + s, 8, ['lll']], [6 + s, 6, ['ll']], [9 + s, 5, ['ll']], [7 + s, 1, ['.b.', 'bbb', 'bbb']]],
+    [[8, 4, ['g', 'g', 'g', 'g', 'g', 'g', 'g', 'g']], [5 + s, 9, ['lll']], [9 + s, 8, ['lll']], [6 + s, 6, ['ll']], [9 + s, 5, ['ll']], [6 + s, 0, ['.f.f.', 'ffyff', '.fff.', '..f..']]]
+  ][stage];
+  return art.compose(rows, ...parts);
+};
+
