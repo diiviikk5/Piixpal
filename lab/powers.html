@@ -59,6 +59,17 @@
   </div>
   <piix-pal pal="drone" on="#cart" box="#shop"></piix-pal>
 </div>
+<style>
+  .cookie{position:absolute;left:40px;right:40px;bottom:40px;display:flex;align-items:center;gap:14px;padding:16px 18px;border:2px solid #16111f;border-radius:14px;background:#fff8e7}
+  .cookie p{position:static;margin:0;width:auto;flex:1}
+  .cookie button{padding:10px 14px;border:2px solid #16111f;border-radius:10px;background:#fff;font-weight:700}
+  .cookie button.ok{background:#c6f432}
+</style>
+<div class="stage" id="cookies">
+  <h3 style="top:40px">Cookie banner</h3>
+  <div class="cookie" id="cookie-banner"><p>We use cookies to remember your theme. That's it.</p><button type="button" class="ok">Accept</button><button type="button">Reject</button><piix-pal pal="crumb"></piix-pal></div>
+</div>
+<script>document.getElementById('cookie-banner').addEventListener('click', e => { if (e.target.closest('button')) e.currentTarget.style.display = 'none'; });</script>
 <script src="../piixpal.js"></script>
 </body>
 </html>
