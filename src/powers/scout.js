@@ -33,3 +33,12 @@ const scoutFace = (rows, by, eyes) => {
 /* boots: standing still, and the three steps of a walk */
 const SCOUT_LEGS = { stand: [[6, 14], [9, 14]], a: [[5, 14], [10, 13]], b: [[7, 14], [8, 14]], c: [[6, 13], [10, 14]] };
 
+/* the flag on its pole: down at the side, or held up high, flapping three ways */
+const scoutFlag = (rows, by, flag, arm) => {
+  const px = 13, top = arm ? 0 : 6;
+  for (let y = top; y <= 13; y++) rows = art.put(rows, px, y + by, ['q']);
+  const cloth = [['rrr', 'rrrr', 'rr'], ['rrrr', 'rrr', 'rr'], ['rrr', 'rrr', 'r']][flag];
+  rows = art.compose(rows, ...cloth.map((r, i) => [px + 1, top + i + by, [r]]));
+  return arm ? art.put(rows, 11, 9 + by, ['gk']) : rows;
+};
+
