@@ -26,7 +26,12 @@ const COMPONENT_LIST = () => [...dir('behaviors'), ...dir('pals'), ...dir('sprit
 /* everything the core declares at the top level becomes part of the shared toolkit */
 const coreNames = () => {
   const names = new Set();
-  for (const f of CORE_LIST()) for (const m of readFileSync(join(src, f), 'utf8').matchAll(/^(?:const|let|var|class|function)\s+([A-Za-z_$][\w$]*)/gm)) names.add(m[1]);
+  for (const f of CORE_LIST()) {
+    const text = readFileSync(join(src, f), 'utf8');
+    for (const m of text.matchAll(/^(?:const|let|var|class|function)\s+([A-Za-z_$][\w$]*)/gm)) names.add(m[1]);
+    /* simple one-line lists too: const A = 1, B = 2; (otherwise B would silently be missing) */
+    for (const m of text.matchAll(/^(?:const|let|var)\s+([^\n(\[{]*);[ \t]*$/gm)) for (const part of m[1].split(',')) { const n = /^\s*([A-Za-z_$][\w$]*)\s*=/.exec(part); if (n) names.add(n[1]); }
+  }
   return [...names];
 };
 
