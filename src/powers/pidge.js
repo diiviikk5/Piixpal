@@ -25,7 +25,7 @@
     });
     rows = art.outline(rows);
     rows = art.compose(rows, [12 + hx, 2 + hy, ['o']], [14 + hx, 3 + hy, ['bb']]);
-    if (feet) rows = art.compose(rows, [6, 10, ['f..f']], [6, 11, ['f..f']]);
+    if (feet) rows = art.compose(rows, [6, 10, ['f__f']], [6, 11, ['f__f']]);
     return rows;
   };
   const PAL = { k: '#17121f', g: '#9aa3b5', G: '#6c7590', w: '#d4d9e4', t: '#33b89a', v: '#8a5fc4', o: '#ff9a2f', b: '#3a3f4f', f: '#ff8fa3' };
