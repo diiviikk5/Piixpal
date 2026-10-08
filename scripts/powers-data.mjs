@@ -142,7 +142,8 @@ export const POWERS = [
     attrs: [["on","what to read (or put the tag inside it)"],["button","a real button that starts and pauses it"],["rate","speaking speed (default 1)"],["pitch","voice pitch (default 1.15, a bit parrot)"],["voice","part of a voice name to prefer, e.g. \"Samantha\""]],
     api: "el.ctl.read()  el.ctl.pause()  el.ctl.stop()",
     events: "piix:read-start, piix:read-end { done }",
-    hab: "<button type=\"button\" class=\"h-btn lime\" id=\"d-listen\" style=\"position:absolute;left:22px;bottom:22px\">Listen</button><article class=\"h-article\" id=\"d-polly\"><h4>A short story</h4><p>Once there was a parrot who loved words. It read every page it could find, out loud, hopping from word to word so nobody lost their place.</p></article><piix-pal pal=\"polly\" on=\"#d-polly\" button=\"#d-listen\"></piix-pal>"
+    hab: "<button type=\"button\" class=\"h-btn lime\" id=\"d-listen\" style=\"position:absolute;left:22px;bottom:22px\">Listen</button><article class=\"h-article\" id=\"d-polly\"><h4>A short story</h4><p>Once there was a parrot who loved words. It read every page it could find, out loud, hopping from word to word so nobody lost their place.</p></article><piix-pal pal=\"polly\" on=\"#d-polly\" button=\"#d-listen\"></piix-pal>",
+    code: "<button id=\"listen\">Listen</button>\n\n<article>\n  <piix-pal pal=\"polly\" button=\"#listen\"></piix-pal>\n  <h1>My post</h1>\n  <p>…</p>\n</article>"
   }
   // new powers go above this line
 ];
