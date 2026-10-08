@@ -63,3 +63,22 @@ defineSprite('tabby', {
 /* the same face, 16 pixels square, for the browser tab */
 const TABBY_ICON = Object.fromEntries(['open', 'left', 'right', 'blink', 'sleep', 'happy'].map(k => [k, tabbyEyes(tabbyHead(0), 0, k)]));
 
+/* draw an icon frame, twice as big, with an optional reading-progress ring and sleepy z's */
+const tabbyDraw = (g, rows, pal, progress, z) => {
+  g.clearRect(0, 0, 32, 32);
+  rows.forEach((r, y) => [...r].forEach((c, x) => { if (pal[c]) { g.fillStyle = pal[c]; g.fillRect(x * 2, y * 2, 2, 2); } }));
+  if (progress != null) {
+    /* a ring of pixels round the edge, filling clockwise from the top */
+    const ring = [];
+    for (let i = 0; i < 16; i++) ring.push([16 + i * 2 - 1, 0]);
+    for (let i = 0; i < 16; i++) ring.push([30, i * 2]);
+    for (let i = 0; i < 16; i++) ring.push([30 - i * 2, 30]);
+    for (let i = 0; i < 16; i++) ring.push([0, 30 - i * 2]);
+    for (let i = 0; i < 8; i++) ring.push([i * 2, 0]);
+    const n = Math.round(clamp(progress, 0, 1) * ring.length);
+    g.fillStyle = '#7bd63a';
+    ring.slice(0, n).forEach(([x, y]) => g.fillRect(x, y, 2, 2));
+  }
+  if (z) { g.fillStyle = '#58c8ff'; g.fillRect(24, 2, 6, 2); g.fillRect(26, 4, 2, 2); g.fillRect(24, 6, 6, 2); }
+};
+
