@@ -47,3 +47,14 @@ const stickerCut = (src, s = Math.max(1, Math.round(28 / Math.max(src.width, src
   return c;
 };
 
+/* where a sticker is stuck: a path to the element under it, and where on that element */
+const stickerPath = el => {
+  const parts = [];
+  for (let e = el; e && e !== document.body && e.parentElement; e = e.parentElement) {
+    if (e.id) { parts.unshift('#' + CSS.escape(e.id)); break; }
+    parts.unshift(`${e.tagName.toLowerCase()}:nth-child(${[...e.parentElement.children].indexOf(e) + 1})`);
+  }
+  return parts.join('>');
+};
+const stickerFind = path => { try { return path ? document.querySelector(path.startsWith('#') ? path : 'body>' + path) : null; } catch (_) { return null; } };
+
