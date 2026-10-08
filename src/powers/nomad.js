@@ -42,3 +42,16 @@ defineSprite('nomad', {
 /* where this window's page sits on the screen (the browser's frame is guessed, evenly) */
 const nomadScreen = () => ({ x: screenX + Math.max(0, outerWidth - innerWidth) / 2, y: screenY + Math.max(0, outerHeight - innerHeight), w: innerWidth, h: innerHeight });
 
+/* is there a window just past this edge? the nearest one that lines up wins */
+const nomadNeighbour = (me, peers, dir) => {
+  let best = null, bd = 1e9;
+  for (const p of peers) {
+    const r = p.rect;
+    if (!r || r.y > me.y + me.h || r.y + r.h < me.y) continue;
+    const gap = dir > 0 ? r.x - (me.x + me.w) : me.x - (r.x + r.w);
+    if (gap < -80 || gap > 260) continue;
+    if (Math.abs(gap) < bd) { best = p; bd = Math.abs(gap); }
+  }
+  return best;
+};
+
