@@ -143,3 +143,10 @@ defineSprite('hatch', {
   frames: { egg0: [hatchEgg(0)], egg1: [hatchEgg(1)], egg2: [hatchEgg(2)], egg3: [hatchEgg(3)] }
 });
 
+/* its eggshell, flying off in two halves (crew only) */
+defineSprite('_shell', {
+  w: 7, h: 6, scale: 3,
+  palette: { k: '#17121f', w: '#fff7ec', s: '#7bd6b8' },
+  frames: { l: [['.kkk...', 'kwwwk..', 'kwswwk.', 'kwwwwk.', 'kwwk.k.', '.k..k..']], r: [['...kkk.', '..kwwwk', '.kwwswk', '.kwwwwk', '.k.kwwk', '..k..k.']] }
+});
+
