@@ -322,7 +322,9 @@ export const POWERS = [
     uses: "your text box’s maxlength (or a limit you give it)",
     support: "every modern browser · tells screen readers how many characters are left at a few points",
     try: "type until you hit the limit (40 here)",
-    desc: "A character counter you can feel. Squish the marshmallow sits on the corner of your text box, perfectly comfy, until the text gets near the limit. Then it starts getting squashed, sweats, holds up how many characters are left, and at the limit it is flat as a pancake. Delete a few and it pops right back up."
+    desc: "A character counter you can feel. Squish the marshmallow sits on the corner of your text box, perfectly comfy, until the text gets near the limit. Then it starts getting squashed, sweats, holds up how many characters are left, and at the limit it is flat as a pancake. Delete a few and it pops right back up.",
+    attrs: [["on","the textarea or input (or put the tag inside its label)"],["limit","the limit, if the field has no maxlength (default 280)"]],
+    events: "piix:limit { length, limit, left }"
   }
   // new powers go above this line
 ];
