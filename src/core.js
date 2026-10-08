@@ -64,6 +64,14 @@ const boxOf = host => {
   if (!sel) return null;
   try { return host.closest(sel) || document.querySelector(sel); } catch (_) { return null; }
 };
+/* pin a pal to the viewport: its x/y become viewport coords (plus the layer origin) */
+const pin = a => { a.node.style.position = 'fixed'; a.pinned = true; return a; };
+/* the world a pal lives in: its box="…" element in doc coords, or (pinning it) the viewport */
+const areaOf = (host, a) => {
+  const box = boxOf(host);
+  if (!box && a) pin(a);
+  return () => box ? rectOf(box) : { l: origin.x, t: origin.y, r: origin.x + docW(), b: origin.y + innerHeight, w: docW(), h: innerHeight, fixed: true };
+};
 const onScreen = (r, m = 200) => r.b > scrollY - m && r.t < scrollY + innerHeight + m && r.r > -m && r.l < docW() + m;
 /* The y a pal stands on at doc-x. Elements can offer a custom contour via piixSurface(x). */
 const surfaceAt = (el, x, r = rectOf(el)) => {
@@ -172,6 +180,7 @@ class Actor {
     this.sx = 1; this.sy = 1; this.rot = 0; this.ox = 0; this.oy = 0;
     this.clip = null; this.fi = 0; this.ft = 0; this.fps = 6; this.loop = true; this.done = false;
     this._drawn = null; this._tf = ''; this._ctf = '';
+    this.pinned = false;              /* true: x/y are viewport coords (+ origin), the node is position:fixed */
 
     const n = this.node = document.createElement('div');
     n.className = 'a';
@@ -245,10 +254,13 @@ class Actor {
     if (ms) this._bt = setTimeout(() => this.bub.classList.remove('on'), ms);
   }
   hush() { clearTimeout(this._bt); this.bub.classList.remove('on'); }
-  /* is the pointer over this pal's box (doc coords)? */
+  /* the pointer in this pal's own coordinate space */
+  get mx() { return this.pinned ? ptr.cx + origin.x : ptr.x; }
+  get my() { return this.pinned ? ptr.cy + origin.y : ptr.y; }
+  /* is the pointer over this pal's box? */
   near(m = 0) {
     const cx = this.x + this.ox, cy = this.y - this.h / 2 + this.oy;
-    return Math.abs(ptr.x - cx) < this.w / 2 + m && Math.abs(ptr.y - cy) < this.h / 2 + m;
+    return Math.abs(this.mx - cx) < this.w / 2 + m && Math.abs(this.my - cy) < this.h / 2 + m;
   }
   destroy() { clearTimeout(this._bt); this.node.remove(); ACTORS.delete(this); }
 }
