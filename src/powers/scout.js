@@ -21,3 +21,12 @@ const scoutShape = by => art.outline(art.paint(17, 17, (x, y) => {
   return null;
 }));
 
+/* eyes and rosy cheeks: open, shut, or happy little arches */
+const scoutFace = (rows, by, eyes) => {
+  const ey = 7 + by;
+  if (eyes === 'happy') rows = art.compose(rows, [7, ey, ['_e_', 'e_e']], [10, ey, ['_e_', 'e_e']]);
+  else if (eyes === 'shut') rows = art.compose(rows, [8, ey + 1, ['e']], [10, ey + 1, ['e']]);
+  else rows = art.compose(rows, [8, ey, ['e', 'e']], [10, ey, ['e', 'e']]);
+  return art.compose(rows, [6, ey + 2, ['p']], [11, ey + 2, ['p']]);
+};
+
