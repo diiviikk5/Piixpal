@@ -37,3 +37,10 @@ defineSprite('drone', {
   fps: { idle: 16, carry: 16 }
 });
 
+/* the cardboard box it carries when there's no picture to carry (crew only) */
+defineSprite('_parcel', {
+  w: 9, h: 8, scale: 3,
+  palette: { k: '#17121f', c: '#d9a066', C: '#b07a43', t: '#f3e2c0' },
+  frames: { idle: [['kkkkkkkkk', 'kccctcccC', 'kccctcccC', 'kkkkkkkkk', 'kccctcccC', 'kccctcccC', 'kCCCtCCCC', 'kkkkkkkkk']] }
+});
+
