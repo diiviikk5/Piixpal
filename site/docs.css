@@ -201,3 +201,6 @@
 .h-form input[type=range]{padding:0;border:0;background:none;accent-color:var(--ink)}
 .h-form textarea{width:100%;font:500 16px/1.4 var(--f-sans);padding:12px 14px;border:2px solid var(--ink);border-radius:10px;background:var(--card);color:var(--ink);resize:none}
 .h-form textarea:focus{outline:none;box-shadow:0 0 0 3px var(--lime)}
+.h-drop{position:absolute;left:22px;right:22px;bottom:22px;height:150px;display:grid;place-content:center;gap:6px;text-align:center;border:3px dashed color-mix(in oklab,var(--ink) 55%,transparent);border-radius:16px;font:700 17px var(--f-sans);cursor:pointer;background:color-mix(in oklab,var(--card) 70%,transparent)}
+.h-drop small{font:500 13px var(--f-sans);color:var(--muted)}
+.h-drop input{position:absolute;inset:0;opacity:0;cursor:pointer}
