@@ -239,7 +239,8 @@ export const POWERS = [
     query: "seed=someone",
     uses: "any word: a username, an email, an id. The same word always makes the same creature",
     support: "every modern browser · sits inline like an image · every render mode works (voxel, dots, dither…)",
-    try: "type a name below and meet its creature"
+    try: "type a name below and meet its creature",
+    desc: "Avatars for everyone, no uploads. Give <code>&lt;piix-avatar&gt;</code> any word, a username, an email, an id, and it draws a little animated creature that is always the same for the same word, with a name to match. Eyes follow the cursor, it blinks and naps like the sprites, and it works in comment threads, user lists and chat."
   }
   // new powers go above this line
 ];
