@@ -26,3 +26,14 @@ const droneShape = (fast, blink, shut) => {
   return art.compose(rows, shut ? [7, 9, ['k..k', '.kk.']] : [6, 9, ['k....k', 'k....k']]);
 };
 
+/* Drone: rotors always spinning, a blink now and then, claws open or holding on */
+defineSprite('drone', {
+  w: 18, h: 12, scale: 3, does: 'cart',
+  palette: { k: '#17121f', a: '#9a93a6', b: '#e9e6f0', d: '#b9b3c4', B: '#ffffff', r: '#a39cb3', e: '#17121f', w: '#58c8ff', g: '#7bd63a' },
+  frames: {
+    idle: [droneShape(true, false), droneShape(false, false), droneShape(true, false), droneShape(false, false), droneShape(true, true), droneShape(false, false)],
+    carry: [droneShape(true, false, true), droneShape(false, false, true)]
+  },
+  fps: { idle: 16, carry: 16 }
+});
+
