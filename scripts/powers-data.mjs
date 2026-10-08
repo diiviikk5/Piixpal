@@ -66,6 +66,17 @@ export const POWERS = [
     api: 'el.ctl.fly()',
     hab: '<p class="h-line" style="bottom:40px">Banners are real links, so they work with keyboards and screen readers too.</p><piix-pal pal="plane" text="Piixpal v0.4 is out →" top="34" repeat="1.5" always></piix-pal>',
     code: '<piix-pal pal="plane"\n  text="v2 is out! Read the post →"\n  href="/blog/v2"></piix-pal>'
+  },
+  {
+    id: 'fetch', fam: 'jobs', accent: 'var(--sun)', kind: 'pal', does: 'fetchdog', where: 'footer',
+    uses: 'every <code>fetch()</code> and <code>XMLHttpRequest</code> on the page (so axios too)',
+    support: 'every modern browser · it only watches, it never changes a request',
+    try: 'press Fetch for a real request, or Slow job; Broken link comes back with a sock',
+    desc: 'A loading indicator that plays fetch. Whenever your page sends a request, the dog perks up and races off; when the response arrives it trots back with a bone. A request that fails? It comes back with a sock and a puzzled look. Requests that finish in a blink just make it spin. For any other async work there is <code>Piixpal.busy(promise)</code>.',
+    attrs: [['match', 'only count requests whose URL contains this, e.g. <code>/api/</code>'], ['at', 'where it sits on its element, 0–1']],
+    api: 'Piixpal.busy(promise)',
+    hab: '<div class="h-btns" style="top:26px;bottom:auto;gap:10px"><button type="button" class="h-btn lime" onclick="fetch(\'../dist/components.json?\'+Date.now())">Fetch</button><button type="button" class="h-btn" onclick="Piixpal.busy(new Promise(r=>setTimeout(r,2200)))">Slow job</button><button type="button" class="h-btn" onclick="fetch(\'../nothing-here-\'+Date.now()).catch(()=>{})">Broken link</button></div><div class="h-floor" id="d-fetch"><i></i><i></i><i></i></div><piix-pal pal="fetch" on="#d-fetch" at=".5"></piix-pal>',
+    code: '<footer>\n  …\n  <piix-pal pal="fetch" match="/api/"></piix-pal>\n</footer>'
   }
   // new powers go above this line
 ];
