@@ -152,7 +152,10 @@ export const POWERS = [
     kind: "pal",
     does: "tldr",
     where: "article",
-    tall: true
+    tall: true,
+    uses: "your browser’s built-in AI summarizer when it has one ready (Chrome), or a sentence picker that runs anywhere",
+    support: "every modern browser · on-device AI in Chrome when the model is already there · never downloads anything itself",
+    try: "click the owl for the TL;DR"
   }
   // new powers go above this line
 ];
