@@ -41,3 +41,28 @@ defineSprite('polly', {
   fps: { idle: 2, talk: 7, happy: 4 }
 });
 
+/* the words to read: every visible text node in the element, and where each one starts */
+const pollyText = el => {
+  const nodes = [];
+  let text = '';
+  const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
+    acceptNode: n => {
+      const p = n.parentElement;
+      if (!p || p.closest('piix-pal,script,style,noscript,[aria-hidden=true]')) return NodeFilter.FILTER_REJECT;
+      return n.data.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+    }
+  });
+  /* a heading and the paragraph after it are two sentences, even without a full stop */
+  const block = n => n.parentElement.closest('p,h1,h2,h3,h4,h5,h6,li,dt,dd,td,th,blockquote,figcaption,button,label,div');
+  let prev = null;
+  for (let n; (n = walk.nextNode());) {
+    const b = block(n);
+    if (text && prev && b !== prev && !/[.!?…:;]\s*$/.test(text)) text = text.replace(/\s*$/, '. ');
+    else if (text && !/\s$/.test(text)) text += ' ';
+    nodes.push({ node: n, start: text.length });
+    text += n.data;
+    prev = b;
+  }
+  return { text, nodes };
+};
+
