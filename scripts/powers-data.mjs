@@ -184,7 +184,10 @@ export const POWERS = [
     accent: "var(--mint)",
     kind: "pal",
     does: "desk",
-    where: "footer"
+    where: "footer",
+    uses: "Document Picture-in-Picture (a little always-on-top window), or a small popup where that is missing",
+    support: "pops out on top of everything in Chrome and Edge · a popup window in Firefox and Safari · the timer is saved between visits",
+    try: "click Sprout, press Start (this one counts one minute), then Pop out"
   }
   // new powers go above this line
 ];
