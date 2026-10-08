@@ -158,3 +158,8 @@ const hatchBecome = (a, spec, s) => {
   a._drawn = null; a.clip = null; a.play(Object.keys(spec.frames)[0]);
 };
 
+/* the pet's memory: its seed, visits, taps, when it hatched and when you were last here */
+const HATCH_KEY = 'piix-hatch';
+const hatchLoad = () => { try { return JSON.parse(localStorage.getItem(HATCH_KEY)) || null; } catch (_) { return null; } };
+const hatchSave = st => { try { localStorage.setItem(HATCH_KEY, JSON.stringify(st)); } catch (_) { /* private mode */ } };
+
