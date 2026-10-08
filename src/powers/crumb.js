@@ -83,6 +83,7 @@ const crumbPath = (w, h, R, fromRight) => {
 /* munch: sit on the banner, then eat it the moment someone clicks one of its buttons */
 defineBehavior('munch', (a, [el], host) => {
   const S = a.s / 3;
+  const boxEl = boxOf(host);
   let state = 'guard', copy = null, path = [], step = 0, biteT = 0, mask = null, mg = null, leaveT = 0, side = 1, x = null, sniffT = 0;
   const crumbs = [];
   const layer = a.node.parentNode;
@@ -152,11 +153,15 @@ defineBehavior('munch', (a, [el], host) => {
         a.play(Math.abs(dx) > 6 ? 'walk' : 'chew');
       } else if (state === 'full') {
         leaveT -= dt; a.play('full');
-        if (leaveT <= 0) { state = 'leave'; side = a.x > scrollX + docW() / 2 ? 1 : -1; }
+        const B = boxEl ? rectOf(boxEl) : { l: scrollX, r: scrollX + docW() };
+        if (leaveT <= 0) { state = 'leave'; side = a.x > (B.l + B.r) / 2 ? 1 : -1; }
       } else if (state === 'leave') {
         a.face = side; a.play('walk'); a.x += side * 160 * S * dt;
-        a.y += 30 * S * dt;
-        if (a.x < scrollX - a.w || a.x > scrollX + docW() + a.w) { state = 'gone'; a.node.style.opacity = '0'; }
+        /* off the edge of the screen, or out through the side of its box */
+        const B = boxEl ? rectOf(boxEl) : null;
+        const out = B ? a.x < B.l + a.w / 2 || a.x > B.r - a.w / 2 : a.x < scrollX - a.w || a.x > scrollX + docW() + a.w;
+        if (B) a.node.style.opacity = clamp(Math.min(a.x - B.l - a.w / 2, B.r - a.w / 2 - a.x) / (24 * S), 0, 1).toFixed(2);
+        if (out) { state = 'gone'; a.node.style.opacity = '0'; }
       }
       for (let i = crumbs.length - 1; i >= 0; i--) {
         const c = crumbs[i];
