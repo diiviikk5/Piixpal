@@ -106,3 +106,11 @@ const pollyMark = range => {
   if (range) CSS.highlights.set('piix-read', new Highlight(range)); else CSS.highlights.delete('piix-read');
 };
 
+/* a voice that speaks the page's language (or the one asked for) */
+const pollyVoice = (lang, want) => {
+  const vs = speechSynthesis.getVoices();
+  if (want) { const v = vs.find(v => v.name.toLowerCase().includes(want.toLowerCase())); if (v) return v; }
+  const L = (lang || 'en').toLowerCase();
+  return vs.find(v => v.lang.toLowerCase() === L && v.localService) || vs.find(v => v.lang.toLowerCase().startsWith(L.slice(0, 2))) || null;
+};
+
