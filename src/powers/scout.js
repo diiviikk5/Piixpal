@@ -77,3 +77,9 @@ const scoutStops = (list, host, boxEl) => {
     .sort((p, q) => p.o - q.o);
 };
 
+/* where to stand on a stop: its top (the letters, for text), near its left */
+const scoutSpot = (e, a, S) => {
+  const sf = TEXTY.test(e.tagName) ? surfaceOf(e) : null, r = rectOf(e);
+  return { x: clamp(r.l + Math.min(r.w * .5, 70 * S), r.l + a.w / 2, Math.max(r.l + a.w / 2, r.r - a.w / 2)), y: sf ? sf.t : r.t };
+};
+
