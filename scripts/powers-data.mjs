@@ -311,6 +311,14 @@ export const POWERS = [
     events: "piix:mood { value, level }",
     hab: "<p class=\"h-line\" style=\"bottom:auto;top:30px\">How was your day?</p><div class=\"h-form\" style=\"bottom:70px\"><input id=\"d-rate\" type=\"range\" min=\"0\" max=\"10\" value=\"5\" aria-label=\"How was your day?\"></div><piix-pal pal=\"meh\" on=\"#d-rate\"></piix-pal>",
     code: "<label>\n  How was it?\n  <input type=\"range\" min=\"0\" max=\"10\">\n  <piix-pal pal=\"meh\"></piix-pal>\n</label>"
+  },
+  {
+    id: "squish",
+    fam: "jobs",
+    accent: "var(--violet)",
+    kind: "pal",
+    does: "limit",
+    where: "label"
   }
   // new powers go above this line
 ];
