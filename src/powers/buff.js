@@ -25,3 +25,15 @@ const buffBody = (by, arms, eyes) => {
   return art.compose(rows, [6, 17, ['kk', 'kk']], [11, 17, ['kk', 'kk']]);
 };
 
+/* the barbell: a bar, and plates that grow with the score (0 = an empty bar) */
+const buffBar = (rows, y, level, oneHand) => {
+  const plate = [[0, 0], [1, 2], [2, 3], [2, 4], [3, 5]][level];
+  const x0 = oneHand ? 7 : 0, x1 = 17;
+  for (let x = x0; x <= x1; x++) rows = art.put(rows, x, y, ['q']);
+  if (plate[0]) {
+    const pw = plate[0], ph = plate[1], top = y - Math.floor(ph / 2);
+    for (const px of [x0, x1 - pw + 1]) for (let dy = 0; dy < ph; dy++) rows = art.put(rows, px, top + dy, ['P'.repeat(pw)]);
+  }
+  return rows;
+};
+
