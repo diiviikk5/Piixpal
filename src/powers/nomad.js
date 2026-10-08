@@ -39,3 +39,6 @@ defineSprite('nomad', {
   fps: { walk: 7, idle: 1.5 }
 });
 
+/* where this window's page sits on the screen (the browser's frame is guessed, evenly) */
+const nomadScreen = () => ({ x: screenX + Math.max(0, outerWidth - innerWidth) / 2, y: screenY + Math.max(0, outerHeight - innerHeight), w: innerWidth, h: innerHeight });
+
