@@ -163,3 +163,81 @@ const HATCH_KEY = 'piix-hatch';
 const hatchLoad = () => { try { return JSON.parse(localStorage.getItem(HATCH_KEY)) || null; } catch (_) { return null; } };
 const hatchSave = st => { try { localStorage.setItem(HATCH_KEY, JSON.stringify(st)); } catch (_) { /* private mode */ } };
 
+/* pet: be an egg until it's time, then live on the page as this visitor's own pet */
+defineBehavior('pet', (a, [el], host) => {
+  const S = a.s / 3;
+  const need = clamp(Math.round(+host.getAttribute('visits') || 3), 1, 99);
+  let st = hatchLoad() || { seed: Math.random().toString(36).slice(2, 10), visits: 0, taps: 0, born: 0, last: 0 };
+  const daysAway = st.last ? (Date.now() - st.last) / 864e5 : 0;
+  st.visits++; st.last = Date.now(); hatchSave(st);
+  const shells = [recruit(a, '_shell'), recruit(a, '_shell')];
+  shells.forEach(s => { s.node.style.opacity = '0'; });
+  let pet = null, x = null, goal = null, wait = rnd(1, 3), wobble = 0, flight = -1, card = null, moodT = 0;
+  const grow = () => st.visits < 6 ? 2 : st.visits < 15 ? 3 : 4;
+  const become = () => { pet = hatchSprite(st.seed); hatchBecome(a, pet, grow()); };
+  const hatch = () => {
+    if (pet) return;
+    st.born = Date.now(); hatchSave(st);
+    become();
+    flight = 0; shells[0].play('l'); shells[1].play('r');
+    a.say('heart', 1600); moodT = 1.6;
+    card = uiCard({ tip: true, width: 250, attrs: { role: 'dialog', 'aria-label': 'It hatched' } });
+    card.append(uiEl('h4', { text: 'It hatched!' }), uiEl('p', { text: `Meet ${pet.petName}. Nobody else has one quite like it. It will grow as you keep visiting.` }),
+      uiEl('div', { cls: 'row' }, uiEl('button', { text: `Hi, ${pet.petName}!`, attrs: { type: 'button' }, on: { click: () => { uiClose(card); card = null; } } })));
+    uiAnnounce(`Your egg hatched. Meet ${pet.petName}.`);
+    host.dispatchEvent(new CustomEvent('piix:hatch', { bubbles: true, detail: { name: pet.petName, seed: st.seed } }));
+  };
+  if (st.born || st.visits >= need) { if (!st.born) { st.born = Date.now(); hatchSave(st); } become(); if (daysAway > .5) { a.say('hi', 1400); setTimeout(() => a.say('#' + Math.max(1, Math.round(daysAway)), 1400), 1500); } }
+
+  return {
+    crew: shells,
+    hatch,
+    reset() { try { localStorage.removeItem(HATCH_KEY); } catch (_) { /* private mode */ } st = { seed: Math.random().toString(36).slice(2, 10), visits: 1, taps: 0, born: 0, last: Date.now() }; hatchSave(st); pet = null; hatchBecome(a, SPRITES.hatch, 3); },
+    get name() { return pet ? pet.petName : null; },
+    tick(dt) {
+      const r = surfaceOf(el) || rectOf(el);
+      const lo = r.l + a.w / 2, hi = Math.max(lo, r.r - a.w / 2);
+      if (x == null) x = lerp(lo, hi, host.getAttribute('at') != null ? clamp(+host.getAttribute('at'), 0, 1) : .5);
+      if (!pet) {
+        /* the egg: cracks show how close it is; tapping wobbles it */
+        const p = Math.max(st.taps / 5, (st.visits - 1) / Math.max(1, need - 1));
+        a.play('egg' + Math.min(3, Math.floor(p * 3.99)));
+        wobble = Math.max(0, wobble - dt * 2.2);
+        a.rot = Math.sin(wobble * 26) * wobble * 14;
+        a.cv.style.transformOrigin = '50% 100%';
+      } else {
+        a.rot = 0;
+        if (moodT > 0) { moodT -= dt; a.play('happy'); }
+        else if (goal == null) {
+          a.play('idle'); wait -= dt;
+          if (ptr.seen && ptrDist(a.x, a.y - a.h / 2) < 120 * S) a.face = ptr.x < a.x ? -1 : 1;
+          if (wait <= 0 && !reduced()) { goal = rnd(lo, hi); wait = rnd(2, 6); }
+        } else {
+          const d = goal - x;
+          x += Math.sign(d) * Math.min(Math.abs(d), 26 * S * dt);
+          a.face = d < 0 ? -1 : 1; a.play('walk');
+          if (Math.abs(d) < 1) goal = null;
+        }
+      }
+      x = clamp(x, lo, hi);
+      a.x = x; a.y = r.t;
+      /* the shell halves fly apart and fade */
+      if (flight >= 0) {
+        flight += dt;
+        shells.forEach((s, i) => {
+          const k = flight, side = i ? 1 : -1;
+          s.x = a.x + side * (8 + 70 * k) * S; s.y = a.y - (60 * k - 140 * k * k) * S; s.rot = side * k * 300;
+          s.node.style.opacity = Math.max(0, 1 - k / .9).toFixed(2);
+        });
+        if (flight > 1) flight = -1;
+      }
+      if (card) uiPlace(card, a.x, a.y - a.h - 4, { under: a.y + 4, area: boxOf(host) ? rectOf(boxOf(host)) : undefined });
+    },
+    poke() {
+      if (!pet) { st.taps++; hatchSave(st); wobble = 1; if (st.taps >= 5) hatch(); else a.say(st.taps >= 3 ? '!' : '?', 500); }
+      else { moodT = 1.2; a.say('heart', 900); a.oy = 0; }
+    },
+    destroy() { if (card) card.remove(); }
+  };
+});
+
