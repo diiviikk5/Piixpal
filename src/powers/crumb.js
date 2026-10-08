@@ -9,3 +9,14 @@
  * Your banner's own buttons still do their job: Crumb eats a stand-in copy, so your code
  * can hide or remove the real one straight away.   Event: piix:eaten */
 
+/* the mouse: a round grey body, a big pink ear, a pink nose and a long curly tail */
+const crumbShape = (by, full) => art.outline(art.volume(art.paint(16, 11, (x, y) => {
+  const yy = y - by;
+  if (art.ellipse(x, yy, 7.2, 6.4, full ? 5.4 : 4.6, full ? 3.6 : 3)) return 'b';
+  if (art.ellipse(x, yy, 11.8, 5.6, 2.6, 2.3)) return 'b';
+  if (art.ellipse(x, yy, 10.2, 2.8, 2.1, 2.1)) return 'b';
+  if (yy === 6 && x >= 1 && x <= 2) return 'q';
+  if (yy === 5 && x === 0) return 'q';
+  return null;
+})));
+
