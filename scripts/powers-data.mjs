@@ -278,6 +278,14 @@ export const POWERS = [
     api: "el.clear()",
     hab: "<button type=\"button\" class=\"h-btn\" style=\"position:absolute;right:20px;top:20px\" data-call=\"#d-stickers:clear\">Peel them all</button><p class=\"h-text\" style=\"bottom:auto;top:110px;left:210px;right:20px;font-size:40px\">Stick it here</p><div style=\"position:absolute;left:20px;top:20px\"><piix-stickers id=\"d-stickers\" box=\".habitat\" names=\"heart,star,bolt,smile,crown,wow,mochi,ufo,toast\"></piix-stickers></div>",
     code: "<piix-stickers names=\"heart,star,bolt,mochi,ufo\"></piix-stickers>"
+  },
+  {
+    id: "buff",
+    fam: "jobs",
+    accent: "var(--coral)",
+    kind: "pal",
+    does: "strength",
+    where: "label"
   }
   // new powers go above this line
 ];
