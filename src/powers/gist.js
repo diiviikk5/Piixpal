@@ -57,3 +57,18 @@ const gistSentences = text => text.split(/\n+/)
   .flatMap(line => line.replace(/\s+/g, ' ').match(/[^.!?]+[.!?]+["')\]]*|[^.!?]+$/g) || [])
   .map(s => s.trim()).filter(s => s.split(' ').length >= 5);
 
+/* pick the sentences that matter most: the words they share with the rest, where they sit, how long they run */
+const gistPick = (sents, n) => {
+  const words = s => s.toLowerCase().match(/[a-zÀ-ɏ']{3,}/g) || [];
+  const freq = new Map();
+  sents.forEach(s => words(s).forEach(w => { if (!GIST_STOP.has(w)) freq.set(w, (freq.get(w) || 0) + 1); }));
+  const top = Math.max(1, ...freq.values());
+  return sents.map((s, i) => {
+    const ws = words(s).filter(w => !GIST_STOP.has(w));
+    let sc = ws.reduce((t, w) => t + freq.get(w) / top, 0) / Math.pow(Math.max(ws.length, 1), .45);
+    if (i === 0) sc *= 1.35;
+    if (s.length > 260) sc *= .7;
+    return { s, i, sc };
+  }).sort((p, q) => q.sc - p.sc).slice(0, n).sort((p, q) => p.i - q.i).map(o => o.s);
+};
+
