@@ -129,3 +129,10 @@ const hatchFigure = seed => {
   };
 };
 
+/* the egg: cream with speckles, cracking a little more each time */
+const hatchEgg = cracks => {
+  let rows = art.outline(art.paint(13, 15, (x, y) => art.ellipse(x, y, 6.5, 8, 4.8, 6.2) ? ((x * 7 + y * 3) % 11 === 0 ? 's' : 'w') : null));
+  const C = [[], [[5, 6, ['k', '_k']]], [[5, 6, ['k', '_k', 'k']], [8, 9, ['_k', 'k']]], [[3, 7, ['kk_k', '__k_k']], [8, 9, ['_k', 'k', '_k']]]][cracks];
+  return art.compose(rows, ...C);
+};
+
