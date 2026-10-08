@@ -236,7 +236,10 @@ export const POWERS = [
     kind: "element",
     tag: "piix-avatar",
     where: ".comment",
-    query: "seed=someone"
+    query: "seed=someone",
+    uses: "any word: a username, an email, an id. The same word always makes the same creature",
+    support: "every modern browser · sits inline like an image · every render mode works (voxel, dots, dither…)",
+    try: "type a name below and meet its creature"
   }
   // new powers go above this line
 ];
