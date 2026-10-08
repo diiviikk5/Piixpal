@@ -94,6 +94,15 @@ export const POWERS = [
     events: "piix:tour-step, piix:tour-end",
     hab: "<div class=\"h-nav\" style=\"height:64px\"><i></i></div><button type=\"button\" class=\"h-btn lime\" style=\"position:absolute;left:70px;top:12px\" data-tour=\"Start a new project here\" data-tour-step=\"1\">+ New</button><input class=\"h-search\" aria-label=\"Search\" placeholder=\"Search…\" style=\"left:178px;top:14px\" data-tour=\"Search every project and file\" data-tour-step=\"2\"><span class=\"h-avatar\" style=\"right:20px;top:14px\" data-tour=\"Your profile and settings\" data-tour-step=\"3\">MK</span><p class=\"h-line\" style=\"bottom:auto;top:118px\">Click Scout to take the tour.</p><div class=\"h-floor\" id=\"d-scout\"><i></i><i></i><i></i></div><piix-pal pal=\"scout\" on=\"#d-scout\" at=\".12\"></piix-pal>",
     code: "<button data-tour=\"Start a new project here\">New</button>\n<input data-tour=\"Search everything\">\n\n<header>\n  <piix-pal pal=\"scout\"></piix-pal>\n</header>"
+  },
+  {
+    id: "drone",
+    fam: "jobs",
+    accent: "var(--sky)",
+    kind: "pal",
+    does: "cart",
+    where: "#cart",
+    tall: true
   }
   // new powers go above this line
 ];
