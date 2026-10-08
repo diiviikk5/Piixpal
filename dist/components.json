@@ -94,6 +94,7 @@
  "ufo": "sprite",
  "wizard": "sprite",
  "bulb": "power",
+ "fetch": "power",
  "pidge": "power",
  "pix": "power",
  "plane": "power",
