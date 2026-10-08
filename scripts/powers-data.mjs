@@ -187,7 +187,8 @@ export const POWERS = [
     where: "footer",
     uses: "Document Picture-in-Picture (a little always-on-top window), or a small popup where that is missing",
     support: "pops out on top of everything in Chrome and Edge · a popup window in Firefox and Safari · the timer is saved between visits",
-    try: "click Sprout, press Start (this one counts one minute), then Pop out"
+    try: "click Sprout, press Start (this one counts one minute), then Pop out",
+    desc: "A desktop pet, straight from a website. Sprout is a plant in a pot with a focus timer: it grows a little while you work, blooms when the time is up with a tiny chime, and tells you to rest your eyes. Press Pop out and it leaves the page for its own little window that floats on top of everything else, so it can keep you company while you work in other apps. Close that window and it comes home."
   }
   // new powers go above this line
 ];
