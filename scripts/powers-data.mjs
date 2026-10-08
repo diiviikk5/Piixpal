@@ -222,7 +222,10 @@ export const POWERS = [
     uses: "a random seed kept in the visitor’s own browser (localStorage), and nothing else",
     support: "every modern browser · nothing leaves the visitor’s device",
     try: "tap the egg five times (or come back a few times)",
-    desc: "A pet that belongs to one visitor. Everyone finds a speckled egg; it hatches after a few visits, or a few taps, into a creature made from that visitor’s own random seed. Its shape, colours, ears, eyes, mouth, markings, tail and name are theirs alone, out of thousands of possible pals. It remembers them, grows bigger as they keep coming back, and says hello (with how many days it has been) after time away."
+    desc: "A pet that belongs to one visitor. Everyone finds a speckled egg; it hatches after a few visits, or a few taps, into a creature made from that visitor’s own random seed. Its shape, colours, ears, eyes, mouth, markings, tail and name are theirs alone, out of thousands of possible pals. It remembers them, grows bigger as they keep coming back, and says hello (with how many days it has been) after time away.",
+    attrs: [["visits","visits before it hatches on its own (default 3)"],["at","where it lives on its element, 0–1"]],
+    api: "el.ctl.hatch()  el.ctl.reset()  el.ctl.name",
+    events: "piix:hatch { name, seed }"
   }
   // new powers go above this line
 ];
