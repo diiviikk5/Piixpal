@@ -30,3 +30,17 @@ const gulpShape = ({ beak = 'shut', by = 0, eyes = 'open', step = 0 }) => {
   return rows;
 };
 
+/* Gulp: waits, watches, opens up, gulps, and looks very pleased */
+defineSprite('gulp', {
+  w: 19, h: 15, scale: 3, does: 'dropzone',
+  palette: { k: '#17121f', w: '#ffffff', W: '#d9dce8', o: '#ffb347', O: '#ff9a2f', e: '#17121f' },
+  frames: {
+    idle: [gulpShape({}), gulpShape({}), gulpShape({ eyes: 'shut' }), gulpShape({})],
+    look: [gulpShape({ by: -1 })],
+    open: [gulpShape({ beak: 'open', by: -1 }), gulpShape({ beak: 'open', by: -1, step: 1 })],
+    full: [gulpShape({ beak: 'full' }), gulpShape({ beak: 'full', by: -1 })],
+    happy: [gulpShape({ eyes: 'happy' }), gulpShape({ eyes: 'happy', by: -1, step: 2 })]
+  },
+  fps: { idle: 2, open: 6, full: 5, happy: 5 }
+});
+
