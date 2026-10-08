@@ -77,3 +77,38 @@ const buffScore = pw => {
 };
 const BUFF_LABELS = ['', 'weak', 'okay', 'strong', 'beast'];
 
+/* strength: lift whatever this password is worth */
+defineBehavior('strength', (a, [el], host) => {
+  const S = a.s / 3;
+  const field = el.matches && el.matches('input') ? el : el.querySelector('input[type=password],input') || el;
+  let score = 0, shown = -1, talkT = 0, shake = 0;
+  const update = () => {
+    score = buffScore(field.value || '');
+    field.setAttribute('data-strength', String(score));
+    if (score !== shown) {
+      if (score > shown && score >= 3) a.say(score === 4 ? 'star' : 'heart', 900);
+      else if (score === 1) a.say('sweat', 900);
+      shown = score;
+      host.dispatchEvent(new CustomEvent('piix:strength', { bubbles: true, detail: { score, label: BUFF_LABELS[score] } }));
+      clearTimeout(talkT);
+      talkT = setTimeout(() => { if (score) uiAnnounce('Password strength: ' + BUFF_LABELS[score]); }, 700);
+    }
+  };
+  field.addEventListener('input', update);
+  update();
+
+  return {
+    get score() { return score; },
+    tick(dt) {
+      const r = rectOf(field);
+      const at = host.getAttribute('at') != null ? clamp(+host.getAttribute('at'), 0, 1) : .9;
+      a.x = r.l + a.w / 2 + Math.max(0, r.w - a.w) * at; a.y = r.t;
+      const typing = document.activeElement === field && field.value;
+      a.play(typing || score === 4 ? 'lift' + score : 'rest' + score);
+      shake = score === 1 && typing ? rnd(-1, 1) * S : 0;
+      a.ox = shake;
+    },
+    poke() { a.say(score ? 'heart' : '?', 700); },
+    destroy() { field.removeEventListener('input', update); clearTimeout(talkT); }
+  };
+});
