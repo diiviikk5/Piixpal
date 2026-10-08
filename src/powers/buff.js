@@ -56,3 +56,6 @@ defineSprite('buff', {
   fps: Object.fromEntries([0, 1, 2, 3, 4].map(l => ['lift' + l, [10, 9, 2.4, 3.4, 2][l]]))
 });
 
+/* passwords everybody tries first */
+const BUFF_COMMON = ['password', '123456', 'qwerty', 'letmein', 'iloveyou', 'admin', 'welcome', 'monkey', 'dragon', 'football', 'abc123', '111111', 'sunshine', 'princess', 'passw0rd', 'master', 'hello', 'freedom', 'whatever', 'trustno1', 'starwars', 'login', 'baseball', 'shadow'];
+
