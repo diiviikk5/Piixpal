@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Piixpal · superpowers lab</title>
+<style>
+  body{margin:0;background:#fff;color:#16111f;font:18px/1.6 system-ui,sans-serif;padding:40px 60px 600px}
+  h1{font-size:64px;line-height:1;margin:40px 0 24px;letter-spacing:-.04em}
+  h2{font-size:36px;margin:60px 0 14px}
+  p{max-width:720px}
+  .btns{display:flex;gap:16px;margin:24px 0}
+  .btn{display:inline-block;padding:12px 18px;border:2px solid #16111f;border-radius:10px;background:#fff;font-weight:700;text-decoration:none;color:inherit}
+  .btn.lime{background:#c6f432}
+  .stage{position:relative;height:360px;border:2px solid #16111f;border-radius:18px;margin:40px 0;overflow:hidden;background:#f7f5ef}
+  .stage h3{position:absolute;left:40px;top:150px;margin:0;font-size:40px}
+  .stage p{position:absolute;left:300px;top:90px;margin:0;width:260px}
+  .stage .btn{position:absolute}
+</style>
+</head>
+<body>
+<h1 id="title">Play this page</h1>
+<p id="lede">Click the little lime hero to take control. Run with the arrow keys, jump with up or space, and hop from line to line. Every heading, paragraph, button and picture is a platform. Coins hide on links and buttons.</p>
+<piix-pal pal="pix" on="#title" at=".1"></piix-pal>
+<div class="btns"><a class="btn lime" href="#a">Get started</a><a class="btn" href="#b">Docs</a><button class="btn" type="button">A button</button></div>
+<h2>A second section</h2>
+<p>More words to stand on. The camera follows Pix up and down the page while you play, and Escape hands the page back to you. Pals that hear a hard landing react to it, so a thud near the toys sends them flying.</p>
+<p>Another paragraph, further down, to fall onto. It is long enough to wrap onto a few lines, and every line is its own platform.</p>
+
+<div class="stage" id="stage">
+  <h3>Boxed level</h3>
+  <p>Inside a box, Pix stays in the box and the camera stays still.</p>
+  <a class="btn lime" href="#c" style="left:60px;top:250px">Bump me</a>
+  <a class="btn" href="#d" style="left:420px;top:240px">Coin</a>
+  <a class="btn" href="#e" style="left:640px;top:170px">High</a>
+  <piix-pal pal="pix" on="#stage h3" box="#stage" coins="5"></piix-pal>
+</div>
+<script src="../piixpal.js"></script>
+</body>
+</html>
