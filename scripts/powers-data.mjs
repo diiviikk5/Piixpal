@@ -256,7 +256,10 @@ export const POWERS = [
     uses: "gems you hide on any of your pages, and the visitor’s own browser to remember what they found",
     support: "every modern browser · progress carries from page to page",
     try: "three gems are hidden in the box: find them all",
-    desc: "A treasure hunt across your whole site. Hide gems anywhere, on any page: tucked on a heading, behind a button, down in the footer. Visitors who spot one click it and it flies into a little jar in the corner that remembers every gem they have found, page to page. Find them all and the jar bursts with sparkles and, if you like, hands over a reward code. Great for launches."
+    desc: "A treasure hunt across your whole site. Hide gems anywhere, on any page: tucked on a heading, behind a button, down in the footer. Visitors who spot one click it and it flies into a little jar in the corner that remembers every gem they have found, page to page. Find them all and the jar bursts with sparkles and, if you like, hands over a reward code. Great for launches.",
+    attrs: [["hunt","the name of the hunt (gems of one hunt share a jar)"],["gem","this gem’s id within the hunt"],["total","how many gems there are"],["reward","a code to show when the jar is full"],["color","the gem’s colour"]],
+    api: "el.ctl.reset()",
+    events: "piix:gem { hunt, found, total }, piix:hunt-done { hunt, reward }"
   }
   // new powers go above this line
 ];
