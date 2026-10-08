@@ -84,3 +84,62 @@ const sproutChime = win => {
   } catch (_) { /* no audio */ }
 };
 
+/* the desk: Sprout big, the clock, and Start / Reset (and Pop out), in any document */
+const SPROUT_CSS = `
+.sp{display:grid;justify-items:center;gap:8px;padding:10px 6px 4px;font:600 13px/1.3 ${UI_FONT};color:${UI_INK}}
+.sp canvas{image-rendering:pixelated;width:96px;height:126px}
+.sp .t{font:800 30px/1 ${UI_MONO};letter-spacing:.04em}
+.sp .m{font:700 11px/1 ${UI_MONO};text-transform:uppercase;letter-spacing:.08em;color:#6c6477}
+.sp .row{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:4px}
+.sp button{font:700 13px/1 ${UI_FONT};padding:9px 12px;border:0;background:${UI_INK};color:${UI_PAPER};cursor:pointer;box-shadow:0 3px 0 rgba(27,18,38,.3)}
+.sp button.ghost{background:transparent;color:${UI_INK};box-shadow:inset 0 0 0 2px ${UI_INK}}
+.sp button:focus-visible{outline:3px solid #6b4cff;outline-offset:2px}`;
+const sproutScene = (root, win, mins, onPop) => {
+  const doc = root.ownerDocument;
+  const st0 = doc.createElement('style'); st0.textContent = SPROUT_CSS;
+  const box = doc.createElement('div'); box.className = 'sp';
+  const cv = doc.createElement('canvas'); cv.width = 16; cv.height = 21;
+  const g = cv.getContext('2d');
+  const mode = doc.createElement('div'); mode.className = 'm';
+  const time = doc.createElement('div'); time.className = 't'; time.setAttribute('role', 'timer');
+  const row = doc.createElement('div'); row.className = 'row';
+  const btn = (text, ghost, fn) => { const b = doc.createElement('button'); b.type = 'button'; b.textContent = text; if (ghost) b.className = 'ghost'; b.addEventListener('click', fn); row.appendChild(b); return b; };
+  const go = btn('Start', false, () => {
+    const s = sproutState();
+    if (s.running) { s.left = sproutLeft(s, mins); s.running = false; }
+    else { if (s.left == null) s.left = (s.mode === 'focus' ? mins.focus : mins.rest) * 60; s.running = true; s.at = Date.now(); }
+    sproutSave(s);
+  });
+  btn('Reset', true, () => sproutSave({ mode: 'focus', left: null, running: false, at: 0, blooms: sproutState().blooms }));
+  if (onPop) btn('Pop out', true, onPop);
+  box.append(cv, mode, time, row);
+  root.append(st0, box);
+  const frames = baked(SPRITES.sprout);
+  let raf = 0, t = 0, last = '';
+  const loop = () => {
+    t++;
+    const s = sproutState();
+    let left = sproutLeft(s, mins);
+    if (s.running && left <= 0) {
+      /* time's up: a bloom and a break, or back to work */
+      if (s.mode === 'focus') { s.blooms++; s.mode = 'rest'; sproutChime(win); root.dispatchEvent(new CustomEvent('piix:bloom', { bubbles: true })); }
+      else s.mode = 'focus';
+      s.left = null; s.running = false; sproutSave(s); left = sproutLeft(s, mins);
+    }
+    const stage = sproutStage(s, mins);
+    const clip = s.mode === 'rest' ? (s.running ? 'z' + stage : 'h' + stage) : 's' + stage;
+    const f = frames[clip][Math.floor(t / 40) % frames[clip].length];
+    const key = clip + f + sproutClock(left) + s.running;
+    if (key !== last) {
+      last = key;
+      g.clearRect(0, 0, 16, 21); g.drawImage(f, 0, 0);
+      time.textContent = sproutClock(left);
+      mode.textContent = s.mode === 'focus' ? (s.running ? 'focus · growing' : 'focus') : 'break · rest your eyes';
+      go.textContent = s.running ? 'Pause' : 'Start';
+    }
+    raf = win.requestAnimationFrame(loop);
+  };
+  loop();
+  return { destroy() { win.cancelAnimationFrame(raf); st0.remove(); box.remove(); } };
+};
+
