@@ -65,3 +65,41 @@ const hatchGenes = seed => {
   };
 };
 
+/* paint one pose: body, top, markings, tail, face, feet */
+const hatchPaint = (G, { eyes = 'open', by = 0, step = 0, whites = false }) => {
+  const shape = HATCH_SHAPES[G.shape], top = HATCH_TOPS[G.top];
+  let rows = art.paint(16, 17, (x, y) => {
+    const yy = y - by;
+    if (yy > 15) return null;
+    if (shape(x, yy)) {
+      if (G.mark === 'belly' && art.ellipse(x, yy, 8, 12.4, 3.4, 2.3)) return 'c';
+      if (G.mark === 'stripes' && (yy === 5 || yy === 7) && x > 5 && x < 11) return 'd';
+      return 'b';
+    }
+    const tp = top(x, yy);
+    if (tp) return tp;
+    if (G.tail === 'curl' && ((x === 14 && yy >= 9 && yy <= 11) || (x === 15 && yy === 9))) return 'b';
+    if (G.tail === 'puff' && art.ellipse(x, yy, 14.5, 11.5, 1.4, 1.4)) return 'c';
+    if (G.tail === 'spike' && x >= 14 && yy >= 10 && yy <= 12 && x - 14 <= 12 - yy) return 'a';
+    return null;
+  });
+  rows = art.outline(art.volume(rows));
+  if (G.mark === 'spots') rows = art.compose(rows, ...G.spots.map(([sx, sy]) => [sx, sy + by, ['a']]).filter(([sx]) => sx > 2 && sx < 13));
+  /* the face */
+  const ey = G.eyeY + by, l = 8 - G.eyeGap - 1, rx = 8 + G.eyeGap - 1;
+  const eh = G.bigEyes ? 2 : 1;
+  if (whites) rows = art.compose(rows, [l, ey, ['ww', 'ww'].slice(0, 2)], [rx, ey, ['ww', 'ww'].slice(0, 2)]);
+  else if (eyes === 'open') rows = art.compose(rows, [l, ey, G.bigEyes ? ['we', 'ee'] : ['e', 'e']], [rx + (G.bigEyes ? 0 : 1), ey, G.bigEyes ? ['we', 'ee'] : ['e', 'e']]);
+  else if (eyes === 'shut') rows = art.compose(rows, [l, ey + eh, ['ee']], [rx, ey + eh, ['ee']]);
+  else if (eyes === 'happy') rows = art.compose(rows, [l, ey, ['.e.', 'e.e'].map(s => s.slice(0, 3))].map((v, i) => i === 0 ? l - 0 : v), [rx, ey, ['.e.', 'e.e']]);
+  const my = ey + 2 + (G.bigEyes ? 1 : 0);
+  const M = { smile: [[7, my, ['e..e', '.ee.']]], cat: [[6, my, ['e.e.e', '.e.e.']]], fang: [[7, my, ['eeee', '.w..']]], o: [[7, my, ['.e', 'e.e'.slice(0, 2)]]], none: [] }[G.mouth];
+  rows = art.compose(rows, ...M);
+  if (G.mark === 'blush' || G.mark === 'belly') rows = art.compose(rows, [l - 1, my, ['p']], [rx + 2, my, ['p']]);
+  /* feet: together, or one lifted for a step */
+  const F = [[[5, 15], [10, 15]], [[4, 14], [10, 15]], [[5, 15], [11, 14]]][step];
+  for (const [fx, fy] of F) rows = art.put(rows, fx, fy + (fy === 15 ? 0 : by), ['kk']);
+  return rows;
+};
+const hatchPalette = G => ({ k: '#17121f', b: G.colors[0], d: G.colors[1], B: G.colors[2], c: G.colors[3], a: G.colors[4], w: '#ffffff', e: '#17121f', p: '#ff9fb5', g: '#5cbf45' });
+
