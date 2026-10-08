@@ -226,7 +226,8 @@ export const POWERS = [
     attrs: [["visits","visits before it hatches on its own (default 3)"],["at","where it lives on its element, 0–1"]],
     api: "el.ctl.hatch()  el.ctl.reset()  el.ctl.name",
     events: "piix:hatch { name, seed }",
-    hab: "<button type=\"button\" class=\"h-btn\" style=\"position:absolute;right:20px;top:20px\" data-call=\"#d-hatch:reset\">Start over</button><p class=\"h-line\" style=\"bottom:auto;top:28px;right:150px\">Tap the egg. What hatches is yours alone.</p><div class=\"h-floor\" id=\"d-hatchfloor\"><i></i><i></i><i></i></div><piix-pal pal=\"hatch\" id=\"d-hatch\" on=\"#d-hatchfloor\" at=\".5\"></piix-pal>"
+    hab: "<button type=\"button\" class=\"h-btn\" style=\"position:absolute;right:20px;top:20px\" data-call=\"#d-hatch:reset\">Start over</button><p class=\"h-line\" style=\"bottom:auto;top:28px;right:150px\">Tap the egg. What hatches is yours alone.</p><div class=\"h-floor\" id=\"d-hatchfloor\"><i></i><i></i><i></i></div><piix-pal pal=\"hatch\" id=\"d-hatch\" on=\"#d-hatchfloor\" at=\".5\"></piix-pal>",
+    code: "<footer>\n  <piix-pal pal=\"hatch\" visits=\"3\"></piix-pal>\n</footer>"
   }
   // new powers go above this line
 ];
