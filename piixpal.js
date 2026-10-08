@@ -72,6 +72,14 @@ const boxOf = host => {
   if (!sel) return null;
   try { return host.closest(sel) || document.querySelector(sel); } catch (_) { return null; }
 };
+/* pin a pal to the viewport: its x/y become viewport coords (plus the layer origin) */
+const pin = a => { a.node.style.position = 'fixed'; a.pinned = true; return a; };
+/* the world a pal lives in: its box="…" element in doc coords, or (pinning it) the viewport */
+const areaOf = (host, a) => {
+  const box = boxOf(host);
+  if (!box && a) pin(a);
+  return () => box ? rectOf(box) : { l: origin.x, t: origin.y, r: origin.x + docW(), b: origin.y + innerHeight, w: docW(), h: innerHeight, fixed: true };
+};
 const onScreen = (r, m = 200) => r.b > scrollY - m && r.t < scrollY + innerHeight + m && r.r > -m && r.l < docW() + m;
 /* The y a pal stands on at doc-x. Elements can offer a custom contour via piixSurface(x). */
 const surfaceAt = (el, x, r = rectOf(el)) => {
@@ -180,6 +188,7 @@ class Actor {
     this.sx = 1; this.sy = 1; this.rot = 0; this.ox = 0; this.oy = 0;
     this.clip = null; this.fi = 0; this.ft = 0; this.fps = 6; this.loop = true; this.done = false;
     this._drawn = null; this._tf = ''; this._ctf = '';
+    this.pinned = false;              /* true: x/y are viewport coords (+ origin), the node is position:fixed */
 
     const n = this.node = document.createElement('div');
     n.className = 'a';
@@ -253,10 +262,13 @@ class Actor {
     if (ms) this._bt = setTimeout(() => this.bub.classList.remove('on'), ms);
   }
   hush() { clearTimeout(this._bt); this.bub.classList.remove('on'); }
-  /* is the pointer over this pal's box (doc coords)? */
+  /* the pointer in this pal's own coordinate space */
+  get mx() { return this.pinned ? ptr.cx + origin.x : ptr.x; }
+  get my() { return this.pinned ? ptr.cy + origin.y : ptr.y; }
+  /* is the pointer over this pal's box? */
   near(m = 0) {
     const cx = this.x + this.ox, cy = this.y - this.h / 2 + this.oy;
-    return Math.abs(ptr.x - cx) < this.w / 2 + m && Math.abs(ptr.y - cy) < this.h / 2 + m;
+    return Math.abs(this.mx - cx) < this.w / 2 + m && Math.abs(this.my - cy) < this.h / 2 + m;
   }
   destroy() { clearTimeout(this._bt); this.node.remove(); ACTORS.delete(this); }
 }
@@ -400,6 +412,124 @@ const bakeIcon = name => {
 };
 Piixpal.icons = ICONS;
 
+/* ---- ui.js ---- */
+/* Real words for pals that need them: toasts, tour cards, tooltips, summaries.
+ * Cards live in their own shadow root, above the pals and NOT aria-hidden, so screen
+ * readers and keyboards can use them. They look like the pixel speech bubbles. */
+const UI_INK = '#1b1226', UI_PAPER = '#fffdf5';
+const UI_FONT = 'system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif';
+const UI_MONO = 'ui-monospace,SFMono-Regular,Menlo,Consolas,monospace';
+const UI_CSS = `
+:host{all:initial}
+.card{position:absolute;left:0;top:0;box-sizing:border-box;width:max-content;max-width:min(var(--w,300px),calc(100vw - 24px));
+  padding:12px 14px;font:500 14px/1.45 ${UI_FONT};color:${UI_INK};background:${UI_PAPER};text-align:left;
+  box-shadow:0 -3px 0 ${UI_INK},0 3px 0 ${UI_INK},-3px 0 0 ${UI_INK},3px 0 0 ${UI_INK},6px 9px 0 rgba(27,18,38,.18);
+  pointer-events:auto;transform-origin:var(--tx,50%) 100%;animation:piix-in .22s steps(4) both}
+.card.below{transform-origin:var(--tx,50%) 0}
+.card.fixed{position:fixed}
+.card.tip::after{content:"";position:absolute;left:var(--tx,50%);top:100%;width:6px;height:6px;margin:3px 0 0 -3px;background:${UI_PAPER};
+  box-shadow:0 3px 0 ${UI_INK},-3px 0 0 ${UI_INK},3px 0 0 ${UI_INK}}
+.card.tip.below::after{top:auto;bottom:100%;margin:0 0 3px -3px;box-shadow:0 -3px 0 ${UI_INK},-3px 0 0 ${UI_INK},3px 0 0 ${UI_INK}}
+.card h4{margin:0 0 5px;font:800 11px/1.2 ${UI_MONO};letter-spacing:.07em;text-transform:uppercase;color:#6c6477;display:flex;align-items:center;gap:7px}
+.card p{margin:0}
+.card ul{margin:2px 0 0;padding-left:18px}
+.card li{margin:4px 0}
+.card .row{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;align-items:center;margin-top:12px}
+.card .row .n{margin-right:auto;font:700 12px/1 ${UI_MONO};color:#6c6477}
+.card button,.card a.b{font:700 13px/1 ${UI_FONT};padding:9px 12px;border:0;border-radius:0;background:${UI_INK};color:${UI_PAPER};cursor:pointer;
+  text-decoration:none;box-shadow:0 3px 0 rgba(27,18,38,.32);transition:transform .08s}
+.card button:active,.card a.b:active{transform:translateY(2px);box-shadow:0 1px 0 rgba(27,18,38,.32)}
+.card button.ghost{background:transparent;color:${UI_INK};box-shadow:inset 0 0 0 2px ${UI_INK}}
+.card button.x{position:absolute;right:4px;top:4px;width:24px;height:24px;padding:0;background:transparent;color:${UI_INK};box-shadow:none;font:700 17px/1 ${UI_FONT}}
+.card button:focus-visible,.card a:focus-visible{outline:3px solid #6b4cff;outline-offset:2px}
+.card a{color:inherit}
+.card canvas{image-rendering:pixelated;flex:none}
+.card .ic{display:flex;gap:10px;align-items:flex-start}
+.card.out{animation:piix-out .16s steps(3) both}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@keyframes piix-in{from{transform:scale(.4);opacity:0}to{transform:none;opacity:1}}
+@keyframes piix-out{to{transform:scale(.5);opacity:0}}
+@media (prefers-reduced-motion:reduce){.card,.card.out{animation:none}}
+`;
+let uiHost = null, uiShadow = null, uiLive = null;
+const uiRoot = () => {
+  if (uiShadow) return uiShadow;
+  uiHost = document.createElement('div');
+  uiHost.setAttribute('data-piixpal-ui', '');
+  uiHost.style.cssText = 'position:absolute;left:0;top:0;width:0;height:0;overflow:visible;z-index:calc(var(--piix-z,2147482000) + 1);margin:0;padding:0;border:0';
+  uiShadow = uiHost.attachShadow({ mode: 'open' });
+  const st = document.createElement('style');
+  st.textContent = UI_CSS;
+  uiLive = document.createElement('div');
+  uiLive.className = 'sr';
+  uiLive.setAttribute('aria-live', 'polite');
+  uiShadow.append(st, uiLive);
+  document.body.appendChild(uiHost);
+  return uiShadow;
+};
+/* uiEl('p', { text, cls, attrs, on, style }, ...children) */
+const uiEl = (tag, o = {}, ...kids) => {
+  const e = document.createElement(tag);
+  if (o.cls) e.className = o.cls;
+  if (o.text != null) e.textContent = o.text;
+  if (o.style) e.style.cssText = o.style;
+  if (o.attrs) for (const k in o.attrs) e.setAttribute(k, o.attrs[k]);
+  if (o.on) for (const k in o.on) e.addEventListener(k, o.on[k]);
+  e.append(...kids.filter(k => k != null && k !== false));
+  return e;
+};
+/* a pixel icon from ICONS as an inline canvas */
+const uiIcon = (name, s = 3) => {
+  if (!ICONS[name] && !numberIcon(name)) return null;
+  const c = bakeIcon(name);
+  c.style.width = c.width * s + 'px'; c.style.height = c.height * s + 'px';
+  return c;
+};
+/* a new card: { fixed, tip, cls, width, attrs } */
+const uiCard = (o = {}) => {
+  const c = uiEl('div', { cls: 'card' + (o.fixed ? ' fixed' : '') + (o.tip ? ' tip' : '') + (o.cls ? ' ' + o.cls : ''), attrs: o.attrs });
+  if (o.width) c.style.setProperty('--w', o.width + 'px');
+  uiRoot().appendChild(c);
+  return c;
+};
+/* put a card's tail at (x, y): doc coords, or viewport coords (+ origin) for fixed cards.
+ * It sits above the point (or below), flips if there's no room, and stays inside `area`. */
+const uiPlace = (c, x, y, { below = false, gap = 12, area } = {}) => {
+  const fixed = c.classList.contains('fixed');
+  const o = uiHost.getBoundingClientRect();
+  const ox = fixed ? origin.x : o.left + scrollX, oy = fixed ? origin.y : o.top + scrollY;
+  const A = area || (fixed ? { l: origin.x, r: origin.x + docW(), t: origin.y, b: origin.y + innerHeight } : { l: scrollX, r: scrollX + docW(), t: scrollY, b: scrollY + innerHeight });
+  const w = c.offsetWidth, h = c.offsetHeight;
+  if (!below && y - h - gap < A.t + 4 && y + gap + h < A.b) below = true;
+  else if (below && y + gap + h > A.b - 4 && y - h - gap > A.t) below = false;
+  const left = clamp(x - w / 2, A.l + 6, Math.max(A.l + 6, A.r - w - 6));
+  const top = below ? y + gap : y - h - gap;
+  c.classList.toggle('below', below);
+  c.style.setProperty('--tx', Math.round(clamp(x - left, 14, w - 14)) + 'px');
+  c.style.left = Math.round(left - ox) + 'px';
+  c.style.top = Math.round(top - oy) + 'px';
+};
+/* put a card's top-left corner at (x, y), in the same coordinates as uiPlace */
+const uiAt = (c, x, y) => {
+  const fixed = c.classList.contains('fixed');
+  const o = uiHost.getBoundingClientRect();
+  c.style.left = Math.round(x - (fixed ? origin.x : o.left + scrollX)) + 'px';
+  c.style.top = Math.round(y - (fixed ? origin.y : o.top + scrollY)) + 'px';
+};
+const uiClose = c => {
+  if (!c || c._closing) return;
+  c._closing = true;
+  if (reduced()) { c.remove(); return; }
+  c.classList.add('out');
+  setTimeout(() => c.remove(), 170);
+};
+/* tell screen readers something happened */
+const uiAnnounce = text => {
+  uiRoot();
+  uiLive.textContent = '';
+  setTimeout(() => { uiLive.textContent = text; }, 40);
+};
+
 /* ---- text.js ---- */
 /* Text geometry shared by every pal that lives on text. */
 /* Per-glyph contour of an element's first line of text: [{l, r, t}] in doc coords.
@@ -444,6 +574,40 @@ const textProfile = (el, cache) => {
   return v;
 };
 const segAt = (segs, x) => { for (const s of segs) if (x >= s.l && x <= s.r) return s.t; return null; };
+
+/* ---------- surfaces: the top edges things can stand or land on ---------- */
+/* what counts as a surface by default (toys, the platformer, weather…) */
+const LAND = 'h1,h2,h3,h4,p,li,button,.btn,img,pre,blockquote,figure,footer,nav,header,table,.card,[data-piix-land]';
+const platCache = { at: -1, sel: '', list: [] };
+/* a surface: text elements use their first line's glyph tops, everything else its box */
+const TEXTY = /^(H[1-6]|P|LI|BLOCKQUOTE|DT|DD|FIGCAPTION|LABEL)$/;
+const surfaceOf = el => {
+  const r = el.getBoundingClientRect();
+  if (r.width <= 8 || r.height <= 2 || r.bottom < -400 || r.top > innerHeight + 2000) return null;
+  if (TEXTY.test(el.tagName)) {
+    const rg = document.createRange();
+    rg.selectNodeContents(el);
+    const rs = [...rg.getClientRects()].filter(q => q.width > 1);
+    if (rs.length) {
+      const top = rs[0].top, line = rs.filter(q => q.top - top < 4);
+      const fs = parseFloat(getComputedStyle(el).fontSize) || 16;
+      return { el, l: Math.min(...line.map(q => q.left)) + scrollX, r: Math.max(...line.map(q => q.right)) + scrollX, t: top + scrollY + (line[0].height - fs) / 2 + fs * .26 };
+    }
+  }
+  return { el, l: r.left + scrollX, r: r.right + scrollX, t: r.top + scrollY };
+};
+/* every surface's top edge in doc coords, measured at most once per frame for everyone */
+const platforms = (sel, extra) => {
+  const t = Math.floor(now() / 16);
+  if (platCache.at !== t || platCache.sel !== sel) {
+    platCache.at = t; platCache.sel = sel;
+    let els = [];
+    try { els = [...document.querySelectorAll(sel)]; } catch (_) { /* bad selector */ }
+    platCache.list = els.map(surfaceOf).filter(Boolean);
+  }
+  if (extra) { const p = surfaceOf(extra); return p ? platCache.list.concat(p) : platCache.list; }
+  return platCache.list;
+};
 
 /* ---- drag.js ---- */
 /* Shared pick-up-and-throw handling. Calls move(x, y, vx, vy) while held (foot point,
@@ -1334,6 +1498,8 @@ class PiixPalElement extends HTMLElement {
     this._unmount(); this._mount();
   }
   get actor() { return this._actor || null; }
+  /* the running behaviour, for pals with an API (el.ctl.toast(…), el.ctl.start()…) */
+  get ctl() { return this._ctl || null; }
   /* poke it from code: el.poke() */
   poke() { if (this._ctl && this._ctl.poke) this._ctl.poke(); }
 
@@ -1426,10 +1592,19 @@ const define = (n, c) => { if (!customElements.get(n)) customElements.define(n, 
  * Piixpal.add('pip', '.btn')                       one bird, every .btn a perch
  * Piixpal.add('mochi', '#card', { size: 120 })     sprites go inside the element
  * Piixpal.add('kitty', someElement)                or pass an element directly */
+/* components that are their own element rather than a pal or sprite: { weather: 'piix-weather' } */
+const ELEMENTS = {};
 const add = (name, where = 'body', attrs = {}) => {
   name = String(name).toLowerCase();
+  if (ELEMENTS[name]) {
+    const el = document.createElement(ELEMENTS[name]);
+    for (const k in attrs) if (attrs[k] !== false && attrs[k] != null && k !== '_tries') el.setAttribute(k, attrs[k] === true ? '' : attrs[k]);
+    const host = typeof where === 'string' ? document.querySelector(where) : where;
+    (host || document.body).appendChild(el);
+    return el;
+  }
   /* not registered yet (its file is still loading)? wait to find out if it's a pal or a sprite */
-  if (!attrs.type && !SPRITES[name] && !FIGURES[name] && (attrs._tries || 0) < 80) {
+  if (!attrs.type && !SPRITES[name] && !FIGURES[name] && !ELEMENTS[name] && (attrs._tries || 0) < 80) {
     setTimeout(() => add(name, where, { ...attrs, _tries: (attrs._tries || 0) + 1 }), 125);
     return null;
   }
@@ -1474,14 +1649,14 @@ const start = (script = SCRIPT) => {
 Object.assign(Piixpal, {
   add,
   /* every pal, sprite and behaviour currently registered */
-  list: () => ({ pals: Object.keys(SPRITES), sprites: Object.keys(FIGURES), behaviors: Object.keys(BEHAVIORS) }),
-  clear: () => document.querySelectorAll('piix-pal,piix-sprite').forEach(e => e.remove())
+  list: () => ({ pals: Object.keys(SPRITES).filter(n => n[0] !== '_'), sprites: Object.keys(FIGURES), behaviors: Object.keys(BEHAVIORS), elements: Object.keys(ELEMENTS) }),
+  clear: () => document.querySelectorAll(['piix-pal', 'piix-sprite', ...Object.values(ELEMENTS)].join()).forEach(e => e.remove())
 });
 
-Piixpal._k = { reduceMQ, reduced, clamp, rnd, chance, pick, lerp, now, hexRGBA, ptr, ptrDist, scroll, subs, raf, frame, sub, unsub, rectOf, docW, boxOf, onScreen, surfaceAt, LAYER_CSS, layer, origin, getLayer, layerOrigin, SPRITES, bake, defineSprite, baked, ACTORS, shout, Actor, recruit, BEHAVIORS, defineBehavior, Piixpal, art, ICON_PAL, ICONS, DIGITS, numberIcon, iconCache, iconPal, bakeIcon, measureCtx, glyphTop, textProfile, segAt, drag, BLIP, CROWD_COLORS, PiixCrowdElement, FIGURES, defineFigure, mixHex, figurePalette, bakeFigure, HEAD, PiixSpriteElement, RENDERS, lum, BAYER, ASCII, TEXTURES, BIG, PiixTypeElement, CELL_SHAPES, PiixPalElement, define, add, autoAttach, SCRIPT, start };
+Piixpal._k = { reduceMQ, reduced, clamp, rnd, chance, pick, lerp, now, hexRGBA, ptr, ptrDist, scroll, subs, raf, frame, sub, unsub, rectOf, docW, boxOf, pin, areaOf, onScreen, surfaceAt, LAYER_CSS, layer, origin, getLayer, layerOrigin, SPRITES, bake, defineSprite, baked, ACTORS, shout, Actor, recruit, BEHAVIORS, defineBehavior, Piixpal, art, ICON_PAL, ICONS, DIGITS, numberIcon, iconCache, iconPal, bakeIcon, UI_INK, UI_FONT, UI_MONO, UI_CSS, uiHost, uiRoot, uiEl, uiIcon, uiCard, uiPlace, uiAt, uiClose, uiAnnounce, measureCtx, glyphTop, textProfile, segAt, LAND, platCache, TEXTY, surfaceOf, platforms, drag, BLIP, CROWD_COLORS, PiixCrowdElement, FIGURES, defineFigure, mixHex, figurePalette, bakeFigure, HEAD, PiixSpriteElement, RENDERS, lum, BAYER, ASCII, TEXTURES, BIG, PiixTypeElement, CELL_SHAPES, PiixPalElement, define, ELEMENTS, add, autoAttach, SCRIPT, start };
 return Piixpal._k;
 })();
-const { reduceMQ, reduced, clamp, rnd, chance, pick, lerp, now, hexRGBA, ptr, ptrDist, scroll, subs, raf, frame, sub, unsub, rectOf, docW, boxOf, onScreen, surfaceAt, LAYER_CSS, layer, origin, getLayer, layerOrigin, SPRITES, bake, defineSprite, baked, ACTORS, shout, Actor, recruit, BEHAVIORS, defineBehavior, Piixpal, art, ICON_PAL, ICONS, DIGITS, numberIcon, iconCache, iconPal, bakeIcon, measureCtx, glyphTop, textProfile, segAt, drag, BLIP, CROWD_COLORS, PiixCrowdElement, FIGURES, defineFigure, mixHex, figurePalette, bakeFigure, HEAD, PiixSpriteElement, RENDERS, lum, BAYER, ASCII, TEXTURES, BIG, PiixTypeElement, CELL_SHAPES, PiixPalElement, define, add, autoAttach, SCRIPT, start } = K;
+const { reduceMQ, reduced, clamp, rnd, chance, pick, lerp, now, hexRGBA, ptr, ptrDist, scroll, subs, raf, frame, sub, unsub, rectOf, docW, boxOf, pin, areaOf, onScreen, surfaceAt, LAYER_CSS, layer, origin, getLayer, layerOrigin, SPRITES, bake, defineSprite, baked, ACTORS, shout, Actor, recruit, BEHAVIORS, defineBehavior, Piixpal, art, ICON_PAL, ICONS, DIGITS, numberIcon, iconCache, iconPal, bakeIcon, UI_INK, UI_FONT, UI_MONO, UI_CSS, uiHost, uiRoot, uiEl, uiIcon, uiCard, uiPlace, uiAt, uiClose, uiAnnounce, measureCtx, glyphTop, textProfile, segAt, LAND, platCache, TEXTY, surfaceOf, platforms, drag, BLIP, CROWD_COLORS, PiixCrowdElement, FIGURES, defineFigure, mixHex, figurePalette, bakeFigure, HEAD, PiixSpriteElement, RENDERS, lum, BAYER, ASCII, TEXTURES, BIG, PiixTypeElement, CELL_SHAPES, PiixPalElement, define, ELEMENTS, add, autoAttach, SCRIPT, start } = K;
 
 /* ---- behaviors/beeline.js ---- */
 /* beeline: a little line of worker bees buzzing round their element. Come close and
@@ -3328,38 +3503,6 @@ defineBehavior('sweep', (a, [el], host) => {
  *   land="css selector"   what counts as a surface (defaults to common content elements)
  *
  * Sprite options (spec.toss): { bounce, friction, spin, heavy, faces, squeak } */
-const LAND = 'h1,h2,h3,h4,p,li,button,.btn,img,pre,blockquote,figure,footer,nav,header,table,.card,[data-piix-land]';
-const platCache = { at: -1, sel: '', list: [] };
-/* a surface: text elements use their first line's glyph tops, everything else its box */
-const TEXTY = /^(H[1-6]|P|LI|BLOCKQUOTE|DT|DD|FIGCAPTION|LABEL)$/;
-const surfaceOf = el => {
-  const r = el.getBoundingClientRect();
-  if (r.width <= 8 || r.height <= 2 || r.bottom < -400 || r.top > innerHeight + 2000) return null;
-  if (TEXTY.test(el.tagName)) {
-    const rg = document.createRange();
-    rg.selectNodeContents(el);
-    const rs = [...rg.getClientRects()].filter(q => q.width > 1);
-    if (rs.length) {
-      const top = rs[0].top, line = rs.filter(q => q.top - top < 4);
-      const fs = parseFloat(getComputedStyle(el).fontSize) || 16;
-      return { el, l: Math.min(...line.map(q => q.left)) + scrollX, r: Math.max(...line.map(q => q.right)) + scrollX, t: top + scrollY + (line[0].height - fs) / 2 + fs * .26 };
-    }
-  }
-  return { el, l: r.left + scrollX, r: r.right + scrollX, t: r.top + scrollY };
-};
-/* every surface's top edge in doc coords, measured at most once per frame for everyone */
-const platforms = (sel, extra) => {
-  const t = Math.floor(now() / 16);
-  if (platCache.at !== t || platCache.sel !== sel) {
-    platCache.at = t; platCache.sel = sel;
-    let els = [];
-    try { els = [...document.querySelectorAll(sel)]; } catch (_) { /* bad selector */ }
-    platCache.list = els.map(surfaceOf).filter(Boolean);
-  }
-  if (extra) { const p = surfaceOf(extra); return p ? platCache.list.concat(p) : platCache.list; }
-  return platCache.list;
-};
-
 defineBehavior('toss', (a, [el], host) => {
   const P = a.spec.toss || {};
   const S = a.s / 4;
@@ -6048,6 +6191,419 @@ defineFigure('onigiri', {
     lid: 'f'
   });
 })();
+
+/* ---- powers/pix.js ---- */
+/* PIX: play your page. A tiny hero in a red headband who can run and jump on your
+ * headings, paragraphs, buttons and images. Click Pix to take control:
+ *   ← → (or A D) run · ↑ W or Space jump, hold for higher, jump again in the air
+ *   ↓ drops through a platform · Esc stops
+ * Coins appear on your links and buttons; collect them all. Gamepads and touch work too.
+ *
+ *   coins="10"          how many coins to hide (0 = none)
+ *   land="selector"     what counts as a platform (defaults to text, buttons, images, cards)
+ *   play="click|keys"   keys: arrow keys start the game too (when nothing else has focus)
+ *
+ * Events: piix:play, piix:coin { got, total }, piix:win, piix:stop  */
+(() => {
+  const W = 17, H = 15;
+  const TAILS = [
+    [[3, 4], [2, 5], [3, 5], [2, 6]],
+    [[3, 3], [2, 3], [1, 2], [3, 4], [2, 4]],
+    [[3, 3], [2, 4], [1, 4], [3, 4], [2, 3]],
+    [[3, 3], [2, 2], [1, 1], [3, 4], [2, 3]]
+  ];
+  const frame = ({ by = 0, tail = 0, feet = [], eyes = 'open' }) => {
+    let rows = art.paint(W, H, (x, y) => {
+      const yy = y - by;
+      if (!art.ellipse(x, yy, 9.5, 7, 5.7, 5.4)) return null;
+      return yy === 3 || yy === 4 ? 'r' : 'b';
+    });
+    rows = art.volume(rows);
+    for (const [tx, ty] of TAILS[tail]) rows = art.put(rows, tx, ty + by, ['r']);
+    rows = art.outline(rows);
+    const ey = 6 + by;
+    if (eyes === 'open') rows = art.compose(rows, [10, ey, ['e', 'e']], [13, ey, ['e', 'e']]);
+    else if (eyes === 'shut') rows = art.compose(rows, [10, ey + 1, ['e']], [13, ey + 1, ['e']]);
+    else if (eyes === 'happy') rows = art.compose(rows, [9, ey, ['_e_', 'e_e']], [12, ey, ['_e_', 'e_e']]);
+    else if (eyes === 'wide') rows = art.compose(rows, [10, ey - 1, ['e', 'e', 'e']], [13, ey - 1, ['e', 'e', 'e']]);
+    rows = art.compose(rows, [9, ey + 2, ['p']], [14, ey + 2, ['p']], [11, ey + 3, ['ee']]);
+    for (const [fx, fy] of feet) rows = art.put(rows, fx, fy, ['k']);
+    return rows;
+  };
+  const STAND = [[6, 13], [7, 13], [11, 13], [12, 13]];
+  const PAL = { k: '#17121f', b: '#c6f432', d: '#8cc21e', B: '#effcb3', r: '#ff4d6d', e: '#17121f', p: '#ff9fb5' };
+  defineSprite('pix', {
+    w: W, h: H, scale: 3, does: 'player',
+    palette: PAL,
+    frames: {
+      idle: [frame({ feet: STAND }), frame({ feet: STAND, tail: 0 }), frame({ feet: STAND, eyes: 'shut' }), frame({ feet: STAND })],
+      run: [
+        frame({ by: -1, tail: 1, feet: [[5, 12], [6, 12], [12, 12], [13, 12]] }),
+        frame({ by: 0, tail: 2, feet: [[7, 13], [8, 13], [10, 13], [11, 13]] }),
+        frame({ by: -1, tail: 1, feet: [[6, 12], [7, 12], [11, 12], [12, 12]] }),
+        frame({ by: 0, tail: 2, feet: [[6, 13], [7, 13], [12, 13], [13, 13]] })
+      ],
+      jump: [frame({ by: -1, tail: 3, feet: [[7, 12], [8, 12], [10, 12], [11, 12]] })],
+      fall: [frame({ tail: 3, eyes: 'wide', feet: [[5, 13], [6, 13], [12, 13], [13, 13]] })],
+      happy: [frame({ feet: STAND, eyes: 'happy' }), frame({ by: -1, tail: 3, eyes: 'happy', feet: [[6, 12], [7, 12], [11, 12], [12, 12]] })]
+    },
+    fps: { idle: 1.5, run: 12, happy: 5 }
+  });
+
+  /* coins: a spinning gold piece (crew only) */
+  const coin = [
+    ['.kkkk.', 'kyYYyk', 'kYyyok', 'kYyyok', 'kYyyok', 'kyyook', '.kkkk.'],
+    ['.kkk..', '.kYyk.', '.kYyk.', '.kYyk.', '.kYyk.', '.kyok.', '.kkk..'],
+    ['..kk..', '..ky..', '..ky..', '..ky..', '..ky..', '..ko..', '..kk..'],
+    ['..kkk.', '.kyYk.', '.kyYk.', '.kyYk.', '.kyYk.', '.koyk.', '..kkk.']
+  ];
+  defineSprite('_coin', {
+    w: 6, h: 7, scale: 3,
+    palette: { k: '#17121f', y: '#ffd23f', Y: '#fff3a8', o: '#e8a213' },
+    frames: { spin: coin, flat: [coin[0]] },
+    fps: { spin: 8 }
+  });
+})();
+
+ICONS.play = ['k...', 'kk..', 'kkk.', 'kkkk', 'kkk.', 'kk..', 'k...'];
+
+/* player: the platformer brain behind Pix. Platforms are every line of text and the top
+ * of every button, image and card; they're one-way, so you jump up through them. */
+const PIX_PLAYERS = new Set();
+const PIX_KEYS = { ArrowLeft: 'l', KeyA: 'l', ArrowRight: 'r', KeyD: 'r', ArrowUp: 'u', KeyW: 'u', Space: 'u', ArrowDown: 'd', KeyS: 'd' };
+const pixEditable = t => !!t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName));
+/* scroll without the page's smooth-scrolling getting in the way */
+const pixScrollTo = y => {
+  const h = document.documentElement, was = h.style.scrollBehavior;
+  h.style.scrollBehavior = 'auto';
+  window.scrollTo(scrollX, y);
+  h.style.scrollBehavior = was;
+};
+defineBehavior('player', (a, [el], host) => {
+  const S = a.s / 3;
+  const boxEl = boxOf(host);
+  const sel = host.getAttribute('land') || LAND;
+  const nCoins = host.hasAttribute('coins') ? clamp(Math.round(+host.getAttribute('coins') || 0), 0, 40) : 10;
+  const RUN = 215 * S, ACC = 1800 * S, AIR = 1150 * S, DEC = 2300 * S, G = 2350 * S, JUMP = 745 * S, CUT = 260 * S, MAXF = 1300 * S;
+  let playing = false, placed = false, vx = 0, vy = 0, ground = null, coyote = 0, buffer = 0, jumps = 0, dropT = 0;
+  let spin = 0, platT = 0, plats = [], bumps = [], hintT = 0, happyT = 0, prevU = false, jumpTap = false;
+  const keys = new Set(), touch = {};
+  const crew = [], coins = [];
+  let hud = null, pad = null, got = 0, total = 0;
+
+  /* ---- the level: every line of text, every box top ---- */
+  const lines = (e, out) => {
+    const rg = document.createRange();
+    rg.selectNodeContents(e);
+    const rs = [...rg.getClientRects()].filter(q => q.width > 2 && q.height > 2);
+    if (!rs.length) return false;
+    const fs = parseFloat(getComputedStyle(e).fontSize) || 16;
+    const ls = [];
+    for (const q of rs) {
+      const L = ls.find(l => Math.min(l.b, q.bottom) - Math.max(l.t, q.top) > Math.min(l.b - l.t, q.height) * .5);
+      if (L) { L.l = Math.min(L.l, q.left); L.r = Math.max(L.r, q.right); L.t = Math.min(L.t, q.top); L.b = Math.max(L.b, q.bottom); }
+      else ls.push({ l: q.left, r: q.right, t: q.top, b: q.bottom });
+    }
+    for (const L of ls) out.push({ el: e, l: L.l + scrollX, r: L.r + scrollX, t: L.t + scrollY + (L.b - L.t - fs) / 2 + fs * .26 });
+    return true;
+  };
+  const measure = () => {
+    const out = [], bs = [];
+    const root = boxEl || document;
+    const lo = boxEl ? -1e9 : scrollY - innerHeight * 1.2, hi = boxEl ? 1e9 : scrollY + innerHeight * 2.2;
+    let els = [];
+    try { els = [...root.querySelectorAll(sel)]; } catch (_) { /* bad selector */ }
+    for (const e of els) {
+      if (e.closest('piix-pal,[data-piixpal]')) continue;
+      const r = e.getBoundingClientRect();
+      if (r.width < 8 || r.height < 4 || r.bottom + scrollY < lo || r.top + scrollY > hi) continue;
+      if (TEXTY.test(e.tagName) && lines(e, out)) continue;
+      out.push({ el: e, l: r.left + scrollX, r: r.right + scrollX, t: r.top + scrollY });
+    }
+    try {
+      for (const e of root.querySelectorAll('a[href],button,.btn,[data-piix-bump]')) {
+        const r = e.getBoundingClientRect();
+        if (r.width < 4 || r.bottom + scrollY < lo || r.top + scrollY > hi) continue;
+        bs.push({ el: e, l: r.left + scrollX, r: r.right + scrollX, t: r.top + scrollY, b: r.bottom + scrollY, cool: 0 });
+      }
+    } catch (_) { /* ignore */ }
+    for (const b of bs) { const old = bumps.find(o => o.el === b.el); if (old) b.cool = old.cool; }
+    plats = out; bumps = bs;
+  };
+  const world = () => {
+    if (boxEl) { const r = rectOf(boxEl); return { l: r.l + a.w / 2, r: r.r - a.w / 2, top: r.t + a.h, floor: r.b - 2 }; }
+    return { l: a.w / 2, r: docW() - a.w / 2, top: -1e9, floor: document.documentElement.scrollHeight - 2 };
+  };
+  const groundAt = (x, y, W) => {
+    let best = null;
+    for (const p of plats) if (x >= p.l - 3 && x <= p.r + 3 && Math.abs(p.t - y) <= 6 && (!best || Math.abs(p.t - y) < Math.abs(best.t - y))) best = p;
+    if (!best && Math.abs(W.floor - y) <= 6) best = { t: W.floor, l: -1e9, r: 1e9, floor: true };
+    return best;
+  };
+  const land = (p, impact) => {
+    a.y = p.t; ground = p; vy = 0; jumps = 0;
+    if (spin) { spin = 0; a.rot = 0; a.cv.style.transformOrigin = ''; }
+    if (impact > 520 * S) { a.sy = .76; a.sx = 1.24; }
+    if (impact > 950 * S) shout(a, 'thud', 200 * S);
+  };
+
+  /* ---- coins ---- */
+  const spawnCoins = () => {
+    const cands = [];
+    try {
+      for (const e of (boxEl || document).querySelectorAll('a[href],button,.btn,h1,h2,h3,[data-piix-coin]')) {
+        if (e.closest('piix-pal,[data-piixpal]')) continue;
+        const r = e.getBoundingClientRect();
+        if (r.width < 12 || r.height < 6) continue;
+        if (!boxEl && (r.bottom < -innerHeight * .3 || r.top > innerHeight * 1.3)) continue;
+        cands.push(r);
+      }
+    } catch (_) { /* ignore */ }
+    for (let i = cands.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [cands[i], cands[j]] = [cands[j], cands[i]]; }
+    const B = boxEl && rectOf(boxEl);
+    for (const r of cands) {
+      if (coins.length >= nCoins) break;
+      const x = r.left + scrollX + rnd(.2, .8) * r.width;
+      let y = r.top + scrollY - 14 * S;
+      /* not right where Pix is standing: that one would be free */
+      if (Math.abs(x - a.x) < 50 * S && Math.abs(y - a.y) < 60 * S) continue;
+      const c = recruit(a, '_coin');
+      if (B) y = Math.max(y, B.t + c.h + 4);
+      c.x = x; c.y = y; c.play('spin', { fps: rnd(7, 10) });
+      coins.push({ c, x, y, ph: rnd(0, 6.28), t: -1 });
+      crew.push(c);
+    }
+    got = 0; total = coins.length;
+  };
+  const collect = k => {
+    if (k.t >= 0) return;
+    k.t = 0; got++;
+    host.dispatchEvent(new CustomEvent('piix:coin', { bubbles: true, detail: { got, total } }));
+    hudUpdate();
+    if (got === total && total) {
+      happyT = 2.4; a.say('star', 2200);
+      host.dispatchEvent(new CustomEvent('piix:win', { bubbles: true, detail: { total } }));
+      uiAnnounce(`All ${total} coins!`);
+    }
+  };
+
+  /* ---- HUD and touch pad ---- */
+  const hudUpdate = () => {
+    if (!hud) return;
+    hud.querySelector('.n').textContent = total ? (got === total ? `all ${total} coins!` : `${got} / ${total} coins`) : 'free play';
+  };
+  const placeHud = () => {
+    if (!hud) return;
+    /* in a box: top-left of the box; on the page: the bottom-left of the screen */
+    const r = boxEl ? rectOf(boxEl) : { l: origin.x, t: origin.y, r: origin.x + docW(), b: origin.y + innerHeight };
+    if (boxEl) uiAt(hud, r.l + 10, r.t + 10); else uiAt(hud, r.l + 14, r.b - hud.offsetHeight - 14);
+    if (pad) uiAt(pad, r.r - pad.offsetWidth - (boxEl ? 10 : 14), r.b - pad.offsetHeight - (boxEl ? 10 : 14));
+  };
+  const showHud = () => {
+    hud = uiCard({ fixed: !boxEl, attrs: { role: 'group', 'aria-label': 'Pix controls' } });
+    hud.style.padding = '9px 11px';
+    hud.append(
+      uiEl('div', { cls: 'ic', style: 'align-items:center;gap:8px' }, uiIcon('play', 2), uiEl('b', { cls: 'n', text: '' }),
+        uiEl('button', { text: 'Stop', attrs: { type: 'button' }, style: 'margin-left:auto;padding:6px 9px', on: { click: () => me.stop() } })),
+      uiEl('div', { text: '← → run · ↑ jump · ↓ drop · Esc', style: `margin-top:6px;font:600 11px/1 ${UI_MONO};color:#6c6477` })
+    );
+    hudUpdate();
+    if (matchMedia('(pointer: coarse)').matches) {
+      pad = uiCard({ fixed: !boxEl, attrs: { role: 'group', 'aria-label': 'Touch controls' } });
+      pad.style.cssText += ';padding:8px;display:flex;gap:8px;touch-action:none;user-select:none;-webkit-user-select:none';
+      for (const [k, label] of [['l', '◀'], ['r', '▶'], ['u', '▲']]) {
+        const b = uiEl('button', { text: label, attrs: { type: 'button', 'aria-label': { l: 'left', r: 'right', u: 'jump' }[k] }, style: 'width:54px;height:54px;font-size:20px;touch-action:none' });
+        const on = e => { e.preventDefault(); touch[k] = true; if (k === 'u') jumpTap = true; try { b.setPointerCapture(e.pointerId); } catch (_) { /* ignore */ } };
+        const off = () => { touch[k] = false; };
+        b.addEventListener('pointerdown', on); b.addEventListener('pointerup', off); b.addEventListener('pointercancel', off); b.addEventListener('lostpointercapture', off);
+        pad.appendChild(b);
+      }
+    }
+    placeHud();
+  };
+
+  /* ---- start / stop ---- */
+  const me = {
+    get playing() { return playing; },
+    start() {
+      if (playing) return;
+      PIX_PLAYERS.forEach(p => p !== me && p.stop());
+      playing = true;
+      measure(); spawnCoins(); showHud();
+      vy = -JUMP * .55; ground = null; a.say('!', 600);
+      host.dispatchEvent(new CustomEvent('piix:play', { bubbles: true }));
+      uiAnnounce('Playing Pix. Arrow keys to run and jump, Escape to stop.' + (total ? ` ${total} coins to find.` : ''));
+    },
+    stop() {
+      if (!playing) return;
+      playing = false; keys.clear(); for (const k in touch) touch[k] = false;
+      coins.splice(0).forEach(k => k.c.destroy()); crew.length = 0;
+      uiClose(hud); uiClose(pad); hud = pad = null;
+      host.dispatchEvent(new CustomEvent('piix:stop', { bubbles: true, detail: { got, total } }));
+    }
+  };
+  PIX_PLAYERS.add(me);
+  const kd = e => {
+    if (pixEditable(e.target) || e.metaKey || e.ctrlKey || e.altKey) return;
+    const k = PIX_KEYS[e.code];
+    if (!playing) {
+      if (!k || host.getAttribute('play') !== 'keys') return;
+      const r = boxEl ? boxEl.getBoundingClientRect() : null;
+      const seen = r ? r.bottom > 0 && r.top < innerHeight : a.y > scrollY && a.y - a.h < scrollY + innerHeight;
+      if (!seen || [...PIX_PLAYERS].some(p => p.playing)) return;
+      me.start();
+    }
+    if (e.key === 'Escape') { me.stop(); return; }
+    if (!k) return;
+    e.preventDefault();
+    if (k === 'u' && !e.repeat) jumpTap = true;
+    keys.add(k);
+  };
+  const ku = e => { const k = PIX_KEYS[e.code]; if (k) keys.delete(k); };
+  const blur = () => keys.clear();
+  addEventListener('keydown', kd);
+  addEventListener('keyup', ku);
+  addEventListener('blur', blur);
+
+  let gpStart = false, gpJump = false;
+  const gamepad = () => {
+    const gps = navigator.getGamepads ? [...navigator.getGamepads()].filter(Boolean) : [];
+    const g = gps[0];
+    if (!g) return null;
+    const b = i => !!(g.buttons[i] && g.buttons[i].pressed);
+    return { l: g.axes[0] < -.35 || b(14), r: g.axes[0] > .35 || b(15), u: b(0) || b(12), d: g.axes[1] > .6 || b(13), start: b(9) };
+  };
+
+  return {
+    crew,
+    awake: () => playing,
+    start: () => me.start(),
+    stop: () => me.stop(),
+    get playing() { return playing; },
+    tick(dt) {
+      const W0 = world();
+      if (!placed) {
+        const r = surfaceOf(el) || rectOf(el), at = host.getAttribute('at');
+        a.x = clamp(r.l + (r.r - r.l) * (at != null ? clamp(+at, 0, 1) : .5), W0.l, W0.r); a.y = r.t;
+        placed = true; measure(); ground = groundAt(a.x, a.y, W0);
+      }
+      platT -= dt;
+      if (platT <= 0) { measure(); platT = playing ? .25 : .7; }
+
+      /* input: keys, touch pad, gamepad */
+      const gp = gamepad();
+      if (gp && gp.start && !gpStart && !playing) me.start();
+      if (gp && gp.u && !gpJump && playing) jumpTap = true;
+      gpStart = !!(gp && gp.start); gpJump = !!(gp && gp.u);
+      const inp = playing
+        ? { l: keys.has('l') || touch.l || (gp && gp.l), r: keys.has('r') || touch.r || (gp && gp.r), u: keys.has('u') || touch.u || (gp && gp.u), d: keys.has('d') || touch.d || (gp && gp.d) }
+        : {};
+      const tap = jumpTap;
+      jumpTap = false;
+
+      /* run */
+      const dir = (inp.r ? 1 : 0) - (inp.l ? 1 : 0);
+      if (dir) { vx = clamp(vx + dir * (ground ? ACC : AIR) * dt, -RUN, RUN); a.face = dir; }
+      else if (ground) { const dv = DEC * dt; vx = Math.abs(vx) <= dv ? 0 : vx - Math.sign(vx) * dv; }
+      else vx *= Math.exp(-1.5 * dt);
+
+      /* jump: buffered, with coyote time, and one flip in the air */
+      if (tap) buffer = .13;
+      buffer -= dt;
+      coyote = ground ? .09 : coyote - dt;
+      if (buffer > 0 && (coyote > 0 || jumps < 2)) {
+        const first = coyote > 0;
+        vy = -JUMP * (first ? 1 : .86);
+        jumps = first ? 1 : 2; ground = null; coyote = 0; buffer = 0;
+        a.sy = 1.2; a.sx = .84;
+        if (!first) { spin = 1; a.cv.style.transformOrigin = '50% 55%'; }
+      }
+      if (playing && !inp.u && vy < -CUT) vy = -CUT;
+      if (inp.d && ground && !ground.floor) { ground = null; dropT = .24; vy = 60 * S; }
+      dropT -= dt;
+
+      /* move */
+      const y0 = a.y;
+      a.x += vx * dt;
+      if (a.x < W0.l) { a.x = W0.l; vx = 0; }
+      if (a.x > W0.r) { a.x = W0.r; vx = 0; }
+      if (ground) {
+        const p = groundAt(a.x, a.y, W0);
+        if (p) { a.y = p.t; ground = p; } else ground = null;
+      }
+      if (!ground) {
+        vy = Math.min(vy + G * dt, MAXF);
+        a.y += vy * dt;
+        if (a.y - a.h < W0.top) { a.y = W0.top + a.h; vy = Math.max(vy, 0); }
+        if (vy < 0) {
+          /* bonk links and buttons from below; a coin sitting on one pops out */
+          const head = a.y - a.h, head0 = y0 - a.h;
+          for (const b of bumps) {
+            if (b.cool > 0 || a.x < b.l || a.x > b.r || !(b.b <= head0 && b.b >= head)) continue;
+            b.cool = .4;
+            try { b.el.animate([{ transform: 'translateY(0)' }, { transform: `translateY(${-6 * S}px)` }, { transform: 'translateY(0)' }], { duration: 200, easing: 'ease-out' }); } catch (_) { /* old browsers */ }
+            for (const k of coins) if (k.t < 0 && k.x >= b.l - 6 && k.x <= b.r + 6 && k.y <= b.t + 4 && k.y >= b.t - 60 * S) collect(k);
+          }
+        } else {
+          let best = null;
+          for (const p of plats) {
+            if (a.x < p.l - 3 || a.x > p.r + 3) continue;
+            if (dropT > 0 && p.t <= y0 + 8) continue;
+            if (p.t >= y0 - .5 && p.t <= a.y && (!best || p.t < best.t)) best = p;
+          }
+          if (!best && a.y >= W0.floor) best = { t: W0.floor, l: -1e9, r: 1e9, floor: true };
+          if (best) land(best, vy);
+        }
+      }
+      for (const b of bumps) b.cool -= dt;
+
+      /* the camera follows while playing */
+      if (playing && !boxEl) {
+        const sy = a.y - a.h / 2 - scrollY, top = innerHeight * .3, bot = innerHeight * .7;
+        const want = sy < top ? sy - top : sy > bot ? sy - bot : 0;
+        if (Math.abs(want) > 1) pixScrollTo(scrollY + (reduced() ? want : want * Math.min(1, dt * 7)));
+      }
+
+      /* coins: bob, get collected, fly up and fade */
+      for (let i = coins.length - 1; i >= 0; i--) {
+        const k = coins[i];
+        if (k.t < 0) {
+          k.ph += dt * 3;
+          k.c.x = k.x; k.c.y = k.y + Math.sin(k.ph) * 2 * S;
+          if (Math.abs(k.c.x - a.x) < (a.w + k.c.w) * .42 && k.c.y > a.y - a.h - 2 && k.c.y - k.c.h < a.y + 2) collect(k);
+        } else {
+          k.t += dt;
+          k.c.y = k.y - k.t * 120 * S; k.c.play('spin', { fps: 24 });
+          k.c.node.style.opacity = Math.max(0, 1 - k.t / .45).toFixed(2);
+          if (k.t > .45) { k.c.destroy(); coins.splice(i, 1); crew.splice(crew.indexOf(k.c), 1); }
+        }
+      }
+
+      /* look */
+      a.sx = lerp(a.sx, 1, .22); a.sy = lerp(a.sy, 1, .22);
+      if (spin > 0) { spin = Math.max(0, spin - dt * 3.2); a.rot = (1 - spin) * 360 * a.face; if (!spin) { a.rot = 0; a.cv.style.transformOrigin = ''; } }
+      happyT -= dt;
+      if (!ground) a.play(vy < 0 ? 'jump' : 'fall');
+      else if (Math.abs(vx) > 18 * S) a.play('run', { fps: 7 + Math.abs(vx) / RUN * 7 });
+      else if (happyT > 0) a.play('happy');
+      else {
+        a.play('idle');
+        if (!playing && ptr.seen && ptrDist(a.x, a.y - a.h / 2) < 140 * S) a.face = ptr.x < a.x ? -1 : 1;
+      }
+      if (!playing) {
+        hintT -= dt;
+        if (hintT <= 0 && a.near(24 * S)) { a.say('play', 1400); hintT = 4; }
+      }
+      placeHud();
+    },
+    poke() { if (playing) jumpTap = true; else me.start(); },
+    hear(type) { if (type === 'thud' && ground && !playing) { vy = -260 * S; ground = null; } },
+    destroy() {
+      me.stop(); PIX_PLAYERS.delete(me);
+      removeEventListener('keydown', kd); removeEventListener('keyup', ku); removeEventListener('blur', blur);
+    }
+  };
+});
 
 K.start(document.currentScript);
 })();

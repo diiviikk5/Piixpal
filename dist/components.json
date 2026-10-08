@@ -92,5 +92,6 @@
  "toast": "sprite",
  "token": "sprite",
  "ufo": "sprite",
- "wizard": "sprite"
+ "wizard": "sprite",
+ "pix": "power"
 }
