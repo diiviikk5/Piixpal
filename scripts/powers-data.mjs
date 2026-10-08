@@ -272,7 +272,8 @@ export const POWERS = [
     where: "footer",
     uses: "your page itself: stickers stick to the element under them, and stay put in the visitor’s browser",
     support: "every modern browser · mouse, pen and touch",
-    try: "drag a sticker off the sheet onto the box; drag it again to move it, double-click to peel it off"
+    try: "drag a sticker off the sheet onto the box; drag it again to move it, double-click to peel it off",
+    desc: "A sheet of pixel stickers your visitors can peel off and slap anywhere on the page: on a heading, a photo, the footer. Each one gets a proper die-cut white border, lands with a little slap at a jaunty angle, and stays stuck to the element it landed on, even when the layout shifts. It is still there next time they visit. Use the built-in stickers or any sprite from the library."
   }
   // new powers go above this line
 ];
