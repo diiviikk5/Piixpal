@@ -30,3 +30,6 @@ const scoutFace = (rows, by, eyes) => {
   return art.compose(rows, [6, ey + 2, ['p']], [11, ey + 2, ['p']]);
 };
 
+/* boots: standing still, and the three steps of a walk */
+const SCOUT_LEGS = { stand: [[6, 14], [9, 14]], a: [[5, 14], [10, 13]], b: [[7, 14], [8, 14]], c: [[6, 13], [10, 14]] };
+
