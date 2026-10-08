@@ -90,3 +90,71 @@ const tabbyLinks = () => {
   return { els, old: els.map(l => [l.getAttribute('href'), l.getAttribute('type'), l.getAttribute('sizes')]), made };
 };
 
+/* tab: live in the favicon, nap when the tab is hidden, wake up when you're back */
+let tabbyOwner = null;
+defineBehavior('tab', (a, [el], host) => {
+  const S = a.s / 3;
+  const owner = !tabbyOwner;
+  if (owner) tabbyOwner = host;
+  const pal = Object.fromEntries(Object.entries(a.spec.palette));
+  const cv = document.createElement('canvas'); cv.width = cv.height = 32;
+  const g = cv.getContext('2d');
+  const links = owner ? tabbyLinks() : null;
+  const away = host.getAttribute('away') || 'Come back! Tabby misses you';
+  let previews = [];
+  try { previews = host.getAttribute('preview') ? [...document.querySelectorAll(host.getAttribute('preview'))].filter(c => c.getContext) : []; } catch (_) { /* bad selector */ }
+  let face = 'open', faceT = 0, blinkT = rnd(1.5, 4), lookT = rnd(3, 6), key = '', savedTitle = null, wake = 0, hop = 0, zT = 0;
+  let clock = 0;
+  const progress = () => host.hasAttribute('progress') ? scrollY / Math.max(1, document.documentElement.scrollHeight - innerHeight) : null;
+  const paint = (f, z) => {
+    const k = f + (z ? 'z' : '') + (host.hasAttribute('progress') ? Math.round(progress() * 40) : '');
+    if (k === key) return;
+    key = k;
+    tabbyDraw(g, TABBY_ICON[f], pal, progress(), z);
+    if (links) { const url = cv.toDataURL('image/png'); links.els.forEach(l => { l.type = 'image/png'; l.removeAttribute('sizes'); l.href = url; }); }
+    for (const p of previews) { const pg = p.getContext('2d'); pg.imageSmoothingEnabled = false; pg.clearRect(0, 0, p.width, p.height); pg.drawImage(cv, 0, 0, p.width, p.height); }
+  };
+  /* hidden tabs get no animation frames, so naps run on a slow timer */
+  const nap = () => { zT++; paint('sleep', zT % 2); if (zT === 2 && owner) { savedTitle = document.title; document.title = away; } };
+  const onVis = () => {
+    if (document.hidden) { zT = 0; clearInterval(clock); clock = setInterval(nap, 1000); paint('sleep', false); }
+    else {
+      clearInterval(clock);
+      if (savedTitle != null && owner) document.title = savedTitle;
+      if (zT >= 2) { wake = 2.4; hop = .4; a.say('heart', 1400); }
+      savedTitle = null; zT = 0;
+    }
+  };
+  document.addEventListener('visibilitychange', onVis);
+  paint('open');
+
+  return {
+    awake: () => true,
+    tick(dt) {
+      const r = surfaceOf(el) || rectOf(el);
+      const at = host.getAttribute('at') != null ? clamp(+host.getAttribute('at'), 0, 1) : .5;
+      a.x = r.l + a.w / 2 + Math.max(0, (r.r - r.l) - a.w) * at; a.y = r.t;
+      hop = Math.max(0, hop - dt); a.oy = -Math.sin(Math.PI * hop / .4) * 14 * S;
+      if (wake > 0) { wake -= dt; face = 'happy'; a.play('happy'); }
+      else {
+        faceT += dt; blinkT -= dt; lookT -= dt;
+        if (blinkT < 0) { face = 'blink'; if (blinkT < -.15) { blinkT = rnd(2, 5); face = 'open'; } }
+        else if (lookT < 0) { face = pick(['left', 'right']); if (lookT < -1.2) { lookT = rnd(3, 7); face = 'open'; } }
+        else face = 'open';
+        a.play('idle');
+      }
+      paint(face, false);
+    },
+    poke() { wake = 1.2; hop = .4; a.say('heart', 900); },
+    destroy() {
+      clearInterval(clock);
+      document.removeEventListener('visibilitychange', onVis);
+      if (savedTitle != null && owner) document.title = savedTitle;
+      if (links) {
+        if (links.made) links.els[0].remove();
+        else links.els.forEach((l, i) => { const [h, t, s] = links.old[i]; h == null ? l.removeAttribute('href') : l.setAttribute('href', h); t == null ? l.removeAttribute('type') : l.setAttribute('type', t); s == null ? l.removeAttribute('sizes') : l.setAttribute('sizes', s); });
+      }
+      if (owner) tabbyOwner = null;
+    }
+  };
+});
