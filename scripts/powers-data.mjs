@@ -340,7 +340,8 @@ export const POWERS = [
     try: "drag a file from your computer over the box (or pick one)",
     desc: "A pelican for your file drop zone. Drag a file anywhere over the page and Gulp perks up and watches it; bring it over the drop zone and it opens its beak wide; let go and it gulps the file down, pouch bulging, then tells you what it swallowed. Works with a plain file input too.",
     attrs: [["on","the drop zone, or a file input"],["accept","let the zone take drops by itself (leave it off if your code already handles them)"],["at","where it stands on the zone, 0–1"]],
-    events: "piix:gulp { files }"
+    events: "piix:gulp { files }",
+    hab: "<label class=\"h-drop\" id=\"d-drop\">Drop a file here<small>or click to pick one</small><input type=\"file\" multiple></label><piix-pal pal=\"gulp\" on=\"#d-drop\" accept></piix-pal>"
   }
   // new powers go above this line
 ];
