@@ -80,3 +80,93 @@ const crumbPath = (w, h, R, fromRight) => {
   return pts;
 };
 
+/* munch: sit on the banner, then eat it the moment someone clicks one of its buttons */
+defineBehavior('munch', (a, [el], host) => {
+  const S = a.s / 3;
+  let state = 'guard', copy = null, path = [], step = 0, biteT = 0, mask = null, mg = null, leaveT = 0, side = 1, x = null, sniffT = 0;
+  const crumbs = [];
+  const layer = a.node.parentNode;
+  const click = e => {
+    if (state !== 'guard' || !el.contains(e.target)) return;
+    if (!e.target.closest('button,a,[role=button],input[type=submit],input[type=button]')) return;
+    copy = crumbCopy(el);
+    const P = 4, mw = Math.max(1, Math.ceil(copy.w / P)), mh = Math.max(1, Math.ceil(copy.h / P));
+    mask = document.createElement('canvas'); mask.width = mw; mask.height = mh;
+    mg = mask.getContext('2d'); mg.fillStyle = '#000'; mg.fillRect(0, 0, mw, mh);
+    path = crumbPath(copy.w, copy.h, clamp(copy.h * .5, 18, 36), a.x > copy.x + (copy.fixed ? scrollX : 0) + copy.w / 2);
+    step = 0; biteT = 0; state = 'eat';
+    a.say('!', 500);
+  };
+  document.addEventListener('click', click, true);
+  const spot = () => {
+    if (!copy) { const r = rectOf(el); return { x: r.l, y: r.t, w: r.w, h: r.h }; }
+    return { x: copy.x - (copy.fixed ? -scrollX : 0), y: copy.y - (copy.fixed ? -scrollY : 0), w: copy.w, h: copy.h };
+  };
+  const crumb = (cx, cy) => {
+    if (crumbs.length > 40) return;
+    const d = document.createElement('div');
+    const s = Math.round(a.s * rnd(.8, 1.6));
+    d.style.cssText = `position:absolute;left:0;top:0;width:${s}px;height:${s}px;background:${pick(['#d9a066', '#b07a43', '#f3e2c0'])};pointer-events:none`;
+    layer.insertBefore(d, a.node);
+    crumbs.push({ d, x: cx, y: cy, vx: rnd(-80, 80) * S, vy: -rnd(40, 160) * S, life: rnd(.6, 1) });
+  };
+
+  return {
+    awake: () => state !== 'gone',
+    boxed: true,
+    tick(dt) {
+      const sp = spot();
+      if (copy && !copy.fixed) { copy.el.style.left = (copy.x - scrollX) + 'px'; copy.el.style.top = (copy.y - scrollY) + 'px'; }
+      if (state === 'guard') {
+        if (!el.isConnected) { a.node.style.opacity = '0'; return; }
+        const at = host.getAttribute('at') != null ? clamp(+host.getAttribute('at'), 0, 1) : .82;
+        a.x = sp.x + a.w / 2 + Math.max(0, sp.w - a.w) * at; a.y = sp.y; a.face = -1;
+        sniffT -= dt;
+        if (sniffT < 0) { sniffT = rnd(2, 4); if (chance(.4)) a.say(pick(['...', 'heart']), 700); }
+        a.play('idle');
+      } else if (state === 'eat') {
+        /* walk to the next bite and take it */
+        const p = path[Math.min(step, path.length - 1)];
+        const tx = sp.x + p.x, ty = sp.y + p.y;
+        if (x == null) x = a.x;
+        const dx = tx - x;
+        x += clamp(dx, -640 * S * dt, 640 * S * dt);
+        a.x = x; a.y = ty; a.face = dx < 0 ? -1 : 1;
+        biteT -= dt;
+        if (Math.abs(dx) < 4 && biteT <= 0) {
+          biteT = reduced() ? 0 : .03;
+          const R = clamp(sp.h * .5, 18, 36);
+          crumbBite(mg, (tx - sp.x + a.face * 6) / 4, (ty - sp.y) / 4, Math.ceil(R / 4) + 1);
+          if (step % 2 === 0) crumb(tx, ty);
+          step++;
+          if (step >= path.length) {
+            copy.el.remove(); copy = null; state = 'full'; leaveT = 1.6; a.say('heart', 1200);
+            host.dispatchEvent(new CustomEvent('piix:eaten', { bubbles: true }));
+            uiAnnounce('Cookie banner eaten');
+          } else {
+            const url = mask.toDataURL();
+            copy.el.style.maskImage = copy.el.style.webkitMaskImage = `url(${url})`;
+            copy.el.style.maskSize = copy.el.style.webkitMaskSize = '100% 100%';
+          }
+        }
+        a.play(Math.abs(dx) > 6 ? 'walk' : 'chew');
+      } else if (state === 'full') {
+        leaveT -= dt; a.play('full');
+        if (leaveT <= 0) { state = 'leave'; side = a.x > scrollX + docW() / 2 ? 1 : -1; }
+      } else if (state === 'leave') {
+        a.face = side; a.play('walk'); a.x += side * 160 * S * dt;
+        a.y += 30 * S * dt;
+        if (a.x < scrollX - a.w || a.x > scrollX + docW() + a.w) { state = 'gone'; a.node.style.opacity = '0'; }
+      }
+      for (let i = crumbs.length - 1; i >= 0; i--) {
+        const c = crumbs[i];
+        c.life -= dt; c.vy += 900 * S * dt; c.x += c.vx * dt; c.y += c.vy * dt;
+        c.d.style.opacity = Math.max(0, c.life).toFixed(2);
+        c.d.style.transform = `translate3d(${Math.round(c.x - origin.x)}px,${Math.round(c.y - origin.y)}px,0)`;
+        if (c.life <= 0) { c.d.remove(); crumbs.splice(i, 1); }
+      }
+    },
+    poke() { if (state === 'guard') { a.say('heart', 700); a.oy = 0; } },
+    destroy() { document.removeEventListener('click', click, true); if (copy) copy.el.remove(); crumbs.forEach(c => c.d.remove()); }
+  };
+});
