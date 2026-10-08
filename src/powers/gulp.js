@@ -51,3 +51,6 @@ defineSprite('_file', {
   frames: { idle: [['kkkkk...', 'kwwwkk..', 'kwwwkWk.', 'kwwwkkkk', 'kwbbbbwk', 'kwwwwwwk', 'kwbbbbwk', 'kwwwwwwk', 'kwbbwwwk', 'kkkkkkkk']] }
 });
 
+/* a file size people can read */
+const gulpSize = n => n < 1024 ? n + ' B' : n < 1048576 ? Math.round(n / 1024) + ' KB' : (n / 1048576).toFixed(1) + ' MB';
+
