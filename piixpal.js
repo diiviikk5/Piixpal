@@ -6202,6 +6202,122 @@ defineFigure('onigiri', {
   });
 })();
 
+/* ---- powers/buff.js ---- */
+/* BUFF: a password-strength meter that lifts. Buff stands on your password field with a
+ * barbell; the stronger the password, the bigger the plates. Weak ones make it strain
+ * and sweat, strong ones go straight up over its head, and a really good one gets a flex
+ * and a sparkle. It also spots the usual suspects: "password", "qwerty", "1234"…
+ *
+ *   <label>Password <input type="password"><piix-pal pal="buff"></piix-pal></label>
+ *   The field gets data-strength="0…4". Event: piix:strength { score, label } */
+
+/* the lifter: a tall round pink body, a red headband, and two strong little arms */
+const buffBody = (by, arms, eyes) => {
+  let rows = art.paint(18, 19, (x, y) => {
+    const yy = y - by;
+    if (art.ellipse(x, yy, 9, 10.6, 5, 5.6)) return yy === 7 ? 'h' : 'b';
+    if (arms === 'up' && (x === 3 || x === 14) && yy >= 3 && yy <= 10) return 'b';
+    if (arms === 'chest' && ((x >= 2 && x <= 3) || (x >= 14 && x <= 15)) && yy >= 11 && yy <= 13) return 'b';
+    if (arms === 'flex' && (((x === 2 || x === 3) && yy >= 8 && yy <= 11) || (x === 14 && yy >= 3 && yy <= 10))) return 'b';
+    return null;
+  });
+  rows = art.outline(art.volume(rows));
+  const ey = 9 + by;
+  if (eyes === 'strain') rows = art.compose(rows, [6, ey, ['e__', '_ee']], [10, ey, ['__e', 'ee_']]);
+  else if (eyes === 'happy') rows = art.compose(rows, [6, ey, ['_e_', 'e_e']], [10, ey, ['_e_', 'e_e']]);
+  else rows = art.compose(rows, [7, ey, ['e', 'e']], [11, ey, ['e', 'e']]);
+  rows = art.compose(rows, [8, ey + 3, eyes === 'strain' ? ['eee'] : ['e.e', '.e.']]);
+  return art.compose(rows, [6, 17, ['kk', 'kk']], [11, 17, ['kk', 'kk']]);
+};
+
+/* the barbell: a bar, and plates that grow with the score (0 = an empty bar) */
+const buffBar = (rows, y, level, oneHand) => {
+  const plate = [[0, 0], [1, 2], [2, 3], [2, 4], [3, 5]][level];
+  const x0 = oneHand ? 7 : 0, x1 = 17;
+  for (let x = x0; x <= x1; x++) rows = art.put(rows, x, y, ['q']);
+  if (plate[0]) {
+    const pw = plate[0], ph = plate[1], top = y - Math.floor(ph / 2);
+    for (const px of [x0, x1 - pw + 1]) for (let dy = 0; dy < ph; dy++) rows = art.put(rows, px, top + dy, ['P'.repeat(pw)]);
+  }
+  return rows;
+};
+
+/* one pose: bar at the belly, overhead, shaking, or a one-armed flex */
+const buffPose = (level, pose) => {
+  if (pose === 'chest') return buffBar(buffBody(0, 'chest', 'open'), 13, level);
+  if (pose === 'strain') return buffBar(buffBody(0, 'chest', 'strain'), 12, level);
+  if (pose === 'lift') return buffBar(buffBody(0, 'up', 'open'), 2, level);
+  return buffBar(buffBody(0, 'flex', 'happy'), 2, level, true);
+};
+
+/* Buff: for each strength, a resting pose and a lifting one */
+defineSprite('buff', {
+  w: 18, h: 19, scale: 3, does: 'strength',
+  palette: { k: '#17121f', b: '#ff9a8a', d: '#d9705f', B: '#ffd0c7', h: '#ff4d6d', e: '#17121f', q: '#7d768a', P: '#3a3247' },
+  frames: Object.assign({}, ...[0, 1, 2, 3, 4].map(l => ({
+    ['rest' + l]: [buffPose(l, 'chest')],
+    ['lift' + l]: l <= 1 ? [buffPose(l, 'strain'), buffPose(l, 'chest')] : l === 4 ? [buffPose(l, 'flex'), buffPose(l, 'lift')] : [buffPose(l, 'chest'), buffPose(l, 'lift')]
+  }))),
+  fps: Object.fromEntries([0, 1, 2, 3, 4].map(l => ['lift' + l, [10, 9, 2.4, 3.4, 2][l]]))
+});
+
+/* passwords everybody tries first */
+const BUFF_COMMON = ['password', '123456', 'qwerty', 'letmein', 'iloveyou', 'admin', 'welcome', 'monkey', 'dragon', 'football', 'abc123', '111111', 'sunshine', 'princess', 'passw0rd', 'master', 'hello', 'freedom', 'whatever', 'trustno1', 'starwars', 'login', 'baseball', 'shadow'];
+
+/* how strong a password is, 0 (nothing yet) to 4 (beast) */
+const buffScore = pw => {
+  if (!pw) return 0;
+  const low = pw.toLowerCase();
+  if (pw.length < 14 && BUFF_COMMON.some(c => low.includes(c))) return 1;
+  const kinds = [/[a-z]/, /[A-Z]/, /\d/, /[^A-Za-z0-9]/].filter(r => r.test(pw)).length;
+  let s = 0;
+  if (pw.length >= 8) s++;
+  if (pw.length >= 12) s++;
+  if (pw.length >= 16) s++;
+  if (kinds >= 3) s++;
+  if (kinds === 4 && pw.length >= 10) s++;
+  if (/(.)\1\1/.test(pw)) s--;
+  if (/0123|1234|2345|3456|4567|5678|6789|abcd|bcde|cdef|qwer|asdf|zxcv/i.test(pw)) s--;
+  return clamp(s, 1, 4);
+};
+const BUFF_LABELS = ['', 'weak', 'okay', 'strong', 'beast'];
+
+/* strength: lift whatever this password is worth */
+defineBehavior('strength', (a, [el], host) => {
+  const S = a.s / 3;
+  const field = el.matches && el.matches('input') ? el : el.querySelector('input[type=password],input') || el;
+  let score = 0, shown = -1, talkT = 0, shake = 0;
+  const update = () => {
+    score = buffScore(field.value || '');
+    field.setAttribute('data-strength', String(score));
+    if (score !== shown) {
+      if (score > shown && score >= 3) a.say(score === 4 ? 'star' : 'heart', 900);
+      else if (score === 1) a.say('sweat', 900);
+      shown = score;
+      host.dispatchEvent(new CustomEvent('piix:strength', { bubbles: true, detail: { score, label: BUFF_LABELS[score] } }));
+      clearTimeout(talkT);
+      talkT = setTimeout(() => { if (score) uiAnnounce('Password strength: ' + BUFF_LABELS[score]); }, 700);
+    }
+  };
+  field.addEventListener('input', update);
+  update();
+
+  return {
+    get score() { return score; },
+    tick(dt) {
+      const r = rectOf(field);
+      const at = host.getAttribute('at') != null ? clamp(+host.getAttribute('at'), 0, 1) : .9;
+      a.x = r.l + a.w / 2 + Math.max(0, r.w - a.w) * at; a.y = r.t;
+      const typing = document.activeElement === field && field.value;
+      a.play(typing || score === 4 ? 'lift' + score : 'rest' + score);
+      shake = score === 1 && typing ? rnd(-1, 1) * S : 0;
+      a.ox = shake;
+    },
+    poke() { a.say(score ? 'heart' : '?', 700); },
+    destroy() { field.removeEventListener('input', update); clearTimeout(talkT); }
+  };
+});
+
 /* ---- powers/bulb.js ---- */
 /* BULB: a pull-chain light switch for dark mode. A beaded chain hangs from the top of
  * the screen with a little bulb on the end. Pull it down and let go (or just click it):
@@ -6445,7 +6561,7 @@ const crumbShape = (by, full) => art.outline(art.volume(art.paint(16, 11, (x, y)
 const crumbFace = (rows, by, { nose = 0, chew = false, eyes = 'open' }) => {
   rows = art.compose(rows, [9, 2 + by, ['pp', 'p']], [14, 5 + by - nose, ['p']]);
   if (eyes === 'open') rows = art.put(rows, 12, 4 + by, ['e', 'e']);
-  else if (eyes === 'happy') rows = art.compose(rows, [11, 5 + by, ['e.e']], [12, 4 + by, ['e']]);
+  else if (eyes === 'happy') rows = art.compose(rows, [11, 5 + by, ['e_e']], [12, 4 + by, ['e']]);
   else rows = art.put(rows, 11, 5 + by, ['ee']);
   return chew ? art.compose(rows, [12, 6 + by, ['BB']], [13, 7 + by, ['e']]) : rows;
 };
@@ -6623,7 +6739,7 @@ const droneShape = (fast, blink, shut) => {
   rows = art.compose(rows, [2, 2, ['k']], [15, 2, ['k']]);
   rows = art.compose(rows, fast ? [0, 1, ['rrrrr']] : [1, 1, ['rrr']], fast ? [13, 1, ['rrrrr']] : [14, 1, ['rrr']]);
   rows = art.compose(rows, blink ? [7, 5, ['kkk', '___']] : [7, 5, ['eew', 'eee']], [11, 4, [blink ? 'k' : 'g']]);
-  return art.compose(rows, shut ? [7, 9, ['k..k', '.kk.']] : [6, 9, ['k....k', 'k....k']]);
+  return art.compose(rows, shut ? [7, 9, ['k__k', '_kk_']] : [6, 9, ['k____k', 'k____k']]);
 };
 
 /* Drone: rotors always spinning, a blink now and then, claws open or holding on */
@@ -6815,7 +6931,7 @@ defineBehavior('cart', (a, [cart], host) => {
       [17, ty + 2, ['n']],                                                                     /* nose */
       [11, 6 + by, ['r', 'r']], [12, 7 + by, ['y']]);                                         /* collar + tag */
     if (face === 'open') rows = art.put(rows, 14, ty + 1, ['e']);
-    if (face === 'happy') rows = art.compose(rows, [13, ty + 1, ['e.e']], [14, ty, ['e']], [15, ty + 4, ['p', 'p']]);
+    if (face === 'happy') rows = art.compose(rows, [13, ty + 1, ['e_e']], [14, ty, ['e']], [15, ty + 4, ['p', 'p']]);
     if (face === 'squint') rows = art.put(rows, 13, ty + 1, ['ee']);
     return rows;
   };
@@ -7128,7 +7244,7 @@ const gistFace = (rows, by, look, glasses) => {
   else if (look === 'happy') rows = art.compose(rows, [3, 4 + by, ['_e_', 'e_e']], [7, 4 + by, ['_e_', 'e_e']]);
   else rows = art.compose(rows, [3 + px, 4 + by, ['e', 'e']], [7 + px, 4 + by, ['e', 'e']]);
   if (glasses) rows = art.compose(rows, [2, 3 + by, ['kkkkkkkkkk']], [2, 6 + by, ['k___k_k___k']]);
-  return art.compose(rows, [5, 13, ['Y.Y']]);
+  return art.compose(rows, [5, 13, ['Y_Y']]);
 };
 
 /* Gist: blinks, skims (eyes darting), thinks, and presents with its glasses on */
@@ -7344,9 +7460,9 @@ const hatchPaint = (G, { eyes = 'open', by = 0, step = 0, whites = false }) => {
   if (whites) rows = art.compose(rows, [l, ey, ['ww', 'ww'].slice(0, 2)], [rx, ey, ['ww', 'ww'].slice(0, 2)]);
   else if (eyes === 'open') rows = art.compose(rows, [l, ey, G.bigEyes ? ['we', 'ee'] : ['e', 'e']], [rx + (G.bigEyes ? 0 : 1), ey, G.bigEyes ? ['we', 'ee'] : ['e', 'e']]);
   else if (eyes === 'shut') rows = art.compose(rows, [l, ey + eh, ['ee']], [rx, ey + eh, ['ee']]);
-  else if (eyes === 'happy') rows = art.compose(rows, [l, ey, ['.e.', 'e.e'].map(s => s.slice(0, 3))].map((v, i) => i === 0 ? l - 0 : v), [rx, ey, ['.e.', 'e.e']]);
+  else if (eyes === 'happy') rows = art.compose(rows, [l, ey, ['_e_', 'e_e'].map(s => s.slice(0, 3))].map((v, i) => i === 0 ? l - 0 : v), [rx, ey, ['_e_', 'e_e']]);
   const my = ey + 2 + (G.bigEyes ? 1 : 0);
-  const M = { smile: [[7, my, ['e..e', '.ee.']]], cat: [[6, my, ['e.e.e', '.e.e.']]], fang: [[7, my, ['eeee', '.w..']]], o: [[7, my, ['.e', 'e.e'.slice(0, 2)]]], none: [] }[G.mouth];
+  const M = { smile: [[7, my, ['e__e', '_ee_']]], cat: [[6, my, ['e_e_e', '_e_e_']]], fang: [[7, my, ['eeee', '_w__']]], o: [[7, my, ['_e', 'e_e'.slice(0, 2)]]], none: [] }[G.mouth];
   rows = art.compose(rows, ...M);
   if (G.mark === 'blush' || G.mark === 'belly') rows = art.compose(rows, [l - 1, my, ['p']], [rx + 2, my, ['p']]);
   /* feet: together, or one lifted for a step */
@@ -7507,6 +7623,97 @@ class PiixAvatarElement extends PiixSpriteElement {
 }
 define('piix-avatar', PiixAvatarElement);
 ELEMENTS.avatar = 'piix-avatar';
+
+/* ---- powers/meh.js ---- */
+/* MEH: a face for your feedback slider. Meh rides the thumb of a range input (or sits on
+ * your star rating) and its face follows the value: furious at the bottom, meh in the
+ * middle, over the moon at the top, with steam, a tear, a blush or little hearts.
+ *
+ *   <input type="range" min="0" max="10"><piix-pal pal="meh"></piix-pal>
+ *   on="#stars"   or a group of radio buttons (star ratings), or a <select>
+ *   Event: piix:mood { value, level }  (level 0…10) */
+
+/* the face's skin: cross red at the bottom, sunny yellow in the middle, happy green at the top */
+const MEH_SKIN = level => level <= 2 ? ['x', 'X', 'y'] : level >= 8 ? ['g', 'G', 'h'] : ['b', 'd', 'B'];
+
+/* one face for one level: a round head, brows, eyes and a mouth that bends with the mood */
+const mehFace = level => {
+  const k = level / 10;
+  const [body, shade, light] = MEH_SKIN(level);
+  let rows = art.outline(art.volume(art.paint(14, 13, (x, y) => art.ellipse(x, y, 7, 6.6, 6.2, 5.8) ? body : null), body, shade, light));
+  /* brows: angry slants low down, worried in the middle, raised up high */
+  if (level <= 2) rows = art.compose(rows, [3, 3, ['ee_']], [3, 4, ['__e']], [9, 3, ['_ee']], [9, 4, ['e__']]);
+  else if (level >= 8) rows = art.compose(rows, [3, 2, ['_ee']], [9, 2, ['ee_']]);
+  /* eyes: shut tight, open, or hearts at the very top */
+  if (level === 10) rows = art.compose(rows, [3, 4, ['r_r', 'rrr', '_r_']], [8, 4, ['r_r', 'rrr', '_r_']]);
+  else if (level === 0) rows = art.compose(rows, [3, 5, ['eee']], [8, 5, ['eee']]);
+  else rows = art.compose(rows, [4, 5, ['e', 'e']], [9, 5, ['e', 'e']]);
+  /* the mouth: a frown, a flat line, a smile, a big open grin */
+  const M = level <= 1 ? ['.eeee.', 'e....e'] : level <= 3 ? ['..ee..', '.e..e.'] : level <= 6 ? ['.eeee.'] : level <= 8 ? ['e....e', '.eeee.'] : ['eeeeee', 'eppppe', '.eeee.'];
+  rows = art.compose(rows, [4, 8, M]);
+  if (level >= 7) rows = art.compose(rows, [2, 7, ['p']], [11, 7, ['p']]);
+  if (level === 0) rows = art.compose(rows, [12, 6, ['t', 't']]);
+  return rows;
+};
+
+/* Meh: eleven faces, plus a little bounce at both ends */
+defineSprite('meh', {
+  w: 14, h: 13, scale: 3, does: 'mood',
+  palette: { k: '#17121f', b: '#ffd84d', d: '#d9a52a', B: '#fff1a8', x: '#ff8a6a', X: '#d9583c', y: '#ffc2ae', g: '#a6e35c', G: '#76b52f', h: '#dcf7b0', e: '#17121f', p: '#ff7a9a', r: '#ff4d6d', t: '#58c8ff' },
+  frames: Object.fromEntries(Array.from({ length: 11 }, (_, i) => ['m' + i, [mehFace(i)]]))
+});
+
+/* read the value as 0…1 from a slider, a set of radio buttons, or a select */
+const mehValue = (el, radios) => {
+  if (el.type === 'range') { const lo = +el.min || 0, hi = el.max === '' ? 100 : +el.max; return clamp(((+el.value) - lo) / ((hi - lo) || 1), 0, 1); }
+  if (el.tagName === 'SELECT') return el.options.length > 1 ? el.selectedIndex / (el.options.length - 1) : 0;
+  const i = radios.findIndex(r => r.checked);
+  return i < 0 ? .5 : radios.length > 1 ? i / (radios.length - 1) : 1;
+};
+
+/* where to sit: on the slider's thumb, on the checked star, or on the select */
+const mehSpot = (el, radios, v) => {
+  if (el.type === 'range') { const r = rectOf(el), thumb = 18; return { x: r.l + thumb / 2 + (r.w - thumb) * v, y: r.t + r.h * .2 }; }
+  const on = radios.find(r => r.checked);
+  const r = rectOf(on ? (on.closest('label') || on) : el);
+  return { x: r.l + r.w / 2, y: r.t };
+};
+
+/* mood: wear the face that matches the value, and ride along with it */
+defineBehavior('mood', (a, [el], host) => {
+  const S = a.s / 3;
+  const input = el.matches && el.matches('input,select') ? el : el.querySelector('input[type=range],select') || el;
+  const radios = [...el.querySelectorAll('input[type=radio]')];
+  let level = -1, hop = 0, x = null;
+  const read = () => {
+    const v = mehValue(input, radios), L = Math.round(v * 10);
+    if (L !== level) {
+      if (level >= 0 && Math.abs(L - level) >= 3) hop = .3;
+      if (L === 10) a.say('heart', 900); else if (L === 0) a.say('vein', 900);
+      level = L;
+      a.cv.style.filter = '';
+      host.dispatchEvent(new CustomEvent('piix:mood', { bubbles: true, detail: { value: v, level: L } }));
+    }
+    return v;
+  };
+  const evs = ['input', 'change'];
+  evs.forEach(ev => (radios.length ? el : input).addEventListener(ev, read));
+
+  return {
+    tick(dt) {
+      const v = read(), p = mehSpot(input, radios, v);
+      x = x == null || reduced() ? p.x : lerp(x, p.x, 1 - Math.exp(-14 * dt));
+      a.x = x; a.y = p.y;
+      hop = Math.max(0, hop - dt);
+      a.oy = -Math.sin(Math.PI * hop / .3) * 12 * S;
+      a.play('m' + level);
+      /* tilt with the slider's direction of travel */
+      a.rot = clamp((p.x - x) * .4, -12, 12);
+    },
+    poke() { hop = .3; a.say(level >= 5 ? 'heart' : '...', 700); },
+    destroy() { evs.forEach(ev => (radios.length ? el : input).removeEventListener(ev, read)); }
+  };
+});
 
 /* ---- powers/nomad.js ---- */
 /* NOMAD: a little traveller who walks between your browser windows. Open your site in two
@@ -7691,7 +7898,7 @@ defineBehavior('roam', (a, targets, host) => {
     });
     rows = art.outline(rows);
     rows = art.compose(rows, [12 + hx, 2 + hy, ['o']], [14 + hx, 3 + hy, ['bb']]);
-    if (feet) rows = art.compose(rows, [6, 10, ['f..f']], [6, 11, ['f..f']]);
+    if (feet) rows = art.compose(rows, [6, 10, ['f__f']], [6, 11, ['f__f']]);
     return rows;
   };
   const PAL = { k: '#17121f', g: '#9aa3b5', G: '#6c7590', w: '#d4d9e4', t: '#33b89a', v: '#8a5fc4', o: '#ff9a2f', b: '#3a3f4f', f: '#ff8fa3' };
@@ -8280,7 +8487,7 @@ defineBehavior('player', (a, [el], host) => {
       return null;
     });
     rows = art.outline(rows);
-    rows = art.compose(rows, [11, 3, ['gg']], [10, 9, ['k..k']], [10, 10, ['k..k']]);
+    rows = art.compose(rows, [11, 3, ['gg']], [10, 9, ['k__k']], [10, 10, ['k__k']]);
     rows = art.compose(rows, prop ? [20, 3, ['p', 'p', 'k', 'p', 'p', 'p']] : [20, 5, ['p', 'k', 'p']]);
     return rows;
   };
@@ -8410,7 +8617,7 @@ const pollyShape = (by, open, wings) => art.outline(art.paint(13, 15, (x, y) => 
 /* its eye and feet */
 const pollyFace = (rows, by, eyes) => {
   rows = eyes === 'shut' ? art.put(rows, 8, 3 + by, ['ee']) : eyes === 'happy' ? art.compose(rows, [8, 3 + by, ['_e_', 'e_e']]) : art.compose(rows, [8, 3 + by, ['we']]);
-  return art.compose(rows, [5, 13, ['o.o']], [5, 14, ['o.o']]);
+  return art.compose(rows, [5, 13, ['o_o']], [5, 14, ['o_o']]);
 };
 
 /* Polly: perches, talks (beak open and shut), flaps up to the next word */
@@ -8837,7 +9044,7 @@ const sproutPot = (eyes = 'open') => {
     return null;
   });
   rows = art.outline(rows);
-  const E = { open: [[5, 16, ['e']], [10, 16, ['e']]], shut: [[5, 17, ['e']], [10, 17, ['e']]], happy: [[4, 16, ['.e.', 'e.e']].map((v, i) => i === 0 ? 4 : v), [9, 16, ['.e.', 'e.e']]], up: [[6, 15, ['e']], [11, 15, ['e']]] }[eyes];
+  const E = { open: [[5, 16, ['e']], [10, 16, ['e']]], shut: [[5, 17, ['e']], [10, 17, ['e']]], happy: [[4, 16, ['_e_', 'e_e']].map((v, i) => i === 0 ? 4 : v), [9, 16, ['_e_', 'e_e']]], up: [[6, 15, ['e']], [11, 15, ['e']]] }[eyes];
   return art.compose(rows, ...E, [4, 17, ['p']], [11, 17, ['p']], [7, 18, ['ee']]);
 };
 
@@ -8848,8 +9055,8 @@ const sproutPlant = (rows, stage, sway) => {
     [[7, 12, ['gg']]],
     [[8, 10, ['g', 'g']], [6 + s, 9, ['ll']], [9 + s, 9, ['ll']]],
     [[8, 6, ['g', 'g', 'g', 'g', 'g', 'g']], [5 + s, 9, ['lll']], [9 + s, 8, ['lll']], [6 + s, 6, ['ll']], [9 + s, 5, ['ll']]],
-    [[8, 4, ['g', 'g', 'g', 'g', 'g', 'g', 'g', 'g']], [5 + s, 9, ['lll']], [9 + s, 8, ['lll']], [6 + s, 6, ['ll']], [9 + s, 5, ['ll']], [7 + s, 1, ['.b.', 'bbb', 'bbb']]],
-    [[8, 4, ['g', 'g', 'g', 'g', 'g', 'g', 'g', 'g']], [5 + s, 9, ['lll']], [9 + s, 8, ['lll']], [6 + s, 6, ['ll']], [9 + s, 5, ['ll']], [6 + s, 0, ['.f.f.', 'ffyff', '.fff.', '..f..']]]
+    [[8, 4, ['g', 'g', 'g', 'g', 'g', 'g', 'g', 'g']], [5 + s, 9, ['lll']], [9 + s, 8, ['lll']], [6 + s, 6, ['ll']], [9 + s, 5, ['ll']], [7 + s, 1, ['_b_', 'bbb', 'bbb']]],
+    [[8, 4, ['g', 'g', 'g', 'g', 'g', 'g', 'g', 'g']], [5 + s, 9, ['lll']], [9 + s, 8, ['lll']], [6 + s, 6, ['ll']], [9 + s, 5, ['ll']], [6 + s, 0, ['_f_f_', 'ffyff', '_fff_', '__f__']]]
   ][stage];
   return art.compose(rows, ...parts);
 };
@@ -9018,6 +9225,75 @@ defineBehavior('desk', (a, [el], host) => {
     },
     poke() { /* opening happens on click */ },
     destroy() { close(); removeEventListener('keydown', esc); a.cv.removeEventListener('click', open); if (pip) try { pip.close(); } catch (_) { /* gone */ } }
+  };
+});
+
+/* ---- powers/squish.js ---- */
+/* SQUISH: a marshmallow that minds your character limit. It sits on the corner of a text
+ * box, perfectly comfy, until the text gets near the limit; then it starts getting
+ * squashed, sweats, shows how many characters are left, and at the limit it's flat as a
+ * pancake. Delete a few and it pops back up.
+ *
+ *   <textarea maxlength="140"></textarea><piix-pal pal="squish"></piix-pal>
+ *   limit="280"   if the field has no maxlength
+ *   Event: piix:limit { length, limit, left } */
+
+/* the marshmallow: a soft pink-white cube with a face */
+const squishShape = (face, color = 'b') => {
+  let rows = art.outline(art.volume(art.paint(13, 12, (x, y) => art.rrect(x, y, 1, 1, 11, 10, 3) ? color : null), color, color === 'b' ? 'd' : 'D', color === 'b' ? 'B' : 'R'));
+  const F = {
+    calm: [[4, 4, ['e___e']], [5, 7, ['eee']]],
+    worry: [[4, 4, ['e___e']], [5, 7, ['_e_']], [10, 2, ['t', 't']]],
+    panic: [[3, 4, ['e_e_e_e'].map(s => s.slice(0, 7))], [4, 5, ['_e___e'.slice(0, 6)]], [5, 7, ['eee', 'e_e']], [10, 2, ['t', 't']], [1, 3, ['t']]],
+    flat: [[3, 5, ['ee___ee']], [5, 7, ['eee']]]
+  }[face];
+  return art.compose(rows, ...F, [2, 6, ['p']], [10, 6, ['p']]);
+};
+
+/* Squish: comfy, worried, panicking, and flattened */
+defineSprite('squish', {
+  w: 13, h: 12, scale: 3, does: 'limit',
+  palette: { k: '#17121f', b: '#fff0f4', d: '#f2c2cf', B: '#ffffff', r: '#ff8fa3', D: '#e5637e', R: '#ffc4cf', e: '#17121f', p: '#ff9fb5', t: '#58c8ff' },
+  frames: { calm: [squishShape('calm')], worry: [squishShape('worry')], panic: [squishShape('panic', 'r')], flat: [squishShape('flat', 'r')] }
+});
+
+/* limit: get squashed as the text gets near its limit */
+defineBehavior('limit', (a, [el], host) => {
+  const S = a.s / 3;
+  const field = el.matches && el.matches('textarea,input') ? el : el.querySelector('textarea,input') || el;
+  const max = () => +host.getAttribute('limit') || (field.maxLength > 0 ? field.maxLength : 280);
+  let squash = 0, warned = 0, lastLeft = null;
+  const update = () => {
+    const len = (field.value || '').length, lim = max(), left = lim - len;
+    if (left !== lastLeft) {
+      lastLeft = left;
+      host.dispatchEvent(new CustomEvent('piix:limit', { bubbles: true, detail: { length: len, limit: lim, left } }));
+      /* tell screen readers at a few points, not on every key */
+      const step = left <= 0 ? 3 : left <= lim * .05 ? 2 : left <= lim * .2 ? 1 : 0;
+      if (step > warned) uiAnnounce(left <= 0 ? 'Character limit reached' : `${left} characters left`);
+      warned = step;
+    }
+    return { len, lim, left };
+  };
+  field.addEventListener('input', update);
+
+  return {
+    tick(dt) {
+      const r = rectOf(field);
+      a.x = r.r - a.w * .7; a.y = r.t + 2 * S;
+      const { len, lim, left } = update();
+      const k = len / lim;
+      /* squashed from 60% full, flat at 100% */
+      const want = clamp((k - .6) / .4, 0, 1);
+      squash = reduced() ? want : lerp(squash, want, 1 - Math.exp(-10 * dt));
+      a.sy = 1 - squash * .62; a.sx = 1 + squash * .55;
+      a.play(k >= 1 ? 'flat' : k >= .9 ? 'panic' : k >= .7 ? 'worry' : 'calm');
+      if (k >= .8 && document.activeElement === field) { if (!a._lastSaid || a._lastSaid !== left) { a.say('#' + Math.max(0, left), 0); a._lastSaid = left; } }
+      else if (a._lastSaid != null) { a.hush(); a._lastSaid = null; }
+      a.ox = k >= 1 ? rnd(-1, 1) * S : 0;
+    },
+    poke() { a.say('heart', 700); },
+    destroy() { field.removeEventListener('input', update); }
   };
 });
 
@@ -9239,10 +9515,10 @@ const tabbyEyes = (rows, oy, eyes) => {
     left: [[4, y, ['we', 'ee']], [10, y, ['we', 'ee']]],
     right: [[5, y, ['ew', 'ee']], [11, y, ['ew', 'ee']]],
     blink: [[4, y + 1, ['ee']], [10, y + 1, ['ee']]],
-    sleep: [[4, y + 1, ['e..e', '.ee.']].map((v, i) => i === 0 ? 3 : v), [10, y + 1, ['e..e', '.ee.']]],
-    happy: [[4, y, ['.ee.', 'e..e']].map((v, i) => i === 0 ? 3 : v), [10, y, ['.ee.', 'e..e']]]
+    sleep: [[4, y + 1, ['e__e', '_ee_']].map((v, i) => i === 0 ? 3 : v), [10, y + 1, ['e__e', '_ee_']]],
+    happy: [[4, y, ['_ee_', 'e__e']].map((v, i) => i === 0 ? 3 : v), [10, y, ['_ee_', 'e__e']]]
   }[eyes];
-  return art.compose(rows, ...E, [7, 11 + oy, ['pp']], [6, 12 + oy, ['e..e']], [7, 13 + oy, ['ee']]);
+  return art.compose(rows, ...E, [7, 11 + oy, ['pp']], [6, 12 + oy, ['e__e']], [7, 13 + oy, ['ee']]);
 };
 
 /* the loaf: a round little body tucked under the head, and a tail that flicks */
