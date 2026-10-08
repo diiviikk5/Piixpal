@@ -247,7 +247,8 @@ class PiixAvatarElement extends PiixSpriteElement {
   _figureName() {
     const seed = this.getAttribute('seed') || 'piixpal', name = 'seed:' + seed;
     if (!FIGURES[name]) defineFigure(name, hatchFigure(seed));
-    if (!this.hasAttribute('aria-label') && !this.hasAttribute('aria-hidden')) this.setAttribute('aria-label', FIGURES[name].petName);
+    /* named after its creature, and renamed when the seed changes (unless you named it yourself) */
+    if ((!this.hasAttribute('aria-label') || this._autoLabel) && !this.hasAttribute('aria-hidden')) { this.setAttribute('aria-label', FIGURES[name].petName); this._autoLabel = true; }
     return name;
   }
 }
