@@ -262,6 +262,14 @@ export const POWERS = [
     events: "piix:gem { hunt, found, total }, piix:hunt-done { hunt, reward }",
     hab: "<button type=\"button\" class=\"h-btn\" style=\"position:absolute;right:20px;top:20px\" onclick=\"document.querySelectorAll('#gem piix-pal').forEach(p => p.ctl && p.ctl.reset())\">Hide them again</button><h4 class=\"lv-h\" id=\"d-gem1\" style=\"position:absolute;left:24px;top:40px;margin:0\">Treasure</h4><p class=\"h-line\" id=\"d-gem2\" style=\"bottom:auto;top:110px\">Gems hide on headings, on lines of text, on buttons, anywhere.</p><div class=\"h-btns\" style=\"bottom:70px\"><span class=\"h-btn\" id=\"d-gem3\">A button</span></div><piix-pal pal=\"gem\" hunt=\"docs\" gem=\"1\" total=\"3\" reward=\"PIXPAL\" on=\"#d-gem1\" at=\".9\"></piix-pal><piix-pal pal=\"gem\" hunt=\"docs\" gem=\"2\" total=\"3\" color=\"#ff4d6d\" on=\"#d-gem2\" at=\".7\"></piix-pal><piix-pal pal=\"gem\" hunt=\"docs\" gem=\"3\" total=\"3\" color=\"#7bd63a\" on=\"#d-gem3\" at=\".2\"></piix-pal>",
     code: "<!-- one per gem, on any pages you like -->\n<piix-pal pal=\"gem\" hunt=\"launch\" gem=\"1\" total=\"5\"\n  reward=\"PIX10\"></piix-pal>"
+  },
+  {
+    id: "stickers",
+    fam: "play",
+    accent: "var(--coral)",
+    kind: "element",
+    tag: "piix-stickers",
+    where: "footer"
   }
   // new powers go above this line
 ];
