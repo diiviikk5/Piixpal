@@ -244,6 +244,15 @@ export const POWERS = [
     attrs: [["seed","any word; same word, same creature"],["size","width in px (default 64)"],["render","pixel, dots, halftone, dither, ascii or voxel"],["look","mouse, wander or none"]],
     hab: "<div class=\"h-comments\"><div class=\"h-c\"><piix-avatar seed=\"mia\" size=\"40\"></piix-avatar><p><b>mia</b> These little guys are so good.</p></div><div class=\"h-c\"><piix-avatar seed=\"sam\" size=\"40\"></piix-avatar><p><b>sam</b> Mine has horns!</p></div><div class=\"h-c\"><piix-avatar id=\"d-av\" seed=\"you\" size=\"40\" render=\"voxel\"></piix-avatar><input class=\"h-search\" style=\"position:static;width:220px\" aria-label=\"Your name\" placeholder=\"type your name…\" oninput=\"document.getElementById('d-av').setAttribute('seed', this.value.trim() || 'you')\"></div></div>",
     code: "<div class=\"comment\">\n  <piix-avatar seed=\"mia\" size=\"40\"></piix-avatar>\n  <p><b>mia</b> Hello!</p>\n</div>"
+  },
+  {
+    id: "gem",
+    fam: "play",
+    accent: "var(--sky)",
+    kind: "pal",
+    does: "hunt",
+    where: "footer",
+    query: "hunt=launch&gem=1&total=5"
   }
   // new powers go above this line
 ];
