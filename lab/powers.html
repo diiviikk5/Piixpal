@@ -43,6 +43,22 @@
 <piix-pal pal="bulb" at=".95"></piix-pal>
 <div class="stage" id="sky"><h3 style="top:120px;font-size:64px">Let it snow</h3><p style="top:240px;left:40px">Weather settles on the real shape of the letters.</p><piix-weather kind="snow" amount="2"></piix-weather></div>
 <div class="stage" id="fall"><h3 style="top:120px;font-size:64px">Autumn leaves</h3><piix-weather kind="leaves" amount="2"></piix-weather></div>
+<style>
+  .shop .cart{position:absolute;right:20px;top:16px;display:flex;align-items:center;gap:8px;padding:8px 12px;border:2px solid #16111f;border-radius:10px;background:#fff;font-weight:700}
+  .shop .cart b{display:grid;place-items:center;min-width:22px;height:22px;border-radius:11px;background:#ff6b4a;color:#fff;font-size:12px}
+  .shop .prods{position:absolute;left:20px;right:20px;bottom:20px;display:flex;gap:16px}
+  .shop .prod{flex:1;display:grid;gap:8px;justify-items:center;padding:12px;border:2px solid #16111f;border-radius:12px;background:#fff}
+  .shop .prod img{width:72px;height:72px;image-rendering:pixelated;border-radius:8px}
+</style>
+<div class="stage shop" id="shop">
+  <span class="cart" id="cart">Cart <b class="count">0</b></span>
+  <div class="prods">
+    <div class="prod" data-product><img src="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%2016'%20shape-rendering%3D'crispEdges'%3E%3Crect%20width%3D'16'%20height%3D'16'%20fill%3D'%23fff3d6'%2F%3E%3Cpath%20fill%3D'%23ff4d6d'%20d%3D'M4%203h3v1h2V3h3l3%203-2%202-1-1v7H5V7L4%208%202%206z'%2F%3E%3C%2Fsvg%3E" alt="Pixel tee"><button class="add-to-cart" type="button">Add tee</button></div>
+    <div class="prod" data-product><img src="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%2016'%20shape-rendering%3D'crispEdges'%3E%3Crect%20width%3D'16'%20height%3D'16'%20fill%3D'%23eef6ff'%2F%3E%3Cpath%20fill%3D'%2358c8ff'%20d%3D'M3%204h8v8H3z'%2F%3E%3Cpath%20fill%3D'%2358c8ff'%20d%3D'M11%206h3v4h-3V9h2V7h-2z'%2F%3E%3C%2Fsvg%3E" alt="Mug"><button class="add-to-cart" type="button">Add mug</button></div>
+    <div class="prod" data-product><img src="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%2016'%20shape-rendering%3D'crispEdges'%3E%3Crect%20width%3D'16'%20height%3D'16'%20fill%3D'%23f3ffe0'%2F%3E%3Cpath%20fill%3D'%238ac926'%20d%3D'M3%209V7l2-2h5l2%202v2z'%2F%3E%3Cpath%20fill%3D'%235c8a12'%20d%3D'M10%209h4v1h-4z'%2F%3E%3C%2Fsvg%3E" alt="Cap"><button class="add-to-cart" type="button">Add cap</button></div>
+  </div>
+  <piix-pal pal="drone" on="#cart" box="#shop"></piix-pal>
+</div>
 <script src="../piixpal.js"></script>
 </body>
 </html>
