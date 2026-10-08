@@ -44,3 +44,10 @@ defineSprite('gulp', {
   fps: { idle: 2, open: 6, full: 5, happy: 5 }
 });
 
+/* a file, flying into the beak (crew only) */
+defineSprite('_file', {
+  w: 8, h: 10, scale: 3,
+  palette: { k: '#17121f', w: '#fffdf5', W: '#e9e2d0', b: '#58c8ff' },
+  frames: { idle: [['kkkkk...', 'kwwwkk..', 'kwwwkWk.', 'kwwwkkkk', 'kwbbbbwk', 'kwwwwwwk', 'kwbbbbwk', 'kwwwwwwk', 'kwbbwwwk', 'kkkkkkkk']] }
+});
+
