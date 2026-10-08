@@ -269,7 +269,10 @@ export const POWERS = [
     accent: "var(--coral)",
     kind: "element",
     tag: "piix-stickers",
-    where: "footer"
+    where: "footer",
+    uses: "your page itself: stickers stick to the element under them, and stay put in the visitor’s browser",
+    support: "every modern browser · mouse, pen and touch",
+    try: "drag a sticker off the sheet onto the box; drag it again to move it, double-click to peel it off"
   }
   // new powers go above this line
 ];
