@@ -205,7 +205,10 @@ export const POWERS = [
     uses: "every window you have open on the same site: BroadcastChannel, plus where each window sits on the screen",
     support: "every modern browser · works between windows and tabs of the same site, no server",
     try: "press Open a second window, put it beside this one, and wait for Nomad to reach the edge",
-    desc: "A little traveller who walks between your browser windows. Open your site twice, side by side, and Nomad walks off the edge of one window and into the other, right where they meet, as if the windows were one room. Close a window and Nomad moves to another one instead of getting lost. On its own it strolls along the bottom of the screen and peeks out at the edges."
+    desc: "A little traveller who walks between your browser windows. Open your site twice, side by side, and Nomad walks off the edge of one window and into the other, right where they meet, as if the windows were one room. Close a window and Nomad moves to another one instead of getting lost. On its own it strolls along the bottom of the screen and peeks out at the edges.",
+    attrs: [["window","the page to open with el.ctl.invite() (default: this page)"]],
+    api: "el.ctl.invite()",
+    events: "piix:arrive, piix:depart"
   }
   // new powers go above this line
 ];
