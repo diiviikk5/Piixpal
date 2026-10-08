@@ -101,3 +101,56 @@ const gistCard = (points, source, close) => {
   return card;
 };
 
+/* tldr: skim the element, then hand over the gist */
+defineBehavior('tldr', (a, [el], host) => {
+  const S = a.s / 3;
+  const boxEl = boxOf(host);
+  const n = clamp(+host.getAttribute('points') || 3, 1, 6);
+  const btn = host.getAttribute('button') ? document.querySelector(host.getAttribute('button')) : null;
+  let state = 'idle', t = 0, card = null, result = null, hop = 0;
+  const close = () => { uiClose(card); card = null; state = 'idle'; a.say('heart', 700); };
+  const summarize = async () => {
+    if (state === 'skim') return;
+    if (card) { close(); return; }
+    state = 'skim'; t = 0; result = null; a.say('...', 1400);
+    const text = (el.innerText || el.textContent || '').trim();
+    const ai = await gistAI(text, document.title);
+    result = ai ? { points: ai, source: 'ai' } : { points: gistPick(gistSentences(text), n), source: 'pick' };
+  };
+  const esc = e => { if (e.key === 'Escape' && card) close(); };
+  addEventListener('keydown', esc);
+  if (btn) btn.addEventListener('click', summarize);
+
+  return {
+    awake: () => state !== 'idle' || !!card,
+    summarize,
+    tick(dt) {
+      const r = surfaceOf(el) || rectOf(el);
+      const at = host.getAttribute('at') != null ? clamp(+host.getAttribute('at'), 0, 1) : .96;
+      a.x = r.l + a.w / 2 + Math.max(0, (r.r - r.l) - a.w) * at; a.y = r.t;
+      t += dt;
+      if (state === 'skim') {
+        a.play('skim');
+        /* skim for a moment at least, then present */
+        if (result && t > (reduced() ? 0 : 1.1)) {
+          state = 'present';
+          if (!result.points.length) { a.say('?', 1000); state = 'idle'; return; }
+          card = gistCard(result.points, result.source, close);
+          uiAnnounce('Summary: ' + result.points.join(' '));
+          host.dispatchEvent(new CustomEvent('piix:gist', { bubbles: true, detail: result }));
+          hop = .3;
+        }
+      } else if (state === 'present') a.play('present');
+      else a.play('idle');
+      hop = Math.max(0, hop - dt);
+      a.oy = -Math.sin(Math.PI * hop / .3) * 8 * S;
+      if (card) {
+        const B = boxEl ? rectOf(boxEl) : null;
+        uiPlace(card, a.x, a.y - a.h - 2 * S, B ? { area: B, under: a.y + 2 * S } : { under: a.y + 2 * S });
+      }
+      if (state === 'idle' && ptr.seen && a.near(20 * S)) a.say('...', 500);
+    },
+    poke: summarize,
+    destroy() { removeEventListener('keydown', esc); if (btn) btn.removeEventListener('click', summarize); if (card) card.remove(); }
+  };
+});
