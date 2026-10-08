@@ -118,3 +118,14 @@ const hatchSprite = seed => {
   });
 };
 
+/* the same creature as a figure: white eyes the cursor can steer, lids that blink */
+const hatchFigure = seed => {
+  const G = hatchGenes(seed);
+  const ey = G.eyeY, l = 8 - G.eyeGap - 1, r = 8 + G.eyeGap - 1;
+  return {
+    w: 16, h: 17, scale: 4, palette: hatchPalette(G), petName: G.name,
+    frames: [hatchPaint(G, { whites: true }), hatchPaint(G, { whites: true })],
+    fps: 1, eyes: [{ x: l, y: ey, w: 2, h: 2 }, { x: r, y: ey, w: 2, h: 2 }], pupil: { w: 1, h: G.bigEyes ? 2 : 1 }, lid: 'b'
+  };
+};
+
