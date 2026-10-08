@@ -44,3 +44,11 @@ const mehValue = (el, radios) => {
   return i < 0 ? .5 : radios.length > 1 ? i / (radios.length - 1) : 1;
 };
 
+/* where to sit: on the slider's thumb, on the checked star, or on the select */
+const mehSpot = (el, radios, v) => {
+  if (el.type === 'range') { const r = rectOf(el), thumb = 18; return { x: r.l + thumb / 2 + (r.w - thumb) * v, y: r.t + r.h * .2 }; }
+  const on = radios.find(r => r.checked);
+  const r = rectOf(on ? (on.closest('label') || on) : el);
+  return { x: r.l + r.w / 2, y: r.t };
+};
+
