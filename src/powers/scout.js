@@ -42,3 +42,10 @@ const scoutFlag = (rows, by, flag, arm) => {
   return arm ? art.put(rows, 11, 9 + by, ['gk']) : rows;
 };
 
+/* one whole frame */
+const scoutFrame = ({ by = 0, legs = 'stand', flag = 0, arm = false, eyes = 'open' }) => {
+  let rows = scoutFace(scoutShape(by), by, eyes);
+  for (const [lx, ly] of SCOUT_LEGS[legs]) rows = art.put(rows, lx, ly + by, ['kk', 'kk'].slice(0, 16 - ly - by));
+  return scoutFlag(rows, by, flag, arm);
+};
+
