@@ -192,7 +192,8 @@ export const POWERS = [
     attrs: [["minutes","focus length (default 25)"],["break","break length (default 5)"]],
     api: "el.ctl.open()  el.ctl.popout()",
     events: "piix:bloom, piix:popout",
-    hab: "<p class=\"h-line\" style=\"bottom:auto;top:30px\">A focus timer that grows. Click the plant.</p><div class=\"h-floor\" id=\"d-sprout\"><i></i><i></i><i></i></div><piix-pal pal=\"sprout\" on=\"#d-sprout\" at=\".5\" minutes=\"1\" break=\".5\"></piix-pal>"
+    hab: "<p class=\"h-line\" style=\"bottom:auto;top:30px\">A focus timer that grows. Click the plant.</p><div class=\"h-floor\" id=\"d-sprout\"><i></i><i></i><i></i></div><piix-pal pal=\"sprout\" on=\"#d-sprout\" at=\".5\" minutes=\"1\" break=\".5\"></piix-pal>",
+    code: "<footer>\n  <piix-pal pal=\"sprout\" minutes=\"25\" break=\"5\"></piix-pal>\n</footer>"
   }
   // new powers go above this line
 ];
