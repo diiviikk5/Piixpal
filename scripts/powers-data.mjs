@@ -285,7 +285,10 @@ export const POWERS = [
     accent: "var(--coral)",
     kind: "pal",
     does: "strength",
-    where: "label"
+    where: "label",
+    uses: "your password field: length, mixed kinds of characters, repeats, keyboard runs and the passwords everybody tries first",
+    support: "every modern browser · the field gets data-strength=\"0…4\" for your own styles",
+    try: "type a password: try “password1”, then something long and odd"
   }
   // new powers go above this line
 ];
