@@ -86,17 +86,18 @@ const uiCard = (o = {}) => {
   return c;
 };
 /* put a card's tail at (x, y): doc coords, or viewport coords (+ origin) for fixed cards.
- * It sits above the point (or below), flips if there's no room, and stays inside `area`. */
-const uiPlace = (c, x, y, { below = false, gap = 12, area } = {}) => {
+ * It sits above the point (or below), flips if there's no room, and stays inside `area`.
+ * under: the point to hang from when it ends up below (say, a pal's feet rather than its head) */
+const uiPlace = (c, x, y, { below = false, gap = 12, area, under = y } = {}) => {
   const fixed = c.classList.contains('fixed');
   const o = uiHost.getBoundingClientRect();
   const ox = fixed ? origin.x : o.left + scrollX, oy = fixed ? origin.y : o.top + scrollY;
   const A = area || (fixed ? { l: origin.x, r: origin.x + docW(), t: origin.y, b: origin.y + innerHeight } : { l: scrollX, r: scrollX + docW(), t: scrollY, b: scrollY + innerHeight });
   const w = c.offsetWidth, h = c.offsetHeight;
-  if (!below && y - h - gap < A.t + 4 && y + gap + h < A.b) below = true;
-  else if (below && y + gap + h > A.b - 4 && y - h - gap > A.t) below = false;
+  if (!below && y - h - gap < A.t + 4 && under + gap + h < A.b) below = true;
+  else if (below && under + gap + h > A.b - 4 && y - h - gap > A.t) below = false;
   const left = clamp(x - w / 2, A.l + 6, Math.max(A.l + 6, A.r - w - 6));
-  const top = below ? y + gap : y - h - gap;
+  const top = below ? under + gap : y - h - gap;
   c.classList.toggle('below', below);
   c.style.setProperty('--tx', Math.round(clamp(x - left, 14, w - 14)) + 'px');
   c.style.left = Math.round(left - ox) + 'px';
