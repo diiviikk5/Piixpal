@@ -28,3 +28,16 @@ const pollyFace = (rows, by, eyes) => {
   return art.compose(rows, [5, 13, ['o.o']], [5, 14, ['o.o']]);
 };
 
+/* Polly: perches, talks (beak open and shut), flaps up to the next word */
+defineSprite('polly', {
+  w: 13, h: 15, scale: 3, does: 'read',
+  palette: { k: '#17121f', r: '#ff4d6d', g: '#3fbf5f', G: '#2a8f45', Y: '#ffd23f', b: '#58c8ff', w: '#ffffff', e: '#17121f', o: '#9a93a6' },
+  frames: {
+    idle: [pollyFace(pollyShape(0), 0, 'open'), pollyFace(pollyShape(0), 0, 'open'), pollyFace(pollyShape(0), 0, 'shut'), pollyFace(pollyShape(0), 0, 'open')],
+    talk: [pollyFace(pollyShape(0, true), 0, 'open'), pollyFace(pollyShape(0), 0, 'open')],
+    hop: [pollyFace(pollyShape(-1, false, true), -1, 'open')],
+    happy: [pollyFace(pollyShape(0), 0, 'happy'), pollyFace(pollyShape(-1, true, true), -1, 'happy')]
+  },
+  fps: { idle: 2, talk: 7, happy: 4 }
+});
+
