@@ -167,3 +167,10 @@
 .h-form input:focus{outline:none;box-shadow:0 0 0 3px var(--lime)}
 .h-captcha{position:absolute;left:50%;bottom:44px;transform:translateX(-50%);display:flex;align-items:center;gap:12px;width:270px;padding:16px;border:2px solid var(--ink);border-radius:10px;background:var(--card);font:600 15px var(--f-sans);cursor:pointer}
 .h-captcha input{width:20px;height:20px;accent-color:var(--ink)}
+
+/* superpowers */
+.pal-doc .habitat.tall{height:380px}
+.lv > *{position:absolute;margin:0}
+.lv-h{font:760 34px/1 var(--f-sans);letter-spacing:-.03em}
+.lv-p{font:500 15.5px/1.5 var(--f-sans);color:var(--ink-2)}
+.power .kv dd code{white-space:nowrap}
