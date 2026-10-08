@@ -334,7 +334,10 @@ export const POWERS = [
     accent: "var(--sun)",
     kind: "pal",
     does: "dropzone",
-    where: "#drop"
+    where: "#drop",
+    uses: "drag and drop (and file inputs): it only watches, your upload code stays in charge",
+    support: "every modern browser · drag and drop on desktop, the file picker everywhere",
+    try: "drag a file from your computer over the box (or pick one)"
   }
   // new powers go above this line
 ];
