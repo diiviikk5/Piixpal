@@ -1,6 +1,7 @@
 // Generates the component docs pages (components/*.html) from one layout.
 // Sprite names and taglines are read straight from src/sprites/*.js.
 import { readFileSync, readdirSync, writeFileSync, mkdirSync } from 'node:fs';
+import { POWERS, FAMILIES } from './powers-data.mjs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -198,7 +199,7 @@ export const PALS = [
 ];
 
 /* on the docs page every pal stays inside its own habitat */
-const boxed = h => h.replace(/<piix-pal(?![^>]*sbox=)/g, '<piix-pal box=".habitat"');
+const boxed = h => h.replace(/<piix-pal(?![^>]*\sbox=)/g, '<piix-pal box=".habitat"');
 const kinds = { pal: PALS.filter(p => !p.kind), play: PALS.filter(p => p.kind === 'play'), toy: PALS.filter(p => p.kind === 'toy'), group: PALS.filter(p => p.kind === 'group') };
 
 /* ---------- layout ---------- */
@@ -215,8 +216,11 @@ const sidebar = active => {
     <h4>Components</h4>
     ${link('sprites.html', `Sprites <span class="n">${sprites.length}</span>`, 'sprites')}
     ${link('pals.html', `Pals <span class="n">${PALS.length}</span>`, 'pals')}
+    ${link('powers.html', `Superpowers <span class="n">${POWERS.length}</span>`, 'powers')}
     ${link('crowd.html', 'Crowd <span class="n">3</span>', 'crowd')}
     ${link('type.html', 'Pixel type', 'type')}
+    <h4>Superpowers</h4>
+    ${POWERS.map(p => `<a href="powers.html#${p.id}" style="--dot:${p.accent}"><i></i>${title(p.id)}</a>`).join('\n    ')}
     <h4>Big sprites</h4>
     ${bigs.map(s => `<a href="sprites.html#s-${s.name}" style="--dot:${s.accent}"><i></i>${title(s.name)}</a>`).join('\n    ')}
     <h4>Sprites</h4>
@@ -291,7 +295,22 @@ const spriteCard = s => `    <article class="scard${s.big ? ' big' : ''}" id="s-
 const CDN_ALL = 'https://cdn.jsdelivr.net/gh/diiviikk5/Piixpal@main/piixpal.min.js';
 const CDN_ONE = n => `https://cdn.jsdelivr.net/gh/diiviikk5/Piixpal@main/dist/c/${n}.min.js`;
 /* every way to add one component, as tabs: like a UI library's install box */
-const installTabs = (name, kind, markup, where = 'h1') => {
+const installTabs = (name, kind, markup, where = 'h1', query = '') => {
+  if (kind === 'element') {
+    const tabs = [
+      ['HTML', `<!-- once, anywhere on the page -->\n<script src="${CDN_ALL}"></script>\n\n${markup}`],
+      ['Single file', `<!-- just ${name} (the shared engine loads itself, once) -->\n<script src="${CDN_ONE(name)}"></script>\n\n${markup}`],
+      ['No markup', `<script src="${CDN_ONE(name)}"\n  data-pals="${name}@${where}${query ? '?' + query : ''}"></script>`],
+      ['JS', `await import("${CDN_ONE(name)}");\nPiixpal.add("${name}", "${where}"${query ? ', ' + JSON.stringify(Object.fromEntries(new URLSearchParams(query))).replace(/"(\w+)":/g, '$1: ') : ''});`],
+      ['React', `// load the script once (wrappers/load.js), then it's a plain tag\n${markup}`],
+      ['Vue', `// main.js: app.use(Piixpal) from "piixpal/vue"\n\n${markup}`],
+      ['Svelte', `<script>import Piixpal from "piixpal/svelte";</script>\n<Piixpal />\n\n${markup}`]
+    ];
+    return `<div class="tabs" data-tabs>
+  <div class="tab-bar" role="tablist">${tabs.map(([t], i) => `<button type="button" role="tab" aria-selected="${i === 0}">${t}</button>`).join('')}</div>
+  ${tabs.map(([, code], i) => `<pre class="codebox tab-pane"${i ? ' hidden' : ''}><button class="copy" type="button" data-copy="${esc(code)}">Copy</button>${esc(code)}</pre>`).join('\n  ')}
+</div>`;
+  }
   const tag = kind === 'sprite' ? 'piix-sprite' : 'piix-pal', attr = kind === 'sprite' ? 'name' : 'pal';
   const Comp = kind === 'sprite' ? 'PiixSprite' : 'PiixPal';
   const tabs = [
@@ -452,11 +471,11 @@ const palSection = p => `
     </div>
   </div>
 </section>`;
-const family = (id, name, blurb, list) => `
+const family = (id, name, blurb, list, render = palSection) => `
 <section class="doc-sec family" id="${id}" aria-labelledby="${id}-h">
   <h2 id="${id}-h" class="fam-h">${name} <span class="pill">${list.length}</span></h2>
   <p>${blurb}</p>
-</section>${list.map(palSection).join('\n')}`;
+</section>${list.map(render).join('\n')}`;
 const palsBody = `<header class="doc-head">
   <div class="crumbs"><a href="./">Components</a><span>/</span><span>Pals</span></div>
   <h1>Pals</h1>
@@ -467,6 +486,34 @@ ${family('characters', 'Characters', 'One pal, one job. Crawlers, peekers, perch
 ${family('play', 'New ways to play', 'Pals that react to what people actually do on your site: typing, passwords, selecting and copying text, scrolling, ticking a checkbox, clicking a deploy button.', kinds.play)}
 ${family('toys', 'Toy box', 'Things to throw around the page. They land on real elements, roll off edges onto whatever is below, and can be batted with a fast swipe. Try throwing one onto another pal.', kinds.toy)}
 ${family('groups', 'Groups', 'One tag, a whole crew: families, flocks, lines and choirs that move and react together.', kinds.group)}`;
+
+/* ---------- superpowers ---------- */
+const powerSection = p => `
+<section class="doc-sec power" id="${p.id}" aria-labelledby="${p.id}-h" style="--accent:${p.accent}">
+  <h2 id="${p.id}-h">${title(p.id)} <span class="pal-no">${p.kind === 'element' ? '&lt;' + p.tag + '&gt;' : 'do="' + p.does + '"'}</span></h2>
+  <p>${p.desc}</p>
+  <div class="pal-doc">
+    <div class="habitat${p.tall ? ' tall' : ''}">${boxed(p.hab)}</div>
+    <div class="info">
+      <dl class="kv">
+        <dt>uses</dt><dd>${p.uses}</dd>
+        <dt>works in</dt><dd>${p.support}</dd>
+        <dt>try it</dt><dd>${p.try}</dd>
+        ${p.attrs.map(([a, d]) => `<dt>${a}</dt><dd>${d}</dd>`).join('\n        ')}
+        ${p.api ? `<dt>api</dt><dd><code>${esc(p.api)}</code></dd>` : ''}
+        ${p.events ? `<dt>events</dt><dd>${p.events}</dd>` : ''}
+      </dl>
+      ${installTabs(p.id, p.kind === 'element' ? 'element' : 'pal', p.code, p.where || 'body', p.query || '')}
+    </div>
+  </div>
+</section>`;
+const powersBody = `<header class="doc-head">
+  <div class="crumbs"><a href="./">Components</a><span>/</span><span>Superpowers</span></div>
+  <h1>Superpowers</h1>
+  <p>Pals that go further than the page. Some step out of it, into your browser tab, your other windows, your desktop and your speakers. Some do real interface jobs. Some turn your site into a game. Every one works with a single tag, and on this page every one stays inside its own box.</p>
+  <div class="pills">${FAMILIES.map(([id, name]) => `<a class="pill" href="#${id}">${name} · ${POWERS.filter(p => p.fam === id).length}</a>`).join('')}<span class="pill">uses the browser itself</span></div>
+</header>
+${FAMILIES.map(([id, name, blurb]) => POWERS.some(p => p.fam === id) ? family(id, name, blurb, POWERS.filter(p => p.fam === id), powerSection) : '').join('\n')}`;
 
 /* ---------- type ---------- */
 const typeBody = `<header class="doc-head">
@@ -588,7 +635,7 @@ const pick = n => sprites.slice(0, n).map(s => `<piix-sprite name="${s.name}" sc
 const indexBody = `<header class="doc-head">
   <div class="crumbs"><span>Components</span></div>
   <h1>Components</h1>
-  <p>${sprites.length + PALS.length + 4} components, every one a plain web component. One script tag, then copy any tag from these pages into your HTML, React, Vue, Svelte, Astro, Webflow or Framer project.</p>
+  <p>${sprites.length + PALS.length + POWERS.length + 4} components, every one a plain web component. One script tag, then copy any tag from these pages into your HTML, React, Vue, Svelte, Astro, Webflow or Framer project.</p>
 </header>
 <section class="doc-sec" aria-label="Component families">
   <div class="ov">
@@ -596,10 +643,12 @@ const indexBody = `<header class="doc-head">
     <a href="pals.html" style="--accent:var(--coral)"><div class="ov-art" id="ov-pals"><span style="font:780 30px var(--f-sans);letter-spacing:-.03em" id="ov-word">live here</span></div><h3>Pals <span>${PALS.length}</span></h3><p>Characters that live on your page: they crawl on headings, bounce on footers, peek over cards, perch on buttons.</p></a>
     <a href="crowd.html" style="--accent:var(--sky)"><div class="ov-art"><piix-crowd mode="crowd" count="26" height="140" scale="2" style="width:100%"></piix-crowd></div><h3>Crowd <span>3</span></h3><p>Hundreds of tiny agents on one stage. They wander and high-five, swarm your cursor, or spell a word.</p></a>
     <a href="pals.html#toys" style="--accent:var(--sun)"><div class="ov-art"><span style="font:780 30px var(--f-sans);letter-spacing:-.03em" id="ov-toys">toy box</span></div><h3>Toys + groups <span>${kinds.toy.length + kinds.group.length}</span></h3><p>Throwable toys that land on your page, and whole crews in one tag: ducks, ants, fish, a choir, fireflies.</p></a>
+    <a href="powers.html" style="--accent:var(--coral)"><div class="ov-art"><span style="font:780 30px var(--f-sans);letter-spacing:-.03em" id="ov-powers">superpowers</span></div><h3>Superpowers <span>${POWERS.length}</span></h3><p>Pals that step out of the page, do real interface jobs, or turn your site into a game.</p></a>
     <a href="type.html" style="--accent:var(--violet)"><div class="ov-art"><div style="width:80%"><piix-type text="abc" rows="14" cell="6" shade="#c6f432" fit intro="none"></piix-type></div></div><h3>Pixel type <span>1</span></h3><p>Any font as chunky extruded blocks that rain in, lift around the cursor and ripple. Pals can walk on it.</p></a>
   </div>
   <piix-pal pal="bitbug" on="#ov-word" scale="3"></piix-pal>
   <piix-pal pal="dice" on="#ov-toys"></piix-pal>
+  <piix-pal pal="pix" on="#ov-powers" coins="0"></piix-pal>
 </section>
 <section class="doc-sec" aria-labelledby="ins-h">
   <h2 id="ins-h">Install once</h2>
@@ -616,7 +665,7 @@ const installBody = `<header class="doc-head">
 </header>
 
 <section class="doc-sec" id="cdn" aria-labelledby="i1"><h2 id="i1">1. Everything, one tag</h2>
-  <p>All ${sprites.length + PALS.length + 4} components in one file (about 40 KB gzipped), served free by jsDelivr. Then use any tag from these pages.</p>
+  <p>All ${sprites.length + PALS.length + POWERS.length + 4} components in one file (about 40 KB gzipped), served free by jsDelivr. Then use any tag from these pages.</p>
   ${codeBox(`<script src="${CDN_ALL}"></script>\n\n<h1>Hello <piix-pal pal="bitbug"></piix-pal></h1>`)}
 </section>
 
@@ -686,10 +735,11 @@ const pages = [
   ['index.html', { key: 'index', title: 'Components', desc: 'Every Piixpal component: sprites, pals and pixel type.', body: indexBody }],
   ['sprites.html', { key: 'sprites', title: 'Sprites', desc: `${sprites.length} inline pixel sprites with cursor-following eyes. Copy a tag, paste it anywhere.`, body: spritesBody }],
   ['pals.html', { key: 'pals', title: 'Pals', desc: 'Pixel characters that live on your page: crawl, bounce, peek, perch, hang, follow, creep.', body: palsBody }],
+  ['powers.html', { key: 'powers', title: 'Superpowers', desc: 'Pals that step out of the page, do real interface jobs, or turn your site into a game.', body: powersBody }],
   ['install.html', { key: 'install', title: 'Install', desc: 'Every way to add Piixpal to a site: one tag, single files, no-markup, JS, React, Vue, Svelte, bookmarklet.', body: installBody }],
   ['builder.html', { key: 'builder', title: 'Builder', desc: 'Pick pals, choose where they live, copy one line.', body: builderBody }],
   ['crowd.html', { key: 'crowd', title: 'Crowd', desc: 'A stage of hundreds of tiny agents: crowd, swarm and formation modes.', body: crowdBody }],
   ['type.html', { key: 'type', title: 'Pixel type', desc: 'Chunky extruded pixel lettering that pals can walk on.', body: typeBody, fonts: '<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@800&family=Instrument+Serif&family=Pacifico&display=swap" rel="stylesheet">\n' }]
 ];
 for (const [file, p] of pages) writeFileSync(join(out, file), page(p));
-console.log(`components/  ${pages.length} pages, ${sprites.length} sprites, ${PALS.length} pals`);
+console.log(`components/  ${pages.length} pages, ${sprites.length} sprites, ${PALS.length} pals, ${POWERS.length} superpowers`);
