@@ -48,3 +48,15 @@ const tabbyLoaf = (eyes, tail, oy = 0) => {
   return art.compose(rows, ...head.map((r, i) => [2, i + oy, [r.replace(/\./g, '_')]]));
 };
 
+/* Tabby on the page: a cat loaf that blinks, flicks its tail, naps, and jumps up when you come back */
+defineSprite('tabby', {
+  w: 22, h: 19, scale: 3, does: 'tab',
+  palette: { k: '#17121f', o: '#ffa64d', O: '#d97a1f', w: '#fff7ec', p: '#ff9fb5', e: '#17121f' },
+  frames: {
+    idle: [tabbyLoaf('open', 0), tabbyLoaf('open', 1), tabbyLoaf('blink', 0), tabbyLoaf('left', 1), tabbyLoaf('open', 0), tabbyLoaf('right', 1)],
+    sleep: [tabbyLoaf('sleep', 0)],
+    happy: [tabbyLoaf('happy', 1), tabbyLoaf('happy', 0, -1)]
+  },
+  fps: { idle: 1.6, happy: 6 }
+});
+
