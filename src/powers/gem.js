@@ -8,3 +8,9 @@
  *   reward="PIX10"   what the finder gets when the jar is full
  *   Events: piix:gem { hunt, found, total }, piix:hunt-done { hunt, reward } */
 
+/* a cut gem, with a glint that travels across it */
+const gemShape = glint => {
+  const rows = ['..kkkkk..', '.kLlLlLk.', 'kLlLlLlLk', 'kkkkkkkkk', '.klllldk.', '..klldk..', '...kdk...', '....k....'];
+  return glint < 0 ? rows : art.put(rows, 2 + glint, glint > 3 ? 2 : 1, ['w']);
+};
+
