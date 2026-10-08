@@ -25,8 +25,9 @@
 <h1 id="title">Play this page</h1>
 <p id="lede">Click the little lime hero to take control. Run with the arrow keys, jump with up or space, and hop from line to line. Every heading, paragraph, button and picture is a platform. Coins hide on links and buttons.</p>
 <piix-pal pal="pix" on="#title" at=".1"></piix-pal>
-<div class="btns"><a class="btn lime" href="#a">Get started</a><a class="btn" href="#b">Docs</a><button class="btn" type="button">A button</button></div>
-<h2>A second section</h2>
+<div class="btns" id="btns"><a class="btn lime" href="#a" data-tour="Start your first project here" data-tour-step="1">Get started</a><a class="btn" href="#b" data-tour="Everything else lives in the docs" data-tour-step="3">Docs</a><button class="btn" type="button">A button</button></div>
+<h2 data-tour="Scroll down for more" data-tour-step="2">A second section</h2>
+<piix-pal pal="scout" on="#btns" at=".95"></piix-pal>
 <p>More words to stand on. The camera follows Pix up and down the page while you play, and Escape hands the page back to you. Pals that hear a hard landing react to it, so a thud near the toys sends them flying.</p>
 <p>Another paragraph, further down, to fall onto. It is long enough to wrap onto a few lines, and every line is its own platform.</p>
 
