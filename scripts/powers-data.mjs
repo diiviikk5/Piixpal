@@ -211,6 +211,14 @@ export const POWERS = [
     events: "piix:arrive, piix:depart",
     hab: "<button type=\"button\" class=\"h-btn lime\" style=\"position:absolute;left:22px;top:22px\" data-call=\"#d-nomad:invite\">Open a second window</button><p class=\"h-line\" style=\"bottom:auto;top:90px\">Nomad walks out of this box and into the other window, then back again.</p><div class=\"h-floor\"><i></i><i></i><i></i></div><piix-pal pal=\"nomad\" id=\"d-nomad\" window=\"nomad.html\"></piix-pal>",
     code: "<!-- on every page of your site -->\n<piix-pal pal=\"nomad\"></piix-pal>"
+  },
+  {
+    id: "hatch",
+    fam: "play",
+    accent: "var(--mint)",
+    kind: "pal",
+    does: "pet",
+    where: "footer"
   }
   // new powers go above this line
 ];
