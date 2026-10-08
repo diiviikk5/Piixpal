@@ -30,10 +30,10 @@ const tabbyEyes = (rows, oy, eyes) => {
     left: [[4, y, ['we', 'ee']], [10, y, ['we', 'ee']]],
     right: [[5, y, ['ew', 'ee']], [11, y, ['ew', 'ee']]],
     blink: [[4, y + 1, ['ee']], [10, y + 1, ['ee']]],
-    sleep: [[4, y + 1, ['e..e', '.ee.']].map((v, i) => i === 0 ? 3 : v), [10, y + 1, ['e..e', '.ee.']]],
-    happy: [[4, y, ['.ee.', 'e..e']].map((v, i) => i === 0 ? 3 : v), [10, y, ['.ee.', 'e..e']]]
+    sleep: [[4, y + 1, ['e__e', '_ee_']].map((v, i) => i === 0 ? 3 : v), [10, y + 1, ['e__e', '_ee_']]],
+    happy: [[4, y, ['_ee_', 'e__e']].map((v, i) => i === 0 ? 3 : v), [10, y, ['_ee_', 'e__e']]]
   }[eyes];
-  return art.compose(rows, ...E, [7, 11 + oy, ['pp']], [6, 12 + oy, ['e..e']], [7, 13 + oy, ['ee']]);
+  return art.compose(rows, ...E, [7, 11 + oy, ['pp']], [6, 12 + oy, ['e__e']], [7, 13 + oy, ['ee']]);
 };
 
 /* the loaf: a round little body tucked under the head, and a tail that flicks */
