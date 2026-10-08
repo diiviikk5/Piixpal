@@ -252,7 +252,10 @@ export const POWERS = [
     kind: "pal",
     does: "hunt",
     where: "footer",
-    query: "hunt=launch&gem=1&total=5"
+    query: "hunt=launch&gem=1&total=5",
+    uses: "gems you hide on any of your pages, and the visitor’s own browser to remember what they found",
+    support: "every modern browser · progress carries from page to page",
+    try: "three gems are hidden in the box: find them all"
   }
   // new powers go above this line
 ];
