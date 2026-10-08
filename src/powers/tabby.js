@@ -82,3 +82,11 @@ const tabbyDraw = (g, rows, pal, progress, z) => {
   if (z) { g.fillStyle = '#58c8ff'; g.fillRect(24, 2, 6, 2); g.fillRect(26, 4, 2, 2); g.fillRect(24, 6, 6, 2); }
 };
 
+/* the page's icon links, found or made, remembered so they can be put back */
+const tabbyLinks = () => {
+  let els = [...document.querySelectorAll('link[rel~="icon"]')];
+  let made = false;
+  if (!els.length) { const l = document.createElement('link'); l.rel = 'icon'; document.head.appendChild(l); els = [l]; made = true; }
+  return { els, old: els.map(l => [l.getAttribute('href'), l.getAttribute('type'), l.getAttribute('sizes')]), made };
+};
+
