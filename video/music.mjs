@@ -49,3 +49,22 @@ function pad(t0, len, notes, g = 1) {
 function stab(t0, notes, g = 1) { notes.forEach((n, j) => { const f = lp(.25); voice(t0, 1.2, t => f(saw(t * hz(n)) + pulse(t * hz(n) * 1.005, .5) * .5) * env(t, .003, .28), .09 * g, j % 2 ? .3 : -.3); }); }
 function sub(t0, g = 1) { let ph = 0; voice(t0, 1.2, t => { ph += (38 + 30 * Math.exp(-t * 6)) / SR; return Math.sin(ph * 2 * Math.PI) * env(t, .005, .45); }, .7 * g); }
 
+/* ---------- sound effects ---------- */
+const sweep = (t0, len, f0, f1, shape, g, pan = 0) => { let ph = 0; voice(t0, len, t => { ph += lerpExp(f0, f1, t / len) / SR; return shape(ph) * env(t, .002, len * .4); }, g, pan); };
+const lerpExp = (a, b, k) => a * Math.pow(b / a, Math.min(1, k));
+const FX = {
+  word: t => { sweep(t, .07, 1400, 1900, p => pulse(p, .5), .08); hat(t, .6); },
+  pop: t => { sweep(t, .16, 500, 1500, p => pulse(p, .25), .12); sweep(t + .05, .12, 1000, 2400, p => tri(p), .1, .3); },
+  land: t => { sweep(t, .12, 320, 110, p => tri(p), .3); },
+  block: t => { sweep(t, .08, 180, 70, p => pulse(p, .5), .12, -.2); },
+  cut: t => { const f = lp(.15); voice(t, .2, (u) => f(noise()) * env(u, .03, .05), .35); },
+  wipe: t => { let k = 0; voice(t, .45, u => { k = Math.min(.9, .02 + u * 1.6); const n = noise(); return n * k * env(u, .25, .07); }, .22); },
+  throw: t => { sweep(t, .18, 300, 900, p => saw(p), .07, .3); },
+  ding: t => { [m('E6'), m('B6')].forEach((n, i) => voice(t + i * .07, .6, u => Math.sin(u * hz(n) * 2 * Math.PI) * env(u, .002, .18), .14)); },
+  coin: t => { voice(t, .05, u => pulse(u * hz(m('B5')), .5) * .9, .09); voice(t + .05, .3, u => pulse(u * hz(m('E6')), .5) * env(u, .002, .12), .09); },
+  slam: t => { kick(t, 1.2); sub(t); crash(t, .8); clap(t, 1); },
+  key: t => { const f = lp(.6); voice(t, .03, u => f(noise()) * env(u, .0005, .006), .3 + noise() * .05, noise() * .4); },
+  chip: (t, i) => { const n = [m('C6'), m('E6'), m('G6'), m('C7'), m('E7'), m('G7')][i % 6]; voice(t, .25, u => pulse(u * hz(n), .25) * env(u, .002, .08), .08); },
+  bigpop: (t, i) => { sweep(t, .22, 200 + i * 60, 900 + i * 120, p => pulse(p, .5), .1); sub(t, .25); }
+};
+
