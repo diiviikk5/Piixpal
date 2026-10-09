@@ -1,9 +1,11 @@
-/* Piixpal launch film: every frame is a pure function of time T (seconds), drawn on one canvas.
- * The pals are the real ones from the library; big 3D sprites are live <piix-sprite> elements. */
-const W = 1920, H = 1080, DUR = 38;
-const cv = document.getElementById('c'), g = cv.getContext('2d');
+/* Piixpal launch film. Every frame is a pure function of time T (seconds), drawn on one canvas.
+ * The pals are the real ones from the library; the render-style shot uses live <piix-sprite> elements.
+ * Shots are drawn into layers so the cuts between them can blur, smear, dissolve into pixels or heat up. */
+const W = 1920, H = 1080, DUR = 36;
+const main = document.getElementById('c');
+let g = main.getContext('2d');
 const C = {
-  ink: '#17121f', ink2: '#2b2436', deep: '#100c16', paper: '#f3eee3', card: '#fbf8f1', muted: '#6c6477', soft: '#cdc6da',
+  ink: '#17121f', ink2: '#2b2436', muted: '#6c6477', soft: '#cdc6da', bone: '#f1ede4', bone2: '#e6e0d3', char: '#121214',
   line: '#d8cfbd', lime: '#c6f432', lime2: '#a8d81c', coral: '#ff6b4a', violet: '#6b4cff', sky: '#58c8ff', sun: '#ffd23f', mint: '#25b89a', white: '#ffffff'
 };
 const SANS = '"Bricolage Grotesque"', PIX = 'Silkscreen', MONO = '"JetBrains Mono"';
@@ -18,13 +20,28 @@ const E = {
   outCubic: k => 1 - Math.pow(1 - k, 3),
   inCubic: k => k * k * k,
   inOut: k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2,
-  outBack: k => { const c = 1.9; return 1 + (c + 1) * Math.pow(k - 1, 3) + c * Math.pow(k - 1, 2); },
+  outBack: k => { const c = 1.7; return 1 + (c + 1) * Math.pow(k - 1, 3) + c * Math.pow(k - 1, 2); },
   outElastic: k => k <= 0 ? 0 : k >= 1 ? 1 : Math.pow(2, -10 * k) * Math.sin((k * 10 - .75) * (2 * Math.PI / 3)) + 1
 };
 
 /* ---------- colour ---------- */
 const rgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
-const mix = (a, b, k) => { const A = rgb(a), B = rgb(b); return 'rgb(' + A.map((v, i) => Math.round(lerp(v, B[i], cl(k)))).join(',') + ')'; };
+const mix = (a, b, k) => { const A = rgb(a), B = rgb(b); return '#' + A.map((v, i) => Math.round(lerp(v, B[i], cl(k))).toString(16).padStart(2, '0')).join(''); };
+
+/* ---------- layers ---------- */
+const canvas = (w = W, h = H) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return c; };
+const LA = canvas(), LB = canvas(), LV = [0, 1, 2, 3, 4].map(() => canvas()), LH = canvas(), TS = canvas(8, 8);
+/* draw fn into a layer instead of the screen */
+function into(cv, fn) {
+  const prev = g; g = cv.getContext('2d');
+  g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height); g.filter = 'none'; g.globalAlpha = 1; g.imageSmoothingEnabled = false;
+  fn();
+  g.setTransform(1, 0, 0, 1, 0, 0); g = prev;
+  return cv;
+}
+const reset = () => { g.setTransform(1, 0, 0, 1, 0, 0); g.filter = 'none'; g.globalAlpha = 1; };
+/* camera: zoom k around (fx, fy), then nudge */
+const camera = (k = 1, fx = W / 2, fy = H / 2, dx = 0, dy = 0) => g.setTransform(k, 0, 0, k, fx - fx * k + dx, fy - fy * k + dy);
 
 /* ---------- pals ---------- */
 const S = Piixpal.sprites, BAKED = {};
@@ -32,14 +49,14 @@ const baked = name => {
   if (BAKED[name]) return BAKED[name];
   const sp = S[name], out = {};
   for (const clip in sp.frames) out[clip] = sp.frames[clip].map(rows => {
-    const c = document.createElement('canvas'); c.width = sp.w; c.height = sp.h;
-    const x = c.getContext('2d'), pad = sp.h - rows.length;
+    const c = canvas(sp.w, sp.h), x = c.getContext('2d'), pad = sp.h - rows.length;
     rows.forEach((row, ry) => { for (let i = 0; i < row.length; i++) { const col = sp.palette[row[i]]; if (col) { x.fillStyle = col; x.fillRect(i, ry + pad, 1, 1); } } });
     return c;
   });
   return (BAKED[name] = out);
 };
-/* draw a pal standing at (x, y): bottom-centre, or centre with o.center. t drives the clip */
+const clipOf = (name, want) => { const c = Object.keys(S[name].frames); return want.find(w => c.includes(w)) || c[0]; };
+/* draw a pal standing at (x, y): bottom-centre, or centre with o.center */
 function pal(name, clip, t, x, y, s, o = {}) {
   const sp = S[name], b = baked(name), fr = b[clip] || b[Object.keys(b)[0]];
   const f = typeof sp.fps === 'object' ? sp.fps[clip] : sp.fps;
@@ -50,656 +67,689 @@ function pal(name, clip, t, x, y, s, o = {}) {
   g.scale((o.flip ? -1 : 1) * (o.sx ?? 1), o.sy ?? 1);
   if (o.alpha != null) g.globalAlpha *= o.alpha;
   g.imageSmoothingEnabled = false;
-  if (o.shadow) { g.fillStyle = 'rgba(0,0,0,.18)'; g.fillRect(-sp.w * s * .4, -2, sp.w * s * .8, 6); }
+  if (o.shadow) { g.fillStyle = 'rgba(23,18,31,.12)'; g.beginPath(); g.ellipse(0, 0, sp.w * s * .42, s * 1.2, 0, 0, 7); g.fill(); }
   g.drawImage(img, -sp.w * s / 2, o.center ? -sp.h * s / 2 : -sp.h * s, sp.w * s, sp.h * s);
   g.restore();
 }
-const size = name => S[name];
+/* a pal that arrives with a squash and a little burst */
+function popPal(T, at, name, clip, x, y, s, o = {}) {
+  if (T < at) return;
+  const p = E.outElastic(prog(T, at, at + .6));
+  pal(name, clip, T, x, y, s, { ...o, sx: p, sy: p });
+  const k = prog(T, at, at + .4);
+  if (k < 1) { g.fillStyle = C.lime; for (let i = 0; i < 8; i++) { const a = i / 8 * 6.283, d = E.outCubic(k) * s * 16, z = s * 2 * (1 - k); g.fillRect(x + Math.cos(a) * d - z / 2, y - s * 4 + Math.sin(a) * d - z / 2, z, z); } }
+}
 
 /* ---------- type ---------- */
-const font = (px, w = 800, fam = SANS) => `${w} ${px}px ${fam}`;
-function text(str, x, y, { size = 80, weight = 800, fam = SANS, color = C.white, align = 'left', alpha = 1, track = 0, base = 'alphabetic' } = {}) {
+const font = (px, w = 560, fam = SANS) => `${w} ${px}px ${fam}`;
+function text(str, x, y, { size = 54, weight = 560, fam = SANS, color = C.ink, align = 'left', alpha = 1, track = 0, base = 'alphabetic' } = {}) {
   g.save();
   g.font = font(size, weight, fam); g.letterSpacing = track + 'px';
   g.fillStyle = color; g.textAlign = align; g.textBaseline = base; g.globalAlpha *= alpha;
   g.fillText(str, x, y);
   g.restore();
 }
-function measure(str, size, weight = 800, fam = SANS, track = 0) {
+function measure(str, size, weight = 560, fam = SANS, track = 0) {
   g.save(); g.font = font(size, weight, fam); g.letterSpacing = track + 'px';
   const m = g.measureText(str); g.restore();
-  return { w: m.width, asc: m.actualBoundingBoxAscent, desc: m.actualBoundingBoxDescent };
+  return { w: m.width, asc: m.actualBoundingBoxAscent };
 }
-/* words that rise out of a mask one after another, and leave the same way */
-function words(list, T, { x, y, size = 110, weight = 800, fam = SANS, color = C.white, align = 'center', t0 = 0, stagger = .08, dur = .6, out = null, track = null }) {
-  const items = list.map(s => typeof s === 'string' ? { w: s } : s);
+/* soft type: each part focuses in out of a blur, and blurs away again. parts: 'text' or [text, colour] */
+function soft(parts, T, tin, tout, { x = W / 2, y = H / 2, size = 62, weight = 560, fam = SANS, color = C.ink, align = 'center', track = null, stagger = .07 } = {}) {
+  parts = (Array.isArray(parts) ? parts : [parts]).map(p => typeof p === 'string' ? [p, color] : p);
+  track = track ?? -size * .02;
   g.save();
-  g.font = font(size, weight, fam); g.letterSpacing = (track ?? -size * .035) + 'px';
-  const sp = size * .26, ws = items.map(it => g.measureText(it.w).width);
-  const total = ws.reduce((a, b) => a + b, 0) + sp * (items.length - 1);
+  g.font = font(size, weight, fam); g.letterSpacing = track + 'px'; g.textBaseline = 'middle';
+  const sp = g.measureText(' ').width + size * .05, ws = parts.map(([s]) => g.measureText(s).width);
+  const total = ws.reduce((a, b) => a + b, 0) + sp * (parts.length - 1);
   let cx = align === 'center' ? x - total / 2 : align === 'right' ? x - total : x;
-  items.forEach((it, i) => {
-    const st = it.at ?? t0 + i * stagger;
-    const pin = E.outExpo(prog(T, st, st + dur));
-    const po = out == null ? 0 : E.inCubic(prog(T, out + i * stagger * .5, out + i * stagger * .5 + .3));
-    if (pin > 0 && po < 1) {
-      g.save();
-      g.beginPath(); g.rect(cx - size, y - size * 1.1, ws[i] + size * 2, size * 1.45); g.clip();
-      g.fillStyle = it.color || color;
-      g.fillText(it.w, cx, y + (1 - pin) * size * 1.25 - po * size * 1.35);
-      g.restore();
+  parts.forEach(([s, col], i) => {
+    const a = E.outCubic(prog(T, tin + i * stagger, tin + i * stagger + .55));
+    const b = tout == null ? 0 : E.inCubic(prog(T, tout + i * stagger * .5, tout + i * stagger * .5 + .35));
+    const k = a * (1 - b);
+    if (k > 0) {
+      g.filter = `blur(${((1 - a) * 18 + b * 16).toFixed(1)}px)`;
+      g.globalAlpha = k; g.fillStyle = col;
+      g.fillText(s, cx, y + (1 - a) * size * .35 - b * size * .2);
     }
     cx += ws[i] + sp;
   });
   g.restore();
   return total;
 }
-function rrect(x, y, w, h, r, fill, stroke, lw = 4) {
+function rrect(x, y, w, h, r, fill, stroke, lw = 2) {
   g.beginPath(); g.roundRect(x, y, w, h, r);
   if (fill) { g.fillStyle = fill; g.fill(); }
   if (stroke) { g.lineWidth = lw; g.strokeStyle = stroke; g.stroke(); }
 }
-/* a chunky pill with the site's hard ink shadow */
-function pill(str, cx, cy, { size = 34, fam = MONO, weight = 600, bg = C.lime, fg = C.ink, pad = 30, k = 1, shadow = C.ink } = {}) {
-  const m = measure(str, size, weight, fam), w = m.w + pad * 2, h = size * 2;
-  g.save(); g.translate(cx, cy); g.scale(k, k);
-  if (shadow) rrect(-w / 2, -h / 2 + 7, w, h, h / 2, shadow);
-  rrect(-w / 2, -h / 2, w, h, h / 2, bg, C.ink, 4);
-  text(str, 0, 2, { size, weight, fam, color: fg, align: 'center', base: 'middle' });
-  g.restore();
-  return w;
+/* a soft drop shadow under a rounded card */
+function lifted(x, y, w, h, r, fill, depth = 1) {
+  g.save(); g.shadowColor = `rgba(40,30,60,${.13 * depth})`; g.shadowBlur = 60 * depth; g.shadowOffsetY = 24 * depth;
+  rrect(x, y, w, h, r, fill); g.restore();
 }
-
-/* ---------- pixel type: chunky extruded blocks, like <piix-type> ---------- */
-const GLYPH = {
-  P: ['11110', '10001', '10001', '11110', '10000', '10000', '10000'],
-  I: ['111', '010', '010', '010', '010', '010', '111'],
-  X: ['10001', '10001', '01010', '00100', '01010', '10001', '10001'],
-  A: ['01110', '10001', '10001', '11111', '10001', '10001', '10001'],
-  L: ['10000', '10000', '10000', '10000', '10000', '10000', '11111']
-};
-function pixelWord(word, cx, top, B, T, t0) {
-  const letters = [...word].map(ch => GLYPH[ch]);
-  const cols = letters.reduce((a, l) => a + l[0].length, 0) + letters.length - 1;
-  let x = cx - cols * B / 2, col = 0;
-  const blocks = [], spots = [];
-  letters.forEach(l => {
-    const lw = l[0].length;
-    spots.push({ x0: x, x1: x + lw * B, mid: x + lw * B / 2 });
-    for (let c = 0; c < lw; c++, col++) for (let r = 0; r < 7; r++) if (l[r][c] === '1') {
-      const st = t0 + col * .032 + (6 - r) * .014;
-      const k = prog(T, st, st + .42);
-      if (k > 0) blocks.push([x + c * B, top + r * B - (1 - E.outBack(k)) * 520, k]);
-    }
-    x += (lw + 1) * B; col++;
-  });
-  const d = B * .3;
-  g.fillStyle = '#5d8a12';
-  for (const [bx, by] of blocks) g.fillRect(bx + d, by + d, B, B);
-  for (const [bx, by] of blocks) {
-    g.fillStyle = C.lime; g.fillRect(bx, by, B, B);
-    g.fillStyle = 'rgba(255,255,255,.35)'; g.fillRect(bx, by, B, B * .16);
-    g.strokeStyle = C.ink; g.lineWidth = 3; g.strokeRect(bx + 1.5, by + 1.5, B - 3, B - 3);
+/* typed code: tokens [[text, colour]], n characters shown */
+function tokens(list, x, y, n, { size = 34, fam = MONO, weight = 500 } = {}) {
+  let left = n, cx = x;
+  for (const [s, col] of list) {
+    if (left <= 0) break;
+    const part = s.slice(0, left); left -= part.length;
+    text(part, cx, y, { size, fam, weight, color: col, base: 'middle' });
+    cx += measure(part, size, weight, fam).w;
   }
-  return spots;
+  return cx;
 }
+const tokLen = list => list.reduce((a, [s]) => a + s.length, 0);
 
-/* ---------- screen furniture ---------- */
-function grid(color, step = 48, ox = 0, oy = 0) {
-  g.save(); g.strokeStyle = color; g.lineWidth = 2; g.beginPath();
-  for (let x = ((ox % step) + step) % step; x < W; x += step) { g.moveTo(x, 0); g.lineTo(x, H); }
-  for (let y = ((oy % step) + step) % step; y < H; y += step) { g.moveTo(0, y); g.lineTo(W, y); }
+/* ---------- backdrops ---------- */
+/* warm paper, a few drifting colour blooms, and the pastel horizon from the bottom of the frame */
+function paper(T, { horizon = 1, blooms = .5, base = C.bone } = {}) {
+  g.fillStyle = base; g.fillRect(0, 0, W, H);
+  if (blooms) [[C.lime, .2, .3], [C.sky, .75, .2], ['#ffb8c8', .55, .75]].forEach(([c, fx, fy], i) => {
+    const x = W * (fx + Math.sin(T * .3 + i * 2) * .06), y = H * (fy + Math.cos(T * .25 + i) * .05), r = 520;
+    const gr = g.createRadialGradient(x, y, 0, x, y, r);
+    gr.addColorStop(0, c + Math.round(blooms * 40).toString(16).padStart(2, '0')); gr.addColorStop(1, c + '00');
+    g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  });
+  if (horizon) {
+    const y0 = H * .58, gr = g.createLinearGradient(0, y0, 0, H);
+    gr.addColorStop(0, 'rgba(241,237,228,0)');
+    gr.addColorStop(.42, `rgba(255,214,184,${.7 * horizon})`);
+    gr.addColorStop(.7, `rgba(255,186,206,${.55 * horizon})`);
+    gr.addColorStop(1, `rgba(176,232,196,${.9 * horizon})`);
+    g.fillStyle = gr; g.fillRect(0, y0, W, H - y0);
+  }
+}
+function studio(spot = .5) {
+  const gr = g.createRadialGradient(W * spot, H * .45, 40, W * spot, H * .5, W * .75);
+  gr.addColorStop(0, '#34323a'); gr.addColorStop(.5, '#1a191d'); gr.addColorStop(1, '#09090a');
+  g.fillStyle = gr; g.fillRect(0, 0, W, H);
+}
+function grid(color, step = 48, x0 = 0, y0 = 0, w = W, h = H, lw = 1.5) {
+  g.save(); g.beginPath(); g.rect(x0, y0, w, h); g.clip();
+  g.strokeStyle = color; g.lineWidth = lw; g.beginPath();
+  for (let x = x0; x <= x0 + w; x += step) { g.moveTo(x, y0); g.lineTo(x, y0 + h); }
+  for (let y = y0; y <= y0 + h; y += step) { g.moveTo(x0, y); g.lineTo(x0 + w, y); }
   g.stroke(); g.restore();
 }
-let VIG;
-function vignette(a = .55) {
-  if (!VIG) {
-    VIG = document.createElement('canvas'); VIG.width = W; VIG.height = H;
-    const v = VIG.getContext('2d'), gr = v.createRadialGradient(W / 2, H / 2, H * .35, W / 2, H / 2, H * 1.05);
-    gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(0,0,0,1)');
-    v.fillStyle = gr; v.fillRect(0, 0, W, H);
-  }
-  g.save(); g.globalAlpha = a; g.drawImage(VIG, 0, 0); g.restore();
+/* film grain over everything, the same for a given frame */
+const GRAIN = (() => { const c = canvas(256, 256), x = c.getContext('2d'), d = x.createImageData(256, 256); for (let i = 0; i < d.data.length; i += 4) { const v = Math.random() * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = v; d.data[i + 3] = 255; } x.putImageData(d, 0, 0); return c; })();
+function grain(T, a = .07) {
+  const f = Math.floor(T * 30), ox = Math.floor(hash(f) * 256), oy = Math.floor(hash(f + .5) * 256);
+  g.save(); g.globalAlpha = a; g.globalCompositeOperation = 'overlay';
+  for (let x = -ox; x < W; x += 256) for (let y = -oy; y < H; y += 256) g.drawImage(GRAIN, x, y);
+  g.restore();
 }
-/* a blocky pixel wipe that covers the screen at tc and uncovers it again */
-function wipe(T, tc, color, dur = .44) {
-  const a = tc - dur / 2;
-  if (T < a || T > tc + dur / 2) return;
-  const B = 120, cols = Math.ceil(W / B), rows = Math.ceil(H / B), k = (T - a) / dur;
-  g.fillStyle = color;
-  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
-    const d = (c + r * .7 + hash(c * 31 + r) * 2) / (cols + rows * .7 + 2);
-    const s = k < .5 ? cl((k * 2 - d * .55) / .45) : 1 - cl(((k - .5) * 2 - d * .55) / .45);
-    if (s > 0) { const z = B * s + 1; g.fillRect(c * B + (B - z) / 2, r * B + (B - z) / 2, z, z); }
-  }
-}
-function flash(T, at, color, len = .35, peak = 1) {
-  const a = T < at ? 0 : peak * (1 - prog(T, at, at + len));
-  if (a > 0) { g.save(); g.globalAlpha = a; g.fillStyle = color; g.fillRect(0, 0, W, H); g.restore(); }
-}
-/* camera: zoom k around (fx, fy) plus a decaying shake from the listed hits */
-function camera(k = 1, fx = W / 2, fy = H / 2, T = 0, hits = [], amp = 14) {
-  let sx = 0, sy = 0;
-  for (const h of hits) {
-    const e = T - h; if (e < 0 || e > .4) continue;
-    const f = (1 - e / .4) ** 2 * amp;
-    sx += Math.sin(e * 90 + h) * f; sy += Math.cos(e * 77 + h * 3) * f;
-  }
-  g.setTransform(k, 0, 0, k, fx - fx * k + sx, fy - fy * k + sy);
-}
-const reset = () => g.setTransform(1, 0, 0, 1, 0, 0);
-function burst(T, at, x, y, color, n = 10, r = 120) {
-  const k = prog(T, at, at + .45); if (k <= 0 || k >= 1) return;
-  g.fillStyle = color;
+/* code glyphs and pixels that blink in around the words */
+const GL = ['<', '>', '/', '{', '}', '/', ';', '*', '/'];
+function glyphs(T, t0, t1, seed, n = 18, { cx = W / 2, cy = H / 2, rx = 560, ry = 300, size = 40, dark = false } = {}) {
+  const cols = dark ? [C.lime, C.sky, '#ff8fb1', C.sun] : [C.coral, C.violet, C.lime2, C.sky, '#ff4fa3', C.ink];
   for (let i = 0; i < n; i++) {
-    const a = i / n * Math.PI * 2 + hash(at * 9 + i), d = E.outCubic(k) * r * (.6 + hash(i + at) * .6), z = 12 * (1 - k) + 2;
-    g.fillRect(x + Math.cos(a) * d - z / 2, y + Math.sin(a) * d - z / 2, z, z);
+    const h = hash(seed * 100 + i), at = t0 + h * (t1 - t0 - .4), life = .3 + hash(i * 7 + seed) * .5;
+    if (T < at || T > at + life) continue;
+    const a = hash(i * 13 + seed) * 6.283, r = .4 + hash(i * 17 + seed) * .6;
+    const x = cx + Math.cos(a) * rx * r, y = cy + Math.sin(a) * ry * r - (T - at) * 24;
+    const col = cols[Math.floor(hash(i * 19 + seed) * cols.length)], k = E.outBack(prog(T, at, at + .14));
+    g.save(); g.translate(x, y); g.rotate((hash(i * 31 + seed) - .5) * .5); g.scale(k, k);
+    if (hash(i * 23 + seed) < .3) { g.fillStyle = col; g.fillRect(-7, -7, 14, 14); }
+    else text(GL[Math.floor(hash(i * 29 + seed) * GL.length)], 0, 0, { size, weight: 400, fam: PIX, color: col, align: 'center', base: 'middle' });
+    g.restore();
   }
 }
-/* the pixel that falls first and becomes a pal */
-function arrive(T, at, x, y, name, s, draw) {
-  const fall = prog(T, at - .38, at);
-  if (T < at) {
-    if (fall > 0) {
-      const py = lerp(y - 760, y, E.inCubic(fall));
-      g.fillStyle = C.lime; g.fillRect(x - 9, py - 18, 18, 18);
-      g.globalAlpha = .35; g.fillRect(x - 5, py - 70, 10, 50); g.globalAlpha = 1;
-    }
-    return;
-  }
-  burst(T, at, x, y - 20, C.lime, 12, 110);
-  const p = E.outElastic(prog(T, at, at + .6));
-  draw(p);
-}
 
-/* ---------- the browser window the opening happens in ---------- */
-function browser(x, y, w, h, { bg = C.card, url = 'yourwebsite.com', dots = [C.line, C.line, C.line], chrome = '#ebe4d4', dark = false } = {}) {
-  rrect(x + 10, y + 14, w, h, 22, 'rgba(0,0,0,.35)');
-  rrect(x, y, w, h, 22, bg);
-  g.save(); g.beginPath(); g.roundRect(x, y, w, 58, [22, 22, 0, 0]); g.fillStyle = chrome; g.fill(); g.restore();
-  dots.forEach((d, i) => { g.beginPath(); g.arc(x + 34 + i * 30, y + 29, 9, 0, 7); g.fillStyle = d; g.fill(); });
-  rrect(x + w / 2 - 200, y + 13, 400, 32, 16, dark ? 'rgba(255,255,255,.07)' : 'rgba(0,0,0,.06)');
-  text(url, x + w / 2, y + 30, { size: 19, weight: 400, fam: MONO, color: dark ? C.soft : C.muted, align: 'center', base: 'middle' });
-}
-
-/* ===================================================================== scenes */
-
-/* 0 – 8s: every website looks the same. Then something moves in. */
-function opening(T) {
-  g.fillStyle = C.ink; g.fillRect(0, 0, W, H);
-  grid('rgba(255,255,255,.025)', 48);
-  const up = E.inOut(prog(T, 1.9, 2.7));
-  const push = E.inCubic(prog(T, 7.15, 8));
-  const BX = 430, BY = 360;
-  camera(lerp(1, 3.1, push), lerp(W / 2, 760, push), lerp(H / 2, 380, push), T, [4.4, 5.6, 6.1, 6.6, 7.1], 9);
-
-  /* the browser rises in */
-  const by = lerp(1150, 0, E.outExpo(prog(T, 1.95, 2.9)));
-  g.save(); g.translate(0, by);
-  const live = (at) => E.outCubic(prog(T, at, at + .35));
-  const dots = [mix(C.line, C.coral, live(7.1)), mix(C.line, C.sun, live(7.15)), mix(C.line, C.mint, live(7.2))];
-  browser(260, 250, 1400, 790, { dots });
-  const head = 'WELCOME TO OUR WEBSITE', hs = 84, hm = measure(head, hs, 800, SANS, -2);
-  const base = 430, capTop = base - measure('W', hs).asc;
-  text(head, 340, base, { size: hs, color: mix('#d6cfc2', C.ink, live(4.4)), track: -2 });
-  const bars = [[470, 980, 5.6], [505, 900, 5.6], [540, 620, 7.1]];
-  bars.forEach(([y, w, at]) => rrect(340, y, w, 18, 9, mix('#e7dfcf', y === 540 ? C.mint : C.violet, live(at) * .55)));
-  const press = T > 5.85 && T < 6.0 ? 5 : 0;
-  rrect(340, 600 + 7, 300, 76, 16, mix('#e7dfcf', C.ink, live(5.85)));
-  rrect(340, 600 + press, 300, 76, 16, mix('#d8cfbd', C.coral, live(5.85)), live(5.85) > 0 ? mix('#d8cfbd', C.ink, live(5.85)) : null);
-  text('LEARN MORE', 490, 640 + press, { size: 28, color: mix(C.card, C.white, live(5.85)), align: 'center', base: 'middle', track: 1 });
-  const cards = [[340, C.sun, 6.35], [770, C.sky, 6.1], [1200, C.mint, 6.6]];
-  cards.forEach(([x, col, at]) => {
-    rrect(x, 730, 400, 250, 20, mix('#efe9dc', col, live(at)), live(at) > .01 ? C.ink : null, 4);
-    rrect(x + 30, 790, 250, 16, 8, 'rgba(23,18,31,.13)'); rrect(x + 30, 822, 300, 16, 8, 'rgba(23,18,31,.13)'); rrect(x + 30, 854, 190, 16, 8, 'rgba(23,18,31,.13)');
-  });
-
-  /* the arrivals */
-  const bugX = 420 + cl(T - 4.75, 0, 2.1) * 170;
-  arrive(T, 4.4, 420, capTop, 'bitbug', 5, p => {
-    const clip = T < 4.75 ? 'idle' : T < 6.85 ? 'walk' : T < 7.55 ? 'look' : 'alarm';
-    const hop = T > 7.55 ? -Math.abs(Math.sin((T - 7.55) * 14)) * 14 : 0;
-    pal('bitbug', clip, T, bugX, capTop + hop, 5, { sx: p, sy: p });
-  });
-  arrive(T, 5.6, 1150, 470, 'kitty', 5, p => {
-    pal('kitty', 'sleep', T, 1150, 470, 5, { sx: p, sy: p });
-    for (let i = 0; i < 3; i++) { const z = ((T - 5.9) * .8 + i / 3) % 1; if (T > 5.9) text('z', 1200 + z * 40, 420 - z * 90, { size: 22 + z * 18, fam: PIX, weight: 400, color: C.violet, alpha: 1 - z }); }
-  });
-  arrive(T, 5.85, 560, 600, 'pip', 5, p => pal('pip', T < 6.4 ? 'idle' : 'peck', T, 560, 600 + press, 5, { sx: p, sy: p, flip: true }));
-  arrive(T, 6.1, 970, 730, 'boing', 5, p => {
-    const b = Math.abs(Math.sin((T - 6.1) * Math.PI * 2)), clip = b > .25 ? 'air' : 'land';
-    pal('boing', clip, T, 970, 730 - b * 70, 5, { sx: p * (b < .1 ? 1.15 : 1), sy: p * (b < .1 ? .85 : 1) });
-  });
-  arrive(T, 6.35, 540, 730, 'termi', 5, p => pal('termi', 'typing', T, 540, 730, 5, { sx: p, sy: p }));
-  arrive(T, 6.6, 1290, 730, 'shel', 5, p => pal('shel', 'walk', T, 1290 + cl(T - 6.8, 0, 2) * 60, 730, 5, { sx: p, sy: p }));
-  arrive(T, 6.85, 1250, capTop, 'penguin', 5, p => pal('penguin', 'walk', T, 1250 - cl(T - 7, 0, 2) * 70, capTop, 5, { sx: p, sy: p, flip: true }));
-  arrive(T, 7.1, 900, 540, 'frog', 5, p => pal('frog', T > 7.4 ? 'happy' : 'sit', T, 900, 540, 5, { sx: p, sy: p }));
+/* ---------- the mark: a lime pixel with two eyes ---------- */
+function mark(x, y, s = 56, k = 1) {
+  g.save(); g.translate(x, y); g.scale(k, k);
+  rrect(-s / 2, -s / 2, s, s, s * .22, C.lime, C.ink, s * .07);
+  g.fillStyle = C.ink; g.fillRect(s * .06, -s * .2, s * .15, s * .26); g.fillRect(-s * .21, -s * .2, s * .15, s * .26);
   g.restore();
-  reset();
-
-  /* the words: they start in the middle and move up out of the way */
-  g.save();
-  g.translate(W / 2, lerp(575, 150, up)); g.scale(lerp(1, .62, up), lerp(1, .62, up));
-  words(['Every', 'website', 'looks', { w: 'the' }, { w: 'same.', color: C.muted }], T, { x: 0, y: 0, size: 136, t0: .2, stagger: .25, out: 4.05 });
-  words(['Until', 'something', { w: 'moved', color: C.lime }, { w: 'in.', color: C.lime }], T, { x: 0, y: 0, size: 136, t0: 4.3, stagger: .12, out: 7.2 });
+}
+function logo(T, at, out, y = H / 2, size = 84) {
+  const tw = measure('Piixpal', size, 650, SANS, -2).w, ms = size * .8, total = ms + size * .32 + tw, x0 = W / 2 - total / 2;
+  const a = E.outCubic(prog(T, at, at + .6)), b = out == null ? 0 : E.inCubic(prog(T, out, out + .35));
+  if (a * (1 - b) <= 0) return;
+  g.save(); g.globalAlpha = a * (1 - b); g.filter = `blur(${((1 - a) * 14 + b * 14).toFixed(1)}px)`;
+  mark(x0 + ms / 2, y, ms, lerp(.6, 1, E.outBack(prog(T, at, at + .5))));
+  text('Piixpal', x0 + ms + size * .32, y + size * .04, { size, weight: 650, color: C.ink, base: 'middle', track: -2 });
   g.restore();
-  vignette(.5);
-  flash(T, 7.75, C.lime, 0, 0);
-  if (T > 7.7) { g.save(); g.globalAlpha = E.inCubic(prog(T, 7.7, 8)); g.fillStyle = C.lime; g.fillRect(0, 0, W, H); g.restore(); }
 }
 
-/* 8 – 12s: the name lands, and so do the pals */
-function title(T) {
-  g.fillStyle = C.ink; g.fillRect(0, 0, W, H);
-  grid('rgba(198,244,50,.05)', 48, 0, (T - 8) * 30);
-  const lands = [9.05, 9.2, 9.35, 9.5, 9.65, 9.8, 9.95];
-  camera(lerp(1.0, 1.05, prog(T, 8, 12)), W / 2, 520, T, [8.05, 8.55, 9.05, 9.5, 9.95], 12);
-  const B = 40, top = 320;
-  const spots = pixelWord('PIIXPAL', W / 2, top, B, T, 8.02);
-  const cast = [['bitbug', 'idle', 7], ['boing', 'idle', 7], ['frog', 'sit', 7], ['penguin', 'idle', 7], ['pip', 'idle', 7], ['shibe', 'rest', 6], ['duck', 'idle', 7]];
-  cast.forEach(([n, clip, s], i) => {
-    const at = lands[i], sp = spots[i];
-    if (T < at - .5) return;
-    const k = prog(T, at - .5, at), y = lerp(-200, top, k * k);
-    const sq = T > at ? 1 - Math.sin(prog(T, at, at + .25) * Math.PI) * .3 : 1;
-    let c = clip, yy = y;
-    if (n === 'boing' && T > at + .3) { const b = Math.abs(Math.sin((T - at - .3) * Math.PI * 2)); yy = top - b * 60; c = b > .2 ? 'air' : 'land'; }
-    if (n === 'bitbug' && T > at + .6) c = 'look';
-    if (n === 'frog' && T > at + .5) c = 'happy';
-    if (n === 'pip' && T > at + .5) c = 'peck';
-    pal(n, c, T, sp.mid, yy, s, { sx: 2 - sq, sy: sq, flip: i > 3 });
-    if (T > at) burst(T, at, sp.mid, top, C.lime, 8, 70);
-  });
+/* ===================================================================== shots */
+
+/* 0 – 3.6: three small phrases, glyphs blinking around them */
+function sOpen(T) {
+  paper(T, { horizon: lerp(0, .5, prog(T, 1, 3.6)), blooms: .35 });
+  glyphs(T, .1, 3.5, 1, 26);
+  soft('Build websites', T, .25, 1.2);
+  soft('that feel', T, 1.35, 2.2);
+  const w = soft([['alive.', C.ink]], T, 2.35, null, { size: 64, weight: 650 });
+  popPal(T, 2.85, 'bitbug', T < 3.2 ? 'idle' : 'walk', W / 2 - w / 2 + 40 + cl(T - 3.2, 0, 1) * 70, H / 2 - 26, 4);
   reset();
-  words(['Tiny', 'pixel', 'creatures', 'that', { w: 'live', color: C.lime }, 'on', 'your', 'website.'], T, { x: W / 2, y: 790, size: 70, weight: 650, color: C.soft, t0: 10.0, stagger: .065 });
-  const vk = E.outBack(prog(T, 10.7, 11.1));
-  if (vk > 0) pill('v0.4  ·  out now', W / 2, 900, { size: 28, k: vk });
-  vignette(.55);
-  flash(T, 8, C.lime, .45);
 }
 
-/* 12 – 22s: the montage, one verb per beat pair */
-const CUTS = [12, 13, 14, 15, 16, 17, 18, 19.5, 22];
-function label(T, t0, verb, color, dim, n) {
-  words([{ w: 'They', color: dim }, ...verb.split(' ').map(w => ({ w, color }))], T, { x: 110, y: 985, size: 112, align: 'left', t0: t0 + .04, stagger: .05, dur: .45 });
-  text(String(n).padStart(2, '0') + ' / 08', W - 110, 120, { size: 26, weight: 600, fam: MONO, color: dim, align: 'right' });
-  text('piixpal', 110, 120, { size: 30, weight: 400, fam: PIX, color: dim });
-}
-function punch(T, t0) { const k = E.outExpo(prog(T, t0, t0 + .4)); camera(lerp(1.12, 1, k), W / 2, H / 2); }
-
-function crawl(T) {
-  const t0 = 12;
-  g.fillStyle = C.paper; g.fillRect(0, 0, W, H); grid('rgba(23,18,31,.05)', 48);
-  punch(T, t0);
-  const str = 'HELLO WORLD', sz = 250, m = measure(str, sz, 800, SANS, -6), base = 640, top = base - measure('H', sz).asc;
-  text(str, W / 2, base, { size: sz, color: C.ink, align: 'center', track: -6 });
-  const x0 = W / 2 - m.w / 2;
-  pal('bitbug', 'walk', T, x0 + 90 + (T - t0) * 760, top, 10, { fps: 14 });
-  pal('pinch', 'walk', T, x0 + m.w - 60 - (T - t0) * 380, top, 9, { flip: true, fps: 12 });
-  pal('gecko', 'walk', T, x0 + 380 + (T - t0) * 300, top, 8, { fps: 12 });
-  reset();
-  label(T, t0, 'crawl.', C.ink, C.muted, 1);
-}
-function nap(T) {
-  const t0 = 13;
-  g.fillStyle = C.sky; g.fillRect(0, 0, W, H); grid('rgba(255,255,255,.12)', 48);
-  punch(T, t0);
-  const x = 420, y = 330, w = 1080, h = 420;
-  rrect(x + 12, y + 14, w, h, 26, C.ink); rrect(x, y, w, h, 26, C.white, C.ink, 5);
-  text('Quarterly report', x + 70, y + 120, { size: 64, color: C.ink, track: -2 });
-  ['Strong growth across every metric we', 'track, and a noticeable increase in', 'pixel creatures napping on the text.'].forEach((l, i) =>
-    text(l, x + 70, y + 200 + i * 58, { size: 40, weight: 500, color: C.muted }));
-  pal('kitty', 'sleep', T, x + 300, y, 9);
-  pal('capy', 'doze', T, x + 820, y, 8, { flip: true });
-  for (let i = 0; i < 4; i++) {
-    const z = ((T - t0) * 1.1 + i / 4) % 1;
-    text('z', x + 380 + z * 60, y - 80 - z * 160, { size: 30 + z * 34, fam: PIX, weight: 400, color: C.ink, alpha: 1 - z });
-  }
-  reset();
-  label(T, t0, 'nap.', C.ink, 'rgba(23,18,31,.55)', 2);
-}
-function perch(T) {
-  const t0 = 14;
-  g.fillStyle = C.sun; g.fillRect(0, 0, W, H); grid('rgba(23,18,31,.06)', 48);
-  punch(T, t0);
-  const land = t0 + .38, press = T > land && T < land + .12 ? 8 : 0;
-  const bx = W / 2 - 340, by = 430, bw = 680, bh = 160;
-  rrect(bx, by + 12, bw, bh, 80, C.ink);
-  rrect(bx, by + press, bw, bh, 80, C.coral, C.ink, 6);
-  text('Get started  →', W / 2, by + bh / 2 + press + 4, { size: 64, color: C.white, align: 'center', base: 'middle', track: -1 });
-  const k = prog(T, t0, land), px = lerp(W + 100, W / 2 + 160, E.outCubic(k)), py = lerp(-120, by + press, E.outCubic(k)) - Math.sin(k * Math.PI) * 120;
-  pal('pip', T < land ? 'fly' : T < land + .3 ? 'idle' : 'peck', T, px, py, 11, { flip: true, fps: T < land ? 12 : 6 });
-  pal('bumble', 'fly', T, W / 2 - 420 + Math.sin(T * 6) * 30, 330 + Math.cos(T * 9) * 20, 7);
-  reset();
-  label(T, t0, 'perch.', C.ink, 'rgba(23,18,31,.5)', 3);
-}
-/* toys under gravity, bouncing off the floor and walls: simulated from the throw, so any frame is reproducible */
-function toss(T, at, x, y, vx, vy, floor = 860) {
-  let px = x, py = y, rot = 0; const dt = 1 / 240;
-  for (let t = at; t < T; t += dt) {
-    vy += 3800 * dt; px += vx * dt; py += vy * dt; rot += vx * dt * .012;
-    if (py > floor) { py = floor; vy *= -.52; vx *= .8; }
-    if (px < 80 || px > W - 80) { vx *= -.8; px = cl(px, 80, W - 80); }
-  }
-  return { x: px, y: py, rot };
-}
-function thrown(T) {
-  const t0 = 15;
-  g.fillStyle = C.coral; g.fillRect(0, 0, W, H); grid('rgba(255,255,255,.08)', 48);
-  punch(T, t0);
-  g.fillStyle = 'rgba(23,18,31,.18)'; g.fillRect(0, 868, W, 12);
-  [['duck', t0 + .05, 260, 520, 1500, -1500], ['dice', t0 + .2, 380, 620, 1100, -1700], ['ball', t0 + .32, 200, 560, 1900, -1300]].forEach(([n, at, x, y, vx, vy]) => {
-    const p = T < at ? { x, y, rot: 0 } : toss(T, at, x, y, vx, vy, 868 - S[n].h * 6.5);
-    pal(n, n === 'dice' ? 'roll' : 'idle', T, p.x, p.y, 13, { center: true, rot: p.rot });
-    if (T < at + .1) cursor(x + 30, y + 40, T < at);
-  });
-  reset();
-  label(T, t0, 'get thrown.', C.white, 'rgba(23,18,31,.6)', 4);
-}
-function cursor(x, y, grab) {
-  const A = grab ? ['k......', 'kk.....', 'kwk....', 'kwwk...', 'kwwwk..', 'kwwwwk.', 'kwwkkk.', 'kk.kwk.', '....kk.'] : ['k......', 'kk.....', 'kwk....', 'kwwk...', 'kwwwk..', 'kwwwwk.', 'kwwkkk.', 'kk.....'];
-  const s = 7;
-  A.forEach((r, j) => [...r].forEach((c, i) => { if (c !== '.') { g.fillStyle = c === 'k' ? C.ink : C.white; g.fillRect(x + i * s, y + j * s, s, s); } }));
-}
-function deliver(T) {
-  const t0 = 16;
-  g.fillStyle = C.violet; g.fillRect(0, 0, W, H); grid('rgba(255,255,255,.08)', 48);
-  punch(T, t0);
-  const drop = t0 + .45;
-  const k = prog(T, t0, drop), bx = lerp(-200, W / 2, E.outCubic(k)), by = 330 + Math.sin(T * 14) * 8;
-  const fx = T < drop ? bx : W / 2 + (T - drop) * 1300, fy = T < drop ? by : by - (T - drop) * 700;
-  const ck = E.outBack(prog(T, drop, drop + .35)), cx = W / 2, cy = T < drop ? by + 150 : lerp(by + 150, 640, ck);
-  /* the note it carries, then the toast it becomes */
-  const cw = lerp(380, 620, ck), ch = lerp(120, 150, ck);
-  if (T < drop) { g.strokeStyle = C.white; g.lineWidth = 4; g.beginPath(); g.moveTo(bx, by - 20); g.lineTo(bx, by + 90); g.stroke(); }
-  g.save(); g.translate(T < drop ? bx : cx, cy);
-  rrect(-cw / 2, -ch / 2 + 10, cw, ch, 24, C.ink); rrect(-cw / 2, -ch / 2, cw, ch, 24, C.white, C.ink, 5);
-  g.beginPath(); g.arc(-cw / 2 + 70, 0, 30, 0, 7); g.fillStyle = C.mint; g.fill();
-  text('✓', -cw / 2 + 70, 3, { size: 36, color: C.white, align: 'center', base: 'middle' });
-  text('Saved', -cw / 2 + 125, -8, { size: 46, color: C.ink, base: 'middle' });
-  text('just now · delivered by pigeon', -cw / 2 + 127, 34, { size: 22, weight: 500, fam: MONO, color: C.muted, base: 'middle', alpha: ck });
-  g.restore();
-  pal('pidge', 'fly', T, fx, fy, 12, { fps: 14 });
-  reset();
-  label(T, t0, 'deliver.', C.white, 'rgba(255,255,255,.55)', 5);
-}
-function weather(T) {
-  const t0 = 17;
-  g.fillStyle = '#0f1630'; g.fillRect(0, 0, W, H);
-  punch(T, t0);
-  const str = 'LET IT SNOW', sz = 240, base = 640, top = base - measure('L', sz).asc, m = measure(str, sz, 800, SANS, -6);
-  text(str, W / 2, base, { size: sz, color: C.white, align: 'center', track: -6 });
-  /* snow settles on every letter top */
-  let x = W / 2 - m.w / 2; const pile = cl((T - t0) * 22, 0, 22);
-  for (const ch of str) {
-    const w = measure(ch, sz, 800, SANS, -6).w;
-    if (ch !== ' ') rrect(x + w * .06, top - pile + 2, w * .74, pile + 8, Math.min(12, pile), '#eaf6ff');
-    x += w;
-  }
-  g.fillStyle = C.white;
-  for (let i = 0; i < 420; i++) {
-    const sp = 260 + hash(i) * 320, sx = hash(i * 7) * W + Math.sin(T * 2 + i) * 20, sy = (hash(i * 3) * H * 1.4 + (T - t0 + 3) * sp) % (H * 1.1) - 40;
-    const z = 4 + Math.round(hash(i * 11) * 3) * 3; g.globalAlpha = .5 + hash(i * 5) * .5; g.fillRect(sx, sy, z, z);
-  }
-  g.globalAlpha = 1;
-  pal('penguin', 'slide', T, lerp(W + 100, -100, prog(T, t0 + .2, t0 + 1)), top - pile + 6, 8, { flip: true });
-  reset();
-  label(T, t0, 'bring the weather.', C.white, 'rgba(255,255,255,.5)', 6);
-}
-let SWARM;
-function swarm(T) {
-  const t0 = 18;
-  g.fillStyle = C.mint; g.fillRect(0, 0, W, H); grid('rgba(255,255,255,.1)', 48);
-  if (!SWARM) {
-    const o = document.createElement('canvas'); o.width = W; o.height = H;
-    const x = o.getContext('2d'); x.font = font(400); x.letterSpacing = '-8px'; x.textAlign = 'center'; x.fillText('HELLO', W / 2, 690);
-    const d = x.getImageData(0, 0, W, H).data, pts = [];
-    for (let y = 0; y < H; y += 13) for (let i = 0; i < W; i += 13) if (d[(y * W + i) * 4 + 3] > 128) pts.push([i, y]);
-    SWARM = pts.map((p, i) => ({ p, s: [hash(i * 3.1) * W * 1.3 - W * .15, hash(i * 5.7) * H * 1.3 - H * .15], d: hash(i * 9.3) * .35 }));
-  }
-  punch(T, t0);
-  const ants = baked('ants').walk;
-  g.imageSmoothingEnabled = false;
-  for (const a of SWARM) {
-    const k = E.inOut(prog(T, t0 + .05 + a.d, t0 + .85 + a.d));
-    const wob = (1 - k) * 40, x = lerp(a.s[0], a.p[0], k) + Math.sin(T * 8 + a.d * 50) * wob, y = lerp(a.s[1], a.p[1], k) + Math.cos(T * 7 + a.d * 40) * wob;
-    const ang = k < 1 ? Math.atan2(a.p[1] - a.s[1], a.p[0] - a.s[0]) : Math.sin(T * 3 + a.d * 20) * .4;
-    g.save(); g.translate(x, y); g.rotate(ang); g.drawImage(ants[Math.floor(T * 10 + a.d * 10) % ants.length], -12, -4.5, 24, 9); g.restore();
-  }
-  reset();
-  label(T, t0, 'swarm.', C.ink, 'rgba(23,18,31,.5)', 7);
-}
-/* a tiny platformer across the words of a sentence */
-let LEVEL;
-const PLAY = [19.5, 21.85];
-function level() {
-  if (LEVEL) return LEVEL;
-  const [t0, t1] = PLAY;
-    const ws = [['YOUR', 820], ['SITE', 690], ['IS', 560], ['A', 700], ['LEVEL', 520]], sz = 130;
-    let x = 140; LEVEL = { sz, plats: [] };
-    for (const [w, base] of ws) { const m = measure(w, sz, 800, SANS, -3); LEVEL.plats.push({ w, x, x1: x + m.w, base, top: base - measure('E', sz).asc }); x += m.w + 120; }
-    /* path: run along each word, hop to the next */
-    const P = LEVEL.plats, seg = [];
-    P.forEach((p, i) => {
-      seg.push({ kind: 'run', x0: i ? p.x + 30 : p.x + 40, x1: p.x1 - 34, y: p.top });
-      if (P[i + 1]) seg.push({ kind: 'jump', x0: p.x1 - 34, x1: P[i + 1].x + 30, y0: p.top, y1: P[i + 1].top });
-    });
-    const len = s => s.kind === 'run' ? Math.abs(s.x1 - s.x0) : 260;
-    const total = seg.reduce((a, s) => a + len(s), 0);
-    let acc = 0; seg.forEach(s => { s.a = acc / total; acc += len(s); s.b = acc / total; });
-    LEVEL.seg = seg;
-    /* each coin sits over the middle of a jump, so it is taken at the jump's halfway time */
-    LEVEL.coins = seg.filter(s => s.kind === 'jump').map(s => ({ x: (s.x0 + s.x1) / 2, y: Math.min(s.y0, s.y1) - 200, at: t0 + .1 + (s.a + s.b) / 2 * (t1 - t0 - .1) }));
-  return LEVEL;
-}
-function play(T) {
-  const [t0, t1] = PLAY;
-  g.fillStyle = '#1b1430'; g.fillRect(0, 0, W, H);
-  for (let i = 0; i < 70; i++) { g.fillStyle = 'rgba(255,255,255,' + (.2 + hash(i) * .5) + ')'; const z = hash(i * 2) > .8 ? 6 : 3; g.fillRect(hash(i * 3) * W, hash(i * 5) * 620, z, z); }
-  punch(T, t0);
-  const { plats, seg, coins, sz } = level();
-  for (const p of plats) {
-    text(p.w, p.x, p.base, { size: sz, color: C.white, track: -3 });
-    g.fillStyle = C.lime; g.fillRect(p.x, p.top - 10, p.x1 - p.x, 10);
-  }
-  const u = prog(T, t0 + .1, t1);
-  const s = seg.find(s => u <= s.b) || seg[seg.length - 1], k = cl((u - s.a) / (s.b - s.a));
-  let x, y, clip;
-  if (s.kind === 'run') { x = lerp(s.x0, s.x1, k); y = s.y; clip = u >= 1 ? 'happy' : 'run'; }
-  else { x = lerp(s.x0, s.x1, k); y = lerp(s.y0, s.y1, k) - Math.sin(k * Math.PI) * 230; clip = k < .5 ? 'jump' : 'fall'; }
-  let got = 0;
-  coins.forEach((c, i) => {
-    if (T >= c.at) {
-      got++;
-      const at = c.at, r = prog(T, at, at + .5);
-      if (r < 1) text('+1', c.x, c.y - r * 80, { size: 34, fam: PIX, weight: 400, color: C.sun, align: 'center', alpha: 1 - r });
-      burst(T, at, c.x, c.y, C.sun, 8, 60);
-    } else pal('_coin', 'spin', T, c.x, c.y + Math.sin(T * 6 + i) * 8, 8);
-  });
-  pal('pix', clip, T, x, y, 9);
-  reset();
-  text('WORLD 1-1', 110, 120, { size: 30, fam: PIX, weight: 400, color: C.soft });
-  text('COINS ' + String(got).padStart(2, '0'), W - 110, 120, { size: 30, fam: PIX, weight: 400, color: C.sun, align: 'right' });
-  words([{ w: 'They', color: 'rgba(255,255,255,.5)' }, ...'turn your site into a game.'.split(' ').map(w => ({ w, color: C.white }))], T, { x: 110, y: 985, size: 100, align: 'left', t0: t0 + .04, stagger: .05, dur: .45 });
-  text('08 / 08', W - 110, 985, { size: 26, weight: 600, fam: MONO, color: 'rgba(255,255,255,.5)', align: 'right' });
-}
-
-/* 22 – 26s: the numbers, one slam per beat pair */
-function stats(T) {
-  g.fillStyle = C.ink; g.fillRect(0, 0, W, H); grid('rgba(255,255,255,.03)', 48);
-  const S4 = [
-    [22, 118, 'components', C.lime, 'bitbug', 'walk'],
-    [23, 23, 'superpowers', '#a996ff', 'pix', 'happy'],
-    [24, 0, 'dependencies', C.coral, 'squish', 'calm'],
-    [25, 1, 'line to start', C.sky, 'termi', 'typing']
-  ];
-  const i = Math.min(3, Math.floor(T - 22)), [t0, n, what, col, who, clip] = S4[i];
-  const k = E.outExpo(prog(T, t0, t0 + .45));
-  camera(lerp(1.5, 1, k), W / 2, 520, T, [22, 23, 24, 25], 22);
-  const shown = n > 1 ? Math.round(n * E.outCubic(prog(T, t0, t0 + .5))) : n;
-  const sz = 420, base = 640, str = String(shown), m = measure(String(n), sz, 800, SANS, -12), top = base - measure('8', sz).asc;
-  g.globalAlpha = cl(k * 3);
-  text(str, W / 2, base, { size: sz, color: col, align: 'center', track: -12 });
-  g.globalAlpha = 1;
-  const walk = who === 'bitbug' ? (T - t0) * 260 : 0;
-  pal(who, clip, T, W / 2 + m.w / 2 - 70 - walk, top, 8, { flip: who === 'bitbug', sx: E.outBack(prog(T, t0 + .2, t0 + .5)), sy: E.outBack(prog(T, t0 + .2, t0 + .5)) });
-  reset();
-  words([what], T, { x: W / 2, y: 790, size: 92, weight: 650, color: C.white, t0: t0 + .08 });
-  vignette(.6);
-  flash(T, t0, col, .18, .5);
-}
-
-/* 26 – 31s: one line, any stack */
-const CODE = [
-  [['<', C.soft], ['h1', C.coral], ['>', C.soft]],
-  [['  Hello world', C.white]],
-  [['  <', C.soft], ['piix-pal', C.coral], [' pal', C.sun], ['=', C.soft], ['"bitbug"', C.lime], [' />', C.soft]],
-  [['</', C.soft], ['h1', C.coral], ['>', C.soft]]
+/* 3.6 – 7: websites fly in from deep space, gather, collapse into one pixel, and that pixel is the logo */
+const CARDS = [
+  ['hero', 960, 470, 540, 330], ['toast', 560, 300, 330, 112], ['chart', 1370, 330, 360, 250], ['profile', 600, 690, 310, 220],
+  ['button', 1330, 640, 300, 100], ['phone', 1590, 560, 210, 390], ['blog', 330, 520, 270, 320], ['dash', 1000, 800, 440, 200], ['price', 1620, 240, 250, 220]
 ];
-function code(T) {
-  const t0 = 26;
-  g.fillStyle = C.deep; g.fillRect(0, 0, W, H); grid('rgba(255,255,255,.03)', 48);
-  const rise = E.outExpo(prog(T, t0, t0 + .6));
-  camera(lerp(1.06, 1, rise), W / 2, H / 2);
-  words(['One', 'line.', { w: 'Any', color: C.lime }, { w: 'stack.', color: C.lime }], T, { x: W / 2, y: 190, size: 104, t0: t0 + .05, stagger: .1 });
-  /* the editor */
-  const ex = 140, ey = 270 + (1 - rise) * 120, ew = 800, eh = 520;
-  rrect(ex + 10, ey + 14, ew, eh, 22, '#000'); rrect(ex, ey, ew, eh, 22, '#0b0810', C.ink2, 3);
-  g.save(); g.beginPath(); g.roundRect(ex, ey, ew, 58, [22, 22, 0, 0]); g.fillStyle = '#1a1522'; g.fill(); g.restore();
-  [C.coral, C.sun, C.mint].forEach((d, i) => { g.beginPath(); g.arc(ex + 34 + i * 30, ey + 29, 9, 0, 7); g.fillStyle = d; g.fill(); });
-  text('index.html', ex + ew / 2, ey + 30, { size: 19, weight: 400, fam: MONO, color: C.soft, align: 'center', base: 'middle' });
-  const cmd = '$ npm i piixpal', ct = prog(T, t0 + .3, t0 + .9);
-  text(cmd.slice(0, Math.round(cmd.length * ct)), ex + 50, ey + 120, { size: 32, weight: 600, fam: MONO, color: C.white });
-  if (T > t0 + 1.0) text('+ piixpal@0.4.0   0 deps   ✓', ex + 50, ey + 168, { size: 26, weight: 400, fam: MONO, color: C.lime, alpha: prog(T, t0 + 1, t0 + 1.15) });
-  const all = CODE.reduce((a, l) => a + l.reduce((b, [s]) => b + s.length, 0), 0);
-  let left = Math.round(all * prog(T, t0 + 1.3, t0 + 2.6)), cy = ey + 250, lastX = ex + 50, lastY = cy;
-  CODE.forEach(line => {
-    let x = ex + 50;
-    for (const [s, col] of line) {
-      if (left <= 0) break;
-      const part = s.slice(0, left); left -= part.length;
-      text(part, x, cy, { size: 32, weight: 600, fam: MONO, color: col });
-      x += measure(part, 32, 600, MONO).w; lastX = x; lastY = cy;
-    }
-    cy += 52;
-  });
-  if (Math.floor(T * 3) % 2 === 0 || T < t0 + 2.7) { g.fillStyle = C.lime; g.fillRect(lastX + 4, lastY - 28, 16, 34); }
-  /* the page it makes */
-  const bx = 980, by = 270 + (1 - rise) * 200;
-  browser(bx, by, 800, 520, { bg: C.paper, url: 'localhost:3000', dots: [C.coral, C.sun, C.mint] });
-  const hk = E.outExpo(prog(T, t0 + 1.6, t0 + 2));
-  const hs = 110, hb = by + 330, htop = hb - measure('H', hs).asc;
-  if (hk > 0) text('Hello world', bx + 70, hb + (1 - hk) * 40, { size: hs, color: C.ink, alpha: hk, track: -3 });
-  rrect(bx + 70, by + 380, 520, 16, 8, C.line); rrect(bx + 70, by + 412, 420, 16, 8, C.line);
-  const pop = t0 + 2.65;
-  if (T > pop - .4) arrive(T, pop, bx + 140, htop, 'bitbug', 6, p => pal('bitbug', T < pop + .3 ? 'alarm' : 'walk', T, bx + 140 + cl(T - pop - .3, 0, 3) * 160, htop, 6, { sx: p, sy: p }));
-  /* the ways in */
-  ['HTML', 'React', 'Vue', 'Svelte', 'shadcn', 'npm'].forEach((s, i, a) => {
-    const at = t0 + 3.2 + i * .2, k = E.outBack(prog(T, at, at + .35));
-    if (k > 0) pill(s, W / 2 + (i - (a.length - 1) / 2) * 250, 930, { size: 34, fam: SANS, weight: 750, bg: [C.lime, C.sky, C.mint, C.sun, C.coral, '#a996ff'][i], k });
+function uiCard(kind, w, h, T) {
+  const P = { hero: [C.ink, 'bitbug'], toast: [C.white, 'pidge'], chart: [C.white, 'boing'], profile: ['#fff1bf', 'kitty'], button: [null, 'pip'], phone: [C.ink, 'frog'], blog: ['#fbf8f1', 'shel'], dash: ['#1f1b29', 'termi'], price: ['#e8f9c4', 'penguin'] }[kind];
+  if (kind === 'button') { rrect(0, 0, w, h, h / 2, C.coral); text('Get started →', w / 2, h / 2 + 2, { size: 30, weight: 650, color: C.white, align: 'center', base: 'middle' }); }
+  else {
+    rrect(0, 0, w, h, 22, P[0]);
+    if (kind === 'hero') { text('Make it', 36, 120, { size: 64, weight: 700, color: C.white, track: -2 }); text('yours.', 36, 190, { size: 64, weight: 700, color: C.lime, track: -2 }); rrect(36, 236, 170, 54, 27, C.lime); rrect(220, 236, 130, 54, 27, null, 'rgba(255,255,255,.3)'); }
+    if (kind === 'toast') { g.beginPath(); g.arc(52, h / 2, 26, 0, 7); g.fillStyle = C.mint; g.fill(); text('✓', 52, h / 2 + 2, { size: 28, weight: 700, color: C.white, align: 'center', base: 'middle' }); text('Saved', 96, h / 2 - 12, { size: 32, weight: 650, base: 'middle' }); text('delivered by pigeon', 96, h / 2 + 22, { size: 18, fam: MONO, weight: 400, color: C.muted, base: 'middle' }); }
+    if (kind === 'chart') { text('Visitors', 28, 50, { size: 26, weight: 650 }); [.4, .7, .5, .9, .65, 1].forEach((v, i) => rrect(28 + i * 52, h - 30 - v * 140, 36, v * 140, 8, i === 5 ? C.violet : '#e3ddf9')); }
+    if (kind === 'profile') { g.beginPath(); g.arc(70, 80, 40, 0, 7); g.fillStyle = C.coral; g.fill(); rrect(130, 58, 140, 18, 9, 'rgba(23,18,31,.7)'); rrect(130, 88, 100, 14, 7, 'rgba(23,18,31,.25)'); rrect(30, 150, 250, 14, 7, 'rgba(23,18,31,.15)'); rrect(30, 176, 190, 14, 7, 'rgba(23,18,31,.15)'); }
+    if (kind === 'phone') { rrect(14, 14, w - 28, h - 28, 18, C.sky); rrect(34, 220, w - 68, 90, 14, C.white); rrect(70, 30, w - 140, 10, 5, C.ink); }
+    if (kind === 'blog') { rrect(18, 18, w - 36, 150, 14, C.mint); rrect(18, 192, w - 60, 20, 10, C.ink); rrect(18, 226, w - 90, 14, 7, C.line); rrect(18, 252, w - 70, 14, 7, C.line); }
+    if (kind === 'dash') { for (let i = 0; i < 3; i++) { rrect(20 + i * 140, 24, 124, 152, 14, '#2b2436'); text(['118', '0', '23'][i], 36 + i * 140, 96, { size: 46, weight: 700, color: [C.lime, C.sky, C.sun][i] }); rrect(36 + i * 140, 130, 80, 10, 5, '#4a4258'); } }
+    if (kind === 'price') { text('Free', 26, 76, { size: 52, weight: 700, track: -2 }); text('forever', 26, 116, { size: 24, fam: MONO, weight: 400, color: C.muted }); rrect(26, 150, w - 52, 46, 23, C.ink); }
+  }
+  pal(P[1], clipOf(P[1], ['idle', 'sit', 'rest', 'typing']), T, w * .7, 0, 4);
+}
+function sCollage(T) {
+  paper(T, { horizon: .5, blooms: .35 });
+  glyphs(T, 3.6, 5.2, 2, 14);
+  const drift = E.inOut(prog(T, 3.6, 5.4)), col = E.inCubic(prog(T, 5.3, 5.85));
+  camera(lerp(1.08, 1, drift), W / 2, H / 2);
+  CARDS.forEach(([kind, x, y, w, h], i) => {
+    const at = 3.6 + i * .085, k = E.outExpo(prog(T, at, at + .8));
+    if (k <= 0) return;
+    const z = lerp(6, 1, k), s = (1 / z) * (1 - col);
+    if (s <= .01) return;
+    const px = lerp(W / 2 + (x - W / 2) / z, W / 2, col), py = lerp(H / 2 + (y - H / 2) / z, H / 2, col);
+    g.save();
+    g.filter = `blur(${((z - 1) * 3 + col * 12).toFixed(1)}px)`; g.globalAlpha = cl(k * 2);
+    g.translate(px, py); g.rotate(col * (i % 2 ? .4 : -.4)); g.scale(s, s); g.translate(-w / 2, -h / 2);
+    lifted(0, 0, w, h, kind === 'button' ? h / 2 : 22, kind === 'button' ? C.coral : '#fff', .8);
+    uiCard(kind, w, h, T);
+    g.restore();
   });
   reset();
-  vignette(.45);
+  /* the pixel everything fell into */
+  const pk = prog(T, 5.7, 5.95);
+  if (pk > 0 && T < 6.1) { const z = 26 * E.outBack(pk) * (1 + Math.sin(T * 30) * .05); g.fillStyle = C.lime; g.fillRect(W / 2 - z / 2, H / 2 - z / 2, z, z); }
+  logo(T, 6.0, null);
+  reset();
 }
 
-/* 31 – 34s: everyone */
-const BIG = [['whale', 330, C.sky], ['astronaut', 620], ['unicorn', 900], ['gpu', 1180], ['llama', 1440], ['crt', 1700]];
-let PARADE;
-function parade(T) {
-  const t0 = 31;
-  g.fillStyle = C.lime; g.fillRect(0, 0, W, H); grid('rgba(23,18,31,.07)', 48, -(T - t0) * 120);
-  words(['Free.', 'Open', 'source.', { w: 'Yours.', color: C.violet }], T, { x: W / 2, y: 210, size: 128, color: C.ink, t0: t0 + .1, stagger: .14 });
-  g.fillStyle = C.ink; g.fillRect(0, 900, W, 180);
-  for (let x = -((T * 300) % 96); x < W; x += 96) { g.fillStyle = C.ink2; g.fillRect(x, 930, 48, 14); }
-  if (!PARADE) PARADE = Object.keys(S).filter(n => n[0] !== '_' && !['fence', 'molehill', 'fireflies', 'ants', 'fish', 'bees', 'duckling'].includes(n));
-  const gap = 190, speed = 640;
-  PARADE.forEach((n, i) => {
-    const x = (T - t0) * speed - i * gap + 300;
-    if (x < -150 || x > W + 150) return;
-    const clips = Object.keys(S[n].frames), clip = ['walk', 'run', 'fly', 'go', 'slide', 'swim', 'roam'].find(c => clips.includes(c)) || clips[0];
-    const hop = clip === clips[0] && !['walk', 'run'].includes(clip) ? -Math.abs(Math.sin(T * 9 + i)) * 26 : 0;
-    const s = Math.max(4, Math.round(124 / Math.max(S[n].w, S[n].h)));
-    pal(n, clip, T + i * .13, x, 900 + hop, s);
-  });
-  vignette(.25);
+/* 7 – 9.6: the prompt. You ask for a pal */
+const PROMPT = [['<', '#8a8494'], ['piix-pal', '#d6336c'], [' pal', '#a66a00'], ['=', '#8a8494'], ['"bitbug"', '#2f8a3a'], [' />', '#8a8494']];
+function sPrompt(T) {
+  paper(T, { horizon: .7, blooms: .4 });
+  logo(T, -1, 7.05);
+  glyphs(T, 7.2, 9.2, 3, 18, { rx: 640, ry: 330 });
+  const k = E.outExpo(prog(T, 7.15, 7.8)), grow = E.inCubic(prog(T, 8.75, 9.6));
+  const w = 860, h = 176, x = W / 2 - w / 2, y = H / 2 - h / 2 + (1 - k) * 60;
+  g.save(); g.globalAlpha = k; g.filter = `blur(${((1 - k) * 12).toFixed(1)}px)`;
+  camera(lerp(1, 1.5, grow), W / 2, H / 2);
+  lifted(x, y, w, h, 26, C.white, 1);
+  const n = Math.round(tokLen(PROMPT) * prog(T, 7.4, 8.3));
+  const end = n ? tokens(PROMPT, x + 40, y + 62, n) : x + 40;
+  if (!n) text('Add a pal to my site…', x + 40, y + 62, { size: 30, weight: 400, color: '#a49eae', base: 'middle' });
+  if (Math.floor(T * 2.5) % 2 === 0 || (T > 7.4 && T < 8.3)) { g.fillStyle = C.ink; g.fillRect(end + 3, y + 44, 3, 38); }
+  text('+', x + 44, y + h - 40, { size: 36, weight: 400, color: '#a49eae', base: 'middle' });
+  const sent = T > 8.55, bx = x + w - 70, by = y + h - 70;
+  rrect(bx, by + (T > 8.55 && T < 8.65 ? 3 : 0), 44, 44, 12, sent ? C.lime : C.ink);
+  text('↑', bx + 22, by + 23, { size: 26, weight: 700, color: sent ? C.ink : C.white, align: 'center', base: 'middle' });
+  /* the pointer that sends it */
+  const ck = E.inOut(prog(T, 8.0, 8.5));
+  if (T > 8.0) cursor(lerp(W - 300, bx + 26, ck), lerp(H - 120, by + 30, ck), 5);
+  g.restore();
+  reset();
 }
-function bigSprites(T) {
-  const on = T >= 31 && T < 34;
-  BIG.forEach(([n, x], i) => {
-    const el = BIG_EL[i], at = 31.5 + i * .25, k = E.outBack(prog(T, at, at + .4));
-    el.style.display = on && k > 0 ? '' : 'none';
-    el._vis = true; /* drawn every frame, the observer is too slow for a frame-by-frame render */
-    el.style.transform = `translate(-50%,-100%) scale(${k}) translateY(${Math.sin(T * 6 + i) * 6}px)`;
-  });
+function cursor(x, y, s) {
+  ['k......', 'kk.....', 'kwk....', 'kwwk...', 'kwwwk..', 'kwwwwk.', 'kwwkkk.', 'kk.....'].forEach((r, j) => [...r].forEach((c, i) => { if (c !== '.') { g.fillStyle = c === 'k' ? C.ink : C.white; g.fillRect(x + i * s, y + j * s, s, s); } }));
 }
-const BIG_EL = BIG.map(([n, x]) => {
+
+/* 9.6 – 13.6: the product shot. Bitbug, one pixel at a time, as glossy cubes under a studio light */
+function voxel(name, clip, frame, cx, by, P, focus, maxBlur = 5) {
+  const sp = S[name], rows = sp.frames[clip][frame % sp.frames[clip].length], pad = sp.h - rows.length;
+  const buckets = [[], [], [], [], []];
+  rows.forEach((row, j) => [...row].forEach((ch, i) => {
+    const col = sp.palette[ch]; if (!col) return;
+    buckets[Math.min(4, Math.floor(Math.abs(i - focus) / 2.4))].push([i, j + pad, col]);
+  }));
+  const d = P * .2, x0 = cx - sp.w * P / 2, y0 = by - sp.h * P;
+  for (let b = 4; b >= 0; b--) {
+    if (!buckets[b].length) continue;
+    const layer = into(LV[b], () => {
+      for (const [i, j, col] of buckets[b]) { g.fillStyle = mix(col, '#000000', .55); g.fillRect(x0 + i * P + d * .5, y0 + j * P + d, P, P); }
+      for (const [i, j, col] of buckets[b]) {
+        const x = x0 + i * P, y = y0 + j * P, gap = P * .05;
+        const gr = g.createLinearGradient(x, y, x, y + P);
+        gr.addColorStop(0, mix(col, '#ffffff', .38)); gr.addColorStop(.35, col); gr.addColorStop(1, mix(col, '#000000', .18));
+        g.fillStyle = gr; g.beginPath(); g.roundRect(x + gap, y + gap, P - gap * 2, P - gap * 2, P * .14); g.fill();
+        g.fillStyle = 'rgba(255,255,255,.45)'; g.fillRect(x + P * .18, y + P * .14, P * .22, P * .08);
+      }
+    });
+    g.save();
+    g.filter = `blur(${(b * maxBlur / 4 * 2).toFixed(1)}px)`;
+    if (b === 0) { g.shadowColor = 'rgba(198,244,50,.28)'; g.shadowBlur = 90; }
+    g.drawImage(layer, 0, 0);
+    g.restore();
+  }
+}
+function sMacro(T) {
+  const k = E.inOut(prog(T, 9.0, 13.8));
+  studio(lerp(.62, .45, k));
+  /* the floor it stands on, and its shadow */
+  const P = lerp(118, 64, k), cx = lerp(780, 980, k), by = lerp(1020, 860, k);
+  g.save(); g.filter = 'blur(30px)'; g.fillStyle = 'rgba(0,0,0,.55)'; g.beginPath(); g.ellipse(cx, by + 20, 16 * P * .5, P * .9, 0, 0, 7); g.fill(); g.restore();
+  voxel('bitbug', 'walk', Math.floor(T * 3), cx, by, P, lerp(13, 6, k), lerp(9, 4, k));
+  soft([['Meet', '#a9a4b2'], ['Bitbug.', '#f1ede4']], T, 10.7, 12.0, { y: 960, size: 46 });
+  soft([['16 × 11 pixels of', '#a9a4b2'], ['personality.', C.lime]], T, 12.2, 13.3, { y: 960, size: 46 });
+  reset();
+}
+
+/* 13.6 – 16.4: on a real-looking site, the headline sliding past, pals living on it */
+function sSite(T) {
+  paper(T, { horizon: 1, blooms: .3 });
+  const z = E.outCubic(prog(T, 13.4, 16.6));
+  camera(lerp(1.1, 1, z), W / 2, H * .45);
+  const x = 300, y = 120, w = 1320, h = 740;
+  lifted(x, y, w, h, 24, C.ink, 1.2);
+  g.save(); g.beginPath(); g.roundRect(x, y, w, h, 24); g.clip();
+  const gr = g.createLinearGradient(x, y, x, y + h); gr.addColorStop(0, '#2a2140'); gr.addColorStop(1, '#120f19');
+  g.fillStyle = gr; g.fillRect(x, y, w, h);
+  grid('rgba(198,244,50,.06)', 44, x, y, w, h);
+  text('▪ trailhead', x + 40, y + 52, { size: 24, weight: 650, color: C.white, base: 'middle' });
+  ['Work', 'About', 'Shop'].forEach((s, i) => text(s, x + w - 360 + i * 100, y + 52, { size: 22, weight: 500, color: '#b9b2c7', base: 'middle' }));
+  rrect(x + w - 70, y + 34, 40, 36, 10, C.lime);
+  /* the headline, wider than the card, gliding left */
+  const hs = 190, hx = x + 40 - (T - 13.4) * 110, hb = y + 400, top = hb - measure('M', hs, 700).asc;
+  text('Make the web', hx, hb, { size: hs, weight: 700, color: C.white, track: -7 });
+  const mx = measure('Make the web ', hs, 700, SANS, -7).w;
+  text('fun again.', hx + mx, hb, { size: hs, weight: 700, color: C.lime, track: -7 });
+  pal('bitbug', 'walk', T, hx + 260 + (T - 13.4) * 230, top, 7);
+  pal('penguin', 'walk', T, hx + mx + 420 + (T - 13.4) * 150, top, 6);
+  /* cards along the bottom */
+  ['Pals', 'Superpowers', 'Sprites', 'Crowd', 'Type'].forEach((s, i) => {
+    const cx = x + 40 + i * 252, cy = y + h - 230;
+    rrect(cx, cy, 232, 190, 18, 'rgba(255,255,255,.06)', 'rgba(255,255,255,.1)', 1.5);
+    text(s, cx + 20, cy + 160, { size: 24, weight: 600, color: C.white });
+    const who = ['kitty', 'pix', 'pip', 'frog', 'boing'][i], c = clipOf(who, ['sleep', 'idle', 'sit']);
+    const b = who === 'boing' ? Math.abs(Math.sin(T * 6)) * 30 : 0;
+    pal(who, who === 'boing' && b > 6 ? 'air' : c, T, cx + 116, cy + 110 - b, 5);
+  });
+  g.restore();
+  reset();
+}
+
+/* 16.4 – 19.2: the component tree writes itself */
+const TREE = [[0, 'components', null], [1, 'pals', null], [2, 'bitbug', 'bitbug'], [2, 'kitty', 'kitty'], [2, 'boing', 'boing'], [2, 'penguin', 'penguin'],
+  [1, 'superpowers', null], [2, 'pidge', 'pidge'], [2, 'pix', 'pix'], [2, 'plug', 'plug'], [1, 'sprites', null], [2, 'whale', null], [2, 'astronaut', null]];
+function sTree(T) {
+  paper(T, { horizon: 1, blooms: .3 });
+  const scroll = E.inOut(prog(T, 17.6, 19.0)) * 300;
+  g.translate(0, -scroll);
+  TREE.forEach(([d, name, sprite], i) => {
+    const at = 16.55 + i * .16; if (T < at) return;
+    const x = 520 + d * 56, y = 260 + i * 70;
+    if (T - at < .5) { g.save(); g.globalAlpha = 1 - (T - at) / .5; rrect(x - 16, y - 28, 380, 56, 12, 'rgba(198,244,50,.6)'); g.restore(); }
+    const folder = !sprite && d < 2;
+    g.save(); g.globalAlpha = E.outCubic(prog(T, at, at + .3)); g.filter = `blur(${((1 - prog(T, at, at + .3)) * 10).toFixed(1)}px)`;
+    if (folder) text('⌄', x - 34, y - 6, { size: 30, weight: 500, color: C.muted, base: 'middle' });
+    if (sprite) pal(sprite, Object.keys(S[sprite].frames)[0], T, x + 18, y + 16, 2);
+    else if (!folder) { rrect(x, y - 16, 34, 32, 6, null, C.muted, 2); }
+    text(name, x + (folder ? 0 : 52), y, { size: 40, weight: folder ? 560 : 450, color: folder ? C.ink : '#4c4558', base: 'middle' });
+    g.restore();
+  });
+  reset();
+  const n = Math.round(118 * E.outCubic(prog(T, 17.2, 18.1)));
+  if (T > 17.1) {
+    soft([[String(n), C.ink]], T, 17.1, 18.95, { x: 1380, y: 470, size: 210, weight: 650, align: 'left' });
+    soft('components', T, 17.3, 18.95, { x: 1388, y: 600, size: 44, color: C.muted, align: 'left' });
+  }
+  glyphs(T, 16.5, 19, 7, 10, { cx: 1500, cy: 500, rx: 300, ry: 260 });
+  reset();
+}
+
+/* 19.2 – 22.8: the same whale in six render styles, each on its own ground */
+const STYLES = [['voxel', 'blueprint'], ['dots', 'riso'], ['halftone', 'news'], ['dither', 'gameboy'], ['ascii', 'crt'], ['pixel', 'lime']];
+function ground(kind, x, y, w, h) {
+  g.save(); g.beginPath(); g.rect(x, y, w, h); g.clip();
+  if (kind === 'blueprint') { g.fillStyle = '#1d4c9e'; g.fillRect(x, y, w, h); grid('rgba(255,255,255,.12)', 24, x, y, w, h, 1); grid('rgba(255,255,255,.22)', 120, x, y, w, h, 2); g.strokeStyle = 'rgba(255,255,255,.35)'; g.lineWidth = 2; g.beginPath(); g.arc(x + w * .5, y + h * .5, Math.min(w, h) * .42, 0, 7); g.stroke(); }
+  if (kind === 'riso') { g.fillStyle = '#ffd6e2'; g.fillRect(x, y, w, h); g.fillStyle = 'rgba(255,79,163,.35)'; for (let yy = y; yy < y + h; yy += 22) for (let xx = x + ((yy - y) / 22 % 2) * 11; xx < x + w; xx += 22) { const r = 2 + 6 * ((xx - x) / w); g.beginPath(); g.arc(xx, yy, r, 0, 7); g.fill(); } }
+  if (kind === 'news') { g.fillStyle = '#efe5cf'; g.fillRect(x, y, w, h); g.fillStyle = 'rgba(23,18,31,.08)'; for (let yy = y + 10; yy < y + h; yy += 7) g.fillRect(x, yy, w, 1.5); }
+  if (kind === 'gameboy') { g.fillStyle = '#9bbc0f'; g.fillRect(x, y, w, h); grid('rgba(48,98,48,.18)', 10, x, y, w, h, 1); }
+  if (kind === 'crt') { const gr = g.createRadialGradient(x + w / 2, y + h / 2, 10, x + w / 2, y + h / 2, w * .7); gr.addColorStop(0, '#0f3a22'); gr.addColorStop(1, '#020805'); g.fillStyle = gr; g.fillRect(x, y, w, h); g.fillStyle = 'rgba(0,0,0,.35)'; for (let yy = y; yy < y + h; yy += 5) g.fillRect(x, yy, w, 2); }
+  if (kind === 'lime') { g.fillStyle = C.lime; g.fillRect(x, y, w, h); grid('rgba(23,18,31,.08)', 40, x, y, w, h, 1.5); }
+  g.restore();
+}
+const STY_T = 19.2, STY_EACH = .42, STY_GRID = STY_T + STYLES.length * STY_EACH;
+const TILE = i => { const w = 560, h = 340, gx = 24; return { x: (W - (3 * w + 2 * gx)) / 2 + (i % 3) * (w + gx), y: 200 + Math.floor(i / 3) * (h + gx), w, h }; };
+const darkGround = kind => kind === 'blueprint' || kind === 'crt';
+function sStyles(T) {
+  g.fillStyle = C.bone; g.fillRect(0, 0, W, H);
+  if (T < STY_GRID) {
+    const i = cl(Math.floor((T - STY_T) / STY_EACH), 0, 5);
+    ground(STYLES[i][1], 0, 0, W, H);
+    text(`render="${STYLES[i][0]}"`, W / 2, 940, { size: 30, fam: MONO, weight: 500, color: darkGround(STYLES[i][1]) ? '#e8f2ff' : C.ink, align: 'center', base: 'middle' });
+  } else {
+    const k = E.outExpo(prog(T, STY_GRID, STY_GRID + .7));
+    camera(lerp(1.12, 1, k));
+    STYLES.forEach(([r, kind], i) => {
+      const t = TILE(i), a = E.outCubic(prog(T, STY_GRID + i * .05, STY_GRID + i * .05 + .4));
+      g.save(); g.globalAlpha = a;
+      lifted(t.x, t.y, t.w, t.h, 22, C.white, .6);
+      g.beginPath(); g.roundRect(t.x, t.y, t.w, t.h, 22); g.clip();
+      ground(kind, t.x, t.y, t.w, t.h);
+      g.restore();
+      text(`render="${r}"`, t.x + 22, t.y + t.h - 26, { size: 20, fam: MONO, weight: 500, color: darkGround(kind) ? '#e8f2ff' : C.ink, alpha: a });
+    });
+    reset();
+    soft([['Six ways to', C.muted], ['draw a pal.', C.ink]], T, STY_GRID + .15, null, { y: 120, size: 48 });
+  }
+  reset();
+}
+/* the live sprites for that shot: one per style, placed over the canvas */
+const STY_EL = STYLES.map(([r]) => {
   const el = document.createElement('piix-sprite');
-  el.setAttribute('name', n); el.setAttribute('scale', '8'); el.setAttribute('look', 'none'); el.setAttribute('sleep-after', '0');
-  el.style.left = x + 'px'; el.style.top = '720px'; el.style.display = 'none';
+  el.setAttribute('name', 'whale'); el.setAttribute('render', r); el.setAttribute('scale', '12'); el.setAttribute('look', 'none'); el.setAttribute('sleep-after', '0');
+  el.style.display = 'none';
   document.getElementById('big').append(el);
   return el;
 });
+function styleSprites(T, vis) {
+  STY_EL.forEach((el, i) => {
+    let on = vis > 0, x, y, s;
+    if (T < STY_GRID) { on = on && i === cl(Math.floor((T - STY_T) / STY_EACH), 0, 5); x = W / 2; y = 860; s = 2.1 + (T - STY_T - i * STY_EACH) * .3; }
+    else { const t = TILE(i), k = E.outExpo(prog(T, STY_GRID, STY_GRID + .7)), z = lerp(1.12, 1, k); x = W / 2 + (t.x + t.w / 2 - W / 2) * z; y = H / 2 + (t.y + t.h - 50 - H / 2) * z; s = .6 * z * E.outCubic(prog(T, STY_GRID + i * .05, STY_GRID + i * .05 + .4)); }
+    el.style.display = on ? '' : 'none';
+    el._vis = true; /* drawn every frame, the observer is too slow for a frame-by-frame render */
+    if (on) { el.style.left = x + 'px'; el.style.top = y + 'px'; el.style.opacity = vis; el.style.filter = vis < 1 ? `blur(${((1 - vis) * 16).toFixed(1)}px)` : ''; el.style.transform = `translate(-50%,-100%) scale(${s})`; }
+  });
+}
 
-/* 34 – 38s: the name, the line, the address */
-function end(T) {
-  const t0 = 34;
-  g.fillStyle = C.ink; g.fillRect(0, 0, W, H); grid('rgba(198,244,50,.045)', 48, 0, -(T - t0) * 20);
-  const k = E.outExpo(prog(T, t0, t0 + .8));
-  camera(lerp(1.08, 1, k), W / 2, 480);
-  const sz = 280, base = 520, m = measure('Piixpal', sz, 800, SANS, -12), top = base - measure('P', sz).asc;
-  words([{ w: 'Piixpal', color: C.white }], T, { x: W / 2, y: base, size: sz, t0: t0 + .02, dur: .8, track: -12 });
-  const px = W / 2 - m.w / 2 + 70;
-  arrive(T, t0 + .7, px, top, 'bitbug', 7, p => pal('bitbug', T < t0 + 1.4 ? 'idle' : T < t0 + 2.4 ? 'look' : 'sniff', T, px, top, 7, { sx: p, sy: p }));
-  words(['Tiny', 'pixel', 'creatures', 'that', { w: 'live', color: C.lime }, 'on', 'your', 'website.'], T, { x: W / 2, y: 650, size: 56, weight: 600, color: C.soft, t0: t0 + .45, stagger: .05 });
-  const a = E.outBack(prog(T, t0 + 1.0, t0 + 1.4)), b = E.outBack(prog(T, t0 + 1.2, t0 + 1.6));
-  if (a > 0) pill('npm i piixpal', W / 2 - 230, 790, { size: 36, bg: C.ink2, fg: C.lime, k: a, shadow: '#000' });
-  if (b > 0) pill('piixpal.dvkk.dev', W / 2 + 230, 790, { size: 36, k: b, shadow: '#000' });
-  if (T > t0 + 1.7) text('free & open source  ·  MIT  ·  118 components  ·  0 dependencies', W / 2, 920, { size: 24, weight: 400, fam: MONO, color: C.muted, align: 'center', alpha: prog(T, t0 + 1.7, t0 + 2.1) });
-  if (a > .5) pal('pip', T < t0 + 2 ? 'idle' : 'peck', T, W / 2 - 330, 754, 6);
-  if (b > .5) { const bb = Math.abs(Math.sin((T - t0) * Math.PI * 2)); pal('boing', bb > .2 ? 'air' : 'land', T, W / 2 + 380, 754 - bb * 50, 5); }
+/* 22.8 – 24.7: superpowers streak in like fast-forwarded tickets */
+const POWERS = [
+  ['Toasts, delivered by pigeon', 'pidge', '#ffd9cf', 'Piixpal.toast()'],
+  ['Snow that settles on your headings', 'penguin', '#d4efff', '<piix-weather>'],
+  ['Your page, as a platformer', 'pix', '#e9fbbf', 'pal="pix"'],
+  ['A pal that sulks when you go offline', 'plug', '#fff0b8', 'pal="plug"'],
+  ['Pull the cord for dark mode', 'bulb', '#e3dcff', 'pal="bulb"']
+];
+function powerCard(i, x, y, T) {
+  const [title, who, bg, tag] = POWERS[i], w = 900, h = 100;
+  rrect(x, y, w, h, 50, bg);
+  g.beginPath(); g.arc(x + 52, y + h / 2, 36, 0, 7); g.fillStyle = C.white; g.fill();
+  pal(who, Object.keys(S[who].frames)[0], T, x + 52, y + h / 2 + 22, 3);
+  text(title, x + 108, y + h / 2 + 2, { size: 34, weight: 600, base: 'middle', track: -.5 });
+  text(tag, x + w - 34, y + h / 2 + 2, { size: 20, fam: MONO, weight: 500, color: C.muted, align: 'right', base: 'middle' });
+}
+function sPowers(T) {
+  paper(T, { horizon: .6, blooms: .5, base: '#ece8f6' });
+  soft([['Superpowers.', C.ink], ['They leave the page.', C.muted]], T, 22.85, null, { y: 160, size: 48 });
+  POWERS.forEach((_, i) => {
+    const at = 23.0 + i * .13, x1 = W / 2 - 450, y = 290 + i * 122;
+    const pos = t => lerp(W + 300, x1, E.outExpo(prog(t, at, at + .55)));
+    if (T < at) return;
+    const v = Math.abs(pos(T) - pos(T - 1 / 60));
+    /* motion blur: several copies along the path, averaged */
+    const n = v > 4 ? 6 : 1;
+    for (let j = 0; j < n; j++) {
+      g.save(); g.globalAlpha = 1 / (j + 1);
+      if (v > 4) g.filter = `blur(${Math.min(14, v * .12).toFixed(1)}px)`;
+      powerCard(i, pos(T - j * .006), y, T);
+      g.restore();
+    }
+  });
   reset();
-  vignette(.55);
-  flash(T, t0, C.lime, .5);
-  if (T > 37.3) { g.fillStyle = `rgba(0,0,0,${E.inOut(prog(T, 37.3, 38))})`; g.fillRect(0, 0, W, H); }
+}
+
+/* 24.7 – 26.2: a quick run across a sentence */
+let LEVEL;
+const PLAY = [24.75, 26.0];
+function level() {
+  if (LEVEL) return LEVEL;
+  const [t0, t1] = PLAY, sz = 120, ws = [['YOUR', 820], ['PAGE', 690], ['IS', 570], ['A', 700], ['LEVEL', 540]];
+  let x = 150; LEVEL = { sz, plats: [] };
+  for (const [w, base] of ws) { const m = measure(w, sz, 700, SANS, -3); LEVEL.plats.push({ w, x, x1: x + m.w, base, top: base - measure('E', sz, 700).asc }); x += m.w + 110; }
+  const P = LEVEL.plats, seg = [];
+  P.forEach((p, i) => {
+    seg.push({ kind: 'run', x0: i ? p.x + 30 : p.x + 40, x1: p.x1 - 34, y: p.top });
+    if (P[i + 1]) seg.push({ kind: 'jump', x0: p.x1 - 34, x1: P[i + 1].x + 30, y0: p.top, y1: P[i + 1].top });
+  });
+  const len = s => s.kind === 'run' ? Math.abs(s.x1 - s.x0) : 240, total = seg.reduce((a, s) => a + len(s), 0);
+  let acc = 0; seg.forEach(s => { s.a = acc / total; acc += len(s); s.b = acc / total; });
+  LEVEL.seg = seg;
+  /* each coin sits over the middle of a jump, so it is taken at the jump's halfway time */
+  LEVEL.coins = seg.filter(s => s.kind === 'jump').map(s => ({ x: (s.x0 + s.x1) / 2, y: Math.min(s.y0, s.y1) - 190, at: t0 + (s.a + s.b) / 2 * (t1 - t0) }));
+  return LEVEL;
+}
+function sPlay(T) {
+  const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, '#9fd8ff'); gr.addColorStop(.7, '#e4f4ff'); gr.addColorStop(1, '#fff3e0');
+  g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  /* pixel clouds drifting */
+  for (let i = 0; i < 5; i++) { const x = ((hash(i) * W + T * (30 + i * 12)) % (W + 400)) - 200, y = 90 + hash(i * 3) * 280, s = 14; g.fillStyle = 'rgba(255,255,255,.9)'; [[0, 1, 6], [1, 0, 4], [2, 1, 3]].forEach(([dx, dy, w]) => g.fillRect(x + dx * s * 2, y + dy * s, w * s * 2, s)); g.fillRect(x - s, y + s * 2, 16 * s, s); }
+  const [t0, t1] = PLAY, { plats, seg, coins, sz } = level();
+  camera(lerp(1.06, 1, E.outCubic(prog(T, 24.5, 25.3))));
+  for (const p of plats) { text(p.w, p.x, p.base, { size: sz, weight: 700, color: C.ink, track: -3 }); g.fillStyle = C.mint; g.fillRect(p.x, p.top - 10, p.x1 - p.x, 10); }
+  const u = prog(T, t0, t1), s = seg.find(s => u <= s.b) || seg[seg.length - 1], k = cl((u - s.a) / (s.b - s.a));
+  let x, y, clip;
+  if (s.kind === 'run') { x = lerp(s.x0, s.x1, k); y = s.y; clip = u >= 1 ? 'happy' : 'run'; }
+  else { x = lerp(s.x0, s.x1, k); y = lerp(s.y0, s.y1, k) - Math.sin(k * Math.PI) * 220; clip = k < .5 ? 'jump' : 'fall'; }
+  let got = 0;
+  coins.forEach((c, i) => {
+    if (T >= c.at) { got++; const r = prog(T, c.at, c.at + .5); if (r < 1) text('+1', c.x, c.y - r * 70, { size: 32, fam: PIX, weight: 400, color: C.coral, align: 'center', alpha: 1 - r }); }
+    else pal('_coin', 'spin', T, c.x, c.y + Math.sin(T * 6 + i) * 8, 7);
+  });
+  pal('pix', clip, T, x, y, 8);
+  reset();
+  text('WORLD 1-1', 90, 90, { size: 28, fam: PIX, weight: 400, color: C.ink });
+  text('COINS ' + String(got).padStart(2, '0'), W - 90, 90, { size: 28, fam: PIX, weight: 400, color: C.ink, align: 'right' });
+}
+
+/* 26.2 – 29.6: dark. One command, then the code */
+const CMD = 'npm i piixpal';
+const REACT = [
+  [['import', '#b69cff'], [' { PiixPal } ', '#e9e6df'], ['from', '#b69cff'], [' "piixpal/react"', C.lime], [';', '#8d8796']],
+  [],
+  [['export default function', '#b69cff'], [' Hero', C.sky], ['() {', '#e9e6df']],
+  [['  return', '#b69cff'], [' (', '#e9e6df']],
+  [['    <', '#8d8796'], ['h1', '#ff8f73'], ['>', '#8d8796']],
+  [['      Hello ', '#e9e6df'], ['<', '#8d8796'], ['PiixPal', '#ff8f73'], [' pal', C.sun], ['=', '#8d8796'], ['"kitty"', C.lime], [' />', '#8d8796']],
+  [['    </', '#8d8796'], ['h1', '#ff8f73'], ['>', '#8d8796']],
+  [['  );', '#e9e6df']],
+  [['}', '#e9e6df']]
+];
+function sDark(T) {
+  g.fillStyle = '#121212'; g.fillRect(0, 0, W, H);
+  const gr = g.createRadialGradient(W / 2, H / 2, 100, W / 2, H / 2, W * .7); gr.addColorStop(0, 'rgba(255,255,255,.04)'); gr.addColorStop(1, 'rgba(0,0,0,.4)'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+  /* the command, typed big */
+  const out = E.inCubic(prog(T, 27.7, 28.1));
+  if (out < 1) {
+    g.save(); g.globalAlpha = 1 - out; g.filter = `blur(${(out * 18).toFixed(1)}px)`;
+    const size = 104, n = Math.round(CMD.length * prog(T, 26.45, 27.1)), shown = CMD.slice(0, n);
+    const full = measure('→ ' + CMD, size, 500).w, x = W / 2 - full / 2, y = H / 2 - out * 60;
+    text('→', x, y, { size, weight: 500, color: C.lime, base: 'middle' });
+    const ax = x + measure('→ ', size, 500).w, px = ax + measure('npm i ', size, 500).w;
+    const sel = E.outCubic(prog(T, 27.2, 27.4));
+    if (sel > 0) rrect(px - 8, y - size * .56, (measure('piixpal', size, 500).w + 16) * sel, size * 1.12, 10, C.lime);
+    text(shown.slice(0, 6), ax, y, { size, weight: 500, color: '#f1ede4', base: 'middle' });
+    text(shown.slice(6), px, y, { size, weight: 500, color: sel > .5 ? C.ink : '#f1ede4', base: 'middle' });
+    if (n < CMD.length || Math.floor(T * 2.5) % 2) { g.fillStyle = C.lime; g.fillRect(ax + measure(shown, size, 500).w + 6, y - size * .5, 6, size); }
+    g.restore();
+  }
+  /* the editor */
+  const k = E.outExpo(prog(T, 27.9, 28.6));
+  if (k > 0) {
+    const w = 1080, h = 560, x = W / 2 - w / 2, y = H / 2 - h / 2 + (1 - k) * 80;
+    g.save(); g.globalAlpha = k; g.filter = `blur(${((1 - k) * 14).toFixed(1)}px)`;
+    rrect(x, y, w, h, 20, '#1b1b1d', '#2c2c30', 2);
+    text('Hero.jsx', x + 36, y + 40, { size: 20, fam: MONO, weight: 500, color: '#8d8796', base: 'middle' });
+    g.fillStyle = '#2c2c30'; g.fillRect(x, y + 76, w, 1.5);
+    const all = REACT.reduce((a, l) => a + tokLen(l), 0);
+    let left = Math.round(all * prog(T, 28.2, 29.2));
+    if (T > 29.15) rrect(x + 12, y + 110 + 5 * 46 - 22, w - 24, 44, 8, 'rgba(107,76,255,.28)');
+    REACT.forEach((line, i) => {
+      const ly = y + 110 + i * 46;
+      text(String(i + 1).padStart(2, ' '), x + 36, ly, { size: 22, fam: MONO, weight: 400, color: '#4d4a55', base: 'middle' });
+      if (left > 0) { const n = Math.min(left, tokLen(line)); tokens(line, x + 90, ly, n, { size: 26 }); left -= n; }
+    });
+    g.restore();
+    popPal(T, 29.25, 'kitty', 'rest', x + w - 160, y, 5);
+  }
+  glyphs(T, 26.3, 27.6, 11, 12, { dark: true, rx: 700, ry: 340 });
+  reset();
+}
+
+/* 29.6 – 32.6: everyone, each on its own tile, the camera pulling back from Bitbug */
+let CAST;
+function sGrid(T) {
+  g.fillStyle = C.bone; g.fillRect(0, 0, W, H);
+  if (!CAST) {
+    CAST = Object.keys(S).filter(n => n[0] !== '_' && !['fence', 'molehill', 'ants', 'fish', 'bees', 'fireflies', 'duckling', 'choir', 'bitbug'].includes(n)).slice(0, 44);
+    CAST.splice(22, 0, 'bitbug');
+  }
+  const cols = 9, ts = 196, gap = 14, x0 = (W - (cols * ts + (cols - 1) * gap)) / 2, y0 = (H - (5 * ts + 4 * gap)) / 2;
+  const bgs = ['#e9fbbf', '#d4efff', '#ffd9cf', '#fff0b8', '#e3dcff', '#d3f3e8', '#ffe1ec', C.white];
+  const zk = E.inOut(prog(T, 29.75, 31.7)), c22 = [x0 + 4 * (ts + gap) + ts / 2, y0 + 2 * (ts + gap) + ts / 2];
+  camera(lerp(5.2, 1, zk), c22[0], c22[1], (W / 2 - c22[0]) * (1 - zk), (H / 2 - c22[1]) * (1 - zk));
+  CAST.forEach((n, i) => {
+    const c = i % cols, r = Math.floor(i / cols), x = x0 + c * (ts + gap), y = y0 + r * (ts + gap);
+    const dist = Math.hypot(c - 4, r - 2), at = 29.6 + dist * .07, k = E.outBack(prog(T, at, at + .45));
+    if (k <= 0) return;
+    g.save(); g.translate(x + ts / 2, y + ts / 2); g.scale(1, k);
+    rrect(-ts / 2, -ts / 2, ts, ts, 22, n === 'bitbug' ? C.ink : bgs[(c * 3 + r * 5) % bgs.length]);
+    const sp = S[n], s = Math.max(3, Math.floor(118 / Math.max(sp.w, sp.h)));
+    pal(n, clipOf(n, ['walk', 'idle', 'fly', 'sit', 'rest', 'swim', 'go']), T + i * .1, 0, sp.h * s / 2, s);
+    g.restore();
+  });
+  reset();
+  const pk = E.outBack(prog(T, 31.75, 32.2));
+  if (pk > 0) {
+    const str = '118 components  ·  0 dependencies', w = measure(str, 40, 600).w + 80;
+    g.save(); g.translate(W / 2, H / 2); g.scale(pk, pk);
+    lifted(-w / 2, -44, w, 88, 44, C.ink, 1.4);
+    text(str, 0, 2, { size: 40, weight: 600, color: C.white, align: 'center', base: 'middle' });
+    g.restore();
+  }
+  reset();
+}
+
+/* 32.6 – 36: the name, the line, the address. Pals walk in to stand under it */
+function sEnd(T) {
+  paper(T, { horizon: 1, blooms: .55 });
+  logo(T, 32.9, null, 440, 104);
+  soft([['Tiny pixel creatures that', C.muted], ['live', C.ink], ['on your website.', C.muted]], T, 33.3, null, { y: 560, size: 40, stagger: .05 });
+  soft([['piixpal.dvkk.dev', C.ink], ['·', '#a49eae'], ['npm i piixpal', C.ink]], T, 33.75, null, { y: 650, size: 28, fam: MONO, weight: 500, stagger: .06 });
+  [['bitbug', -1, 780], ['boing', -1, 600], ['pip', -1, 420], ['penguin', 1, 1150], ['frog', 1, 1330], ['kitty', 1, 1500]].forEach(([n, side, stop], i) => {
+    const at = 33.0 + i * .12, k = E.outCubic(prog(T, at, at + 1.1)), x = lerp(side < 0 ? -120 : W + 120, stop, k);
+    if (T < at) return;
+    const moving = k < .98, clip = moving ? clipOf(n, ['walk', 'slide', 'fly', 'air']) : clipOf(n, ['idle', 'sit', 'rest']);
+    pal(n, clip, T, x, 900, 5, { flip: side > 0 && n !== 'kitty', shadow: true });
+  });
+  if (T > 35.3) { g.fillStyle = `rgba(0,0,0,${E.inOut(prog(T, 35.3, 36))})`; g.fillRect(0, 0, W, H); }
+  reset();
+}
+
+/* ===================================================================== the cut */
+const SHOTS = [[0, sOpen], [3.6, sCollage], [7.0, sPrompt], [9.6, sMacro], [13.6, sSite], [16.4, sTree], [19.2, sStyles], [22.8, sPowers], [24.7, sPlay], [26.2, sDark], [29.6, sGrid], [32.6, sEnd]];
+/* how each shot hands over to the next: [type, length] */
+const CUT = { 3.6: ['blur', .5], 7.0: ['cut', 0], 9.6: ['thermal', 1.7], 13.6: ['whip', .4], 16.4: ['blur', .55], 19.2: ['pixels', .5], 22.8: ['blur', .5], 24.7: ['pixels', .45], 26.2: ['whip', .4], 29.6: ['pixels', .6], 32.6: ['blur', .7] };
+
+/* average copies of a layer slid sideways: a camera whip */
+function smear(src, dx, amt, n = 9) {
+  for (let i = 0; i < n; i++) { g.globalAlpha = 1 / (i + 1); g.drawImage(src, dx + amt * (i / (n - 1) - .5), 0); }
+  g.globalAlpha = 1;
+}
+/* the heat map: the picture, pixelated, with its brightness run through a hot palette */
+const HEAT = ['#1d1240', '#4b2bd6', '#c43bd8', '#ff4f7a', '#ff8a3d', '#ffd23f', '#d8f75a', '#f6ffe0'].map(rgb);
+function thermal(src, cell, T) {
+  const w = Math.ceil(W / cell), h = Math.ceil(H / cell);
+  TS.width = w; TS.height = h;
+  const x = TS.getContext('2d'); x.imageSmoothingEnabled = true; x.drawImage(src, 0, 0, w, h);
+  const d = x.getImageData(0, 0, w, h), p = d.data;
+  for (let j = 0; j < h; j++) for (let i = 0; i < w; i++) {
+    const o = (j * w + i) * 4;
+    let v = (p[o] * .3 + p[o + 1] * .59 + p[o + 2] * .11) / 255;
+    v = cl(v * 1.5 + .18 * Math.sin(i * .21 + T * 4) * Math.sin(j * .17 - T * 3) + .12);
+    const f = v * (HEAT.length - 1), a = Math.floor(f), b = Math.min(HEAT.length - 1, a + 1), t = f - a;
+    p[o] = lerp(HEAT[a][0], HEAT[b][0], t); p[o + 1] = lerp(HEAT[a][1], HEAT[b][1], t); p[o + 2] = lerp(HEAT[a][2], HEAT[b][2], t); p[o + 3] = 255;
+  }
+  x.putImageData(d, 0, 0);
+  g.imageSmoothingEnabled = false; g.drawImage(TS, 0, 0, W, H);
+}
+function draw(T) {
+  reset(); g.imageSmoothingEnabled = false;
+  g.fillStyle = '#000'; g.fillRect(0, 0, W, H);
+  let i = 0; while (i + 1 < SHOTS.length && T >= SHOTS[i + 1][0]) i++;
+  /* inside a handover? */
+  let from = null, to = null, kind, k;
+  for (const j of [i, i + 1]) {
+    if (j <= 0 || j >= SHOTS.length) continue;
+    const B = SHOTS[j][0], [type, d] = CUT[B] || ['cut', 0];
+    if (d && T >= B - d / 2 && T < B + d / 2) { from = SHOTS[j - 1][1]; to = SHOTS[j][1]; kind = type; k = (T - (B - d / 2)) / d; }
+  }
+  if (!from) { SHOTS[i][1](T); reset(); grain(T); return; }
+  into(LA, () => from(T)); into(LB, () => to(T));
+  if (kind === 'blur') {
+    g.filter = `blur(${(k * 22).toFixed(1)}px)`; g.drawImage(LA, 0, 0);
+    g.filter = `blur(${((1 - k) * 22).toFixed(1)}px)`; g.globalAlpha = E.inOut(k); g.drawImage(LB, 0, 0);
+  } else if (kind === 'whip') {
+    const s = Math.sin(k * Math.PI) * 420;
+    if (k < .5) smear(LA, -E.inCubic(k * 2) * 500, s); else smear(LB, (1 - E.outCubic((k - .5) * 2)) * 500, s);
+  } else if (kind === 'pixels') {
+    g.drawImage(LA, 0, 0);
+    const B = 96, cols = Math.ceil(W / B), rows = Math.ceil(H / B);
+    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+      const d = hash(c * 37 + r * 11) * .7 + (c / cols) * .3, x = c * B, y = r * B;
+      if (k > d + .12) g.drawImage(LB, x, y, B, B, x, y, B, B);
+      else if (k > d) { g.fillStyle = (c + r) % 3 ? C.bone : C.lime; g.fillRect(x + 2, y + 2, B - 4, B - 4); }
+    }
+  } else if (kind === 'thermal') {
+    g.drawImage(LA, 0, 0);
+    const cell = Math.round(lerp(72, 8, E.inOut(cl((k - .15) / .7))));
+    const heat = into(LH, () => thermal(LB, cell, T));
+    g.globalAlpha = E.inOut(cl(k / .25)); g.drawImage(heat, 0, 0);
+    g.globalAlpha = E.inOut(cl((k - .78) / .22)); g.drawImage(LB, 0, 0);
+  } else g.drawImage(LB, 0, 0);
+  reset(); grain(T);
+}
+/* how visible the live sprites are: fully inside the styles shot, fading through its handovers */
+function spriteVis(T) {
+  const a = STY_T, b = SHOTS.find(s => s[1] === sPowers)[0], da = CUT[a][1] / 2, db = CUT[b][1] / 2;
+  if (T < a - da || T > b + db) return 0;
+  if (T < a + da) return T > a ? 1 : 0;
+  if (T > b - db) return 1 - prog(T, b - db, b + db);
+  return 1;
 }
 
 /* ===================================================================== sound cues
  * music.mjs reads these, so every blip lands on the frame that makes it */
 function cues() {
   const c = [], at = (t, kind) => c.push([+t.toFixed(3), kind]);
-  [.2, .45, .7, .95, 1.2, 4.3, 4.42, 4.54, 4.66].forEach(t => at(t, 'word'));
-  [4.4, 5.6, 5.85, 6.1, 6.35, 6.6, 6.85, 7.1, 28.65, 34.7].forEach(t => at(t, 'pop'));
-  [9.05, 9.2, 9.35, 9.5, 9.65, 9.8, 9.95].forEach(t => at(t, 'land'));
-  [0, 6, 9, 15, 21, 27, 33].forEach(col => at(8.02 + col * .032 + .3, 'block'));
-  [13, 14, 15, 16, 17, 18, 19.5].forEach(t => at(t - .06, 'cut'));
-  [11.78, 21.78, 25.78, 30.78].forEach(t => at(t, 'wipe'));
-  [15.05, 15.2, 15.32].forEach(t => at(t, 'throw'));
-  at(14.38, 'land'); at(16.45, 'ding');
+  [.25, 1.35, 2.35].forEach(t => at(t, 'word'));
+  at(2.85, 'pop');
+  CARDS.forEach((_, i) => at(3.6 + i * .085, 'card'));
+  at(5.3, 'suck'); at(5.72, 'blip'); at(6.0, 'logo');
+  for (let i = 0; i < tokLen(PROMPT); i++) at(7.4 + i * .9 / tokLen(PROMPT), 'key');
+  at(8.55, 'click');
+  at(8.75, 'heat');
+  [10.7, 12.2].forEach(t => at(t, 'word'));
+  at(13.4, 'whoosh');
+  TREE.forEach((_, i) => at(16.55 + i * .16, 'tick'));
+  for (let i = 0; i < 6; i++) at(STY_T + i * STY_EACH, 'style');
+  at(STY_GRID, 'whoosh');
+  POWERS.forEach((_, i) => at(23.0 + i * .13, 'swish'));
   level().coins.forEach(k => at(k.at, 'coin'));
-  [22, 23, 24, 25].forEach(t => at(t, 'slam'));
-  for (let i = 0; i < 15; i++) at(26.3 + i * .6 / 15, 'key');
-  for (let i = 0; i < 60; i++) at(27.3 + i * 1.3 / 60, 'key');
-  for (let i = 0; i < 6; i++) at(29.2 + i * .2, 'chip');
-  for (let i = 0; i < 6; i++) at(31.5 + i * .25, 'bigpop');
+  at(26.0, 'whoosh');
+  for (let i = 0; i < CMD.length; i++) at(26.45 + i * .65 / CMD.length, 'key');
+  at(27.2, 'select');
+  for (let i = 0; i < 70; i++) at(28.2 + i / 70, 'key');
+  at(29.25, 'pop');
+  for (let i = 0; i < 6; i++) at(29.6 + i * .12, 'tile');
+  at(31.75, 'logo');
+  for (let i = 0; i < 6; i++) at(34.1 + i * .12, 'step');
   return c.sort((a, b) => a[0] - b[0]);
 }
 
-/* ===================================================================== timeline */
-const SCENES = [[0, opening], [8, title], [12, crawl], [13, nap], [14, perch], [15, thrown], [16, deliver], [17, weather], [18, swarm], [19.5, play], [22, stats], [26, code], [31, parade], [34, end]];
-function draw(T) {
-  reset();
-  g.imageSmoothingEnabled = false;
-  let s = SCENES[0][1];
-  for (const [at, fn] of SCENES) if (T >= at) s = fn;
-  s(T);
-  reset();
-  wipe(T, 12, C.ink); wipe(T, 22, C.lime); wipe(T, 26, C.violet); wipe(T, 31, C.ink);
-}
-
-const ready = Promise.all(['800 100px "Bricolage Grotesque"', '650 100px "Bricolage Grotesque"', '500 40px "Bricolage Grotesque"', '400 30px Silkscreen', '600 30px "JetBrains Mono"', '400 30px "JetBrains Mono"'].map(f => document.fonts.load(f)))
+const ready = Promise.all(['700 100px "Bricolage Grotesque"', '650 100px "Bricolage Grotesque"', '560 100px "Bricolage Grotesque"', '450 40px "Bricolage Grotesque"', '400 30px Silkscreen', '500 30px "JetBrains Mono"', '400 30px "JetBrains Mono"'].map(f => document.fonts.load(f)))
   .then(() => document.fonts.ready);
 /* the renderer calls this once per frame; it moves the library's clock to T too */
-window.__film = { DUR, ready, cues, frame(T) { bigSprites(T); __clock.step(T * 1000 - __clock.ms); draw(T); } };
+window.__film = { DUR, ready, cues, frame(T) { styleSprites(T, spriteVis(T)); __clock.step(T * 1000 - __clock.ms); draw(T); } };
 
 /* watching in a normal browser: play in real time */
 if (!navigator.webdriver && !location.search.includes('render')) {
