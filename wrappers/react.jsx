@@ -23,4 +23,7 @@ export const PiixPal = make('piix-pal');
 export const PiixSprite = make('piix-sprite');
 export const PiixType = make('piix-type');
 export const PiixCrowd = make('piix-crowd');
+export const PiixWeather = make('piix-weather');
+export const PiixStickers = make('piix-stickers');
+export const PiixAvatar = make('piix-avatar');
 export { loadPiixpal };
