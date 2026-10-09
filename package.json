@@ -1,7 +1,7 @@
 {
   "name": "piixpal",
   "version": "0.4.0",
-  "description": "Tiny pixel creatures that live on your website. Drop-in web components, zero dependencies.",
+  "description": "Pixel characters that live on your website: drop-in web components with zero dependencies. Pals, sprites and superpowers.",
   "main": "piixpal.js",
   "files": [
     "piixpal.js",
@@ -23,14 +23,23 @@
     "sprite",
     "animation",
     "ui",
-    "website-pet"
+    "website-pet",
+    "web-component",
+    "custom-elements",
+    "react",
+    "vue",
+    "svelte",
+    "nextjs",
+    "easter-egg",
+    "toast",
+    "onboarding"
   ],
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/diiviikk5/Piixpal.git"
   },
-  "homepage": "https://github.com/diiviikk5/Piixpal#readme",
+  "homepage": "https://piixpal.vercel.app",
   "devDependencies": {
     "esbuild": "^0.25.12"
   },
@@ -46,10 +55,17 @@
     "./min": "./piixpal.min.js",
     "./core": "./dist/core.min.js",
     "./c/*": "./dist/c/*.min.js",
-    "./react": "./wrappers/react.jsx",
-    "./vue": "./wrappers/vue.js",
-    "./svelte": "./wrappers/Piixpal.svelte",
-    "./load": "./wrappers/load.js"
+    "./react": {
+      "types": "./types/react.d.ts",
+      "default": "./wrappers/npm/react.js"
+    },
+    "./vue": "./wrappers/npm/vue.js",
+    "./svelte": {
+      "svelte": "./wrappers/npm/Piixpal.svelte",
+      "default": "./wrappers/npm/Piixpal.svelte"
+    },
+    "./load": "./wrappers/npm/load.js",
+    "./package.json": "./package.json"
   },
   "sideEffects": [
     "piixpal.js",
@@ -58,7 +74,8 @@
   ],
   "peerDependencies": {
     "react": ">=17",
-    "vue": ">=3"
+    "vue": ">=3",
+    "svelte": ">=3"
   },
   "peerDependenciesMeta": {
     "react": {
@@ -66,6 +83,13 @@
     },
     "vue": {
       "optional": true
+    },
+    "svelte": {
+      "optional": true
     }
-  }
+  },
+  "bugs": {
+    "url": "https://github.com/diiviikk5/Piixpal/issues"
+  },
+  "author": "diiviikk5"
 }
