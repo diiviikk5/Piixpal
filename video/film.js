@@ -318,3 +318,12 @@ function title(T) {
   flash(T, 8, C.lime, .45);
 }
 
+/* 12 – 22s: the montage, one verb per beat pair */
+const CUTS = [12, 13, 14, 15, 16, 17, 18, 19.5, 22];
+function label(T, t0, verb, color, dim, n) {
+  words([{ w: 'They', color: dim }, ...verb.split(' ').map(w => ({ w, color }))], T, { x: 110, y: 985, size: 112, align: 'left', t0: t0 + .04, stagger: .05, dur: .45 });
+  text(String(n).padStart(2, '0') + ' / 08', W - 110, 120, { size: 26, weight: 600, fam: MONO, color: dim, align: 'right' });
+  text('piixpal', 110, 120, { size: 30, weight: 400, fam: PIX, color: dim });
+}
+function punch(T, t0) { const k = E.outExpo(prog(T, t0, t0 + .4)); camera(lerp(1.12, 1, k), W / 2, H / 2); }
+
