@@ -5,7 +5,7 @@
 **Tiny pixel creatures that live on your website.**
 
 They crawl on your headings, nap on your paragraphs, perch on your buttons and bounce on your footer.
-95 components: 42 pals (characters, interactions, toys and groups), 49 sprites (30 small, 19 big 3D), a crowd stage and pixel type.
+118 components: 42 pals (characters, interactions, toys and groups), 23 superpowers, 49 sprites (30 small, 19 big 3D), a crowd stage and pixel type.
 One script tag. Zero dependencies. Free and open source (MIT).
 
 </div>
@@ -111,6 +111,50 @@ and **Capy** (a capybara with a yuzu on its head, `mind`).
 
 Pals notice each other, too. A hard landing from Boing makes Moss grumble, Lurk duck, Pip take off
 and Bitbug run. Two Bitbugs that meet share a little heart and turn around.
+
+## Superpowers
+
+Pals that step out of the page, do real interface jobs, or turn your site into a game. One tag each.
+
+**Beyond the page**
+
+| | |
+| --- | --- |
+| **Polly** `pal="polly"` | reads your page aloud, hopping along each word as it is spoken (Web Speech API, words light up) |
+| **Gist** `pal="gist"` | an owl that sums up your article in a few key points (the browser's on-device AI when it is ready, a sentence picker otherwise) |
+| **Tabby** `pal="tabby"` | a cat that lives in your browser tab's icon, naps while you're away and wakes when you're back |
+| **Sprout** `pal="sprout"` | a focus-timer plant that pops out into its own always-on-top window (Document Picture-in-Picture) |
+| **Nomad** `pal="nomad"` | a traveller who walks between your browser windows (BroadcastChannel) |
+
+**Pals with jobs**
+
+| | |
+| --- | --- |
+| **Bulb** `pal="bulb"` | a pull-chain light switch for dark mode, with rope physics |
+| **Pidge** `Piixpal.toast("Saved!")` | toast notifications, delivered by pigeon |
+| **Plane** `pal="plane"` | tows your announcement banner (a real link) across the page |
+| **Fetch** `pal="fetch"` | runs off on every `fetch()` and XHR and brings back the response; `Piixpal.busy(promise)` |
+| **Scout** `pal="scout"` | onboarding tours from `data-tour` attributes, with a spotlight |
+| **Drone** `pal="drone"` | flies the product picture into your cart |
+| **Crumb** `pal="crumb"` | eats your cookie banner when someone accepts or rejects |
+| **Buff** `pal="buff"` | a password-strength meter that lifts heavier as the password gets stronger |
+| **Meh** `pal="meh"` | a face on your rating slider, from furious to delighted |
+| **Squish** `pal="squish"` | a marshmallow that gets squashed as text nears the character limit |
+| **Gulp** `pal="gulp"` | a pelican that gulps down files dropped on your drop zone |
+| **Plug** `pal="plug"` | shows up when the connection drops, plugs back in when it returns |
+| **Avatar** `<piix-avatar seed="mia">` | a unique animated pixel avatar for any name |
+
+**Play your site**
+
+| | |
+| --- | --- |
+| **Pix** `pal="pix"` | play your page as a platformer: every line of text is a platform, coins hide on buttons |
+| **Weather** `<piix-weather kind="snow">` | snow that settles on the real shape of your letters, plus rain, leaves and petals |
+| **Gem** `pal="gem"` | a treasure hunt across your whole site, with a reward code |
+| **Hatch** `pal="hatch"` | every visitor hatches their own one-of-a-kind pet |
+| **Stickers** `<piix-stickers>` | a sheet of stickers visitors peel off and stick anywhere |
+
+Any pal can be kept inside one element with `box="selector"`.
 
 ## Sprites
 
