@@ -343,6 +343,14 @@ export const POWERS = [
     events: "piix:gulp { files }",
     hab: "<label class=\"h-drop\" id=\"d-drop\">Drop a file here<small>or click to pick one</small><input type=\"file\" multiple></label><piix-pal pal=\"gulp\" on=\"#d-drop\" accept></piix-pal>",
     code: "<div id=\"drop\">Drop files here</div>\n<piix-pal pal=\"gulp\" on=\"#drop\" accept></piix-pal>"
+  },
+  {
+    id: "plug",
+    fam: "jobs",
+    accent: "var(--mint)",
+    kind: "pal",
+    does: "offline",
+    where: "body"
   }
   // new powers go above this line
 ];
