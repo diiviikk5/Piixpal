@@ -684,3 +684,15 @@ function cues() {
   return c.sort((a, b) => a[0] - b[0]);
 }
 
+/* ===================================================================== timeline */
+const SCENES = [[0, opening], [8, title], [12, crawl], [13, nap], [14, perch], [15, thrown], [16, deliver], [17, weather], [18, swarm], [19.5, play], [22, stats], [26, code], [31, parade], [34, end]];
+function draw(T) {
+  reset();
+  g.imageSmoothingEnabled = false;
+  let s = SCENES[0][1];
+  for (const [at, fn] of SCENES) if (T >= at) s = fn;
+  s(T);
+  reset();
+  wipe(T, 12, C.ink); wipe(T, 22, C.lime); wipe(T, 26, C.violet); wipe(T, 31, C.ink);
+}
+
