@@ -35,3 +35,10 @@ defineSprite('plug', {
   fps: { sad: 1.5, happy: 4 }
 });
 
+/* the wall socket it plugs into (crew only) */
+defineSprite('_socket', {
+  w: 9, h: 12, scale: 3,
+  palette: { k: '#17121f', w: '#fffdf5', W: '#e2dccb', s: '#3a3247' },
+  frames: { idle: [['.kkkkkkk.', 'kwwwwwwwk', 'kwwwwwwwk', 'kwssswwwk', 'kwwwwwwwk', 'kwwwwwwwk', 'kwwwwwwwk', 'kwssswwwk', 'kwwwwwwwk', 'kWWWWWWWk', '.kkkkkkk.', '.........']] }
+});
+
