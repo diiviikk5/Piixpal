@@ -640,3 +640,26 @@ const BIG_EL = BIG.map(([n, x]) => {
   return el;
 });
 
+/* 34 – 38s: the name, the line, the address */
+function end(T) {
+  const t0 = 34;
+  g.fillStyle = C.ink; g.fillRect(0, 0, W, H); grid('rgba(198,244,50,.045)', 48, 0, -(T - t0) * 20);
+  const k = E.outExpo(prog(T, t0, t0 + .8));
+  camera(lerp(1.08, 1, k), W / 2, 480);
+  const sz = 280, base = 520, m = measure('Piixpal', sz, 800, SANS, -12), top = base - measure('P', sz).asc;
+  words([{ w: 'Piixpal', color: C.white }], T, { x: W / 2, y: base, size: sz, t0: t0 + .02, dur: .8, track: -12 });
+  const px = W / 2 - m.w / 2 + 70;
+  arrive(T, t0 + .7, px, top, 'bitbug', 7, p => pal('bitbug', T < t0 + 1.4 ? 'idle' : T < t0 + 2.4 ? 'look' : 'sniff', T, px, top, 7, { sx: p, sy: p }));
+  words(['Tiny', 'pixel', 'creatures', 'that', { w: 'live', color: C.lime }, 'on', 'your', 'website.'], T, { x: W / 2, y: 650, size: 56, weight: 600, color: C.soft, t0: t0 + .45, stagger: .05 });
+  const a = E.outBack(prog(T, t0 + 1.0, t0 + 1.4)), b = E.outBack(prog(T, t0 + 1.2, t0 + 1.6));
+  if (a > 0) pill('npm i piixpal', W / 2 - 230, 790, { size: 36, bg: C.ink2, fg: C.lime, k: a, shadow: '#000' });
+  if (b > 0) pill('piixpal.dvkk.dev', W / 2 + 230, 790, { size: 36, k: b, shadow: '#000' });
+  if (T > t0 + 1.7) text('free & open source  ·  MIT  ·  118 components  ·  0 dependencies', W / 2, 920, { size: 24, weight: 400, fam: MONO, color: C.muted, align: 'center', alpha: prog(T, t0 + 1.7, t0 + 2.1) });
+  if (a > .5) pal('pip', T < t0 + 2 ? 'idle' : 'peck', T, W / 2 - 330, 754, 6);
+  if (b > .5) { const bb = Math.abs(Math.sin((T - t0) * Math.PI * 2)); pal('boing', bb > .2 ? 'air' : 'land', T, W / 2 + 380, 754 - bb * 50, 5); }
+  reset();
+  vignette(.55);
+  flash(T, t0, C.lime, .5);
+  if (T > 37.3) { g.fillStyle = `rgba(0,0,0,${E.inOut(prog(T, 37.3, 38))})`; g.fillRect(0, 0, W, H); }
+}
+
