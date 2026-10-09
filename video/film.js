@@ -144,3 +144,71 @@ function pixelWord(word, cx, top, B, T, t0) {
   return spots;
 }
 
+/* ---------- screen furniture ---------- */
+function grid(color, step = 48, ox = 0, oy = 0) {
+  g.save(); g.strokeStyle = color; g.lineWidth = 2; g.beginPath();
+  for (let x = ((ox % step) + step) % step; x < W; x += step) { g.moveTo(x, 0); g.lineTo(x, H); }
+  for (let y = ((oy % step) + step) % step; y < H; y += step) { g.moveTo(0, y); g.lineTo(W, y); }
+  g.stroke(); g.restore();
+}
+let VIG;
+function vignette(a = .55) {
+  if (!VIG) {
+    VIG = document.createElement('canvas'); VIG.width = W; VIG.height = H;
+    const v = VIG.getContext('2d'), gr = v.createRadialGradient(W / 2, H / 2, H * .35, W / 2, H / 2, H * 1.05);
+    gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(0,0,0,1)');
+    v.fillStyle = gr; v.fillRect(0, 0, W, H);
+  }
+  g.save(); g.globalAlpha = a; g.drawImage(VIG, 0, 0); g.restore();
+}
+/* a blocky pixel wipe that covers the screen at tc and uncovers it again */
+function wipe(T, tc, color, dur = .44) {
+  const a = tc - dur / 2;
+  if (T < a || T > tc + dur / 2) return;
+  const B = 120, cols = Math.ceil(W / B), rows = Math.ceil(H / B), k = (T - a) / dur;
+  g.fillStyle = color;
+  for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+    const d = (c + r * .7 + hash(c * 31 + r) * 2) / (cols + rows * .7 + 2);
+    const s = k < .5 ? cl((k * 2 - d * .55) / .45) : 1 - cl(((k - .5) * 2 - d * .55) / .45);
+    if (s > 0) { const z = B * s + 1; g.fillRect(c * B + (B - z) / 2, r * B + (B - z) / 2, z, z); }
+  }
+}
+function flash(T, at, color, len = .35, peak = 1) {
+  const a = T < at ? 0 : peak * (1 - prog(T, at, at + len));
+  if (a > 0) { g.save(); g.globalAlpha = a; g.fillStyle = color; g.fillRect(0, 0, W, H); g.restore(); }
+}
+/* camera: zoom k around (fx, fy) plus a decaying shake from the listed hits */
+function camera(k = 1, fx = W / 2, fy = H / 2, T = 0, hits = [], amp = 14) {
+  let sx = 0, sy = 0;
+  for (const h of hits) {
+    const e = T - h; if (e < 0 || e > .4) continue;
+    const f = (1 - e / .4) ** 2 * amp;
+    sx += Math.sin(e * 90 + h) * f; sy += Math.cos(e * 77 + h * 3) * f;
+  }
+  g.setTransform(k, 0, 0, k, fx - fx * k + sx, fy - fy * k + sy);
+}
+const reset = () => g.setTransform(1, 0, 0, 1, 0, 0);
+function burst(T, at, x, y, color, n = 10, r = 120) {
+  const k = prog(T, at, at + .45); if (k <= 0 || k >= 1) return;
+  g.fillStyle = color;
+  for (let i = 0; i < n; i++) {
+    const a = i / n * Math.PI * 2 + hash(at * 9 + i), d = E.outCubic(k) * r * (.6 + hash(i + at) * .6), z = 12 * (1 - k) + 2;
+    g.fillRect(x + Math.cos(a) * d - z / 2, y + Math.sin(a) * d - z / 2, z, z);
+  }
+}
+/* the pixel that falls first and becomes a pal */
+function arrive(T, at, x, y, name, s, draw) {
+  const fall = prog(T, at - .38, at);
+  if (T < at) {
+    if (fall > 0) {
+      const py = lerp(y - 760, y, E.inCubic(fall));
+      g.fillStyle = C.lime; g.fillRect(x - 9, py - 18, 18, 18);
+      g.globalAlpha = .35; g.fillRect(x - 5, py - 70, 10, 50); g.globalAlpha = 1;
+    }
+    return;
+  }
+  burst(T, at, x, y - 20, C.lime, 12, 110);
+  const p = E.outElastic(prog(T, at, at + .6));
+  draw(p);
+}
+
