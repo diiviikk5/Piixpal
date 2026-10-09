@@ -6,3 +6,8 @@ import { mkdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { serve, browser, sleep } from './edge.mjs';
 
+const OUT = join(import.meta.dirname, 'out'), FPS = +(process.env.FPS || 30);
+mkdirSync(OUT, { recursive: true });
+const arg = process.argv.indexOf('--stills');
+const stills = arg > 0 ? process.argv[arg + 1].split(',').map(Number) : null;
+
