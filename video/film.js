@@ -26,3 +26,33 @@ const E = {
 const rgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
 const mix = (a, b, k) => { const A = rgb(a), B = rgb(b); return 'rgb(' + A.map((v, i) => Math.round(lerp(v, B[i], cl(k)))).join(',') + ')'; };
 
+/* ---------- pals ---------- */
+const S = Piixpal.sprites, BAKED = {};
+const baked = name => {
+  if (BAKED[name]) return BAKED[name];
+  const sp = S[name], out = {};
+  for (const clip in sp.frames) out[clip] = sp.frames[clip].map(rows => {
+    const c = document.createElement('canvas'); c.width = sp.w; c.height = sp.h;
+    const x = c.getContext('2d'), pad = sp.h - rows.length;
+    rows.forEach((row, ry) => { for (let i = 0; i < row.length; i++) { const col = sp.palette[row[i]]; if (col) { x.fillStyle = col; x.fillRect(i, ry + pad, 1, 1); } } });
+    return c;
+  });
+  return (BAKED[name] = out);
+};
+/* draw a pal standing at (x, y): bottom-centre, or centre with o.center. t drives the clip */
+function pal(name, clip, t, x, y, s, o = {}) {
+  const sp = S[name], b = baked(name), fr = b[clip] || b[Object.keys(b)[0]];
+  const f = typeof sp.fps === 'object' ? sp.fps[clip] : sp.fps;
+  const img = fr[o.frame != null ? o.frame % fr.length : Math.floor(Math.max(0, t) * (o.fps || f || 6)) % fr.length];
+  g.save();
+  g.translate(x, y);
+  if (o.rot) g.rotate(o.rot);
+  g.scale((o.flip ? -1 : 1) * (o.sx ?? 1), o.sy ?? 1);
+  if (o.alpha != null) g.globalAlpha *= o.alpha;
+  g.imageSmoothingEnabled = false;
+  if (o.shadow) { g.fillStyle = 'rgba(0,0,0,.18)'; g.fillRect(-sp.w * s * .4, -2, sp.w * s * .8, 6); }
+  g.drawImage(img, -sp.w * s / 2, o.center ? -sp.h * s / 2 : -sp.h * s, sp.w * s, sp.h * s);
+  g.restore();
+}
+const size = name => S[name];
+
