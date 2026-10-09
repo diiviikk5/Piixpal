@@ -663,3 +663,24 @@ function end(T) {
   if (T > 37.3) { g.fillStyle = `rgba(0,0,0,${E.inOut(prog(T, 37.3, 38))})`; g.fillRect(0, 0, W, H); }
 }
 
+/* ===================================================================== sound cues
+ * music.mjs reads these, so every blip lands on the frame that makes it */
+function cues() {
+  const c = [], at = (t, kind) => c.push([+t.toFixed(3), kind]);
+  [.2, .45, .7, .95, 1.2, 4.3, 4.42, 4.54, 4.66].forEach(t => at(t, 'word'));
+  [4.4, 5.6, 5.85, 6.1, 6.35, 6.6, 6.85, 7.1, 28.65, 34.7].forEach(t => at(t, 'pop'));
+  [9.05, 9.2, 9.35, 9.5, 9.65, 9.8, 9.95].forEach(t => at(t, 'land'));
+  [0, 6, 9, 15, 21, 27, 33].forEach(col => at(8.02 + col * .032 + .3, 'block'));
+  [13, 14, 15, 16, 17, 18, 19.5].forEach(t => at(t - .06, 'cut'));
+  [11.78, 21.78, 25.78, 30.78].forEach(t => at(t, 'wipe'));
+  [15.05, 15.2, 15.32].forEach(t => at(t, 'throw'));
+  at(14.38, 'land'); at(16.45, 'ding');
+  level().coins.forEach(k => at(k.at, 'coin'));
+  [22, 23, 24, 25].forEach(t => at(t, 'slam'));
+  for (let i = 0; i < 15; i++) at(26.3 + i * .6 / 15, 'key');
+  for (let i = 0; i < 60; i++) at(27.3 + i * 1.3 / 60, 'key');
+  for (let i = 0; i < 6; i++) at(29.2 + i * .2, 'chip');
+  for (let i = 0; i < 6; i++) at(31.5 + i * .25, 'bigpop');
+  return c.sort((a, b) => a[0] - b[0]);
+}
+
