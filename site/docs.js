@@ -51,7 +51,33 @@
       ['shy', 'tilt', 'still'].forEach(k => st[k] && attrs.push(k));
       if (st.nap) attrs.push('sleep-after="4"');
       const tag = `<piix-sprite ${attrs.join(' ')}></piix-sprite>`;
-      showCode($('#c-code'), tag);
+      /* the same sprite, for every setup */
+      const CDN = 'https://cdn.jsdelivr.net/npm/piixpal@0.4/';
+      const Name = st.name.split('-').map(w => w[0].toUpperCase() + w.slice(1)).join('');
+      const jsx = attrs.map(a => a.replace(/^([\w-]+)="(\d+)"$/, '$1={$2}')).filter(a => !a.startsWith('name=')).join(' ');
+      const props = attrs.filter(a => !a.startsWith('name=')).join(' ');
+      codes = {
+        HTML: `<script src="${CDN}piixpal.min.js"></script>\n\n${tag}`,
+        'Single file': `<script src="${CDN}dist/c/${st.name}.min.js"></script>\n\n${tag}`,
+        React: `// npm install piixpal\nimport { PiixSprite } from "piixpal/react";\n\n<PiixSprite name="${st.name}"${jsx ? ' ' + jsx : ''} />`,
+        Vue: `// main.js: app.use(Piixpal) from "piixpal/vue"\n\n${tag}`,
+        Svelte: `<script>import Piixpal from "piixpal/svelte";</script>\n<Piixpal />\n\n${tag}`,
+        shadcn: `npx shadcn@latest add https://piixpal.dvkk.dev/r/${st.name}.json\n\nimport { ${Name} } from "@/components/piixpal/${st.name}";\n\n<${Name}${props ? ' ' + props : ''} />`
+      };
+      tabs();
+    };
+    /* code tabs under the customiser */
+    let codes = {}, tab = 'HTML';
+    const tabs = () => {
+      const bar = $('#c-tabs');
+      if (!bar.children.length) Object.keys(codes).forEach(k => {
+        const b = document.createElement('button');
+        b.type = 'button'; b.role = 'tab'; b.textContent = k;
+        b.addEventListener('click', () => { tab = k; tabs(); });
+        bar.appendChild(b);
+      });
+      [...bar.children].forEach(b => b.setAttribute('aria-selected', String(b.textContent === tab)));
+      showCode($('#c-code'), codes[tab]);
     };
     const pick = name => { st.name = name; render(); };
     $('#c-pick').addEventListener('change', e => pick(e.target.value));
