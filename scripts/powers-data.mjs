@@ -350,7 +350,10 @@ export const POWERS = [
     accent: "var(--mint)",
     kind: "pal",
     does: "offline",
-    where: "body"
+    where: "body",
+    uses: "the browser’s online and offline events",
+    support: "every modern browser",
+    try: "press Go offline, then Back online"
   }
   // new powers go above this line
 ];
