@@ -68,3 +68,53 @@ const FX = {
   bigpop: (t, i) => { sweep(t, .22, 200 + i * 60, 900 + i * 120, p => pulse(p, .5), .1); sub(t, .25); }
 };
 
+/* ---------- the score ---------- */
+const CH = { C: ['C', 'E', 'G'], G: ['G', 'B', 'D'], Am: ['A', 'C', 'E'], F: ['F', 'A', 'C'] };
+const ROOT = { C: m('C2'), G: m('G1'), Am: m('A1'), F: m('F1') };
+const chordAt = t => ['C', 'G', 'Am', 'F'][Math.floor(t / 2) % 4];
+const tones = (c, oct) => CH[c].map(n => m(n + oct)).map((n, i, a) => n < a[0] ? n + 12 : n);
+const MEL = {
+  C: ['E5', 0, 'G5', 'E5', 'C6', 0, 'G5', 0],
+  G: ['D5', 0, 'G5', 'D5', 'B5', 0, 'A5', 'G5'],
+  Am: ['C5', 0, 'E5', 'A5', 'C6', 0, 'B5', 'A5'],
+  F: ['A5', 0, 'G5', 'F5', 'E5', 0, 'D5', 0]
+};
+/* sections: [from, to, parts] */
+const parts = (t) => {
+  if (t < 4) return { pad: 2, tick: 1.4 };
+  if (t < 8) return { pad: 1, tick: 1, bass: t >= 4 ? .7 : 0, kick: t >= 6 ? .55 : 0, roll: t >= 7 && t < 7.875 };
+  if (t < 22) return { pad: 1, bass: 1, kick: 1, snare: 1, hats: 1, arp: 1, lead: 1 };
+  if (t < 26) return { pad: .6, tick: .7 };
+  if (t < 31) return { pad: .8, bass: 1, kick: 1, snare: .7, hats: .8, arp: 1.2 };
+  if (t < 34) return { pad: 1, bass: 1, kick: 1, snare: 1, hats: 1, arp: 1, lead: 1.1 };
+  return {};
+};
+for (let bar = 0; bar < 17; bar++) {
+  const t0 = bar * 2, c = chordAt(t0), P = parts(t0 + .01);
+  if (P.pad) pad(t0, 2, tones(c, 4).concat(m(CH[c][0] + 3)), P.pad);
+  for (let s = 0; s < 16; s++) {                                     /* sixteenths */
+    const t = t0 + s * BEAT / 4, Q = parts(t + .001);
+    if (Q.kick && s % 4 === 0) kick(t, Q.kick);
+    if (Q.snare && (s === 4 || s === 12)) { snare(t, Q.snare); clap(t, .6 * Q.snare); }
+    if (Q.hats) hat(t, (s % 2 ? .55 : 1) * Q.hats * (s % 4 === 2 ? 1.3 : 1), s % 8 === 6);
+    if (Q.tick && s % 2 === 0) hat(t, .35 * Q.tick);
+    if (Q.bass && s % 2 === 0) bass(t, BEAT / 2, ROOT[c] + (s % 4 === 2 ? 12 : 0), Q.bass);
+    if (Q.arp) { const tn = tones(c, 5); arp(t, .12, tn[[0, 1, 2, 1][s % 4]] + (s >= 8 ? 12 : 0), Q.arp); }
+    if (Q.lead && s % 2 === 0) { const n = MEL[c][s / 2]; if (n) lead(t, BEAT / 2 * .9, m(n), Q.lead); }
+    if (Q.roll) { const sub16 = t >= 7.5 ? 2 : 1; for (let k = 0; k < sub16; k++) snare(t + k * BEAT / 8, .25 + (t - 7) * .7); }
+  }
+}
+/* the riser into the drop, and the gap right before it */
+{ const f = lp(.05); voice(6, 1.9, t => { const k = t / 1.9; return (f(noise()) * (.3 + k * 2.4) + saw(t * lerpExp(110, 880, k)) * .08) * k * k; }, .35); }
+crash(8, 1.2); sub(8, 1.2); kick(8, 1.3);
+stab(8, tones('C', 4).concat(m('C5')), 1.2);
+/* the stats: one big chord per slam */
+[['C', 22], ['G', 23], ['Am', 24], ['F', 25]].forEach(([c, t]) => stab(t, tones(c, 4).concat(m(CH[c][0] + 5)), 1.3));
+/* fills into each new section */
+[21.5, 30.5].forEach(t0 => { for (let k = 0; k < 8; k++) snare(t0 + k * BEAT / 4, .5 + k * .08); });
+/* the end: one held chord and a little sign-off */
+crash(34, 1.3); kick(34, 1.3); sub(34, 1.4);
+stab(34, tones('C', 4).concat(m('C5'), m('G5')), 1.4);
+pad(34, 3, tones('C', 4).concat(m('C3'), m('E5')), 1.6);
+['C6', 'E6', 'G6', 'C7'].forEach((n, i) => lead(35.2 + i * .125, .2, m(n), .6, i % 2 ? .3 : -.3));
+
