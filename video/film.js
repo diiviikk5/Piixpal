@@ -327,3 +327,200 @@ function label(T, t0, verb, color, dim, n) {
 }
 function punch(T, t0) { const k = E.outExpo(prog(T, t0, t0 + .4)); camera(lerp(1.12, 1, k), W / 2, H / 2); }
 
+function crawl(T) {
+  const t0 = 12;
+  g.fillStyle = C.paper; g.fillRect(0, 0, W, H); grid('rgba(23,18,31,.05)', 48);
+  punch(T, t0);
+  const str = 'HELLO WORLD', sz = 250, m = measure(str, sz, 800, SANS, -6), base = 640, top = base - measure('H', sz).asc;
+  text(str, W / 2, base, { size: sz, color: C.ink, align: 'center', track: -6 });
+  const x0 = W / 2 - m.w / 2;
+  pal('bitbug', 'walk', T, x0 + 90 + (T - t0) * 760, top, 10, { fps: 14 });
+  pal('pinch', 'walk', T, x0 + m.w - 60 - (T - t0) * 380, top, 9, { flip: true, fps: 12 });
+  pal('gecko', 'walk', T, x0 + 380 + (T - t0) * 300, top, 8, { fps: 12 });
+  reset();
+  label(T, t0, 'crawl.', C.ink, C.muted, 1);
+}
+function nap(T) {
+  const t0 = 13;
+  g.fillStyle = C.sky; g.fillRect(0, 0, W, H); grid('rgba(255,255,255,.12)', 48);
+  punch(T, t0);
+  const x = 420, y = 330, w = 1080, h = 420;
+  rrect(x + 12, y + 14, w, h, 26, C.ink); rrect(x, y, w, h, 26, C.white, C.ink, 5);
+  text('Quarterly report', x + 70, y + 120, { size: 64, color: C.ink, track: -2 });
+  ['Strong growth across every metric we', 'track, and a noticeable increase in', 'pixel creatures napping on the text.'].forEach((l, i) =>
+    text(l, x + 70, y + 200 + i * 58, { size: 40, weight: 500, color: C.muted }));
+  pal('kitty', 'sleep', T, x + 300, y, 9);
+  pal('capy', 'doze', T, x + 820, y, 8, { flip: true });
+  for (let i = 0; i < 4; i++) {
+    const z = ((T - t0) * 1.1 + i / 4) % 1;
+    text('z', x + 380 + z * 60, y - 80 - z * 160, { size: 30 + z * 34, fam: PIX, weight: 400, color: C.ink, alpha: 1 - z });
+  }
+  reset();
+  label(T, t0, 'nap.', C.ink, 'rgba(23,18,31,.55)', 2);
+}
+function perch(T) {
+  const t0 = 14;
+  g.fillStyle = C.sun; g.fillRect(0, 0, W, H); grid('rgba(23,18,31,.06)', 48);
+  punch(T, t0);
+  const land = t0 + .38, press = T > land && T < land + .12 ? 8 : 0;
+  const bx = W / 2 - 340, by = 430, bw = 680, bh = 160;
+  rrect(bx, by + 12, bw, bh, 80, C.ink);
+  rrect(bx, by + press, bw, bh, 80, C.coral, C.ink, 6);
+  text('Get started  →', W / 2, by + bh / 2 + press + 4, { size: 64, color: C.white, align: 'center', base: 'middle', track: -1 });
+  const k = prog(T, t0, land), px = lerp(W + 100, W / 2 + 160, E.outCubic(k)), py = lerp(-120, by + press, E.outCubic(k)) - Math.sin(k * Math.PI) * 120;
+  pal('pip', T < land ? 'fly' : T < land + .3 ? 'idle' : 'peck', T, px, py, 11, { flip: true, fps: T < land ? 12 : 6 });
+  pal('bumble', 'fly', T, W / 2 - 420 + Math.sin(T * 6) * 30, 330 + Math.cos(T * 9) * 20, 7);
+  reset();
+  label(T, t0, 'perch.', C.ink, 'rgba(23,18,31,.5)', 3);
+}
+/* toys under gravity, bouncing off the floor and walls: simulated from the throw, so any frame is reproducible */
+function toss(T, at, x, y, vx, vy, floor = 860) {
+  let px = x, py = y, rot = 0; const dt = 1 / 240;
+  for (let t = at; t < T; t += dt) {
+    vy += 3800 * dt; px += vx * dt; py += vy * dt; rot += vx * dt * .012;
+    if (py > floor) { py = floor; vy *= -.52; vx *= .8; }
+    if (px < 80 || px > W - 80) { vx *= -.8; px = cl(px, 80, W - 80); }
+  }
+  return { x: px, y: py, rot };
+}
+function thrown(T) {
+  const t0 = 15;
+  g.fillStyle = C.coral; g.fillRect(0, 0, W, H); grid('rgba(255,255,255,.08)', 48);
+  punch(T, t0);
+  g.fillStyle = 'rgba(23,18,31,.18)'; g.fillRect(0, 868, W, 12);
+  [['duck', t0 + .05, 260, 520, 1500, -1500], ['dice', t0 + .2, 380, 620, 1100, -1700], ['ball', t0 + .32, 200, 560, 1900, -1300]].forEach(([n, at, x, y, vx, vy]) => {
+    const p = T < at ? { x, y, rot: 0 } : toss(T, at, x, y, vx, vy, 868 - S[n].h * 6.5);
+    pal(n, n === 'dice' ? 'roll' : 'idle', T, p.x, p.y, 13, { center: true, rot: p.rot });
+    if (T < at + .1) cursor(x + 30, y + 40, T < at);
+  });
+  reset();
+  label(T, t0, 'get thrown.', C.white, 'rgba(23,18,31,.6)', 4);
+}
+function cursor(x, y, grab) {
+  const A = grab ? ['k......', 'kk.....', 'kwk....', 'kwwk...', 'kwwwk..', 'kwwwwk.', 'kwwkkk.', 'kk.kwk.', '....kk.'] : ['k......', 'kk.....', 'kwk....', 'kwwk...', 'kwwwk..', 'kwwwwk.', 'kwwkkk.', 'kk.....'];
+  const s = 7;
+  A.forEach((r, j) => [...r].forEach((c, i) => { if (c !== '.') { g.fillStyle = c === 'k' ? C.ink : C.white; g.fillRect(x + i * s, y + j * s, s, s); } }));
+}
+function deliver(T) {
+  const t0 = 16;
+  g.fillStyle = C.violet; g.fillRect(0, 0, W, H); grid('rgba(255,255,255,.08)', 48);
+  punch(T, t0);
+  const drop = t0 + .45;
+  const k = prog(T, t0, drop), bx = lerp(-200, W / 2, E.outCubic(k)), by = 330 + Math.sin(T * 14) * 8;
+  const fx = T < drop ? bx : W / 2 + (T - drop) * 1300, fy = T < drop ? by : by - (T - drop) * 700;
+  const ck = E.outBack(prog(T, drop, drop + .35)), cx = W / 2, cy = T < drop ? by + 150 : lerp(by + 150, 640, ck);
+  /* the note it carries, then the toast it becomes */
+  const cw = lerp(380, 620, ck), ch = lerp(120, 150, ck);
+  if (T < drop) { g.strokeStyle = C.white; g.lineWidth = 4; g.beginPath(); g.moveTo(bx, by - 20); g.lineTo(bx, by + 90); g.stroke(); }
+  g.save(); g.translate(T < drop ? bx : cx, cy);
+  rrect(-cw / 2, -ch / 2 + 10, cw, ch, 24, C.ink); rrect(-cw / 2, -ch / 2, cw, ch, 24, C.white, C.ink, 5);
+  g.beginPath(); g.arc(-cw / 2 + 70, 0, 30, 0, 7); g.fillStyle = C.mint; g.fill();
+  text('✓', -cw / 2 + 70, 3, { size: 36, color: C.white, align: 'center', base: 'middle' });
+  text('Saved', -cw / 2 + 125, -8, { size: 46, color: C.ink, base: 'middle' });
+  text('just now · delivered by pigeon', -cw / 2 + 127, 34, { size: 22, weight: 500, fam: MONO, color: C.muted, base: 'middle', alpha: ck });
+  g.restore();
+  pal('pidge', 'fly', T, fx, fy, 12, { fps: 14 });
+  reset();
+  label(T, t0, 'deliver.', C.white, 'rgba(255,255,255,.55)', 5);
+}
+function weather(T) {
+  const t0 = 17;
+  g.fillStyle = '#0f1630'; g.fillRect(0, 0, W, H);
+  punch(T, t0);
+  const str = 'LET IT SNOW', sz = 240, base = 640, top = base - measure('L', sz).asc, m = measure(str, sz, 800, SANS, -6);
+  text(str, W / 2, base, { size: sz, color: C.white, align: 'center', track: -6 });
+  /* snow settles on every letter top */
+  let x = W / 2 - m.w / 2; const pile = cl((T - t0) * 22, 0, 22);
+  for (const ch of str) {
+    const w = measure(ch, sz, 800, SANS, -6).w;
+    if (ch !== ' ') rrect(x + w * .06, top - pile + 2, w * .74, pile + 8, Math.min(12, pile), '#eaf6ff');
+    x += w;
+  }
+  g.fillStyle = C.white;
+  for (let i = 0; i < 420; i++) {
+    const sp = 260 + hash(i) * 320, sx = hash(i * 7) * W + Math.sin(T * 2 + i) * 20, sy = (hash(i * 3) * H * 1.4 + (T - t0 + 3) * sp) % (H * 1.1) - 40;
+    const z = 4 + Math.round(hash(i * 11) * 3) * 3; g.globalAlpha = .5 + hash(i * 5) * .5; g.fillRect(sx, sy, z, z);
+  }
+  g.globalAlpha = 1;
+  pal('penguin', 'slide', T, lerp(W + 100, -100, prog(T, t0 + .2, t0 + 1)), top - pile + 6, 8, { flip: true });
+  reset();
+  label(T, t0, 'bring the weather.', C.white, 'rgba(255,255,255,.5)', 6);
+}
+let SWARM;
+function swarm(T) {
+  const t0 = 18;
+  g.fillStyle = C.mint; g.fillRect(0, 0, W, H); grid('rgba(255,255,255,.1)', 48);
+  if (!SWARM) {
+    const o = document.createElement('canvas'); o.width = W; o.height = H;
+    const x = o.getContext('2d'); x.font = font(400); x.letterSpacing = '-8px'; x.textAlign = 'center'; x.fillText('HELLO', W / 2, 690);
+    const d = x.getImageData(0, 0, W, H).data, pts = [];
+    for (let y = 0; y < H; y += 13) for (let i = 0; i < W; i += 13) if (d[(y * W + i) * 4 + 3] > 128) pts.push([i, y]);
+    SWARM = pts.map((p, i) => ({ p, s: [hash(i * 3.1) * W * 1.3 - W * .15, hash(i * 5.7) * H * 1.3 - H * .15], d: hash(i * 9.3) * .35 }));
+  }
+  punch(T, t0);
+  const ants = baked('ants').walk;
+  g.imageSmoothingEnabled = false;
+  for (const a of SWARM) {
+    const k = E.inOut(prog(T, t0 + .05 + a.d, t0 + .85 + a.d));
+    const wob = (1 - k) * 40, x = lerp(a.s[0], a.p[0], k) + Math.sin(T * 8 + a.d * 50) * wob, y = lerp(a.s[1], a.p[1], k) + Math.cos(T * 7 + a.d * 40) * wob;
+    const ang = k < 1 ? Math.atan2(a.p[1] - a.s[1], a.p[0] - a.s[0]) : Math.sin(T * 3 + a.d * 20) * .4;
+    g.save(); g.translate(x, y); g.rotate(ang); g.drawImage(ants[Math.floor(T * 10 + a.d * 10) % ants.length], -12, -4.5, 24, 9); g.restore();
+  }
+  reset();
+  label(T, t0, 'swarm.', C.ink, 'rgba(23,18,31,.5)', 7);
+}
+/* a tiny platformer across the words of a sentence */
+let LEVEL;
+const PLAY = [19.5, 21.85];
+function level() {
+  if (LEVEL) return LEVEL;
+  const [t0, t1] = PLAY;
+    const ws = [['YOUR', 820], ['SITE', 690], ['IS', 560], ['A', 700], ['LEVEL', 520]], sz = 130;
+    let x = 140; LEVEL = { sz, plats: [] };
+    for (const [w, base] of ws) { const m = measure(w, sz, 800, SANS, -3); LEVEL.plats.push({ w, x, x1: x + m.w, base, top: base - measure('E', sz).asc }); x += m.w + 120; }
+    /* path: run along each word, hop to the next */
+    const P = LEVEL.plats, seg = [];
+    P.forEach((p, i) => {
+      seg.push({ kind: 'run', x0: i ? p.x + 30 : p.x + 40, x1: p.x1 - 34, y: p.top });
+      if (P[i + 1]) seg.push({ kind: 'jump', x0: p.x1 - 34, x1: P[i + 1].x + 30, y0: p.top, y1: P[i + 1].top });
+    });
+    const len = s => s.kind === 'run' ? Math.abs(s.x1 - s.x0) : 260;
+    const total = seg.reduce((a, s) => a + len(s), 0);
+    let acc = 0; seg.forEach(s => { s.a = acc / total; acc += len(s); s.b = acc / total; });
+    LEVEL.seg = seg;
+    /* each coin sits over the middle of a jump, so it is taken at the jump's halfway time */
+    LEVEL.coins = seg.filter(s => s.kind === 'jump').map(s => ({ x: (s.x0 + s.x1) / 2, y: Math.min(s.y0, s.y1) - 200, at: t0 + .1 + (s.a + s.b) / 2 * (t1 - t0 - .1) }));
+  return LEVEL;
+}
+function play(T) {
+  const [t0, t1] = PLAY;
+  g.fillStyle = '#1b1430'; g.fillRect(0, 0, W, H);
+  for (let i = 0; i < 70; i++) { g.fillStyle = 'rgba(255,255,255,' + (.2 + hash(i) * .5) + ')'; const z = hash(i * 2) > .8 ? 6 : 3; g.fillRect(hash(i * 3) * W, hash(i * 5) * 620, z, z); }
+  punch(T, t0);
+  const { plats, seg, coins, sz } = level();
+  for (const p of plats) {
+    text(p.w, p.x, p.base, { size: sz, color: C.white, track: -3 });
+    g.fillStyle = C.lime; g.fillRect(p.x, p.top - 10, p.x1 - p.x, 10);
+  }
+  const u = prog(T, t0 + .1, t1);
+  const s = seg.find(s => u <= s.b) || seg[seg.length - 1], k = cl((u - s.a) / (s.b - s.a));
+  let x, y, clip;
+  if (s.kind === 'run') { x = lerp(s.x0, s.x1, k); y = s.y; clip = u >= 1 ? 'happy' : 'run'; }
+  else { x = lerp(s.x0, s.x1, k); y = lerp(s.y0, s.y1, k) - Math.sin(k * Math.PI) * 230; clip = k < .5 ? 'jump' : 'fall'; }
+  let got = 0;
+  coins.forEach((c, i) => {
+    if (T >= c.at) {
+      got++;
+      const at = c.at, r = prog(T, at, at + .5);
+      if (r < 1) text('+1', c.x, c.y - r * 80, { size: 34, fam: PIX, weight: 400, color: C.sun, align: 'center', alpha: 1 - r });
+      burst(T, at, c.x, c.y, C.sun, 8, 60);
+    } else pal('_coin', 'spin', T, c.x, c.y + Math.sin(T * 6 + i) * 8, 8);
+  });
+  pal('pix', clip, T, x, y, 9);
+  reset();
+  text('WORLD 1-1', 110, 120, { size: 30, fam: PIX, weight: 400, color: C.soft });
+  text('COINS ' + String(got).padStart(2, '0'), W - 110, 120, { size: 30, fam: PIX, weight: 400, color: C.sun, align: 'right' });
+  words([{ w: 'They', color: 'rgba(255,255,255,.5)' }, ...'turn your site into a game.'.split(' ').map(w => ({ w, color: C.white }))], T, { x: 110, y: 985, size: 100, align: 'left', t0: t0 + .04, stagger: .05, dur: .45 });
+  text('08 / 08', W - 110, 985, { size: 26, weight: 600, fam: MONO, color: 'rgba(255,255,255,.5)', align: 'right' });
+}
+
