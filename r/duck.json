@@ -5,7 +5,7 @@
   "title": "Duck",
   "description": "A rubber duck you can throw. It squeaks when it lands.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

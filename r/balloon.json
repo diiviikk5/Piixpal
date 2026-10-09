@@ -5,7 +5,7 @@
   "title": "Balloon",
   "description": "A balloon with a face, tied to your element, bobbing in the breeze.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

@@ -5,7 +5,7 @@
   "title": "Bitbug",
   "description": "A lime beetle that crawls along the real outline of your letters.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

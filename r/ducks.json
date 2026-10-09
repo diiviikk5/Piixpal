@@ -5,7 +5,7 @@
   "title": "Ducks",
   "description": "A mother duck and her ducklings.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

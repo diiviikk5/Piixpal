@@ -5,7 +5,7 @@
   "title": "Heart",
   "description": "A like button with feelings. Beats steadily, blushes easily.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

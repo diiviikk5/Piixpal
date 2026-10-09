@@ -5,7 +5,7 @@
   "title": "Onigiri",
   "description": "A rice ball in a seaweed jacket. Calm, round-ish, triangular.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

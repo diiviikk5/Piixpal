@@ -5,7 +5,7 @@
   "title": "Gpu",
   "description": "A graphics card whose two fans are its eyes. RGB strip included, obviously.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

@@ -5,7 +5,7 @@
   "title": "Capy",
   "description": "A capybara with a yuzu on its head, completely unbothered.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

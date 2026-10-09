@@ -5,7 +5,7 @@
   "title": "Shibe",
   "description": "A shiba that lounges on your text, tail wagging.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

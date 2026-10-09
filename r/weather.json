@@ -5,7 +5,7 @@
   "title": "Weather",
   "description": "Snow that settles on your letters, plus rain, leaves and petals.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

@@ -5,7 +5,7 @@
   "title": "Bulb",
   "description": "A pull-chain light switch for dark mode.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

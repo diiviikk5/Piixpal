@@ -5,7 +5,7 @@
   "title": "Mochi",
   "description": "A soft pink rice cake. Squishy, blushy, easily delighted.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

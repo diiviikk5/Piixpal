@@ -5,7 +5,7 @@
   "title": "Cactus",
   "description": "A potted cactus who blooms when it is in a good mood. Do not hug.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

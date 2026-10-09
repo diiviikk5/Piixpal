@@ -5,7 +5,7 @@
   "title": "Drone",
   "description": "Flies the product picture into your cart when someone adds to cart.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

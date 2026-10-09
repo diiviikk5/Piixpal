@@ -5,7 +5,7 @@
   "title": "Pinch",
   "description": "A crab that walks sideways along your text.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

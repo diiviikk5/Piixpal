@@ -5,7 +5,7 @@
   "title": "Astronaut",
   "description": "A tiny astronaut floating in place. Eyes glow behind the visor.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

@@ -5,7 +5,7 @@
   "title": "Frog",
   "description": "A frog that snaps its tongue at your cursor.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

@@ -5,7 +5,7 @@
   "title": "Scrolly",
   "description": "A little runner on a reading-progress bar.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

@@ -5,7 +5,7 @@
   "title": "Pip",
   "description": "A round bird that hops between your buttons and perches on them.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

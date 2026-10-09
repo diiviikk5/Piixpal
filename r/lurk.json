@@ -5,7 +5,7 @@
   "title": "Lurk",
   "description": "A shy creature that peeks over the edge of your cards.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

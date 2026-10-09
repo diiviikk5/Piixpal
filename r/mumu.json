@@ -5,7 +5,7 @@
   "title": "Mumu",
   "description": "A round little bear who would like a snack, please. Ears wiggle.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

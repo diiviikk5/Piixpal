@@ -5,7 +5,7 @@
   "title": "Dragon",
   "description": "A pocket dragon. Flaps its little wings. Breathes a little fire now and then.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

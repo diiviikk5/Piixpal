@@ -5,7 +5,7 @@
   "title": "Donut",
   "description": "A strawberry donut with sprinkles. Has a hole in its life and is fine with it.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

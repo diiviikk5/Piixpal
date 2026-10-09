@@ -5,7 +5,7 @@
   "title": "Avocado",
   "description": "Half an avocado, proudly showing off its pit. Ripe for exactly one day.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

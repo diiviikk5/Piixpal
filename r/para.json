@@ -5,7 +5,7 @@
   "title": "Para",
   "description": "A parachutist who drops onto your section when it scrolls into view.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

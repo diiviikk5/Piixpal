@@ -5,7 +5,7 @@
   "title": "Cube",
   "description": "A jelly cube that bounces high and wobbles.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

@@ -5,7 +5,7 @@
   "title": "Wizard",
   "description": "A very small wizard whose hat does most of the work. Sparkles on request.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

@@ -5,7 +5,7 @@
   "title": "Gecko",
   "description": "A gecko that climbs up and around the sides of your cards.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

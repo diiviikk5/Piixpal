@@ -5,7 +5,7 @@
   "title": "Candle",
   "description": "A little candle with a flame that never sits still.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

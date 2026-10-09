@@ -5,7 +5,7 @@
   "title": "Llama",
   "description": "A fluffy llama with a long neck and a calm, knowing look.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

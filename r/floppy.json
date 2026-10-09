@@ -5,7 +5,7 @@
   "title": "Floppy",
   "description": "A floppy disk who remembers when 1.44 MB was a lot. Also, the save icon.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

@@ -5,7 +5,7 @@
   "title": "Nomad",
   "description": "A little traveller who walks between your browser windows.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

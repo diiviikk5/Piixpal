@@ -5,7 +5,7 @@
   "title": "Gist",
   "description": "An owl that sums up your article in a few key points.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

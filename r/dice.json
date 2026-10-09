@@ -5,7 +5,7 @@
   "title": "Dice",
   "description": "Throw it and it lands on a random face.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

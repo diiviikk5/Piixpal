@@ -5,7 +5,7 @@
   "title": "Server",
   "description": "A server rack keeping your site alive. Its drive lights never stop.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

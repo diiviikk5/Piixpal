@@ -5,7 +5,7 @@
   "title": "Pix",
   "description": "A tiny hero that lets visitors play your page as a platformer.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

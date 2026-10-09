@@ -5,7 +5,7 @@
   "title": "Hiss",
   "description": "A snake that slithers along your headings.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

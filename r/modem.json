@@ -5,7 +5,7 @@
   "title": "Modem",
   "description": "A dial-up modem. Its lights blink in a pattern only it understands.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

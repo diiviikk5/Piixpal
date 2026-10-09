@@ -5,7 +5,7 @@
   "title": "Choir",
   "description": "A choir who sway and sing in perfect time from a shared score.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

@@ -5,7 +5,7 @@
   "title": "Toast",
   "description": "A slice of toast with a pat of butter slowly giving up.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

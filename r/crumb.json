@@ -5,7 +5,7 @@
   "title": "Crumb",
   "description": "A mouse that eats your cookie banner when someone accepts or rejects.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

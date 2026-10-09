@@ -5,7 +5,7 @@
   "title": "Termi",
   "description": "A tiny terminal that types out your lines, one character at a time.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

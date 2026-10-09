@@ -5,7 +5,7 @@
   "title": "Coffee",
   "description": "A mug of coffee, steaming gently, quietly judging your sleep schedule.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

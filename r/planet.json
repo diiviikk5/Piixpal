@@ -5,7 +5,7 @@
   "title": "Planet",
   "description": "A small ringed planet. Spins slowly, shines a little, thinks big.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

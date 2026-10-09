@@ -5,7 +5,7 @@
   "title": "Polly",
   "description": "Reads your page aloud, hopping along each word as it is spoken.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

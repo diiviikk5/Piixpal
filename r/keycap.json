@@ -5,7 +5,7 @@
   "title": "Keycap",
   "description": "A chunky mechanical keycap. Thocky. Click it for a satisfying press.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

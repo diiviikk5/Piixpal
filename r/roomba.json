@@ -5,7 +5,7 @@
   "title": "Roomba",
   "description": "A robot vacuum that sweeps along your footer, very seriously.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

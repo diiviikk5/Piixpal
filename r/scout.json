@@ -5,7 +5,7 @@
   "title": "Scout",
   "description": "Onboarding tours, guided by a tiny explorer.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

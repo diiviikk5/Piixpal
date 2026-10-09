@@ -5,7 +5,7 @@
   "title": "Beep",
   "description": "A robot that panics when someone ticks “I’m not a robot”.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

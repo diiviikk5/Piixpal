@@ -5,7 +5,7 @@
   "title": "Brain",
   "description": "A very big brain, thinking very hard. Sparks race along its folds.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

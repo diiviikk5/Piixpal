@@ -5,7 +5,7 @@
   "title": "Rocket",
   "description": "Sits on your Deploy button. Click it: countdown, lift-off, landing.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

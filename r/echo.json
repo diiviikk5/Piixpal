@@ -5,7 +5,7 @@
   "title": "Echo",
   "description": "A copycat cursor that replays your moves half a second late.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

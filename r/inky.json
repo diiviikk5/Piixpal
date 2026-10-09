@@ -5,7 +5,7 @@
   "title": "Inky",
   "description": "A small squid with five wiggly arms and one very big question.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

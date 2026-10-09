@@ -5,7 +5,7 @@
   "title": "Pebble",
   "description": "A heavy rock that lands with a thud every pal hears.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

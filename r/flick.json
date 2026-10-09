@@ -5,7 +5,7 @@
   "title": "Flick",
   "description": "A little flame with big feelings. Never, ever stands still.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

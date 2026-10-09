@@ -5,7 +5,7 @@
   "title": "Fluff",
   "description": "A sheep made almost entirely of cloud. Trots in place, very proudly.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

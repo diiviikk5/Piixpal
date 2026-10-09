@@ -5,7 +5,7 @@
   "title": "Plane",
   "description": "A plane that tows your announcement banner across the page.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

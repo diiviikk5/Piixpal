@@ -5,7 +5,7 @@
   "title": "Meh",
   "description": "A face that rides your rating slider, from furious to delighted.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

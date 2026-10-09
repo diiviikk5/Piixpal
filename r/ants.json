@@ -5,7 +5,7 @@
   "title": "Ants",
   "description": "A marching line of ants, some carrying crumbs.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

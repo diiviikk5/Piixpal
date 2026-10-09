@@ -5,7 +5,7 @@
   "title": "Unicorn",
   "description": "The startup kind. A golden horn, a rainbow mane, a billion-dollar smile.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

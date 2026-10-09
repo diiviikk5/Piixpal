@@ -5,7 +5,7 @@
   "title": "Router",
   "description": "A Wi-Fi router whose signal bars follow your cursor.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

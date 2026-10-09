@@ -5,7 +5,7 @@
   "title": "Shel",
   "description": "A snail that creeps along your text, leaving a shiny trail.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

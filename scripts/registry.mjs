@@ -86,7 +86,8 @@ const add = (name, title, description, tag, attr, load) => {
     json: {
       $schema: 'https://ui.shadcn.com/schema/registry-item.json',
       name, type: 'registry:component', title, description,
-      registryDependencies: [`${SITE}/r/piixpal.json`],
+      /* the loader comes from the vercel.app address, which always resolves */
+      registryDependencies: ["https://piixpal.vercel.app/r/piixpal.json"],
       files: [{ path: `registry/piixpal/${name}.tsx`, type: 'registry:component', target: `components/piixpal/${name}.tsx`, content: component({ name, Comp, tag, attr, load }) }]
     }
   });

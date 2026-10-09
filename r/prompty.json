@@ -5,7 +5,7 @@
   "title": "Prompty",
   "description": "A chat bubble who is always just about to reply. Thinking… thinking…",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

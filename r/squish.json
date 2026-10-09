@@ -5,7 +5,7 @@
   "title": "Squish",
   "description": "A marshmallow that gets squashed as the text nears its limit.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

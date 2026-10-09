@@ -5,7 +5,7 @@
   "title": "Inbox",
   "description": "An envelope with a notification badge it cannot stop checking.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

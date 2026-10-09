@@ -5,7 +5,7 @@
   "title": "PixelType",
   "description": "Any font as chunky extruded pixel blocks that pals can walk on.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

@@ -5,7 +5,7 @@
   "title": "Fetch",
   "description": "A dog that runs off on every fetch() and brings back the response.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

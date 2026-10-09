@@ -5,7 +5,7 @@
   "title": "Boing",
   "description": "A jelly drop that bounces on your footer and lands with a splat.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

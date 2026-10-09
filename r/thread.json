@@ -5,7 +5,7 @@
   "title": "Thread",
   "description": "A spider that dangles from your nav on a long thread.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

@@ -5,7 +5,7 @@
   "title": "Hops",
   "description": "Long ears, short attention span. One ear never quite stays up.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

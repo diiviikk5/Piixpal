@@ -5,7 +5,7 @@
   "title": "Kitty",
   "description": "A black cat that lounges on your element and swats at the cursor.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

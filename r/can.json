@@ -5,7 +5,7 @@
   "title": "Can",
   "description": "A soda can that rolls off the edge of everything.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

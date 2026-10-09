@@ -5,7 +5,7 @@
   "title": "Crowd",
   "description": "Hundreds of tiny agents on one canvas: they wander, swarm your cursor, or spell a word.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

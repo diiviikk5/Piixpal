@@ -5,7 +5,7 @@
   "title": "Sushi",
   "description": "A piece of salmon nigiri wearing its fish like a very good blanket.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

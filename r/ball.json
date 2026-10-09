@@ -5,7 +5,7 @@
   "title": "Ball",
   "description": "A beach ball you can throw around your page.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

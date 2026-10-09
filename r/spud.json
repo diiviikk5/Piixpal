@@ -5,7 +5,7 @@
   "title": "Spud",
   "description": "A lumpy potato with a tiny sprout and a lot of potential.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

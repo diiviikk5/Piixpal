@@ -5,7 +5,7 @@
   "title": "Buff",
   "description": "A password-strength meter that lifts heavier as the password gets stronger.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

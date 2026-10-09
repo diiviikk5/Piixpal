@@ -5,7 +5,7 @@
   "title": "Bolt",
   "description": "A chunky robot whose face is a little screen. Its eyes glow.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

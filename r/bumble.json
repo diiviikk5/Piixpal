@@ -5,7 +5,7 @@
   "title": "Bumble",
   "description": "A fuzzy bee that buzzes about your element.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

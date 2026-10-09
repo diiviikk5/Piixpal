@@ -5,7 +5,7 @@
   "title": "Sprout",
   "description": "A focus-timer plant that pops out into its own always-on-top window.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

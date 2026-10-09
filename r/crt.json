@@ -5,7 +5,7 @@
   "title": "Crt",
   "description": "A beige monitor from the old internet. Its face glows on the screen.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

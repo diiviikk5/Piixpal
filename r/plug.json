@@ -5,7 +5,7 @@
   "title": "Plug",
   "description": "Shows up when the connection drops, plugs back in when it returns.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

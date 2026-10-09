@@ -5,7 +5,7 @@
   "title": "Alien",
   "description": "A tiny visitor with three eyes and one antenna. Has questions about your CSS.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

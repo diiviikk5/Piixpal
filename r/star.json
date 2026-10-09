@@ -5,7 +5,7 @@
   "title": "Star",
   "description": "A little star who twinkles on purpose. Main-character energy.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

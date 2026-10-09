@@ -5,7 +5,7 @@
   "title": "Battery",
   "description": "A battery that is always charging and always at one percent. Brave.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

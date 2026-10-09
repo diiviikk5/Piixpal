@@ -5,7 +5,7 @@
   "title": "Snip",
   "description": "A highlighter that hops to whatever text you select.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

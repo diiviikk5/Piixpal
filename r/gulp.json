@@ -5,7 +5,7 @@
   "title": "Gulp",
   "description": "A pelican that gulps down files dropped on your drop zone.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {

@@ -5,7 +5,7 @@
   "title": "Ufo",
   "description": "A very small visitor. Came in peace, stayed for the cursor.",
   "registryDependencies": [
-    "https://piixpal.dvkk.dev/r/piixpal.json"
+    "https://piixpal.vercel.app/r/piixpal.json"
   ],
   "files": [
     {
