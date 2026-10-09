@@ -222,3 +222,28 @@ document.addEventListener('click', e => {
   try { args = b.dataset.args ? JSON.parse(b.dataset.args) : []; } catch (_) { /* bad JSON */ }
   if (t && typeof t[method] === 'function') t[method](...args);
 });
+
+/* ---------- sidebar: filter by name; open the group you're in ---------- */
+(() => {
+  const side = document.querySelector('.side');
+  if (!side) return;
+  const find = side.querySelector('.side-find'), none = side.querySelector('.side-none');
+  const groups = [...side.querySelectorAll('.sg')];
+  const was = groups.map(g => g.open);
+  find && find.addEventListener('input', () => {
+    const q = find.value.trim().toLowerCase();
+    let any = false;
+    groups.forEach((g, i) => {
+      let hit = false;
+      g.querySelectorAll(':scope > a').forEach(a => { const ok = !q || a.textContent.toLowerCase().includes(q); a.hidden = !ok; hit = hit || ok; });
+      g.querySelectorAll(':scope > h5').forEach(h => { let n = h.nextElementSibling, vis = false; while (n && n.tagName === 'A') { vis = vis || !n.hidden; n = n.nextElementSibling; } h.hidden = !vis; });
+      g.hidden = q && !hit;
+      g.open = q ? hit : was[i];
+      any = any || hit;
+    });
+    if (none) none.hidden = !q || any;
+  });
+  /* the current item stays in view in the sidebar */
+  const cur = () => { const a = side.querySelector('a.on'); if (a && side.scrollHeight > side.clientHeight) { const r = a.getBoundingClientRect(), s = side.getBoundingClientRect(); if (r.top < s.top + 40 || r.bottom > s.bottom - 40) side.scrollTop += r.top - s.top - s.height / 2; } };
+  new MutationObserver(cur).observe(side, { subtree: true, attributes: true, attributeFilter: ['class'] });
+})();
