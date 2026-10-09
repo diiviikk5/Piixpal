@@ -1,6 +1,6 @@
 # The launch film
 
-A 38-second launch film drawn entirely in code: the real pals from `src/`, a canvas stage, and a chiptune score synthesised from scratch. No screenshots or stock footage.
+A 36-second launch film drawn entirely in code: the real pals from `src/`, a canvas stage, and a chiptune score synthesised from scratch. No screenshots or stock footage.
 
 ```bash
 node video/render.mjs --cues    # the film's sound cues -> video/out/cues.json
