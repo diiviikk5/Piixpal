@@ -2,6 +2,7 @@
 // Sprite names and taglines are read straight from src/sprites/*.js.
 import { readFileSync, readdirSync, writeFileSync, mkdirSync } from 'node:fs';
 import { POWERS, FAMILIES } from './powers-data.mjs';
+import { gzipSync } from 'node:zlib';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -11,6 +12,8 @@ mkdirSync(out, { recursive: true });
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 /* ---------- data ---------- */
+/* how big the everything-bundle is, gzipped, for the install page */
+const GZ = (() => { try { return Math.round(gzipSync(readFileSync(join(root, 'piixpal.min.js'))).length / 1024); } catch (_) { return 95; } })();
 const ACCENTS = ['var(--lime)', 'var(--coral)', 'var(--violet)', 'var(--sky)', 'var(--sun)', 'var(--mint)'];
 const sprites = readdirSync(join(root, 'src/sprites')).filter(f => f.endsWith('.js')).sort().map((f, i) => {
   const src = readFileSync(join(root, 'src/sprites', f), 'utf8');
@@ -326,7 +329,7 @@ ${rows.map(([a, d, def]) => `<tr><td><code>${a}</code></td><td>${d}</td><td>${de
 const spritesBody = `<header class="doc-head">
   <div class="crumbs"><a href="./">Components</a><span>/</span><span>Sprites</span></div>
   <h1>Sprites</h1>
-  <p>${sprites.length} characters that sit inline, like an image: ${bigs.length} big 3D ones and ${smalls.length} small pixel ones. Their eyes follow the cursor, they blink, breathe a pixel, hop when you click them and nap when nobody's around. Pick one, copy the tag, paste it anywhere.</p>
+  <p>Characters that sit inline, like an image. Their eyes follow the cursor; they blink, hop and nap.</p>
   <div class="pills"><span class="pill">${sprites.length} sprites</span><span class="pill">pixel · dots · halftone · dither · ascii · 3D</span><span class="pill">inline, no positioning</span><span class="pill">eyes follow the cursor</span><span class="pill">one tag</span></div>
 </header>
 
@@ -565,7 +568,7 @@ const typeBody = `<header class="doc-head">
 const crowdBody = `<header class="doc-head">
   <div class="crumbs"><a href="./">Components</a><span>/</span><span>Crowd</span></div>
   <h1>Crowd</h1>
-  <p><code>&lt;piix-crowd&gt;</code> is a stage full of tiny agents, hundreds of them on one canvas. They wander and high-five, flock after your cursor, or walk into place to spell a word. Click the floor to drop one in; grab one and throw it.</p>
+  <p>Hundreds of tiny agents on one canvas. They wander, swarm your cursor, or spell a word.</p>
   <div class="pills"><span class="pill">3 modes</span><span class="pill">up to 600 agents</span><span class="pill">one canvas, 60fps</span><span class="pill">drag + throw</span></div>
 </header>
 <section class="doc-sec" id="customise" aria-labelledby="cr-h">
@@ -642,7 +645,7 @@ const installBody = `<header class="doc-head">
 </header>
 
 <section class="doc-sec" id="cdn" aria-labelledby="i1"><h2 id="i1">1. Everything, one tag</h2>
-  <p>All ${sprites.length + PALS.length + POWERS.length + 4} components in one file (about 40 KB gzipped), served free by jsDelivr. Then use any tag from these pages.</p>
+  <p>All ${sprites.length + PALS.length + POWERS.length + 4} components in one file (about ${GZ} KB gzipped), served free by jsDelivr. Then use any tag from these pages.</p>
   ${codeBox(`<script src="${CDN_ALL}"></script>\n\n<h1>Hello <piix-pal pal="bitbug"></piix-pal></h1>`)}
 </section>
 
