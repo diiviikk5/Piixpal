@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const src = join(root, 'src');
-const CDN = 'https://cdn.jsdelivr.net/gh/diiviikk5/Piixpal@main/dist/';
+const CDN = 'https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/';
 
 const dir = d => existsSync(join(src, d))
   ? readdirSync(join(src, d)).filter(f => f.endsWith('.js')).sort().map(f => join(d, f))
