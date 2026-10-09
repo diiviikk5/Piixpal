@@ -56,3 +56,57 @@ function pal(name, clip, t, x, y, s, o = {}) {
 }
 const size = name => S[name];
 
+/* ---------- type ---------- */
+const font = (px, w = 800, fam = SANS) => `${w} ${px}px ${fam}`;
+function text(str, x, y, { size = 80, weight = 800, fam = SANS, color = C.white, align = 'left', alpha = 1, track = 0, base = 'alphabetic' } = {}) {
+  g.save();
+  g.font = font(size, weight, fam); g.letterSpacing = track + 'px';
+  g.fillStyle = color; g.textAlign = align; g.textBaseline = base; g.globalAlpha *= alpha;
+  g.fillText(str, x, y);
+  g.restore();
+}
+function measure(str, size, weight = 800, fam = SANS, track = 0) {
+  g.save(); g.font = font(size, weight, fam); g.letterSpacing = track + 'px';
+  const m = g.measureText(str); g.restore();
+  return { w: m.width, asc: m.actualBoundingBoxAscent, desc: m.actualBoundingBoxDescent };
+}
+/* words that rise out of a mask one after another, and leave the same way */
+function words(list, T, { x, y, size = 110, weight = 800, fam = SANS, color = C.white, align = 'center', t0 = 0, stagger = .08, dur = .6, out = null, track = null }) {
+  const items = list.map(s => typeof s === 'string' ? { w: s } : s);
+  g.save();
+  g.font = font(size, weight, fam); g.letterSpacing = (track ?? -size * .035) + 'px';
+  const sp = size * .26, ws = items.map(it => g.measureText(it.w).width);
+  const total = ws.reduce((a, b) => a + b, 0) + sp * (items.length - 1);
+  let cx = align === 'center' ? x - total / 2 : align === 'right' ? x - total : x;
+  items.forEach((it, i) => {
+    const st = it.at ?? t0 + i * stagger;
+    const pin = E.outExpo(prog(T, st, st + dur));
+    const po = out == null ? 0 : E.inCubic(prog(T, out + i * stagger * .5, out + i * stagger * .5 + .3));
+    if (pin > 0 && po < 1) {
+      g.save();
+      g.beginPath(); g.rect(cx - size, y - size * 1.1, ws[i] + size * 2, size * 1.45); g.clip();
+      g.fillStyle = it.color || color;
+      g.fillText(it.w, cx, y + (1 - pin) * size * 1.25 - po * size * 1.35);
+      g.restore();
+    }
+    cx += ws[i] + sp;
+  });
+  g.restore();
+  return total;
+}
+function rrect(x, y, w, h, r, fill, stroke, lw = 4) {
+  g.beginPath(); g.roundRect(x, y, w, h, r);
+  if (fill) { g.fillStyle = fill; g.fill(); }
+  if (stroke) { g.lineWidth = lw; g.strokeStyle = stroke; g.stroke(); }
+}
+/* a chunky pill with the site's hard ink shadow */
+function pill(str, cx, cy, { size = 34, fam = MONO, weight = 600, bg = C.lime, fg = C.ink, pad = 30, k = 1, shadow = C.ink } = {}) {
+  const m = measure(str, size, weight, fam), w = m.w + pad * 2, h = size * 2;
+  g.save(); g.translate(cx, cy); g.scale(k, k);
+  if (shadow) rrect(-w / 2, -h / 2 + 7, w, h, h / 2, shadow);
+  rrect(-w / 2, -h / 2, w, h, h / 2, bg, C.ink, 4);
+  text(str, 0, 2, { size, weight, fam, color: fg, align: 'center', base: 'middle' });
+  g.restore();
+  return w;
+}
+
