@@ -1,14 +1,36 @@
 <div align="center">
 
-# Piixpal
+<a href="https://piixpal.dvkk.dev"><img src="https://piixpal.dvkk.dev/site/readme/hero.png" alt="Piixpal: tiny pixel creatures that live on your website" width="100%"></a>
 
-**Tiny pixel creatures that live on your website.**
+<h1>Piixpal</h1>
 
-They crawl on your headings, nap on your paragraphs, perch on your buttons and bounce on your footer.
-118 components: 42 pals (characters, interactions, toys and groups), 23 superpowers, 49 sprites (30 small, 19 big 3D), a crowd stage and pixel type.
-One script tag. Zero dependencies. Free and open source (MIT).
+<p><b>Tiny pixel creatures that live on your website.</b></p>
+
+<p>They crawl on your headings, nap on your paragraphs, perch on your buttons, deliver your toasts<br>and turn your page into a game. 118 drop-in web components. Zero dependencies.</p>
+
+<p>
+<a href="https://www.npmjs.com/package/piixpal"><img src="https://img.shields.io/npm/v/piixpal?color=c6f432&labelColor=17121f&style=flat-square" alt="npm version"></a>
+<a href="https://www.npmjs.com/package/piixpal"><img src="https://img.shields.io/npm/dm/piixpal?color=c6f432&labelColor=17121f&style=flat-square" alt="npm downloads"></a>
+<a href="https://www.jsdelivr.com/package/npm/piixpal"><img src="https://img.shields.io/jsdelivr/npm/hm/piixpal?color=c6f432&labelColor=17121f&style=flat-square" alt="jsDelivr hits"></a>
+<img src="https://img.shields.io/badge/dependencies-0-c6f432?labelColor=17121f&style=flat-square" alt="zero dependencies">
+<a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-c6f432?labelColor=17121f&style=flat-square" alt="MIT license"></a>
+</p>
+
+<p>
+<a href="https://piixpal.dvkk.dev"><b>Website</b></a> ·
+<a href="https://piixpal.dvkk.dev/components/"><b>Components</b></a> ·
+<a href="https://piixpal.dvkk.dev/components/powers"><b>Superpowers</b></a> ·
+<a href="https://piixpal.dvkk.dev/components/install"><b>Install</b></a> ·
+<a href="https://piixpal.dvkk.dev/components/builder"><b>Builder</b></a>
+</p>
 
 </div>
+
+<br>
+
+## Quick start
+
+Paste one line, then put a pal inside anything:
 
 ```html
 <script src="https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js"></script>
@@ -19,27 +41,81 @@ One script tag. Zero dependencies. Free and open source (MIT).
 </h1>
 ```
 
-That's it. The bug finds the outline of your letters and starts walking.
+The bug finds the real outline of your letters and starts walking. Every component on the
+[components pages](https://piixpal.dvkk.dev/components/) has a live demo and a copy button.
 
-## Install: pick whatever suits your site
+<table>
+<tr>
+<td width="50%"><a href="https://piixpal.dvkk.dev/components/powers"><img src="https://piixpal.dvkk.dev/site/readme/powers.png" alt="Superpowers: a platformer, snow on letters, toasts by pigeon, a pull-chain"></a></td>
+<td width="50%"><a href="https://piixpal.dvkk.dev/components/sprites"><img src="https://piixpal.dvkk.dev/site/readme/sprites.png" alt="Big 3D sprites"></a></td>
+</tr>
+<tr>
+<td align="center"><b>Superpowers</b>: they leave the page</td>
+<td align="center"><b>Sprites</b>: inline, like an image</td>
+</tr>
+<tr>
+<td colspan="2"><a href="https://piixpal.dvkk.dev/components/powers"><img src="https://piixpal.dvkk.dev/site/readme/docs.png" alt="The docs: every component with a live demo and its code"></a></td>
+</tr>
+<tr>
+<td colspan="2" align="center"><b>The docs</b>: every component, live, with the code to copy right beside it</td>
+</tr>
+</table>
 
-No download, no build step, no account.
+## Install
 
-| Way | Snippet |
-| --- | --- |
-| **Everything, one tag** (~45 KB gzipped) | `<script src="https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js"></script>` |
-| **Just one component** (1–4 KB, the shared 16 KB engine loads itself once) | `<script src="https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/kitty.min.js"></script>` |
-| **No markup at all** (Webflow, Framer, WordPress, Shopify custom-code boxes) | `<script src="…/piixpal.min.js" data-pals="bitbug@h1, boing@footer, pip@.btn"></script>` |
-| **JavaScript** | `Piixpal.add("kitty", "h1")` |
-| **React / Next** | `import { PiixPal } from "piixpal/react"` → `<PiixPal pal="bitbug" />` (or copy `wrappers/react.jsx`) |
-| **Vue 3** | `app.use(Piixpal)` from `piixpal/vue`, then `<piix-pal pal="bitbug" />` |
-| **Svelte** | `<Piixpal />` from `piixpal/svelte`, then the tags |
-| **Self-host** | download `piixpal.min.js` or anything in `dist/` |
+Pick whatever suits your site. Every option works on its own.
 
-`data-pals` format: `name@css-selector`, comma separated, optional `?attr=value` (e.g. `moss@p?at=.9`).
-The docs site has a **Builder** that writes this line for you, and a **bookmarklet** that drops pals onto any
-website you're looking at. TypeScript types live in `types/piixpal.d.ts`. The npm package is prepared
-(`package.json` exports for the core, single components and wrappers) but not published yet.
+**Script tag** (no build step):
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js"></script>
+```
+
+or just the components you use, each 1–6 KB (the shared engine loads itself, once):
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/bitbug.min.js"></script>
+```
+
+**npm**
+
+```bash
+npm install piixpal
+```
+
+```jsx
+import { PiixPal } from "piixpal/react";   // also piixpal/vue and piixpal/svelte
+
+<h1>Hello <PiixPal pal="bitbug" /></h1>
+```
+
+**shadcn**: add a component to your project as a file you own
+
+```bash
+npx shadcn@latest add https://piixpal.dvkk.dev/r/bitbug.json
+```
+
+**No markup** (Webflow, Framer, WordPress, Shopify): say what goes where on the script tag
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js"
+  data-pals="bitbug@h1, boing@footer, pip@.button"></script>
+```
+
+**With AI**: point your assistant at [`llms.txt`](https://piixpal.dvkk.dev/llms.txt), a plain list of every component and how to add it.
+
+The [Builder](https://piixpal.dvkk.dev/components/builder) writes the no-markup line for you, and the
+[bookmarklet](https://piixpal.dvkk.dev/components/install#bookmarklet) drops pals onto any website you're looking at.
+
+## What's inside
+
+| | | |
+| --- | --- | --- |
+| **42 pals** | characters that live on your page: crawlers, bouncers, peekers, toys you can throw, whole crews in one tag | [browse →](https://piixpal.dvkk.dev/components/pals) |
+| **23 superpowers** | pals that step out of the page, do real interface jobs, or turn your site into a game | [browse →](https://piixpal.dvkk.dev/components/powers) |
+| **49 sprites** | inline characters, 30 small pixel ones and 19 big 3D ones, in six render styles | [browse →](https://piixpal.dvkk.dev/components/sprites) |
+| **Crowd** | hundreds of tiny agents on one canvas: they wander, swarm or spell a word | [try →](https://piixpal.dvkk.dev/components/crowd) |
+| **Pixel type** | any font as chunky extruded blocks that pals can walk on | [try →](https://piixpal.dvkk.dev/components/type) |
 
 ---
 
@@ -184,7 +260,7 @@ Every sprite can render three ways with `render`:
 Other attributes: `size`, `scale`, `depth` (voxel extrusion), `color`, `eye`, `hue`, `look="mouse|wander|none"`,
 `shy`, `tilt` (`no-shy` / `no-tilt` on big ones), `still`, `sleep-after`.
 
-Browse and customise them all on the components pages (`components/sprites.html`).
+Browse and customise them all on the [sprites page](https://piixpal.dvkk.dev/components/sprites).
 
 ## Crowd
 
@@ -219,9 +295,9 @@ All optional.
 
 | Attribute | What it does | Default |
 | --- | --- | --- |
-| `pal` | `bitbug` `boing` `moss` `lurk` `thread` `pip` `bumble` `shel` | `bitbug` |
+| `pal` | which pal: any name from the [components pages](https://piixpal.dvkk.dev/components/) | `bitbug` |
 | `on` | CSS selector for what to live on. Several matches give Pip more perches | parent element |
-| `do` | swap the behaviour: `crawl` `bounce` `mind` `peek` `hang` `perch` `follow` `creep` | the pal's own |
+| `do` | swap the behaviour (`crawl`, `bounce`, `mind`, `peek`, `hang`, `perch`…) | the pal's own |
 | `at` | where along the element, `0` (left) to `1` (right) | random |
 | `scale` | size of one sprite pixel in CSS pixels | 3 or 4 |
 | `fixed-scale` | don't shrink a notch on phones | off |
@@ -230,6 +306,7 @@ All optional.
 | `speed` | crawl speed multiplier | `1` |
 | `energy` | bounce energy multiplier | `1` |
 | `length` | thread length in px (hang) | `70` |
+| `box` | CSS selector: keep the pal inside that element | off |
 
 ### Events and methods
 
@@ -309,6 +386,7 @@ so any pal can borrow any behaviour. `Piixpal.art` has helpers (`compose`, `put`
 npm run dev     # http://localhost:5173, rebuilds piixpal.js on every request
 npm run build   # concatenates src/ into piixpal.js (+ piixpal.min.js)
 npm run docs    # regenerates components/*.html
+npm run registry  # regenerates the shadcn registry (r/) and llms.txt
 ```
 
 - `src/core.js`: loop, pointer, overlay layer, sprite baker, `Actor`
@@ -318,7 +396,9 @@ npm run docs    # regenerates components/*.html
 - `src/elements/sprite.js`: `<piix-sprite>` (pixel, dots and voxel renderers)
 - `src/sprites/*.js`: the sprites (`big-*` are the big 3D ones)
 - `src/boot.js`: `<piix-pal>`
-- `lab/`: sprite lab and a playground page
+- `src/powers/*.js`: the superpowers
+- `src/ui.js`: accessible cards for pals that need real words (toasts, tours)
+- `lab/`: test pages
 
 ## Originals only
 
@@ -326,6 +406,10 @@ Every character here is drawn from scratch. Themes nod to tech, AI and internet 
 bubble that is always thinking, a startup unicorn, a captcha robot), but none copy a company's logo or mascot or any
 copyrighted character, so they're safe to use anywhere.
 
+## Contributing
+
+Issues and pull requests are welcome. New pals are especially welcome: draw one with `Piixpal.sprite` (see above), give it a behaviour, and open a PR. Run `npm run dev` and `node scripts/sheet.mjs src/pals/yours.js` to check your art.
+
 ## License
 
-MIT. Use it anywhere. A star on GitHub is plenty.
+MIT. Use it anywhere, free forever. A star on GitHub is plenty.
