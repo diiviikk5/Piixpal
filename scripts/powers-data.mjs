@@ -354,7 +354,10 @@ export const POWERS = [
     uses: "the browser’s online and offline events",
     support: "every modern browser",
     try: "press Go offline, then Back online",
-    desc: "An offline indicator with feelings. When the connection drops, a little plug slides into the corner, unplugged and sparking. When it comes back, it hops into its socket and slides away."
+    desc: "An offline indicator with feelings. When the connection drops, a little plug slides into the corner, unplugged and sparking. When it comes back, it hops into its socket and slides away.",
+    attrs: [["always","stay in the corner, plugged in, even when online"]],
+    api: "el.ctl.offline()  el.ctl.online()",
+    events: "piix:offline, piix:online"
   }
   // new powers go above this line
 ];
