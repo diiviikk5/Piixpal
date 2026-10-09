@@ -379,3 +379,4 @@ code,kbd,pre{font-family:var(--f-mono)}
   .nav .btn-sm svg{width:18px;height:18px}
   .logo span{font-size:inherit}
 }
+@media (max-width:440px){.links{justify-content:space-between;margin:0}.links a{font-size:14px;padding:7px 6px}}
