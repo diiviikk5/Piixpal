@@ -350,3 +350,16 @@ code,kbd,pre{font-family:var(--f-mono)}
 .pcap input{width:20px;height:20px;accent-color:var(--ink)}
 .pdeploy{display:flex;justify-content:center;padding-bottom:6px}
 .pterm{height:12px;border-radius:6px;background:var(--paper-3)}
+
+/* ---------- superpowers on the home page ---------- */
+.pw-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+@media (max-width:760px){.pw-grid{grid-template-columns:minmax(0,1fr)}}
+.pw-card{position:relative;height:260px;border:2px solid var(--ink);border-radius:var(--r-lg);box-shadow:0 4px 0 var(--ink);overflow:hidden;
+  background:radial-gradient(color-mix(in oklab,var(--ink) 12%,transparent) 1px,transparent 1.3px) 0 0/16px 16px,var(--card);transition:background-color .35s,color .35s}
+.pw-card.dark{--ink:#f2eef8;background:radial-gradient(rgba(255,255,255,.08) 1px,transparent 1.3px) 0 0/16px 16px,#17121f;color:#f2eef8}
+.pw-name{position:absolute;left:16px;top:14px;font:400 11px/1 var(--f-pix);text-transform:uppercase;color:var(--muted)}
+.pw-h{position:absolute;left:22px;bottom:70px;margin:0;font:780 36px/1 var(--f-sans);letter-spacing:-.04em}
+#pw-snow .pw-h{left:0;right:0;text-align:center;bottom:84px}
+.pw-b1{position:absolute;left:210px;bottom:120px}
+.pw-b2{position:absolute;right:30px;bottom:170px}
+#pw-toast .btn{position:absolute;left:22px;top:48px}
