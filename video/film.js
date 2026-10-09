@@ -288,3 +288,33 @@ function opening(T) {
   if (T > 7.7) { g.save(); g.globalAlpha = E.inCubic(prog(T, 7.7, 8)); g.fillStyle = C.lime; g.fillRect(0, 0, W, H); g.restore(); }
 }
 
+/* 8 – 12s: the name lands, and so do the pals */
+function title(T) {
+  g.fillStyle = C.ink; g.fillRect(0, 0, W, H);
+  grid('rgba(198,244,50,.05)', 48, 0, (T - 8) * 30);
+  const lands = [9.05, 9.2, 9.35, 9.5, 9.65, 9.8, 9.95];
+  camera(lerp(1.0, 1.05, prog(T, 8, 12)), W / 2, 520, T, [8.05, 8.55, 9.05, 9.5, 9.95], 12);
+  const B = 40, top = 320;
+  const spots = pixelWord('PIIXPAL', W / 2, top, B, T, 8.02);
+  const cast = [['bitbug', 'idle', 7], ['boing', 'idle', 7], ['frog', 'sit', 7], ['penguin', 'idle', 7], ['pip', 'idle', 7], ['shibe', 'rest', 6], ['duck', 'idle', 7]];
+  cast.forEach(([n, clip, s], i) => {
+    const at = lands[i], sp = spots[i];
+    if (T < at - .5) return;
+    const k = prog(T, at - .5, at), y = lerp(-200, top, k * k);
+    const sq = T > at ? 1 - Math.sin(prog(T, at, at + .25) * Math.PI) * .3 : 1;
+    let c = clip, yy = y;
+    if (n === 'boing' && T > at + .3) { const b = Math.abs(Math.sin((T - at - .3) * Math.PI * 2)); yy = top - b * 60; c = b > .2 ? 'air' : 'land'; }
+    if (n === 'bitbug' && T > at + .6) c = 'look';
+    if (n === 'frog' && T > at + .5) c = 'happy';
+    if (n === 'pip' && T > at + .5) c = 'peck';
+    pal(n, c, T, sp.mid, yy, s, { sx: 2 - sq, sy: sq, flip: i > 3 });
+    if (T > at) burst(T, at, sp.mid, top, C.lime, 8, 70);
+  });
+  reset();
+  words(['Tiny', 'pixel', 'creatures', 'that', { w: 'live', color: C.lime }, 'on', 'your', 'website.'], T, { x: W / 2, y: 790, size: 70, weight: 650, color: C.soft, t0: 10.0, stagger: .065 });
+  const vk = E.outBack(prog(T, 10.7, 11.1));
+  if (vk > 0) pill('v0.4  ·  out now', W / 2, 900, { size: 28, k: vk });
+  vignette(.55);
+  flash(T, 8, C.lime, .45);
+}
+
