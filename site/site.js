@@ -190,3 +190,10 @@ document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click'
     crowd.setAttribute('count', b.dataset.m === 'form' ? 240 : b.dataset.m === 'swarm' ? 160 : 110);
   });
 })();
+
+/* ?at=section-id jumps straight to a section (handy for screenshots and links) */
+(() => {
+  const at = new URLSearchParams(location.search).get('at');
+  if (!at) return;
+  addEventListener('load', () => { const el = document.getElementById(at); if (el) { document.documentElement.style.scrollBehavior = 'auto'; el.scrollIntoView(); } });
+})();
