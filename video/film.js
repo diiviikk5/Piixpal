@@ -549,3 +549,56 @@ function stats(T) {
   flash(T, t0, col, .18, .5);
 }
 
+/* 26 – 31s: one line, any stack */
+const CODE = [
+  [['<', C.soft], ['h1', C.coral], ['>', C.soft]],
+  [['  Hello world', C.white]],
+  [['  <', C.soft], ['piix-pal', C.coral], [' pal', C.sun], ['=', C.soft], ['"bitbug"', C.lime], [' />', C.soft]],
+  [['</', C.soft], ['h1', C.coral], ['>', C.soft]]
+];
+function code(T) {
+  const t0 = 26;
+  g.fillStyle = C.deep; g.fillRect(0, 0, W, H); grid('rgba(255,255,255,.03)', 48);
+  const rise = E.outExpo(prog(T, t0, t0 + .6));
+  camera(lerp(1.06, 1, rise), W / 2, H / 2);
+  words(['One', 'line.', { w: 'Any', color: C.lime }, { w: 'stack.', color: C.lime }], T, { x: W / 2, y: 190, size: 104, t0: t0 + .05, stagger: .1 });
+  /* the editor */
+  const ex = 140, ey = 270 + (1 - rise) * 120, ew = 800, eh = 520;
+  rrect(ex + 10, ey + 14, ew, eh, 22, '#000'); rrect(ex, ey, ew, eh, 22, '#0b0810', C.ink2, 3);
+  g.save(); g.beginPath(); g.roundRect(ex, ey, ew, 58, [22, 22, 0, 0]); g.fillStyle = '#1a1522'; g.fill(); g.restore();
+  [C.coral, C.sun, C.mint].forEach((d, i) => { g.beginPath(); g.arc(ex + 34 + i * 30, ey + 29, 9, 0, 7); g.fillStyle = d; g.fill(); });
+  text('index.html', ex + ew / 2, ey + 30, { size: 19, weight: 400, fam: MONO, color: C.soft, align: 'center', base: 'middle' });
+  const cmd = '$ npm i piixpal', ct = prog(T, t0 + .3, t0 + .9);
+  text(cmd.slice(0, Math.round(cmd.length * ct)), ex + 50, ey + 120, { size: 32, weight: 600, fam: MONO, color: C.white });
+  if (T > t0 + 1.0) text('+ piixpal@0.4.0   0 deps   ✓', ex + 50, ey + 168, { size: 26, weight: 400, fam: MONO, color: C.lime, alpha: prog(T, t0 + 1, t0 + 1.15) });
+  const all = CODE.reduce((a, l) => a + l.reduce((b, [s]) => b + s.length, 0), 0);
+  let left = Math.round(all * prog(T, t0 + 1.3, t0 + 2.6)), cy = ey + 250, lastX = ex + 50, lastY = cy;
+  CODE.forEach(line => {
+    let x = ex + 50;
+    for (const [s, col] of line) {
+      if (left <= 0) break;
+      const part = s.slice(0, left); left -= part.length;
+      text(part, x, cy, { size: 32, weight: 600, fam: MONO, color: col });
+      x += measure(part, 32, 600, MONO).w; lastX = x; lastY = cy;
+    }
+    cy += 52;
+  });
+  if (Math.floor(T * 3) % 2 === 0 || T < t0 + 2.7) { g.fillStyle = C.lime; g.fillRect(lastX + 4, lastY - 28, 16, 34); }
+  /* the page it makes */
+  const bx = 980, by = 270 + (1 - rise) * 200;
+  browser(bx, by, 800, 520, { bg: C.paper, url: 'localhost:3000', dots: [C.coral, C.sun, C.mint] });
+  const hk = E.outExpo(prog(T, t0 + 1.6, t0 + 2));
+  const hs = 110, hb = by + 330, htop = hb - measure('H', hs).asc;
+  if (hk > 0) text('Hello world', bx + 70, hb + (1 - hk) * 40, { size: hs, color: C.ink, alpha: hk, track: -3 });
+  rrect(bx + 70, by + 380, 520, 16, 8, C.line); rrect(bx + 70, by + 412, 420, 16, 8, C.line);
+  const pop = t0 + 2.65;
+  if (T > pop - .4) arrive(T, pop, bx + 140, htop, 'bitbug', 6, p => pal('bitbug', T < pop + .3 ? 'alarm' : 'walk', T, bx + 140 + cl(T - pop - .3, 0, 3) * 160, htop, 6, { sx: p, sy: p }));
+  /* the ways in */
+  ['HTML', 'React', 'Vue', 'Svelte', 'shadcn', 'npm'].forEach((s, i, a) => {
+    const at = t0 + 3.2 + i * .2, k = E.outBack(prog(T, at, at + .35));
+    if (k > 0) pill(s, W / 2 + (i - (a.length - 1) / 2) * 250, 930, { size: 34, fam: SANS, weight: 750, bg: [C.lime, C.sky, C.mint, C.sun, C.coral, '#a996ff'][i], k });
+  });
+  reset();
+  vignette(.45);
+}
+
