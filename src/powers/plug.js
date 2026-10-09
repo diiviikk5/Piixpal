@@ -27,3 +27,11 @@ const plugShape = (face, by = 0) => {
   return rows;
 };
 
+/* Plug: sad and sparking, zapped, and happily plugged in */
+defineSprite('plug', {
+  w: 16, h: 12, scale: 3, does: 'offline',
+  palette: { k: '#17121f', b: '#f3f0fa', d: '#c9c3d6', B: '#ffffff', y: '#ffd23f', q: '#7d768a', e: '#17121f', t: '#58c8ff' },
+  frames: { sad: [plugShape('sad'), plugShape('sad', -1)], zap: [plugShape('zap')], happy: [plugShape('happy'), plugShape('happy', -1)] },
+  fps: { sad: 1.5, happy: 4 }
+});
+
