@@ -5,3 +5,6 @@ Thumbs.db
 .vscode/
 .idea/
 sheet.png
+
+.vercel
+.env*
