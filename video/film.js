@@ -222,3 +222,69 @@ function browser(x, y, w, h, { bg = C.card, url = 'yourwebsite.com', dots = [C.l
   text(url, x + w / 2, y + 30, { size: 19, weight: 400, fam: MONO, color: dark ? C.soft : C.muted, align: 'center', base: 'middle' });
 }
 
+/* ===================================================================== scenes */
+
+/* 0 – 8s: every website looks the same. Then something moves in. */
+function opening(T) {
+  g.fillStyle = C.ink; g.fillRect(0, 0, W, H);
+  grid('rgba(255,255,255,.025)', 48);
+  const up = E.inOut(prog(T, 1.9, 2.7));
+  const push = E.inCubic(prog(T, 7.15, 8));
+  const BX = 430, BY = 360;
+  camera(lerp(1, 3.1, push), lerp(W / 2, 760, push), lerp(H / 2, 380, push), T, [4.4, 5.6, 6.1, 6.6, 7.1], 9);
+
+  /* the browser rises in */
+  const by = lerp(1150, 0, E.outExpo(prog(T, 1.95, 2.9)));
+  g.save(); g.translate(0, by);
+  const live = (at) => E.outCubic(prog(T, at, at + .35));
+  const dots = [mix(C.line, C.coral, live(7.1)), mix(C.line, C.sun, live(7.15)), mix(C.line, C.mint, live(7.2))];
+  browser(260, 250, 1400, 790, { dots });
+  const head = 'WELCOME TO OUR WEBSITE', hs = 84, hm = measure(head, hs, 800, SANS, -2);
+  const base = 430, capTop = base - measure('W', hs).asc;
+  text(head, 340, base, { size: hs, color: mix('#d6cfc2', C.ink, live(4.4)), track: -2 });
+  const bars = [[470, 980, 5.6], [505, 900, 5.6], [540, 620, 7.1]];
+  bars.forEach(([y, w, at]) => rrect(340, y, w, 18, 9, mix('#e7dfcf', y === 540 ? C.mint : C.violet, live(at) * .55)));
+  const press = T > 5.85 && T < 6.0 ? 5 : 0;
+  rrect(340, 600 + 7, 300, 76, 16, mix('#e7dfcf', C.ink, live(5.85)));
+  rrect(340, 600 + press, 300, 76, 16, mix('#d8cfbd', C.coral, live(5.85)), live(5.85) > 0 ? mix('#d8cfbd', C.ink, live(5.85)) : null);
+  text('LEARN MORE', 490, 640 + press, { size: 28, color: mix(C.card, C.white, live(5.85)), align: 'center', base: 'middle', track: 1 });
+  const cards = [[340, C.sun, 6.35], [770, C.sky, 6.1], [1200, C.mint, 6.6]];
+  cards.forEach(([x, col, at]) => {
+    rrect(x, 730, 400, 250, 20, mix('#efe9dc', col, live(at)), live(at) > .01 ? C.ink : null, 4);
+    rrect(x + 30, 790, 250, 16, 8, 'rgba(23,18,31,.13)'); rrect(x + 30, 822, 300, 16, 8, 'rgba(23,18,31,.13)'); rrect(x + 30, 854, 190, 16, 8, 'rgba(23,18,31,.13)');
+  });
+
+  /* the arrivals */
+  const bugX = 420 + cl(T - 4.75, 0, 2.1) * 170;
+  arrive(T, 4.4, 420, capTop, 'bitbug', 5, p => {
+    const clip = T < 4.75 ? 'idle' : T < 6.85 ? 'walk' : T < 7.55 ? 'look' : 'alarm';
+    const hop = T > 7.55 ? -Math.abs(Math.sin((T - 7.55) * 14)) * 14 : 0;
+    pal('bitbug', clip, T, bugX, capTop + hop, 5, { sx: p, sy: p });
+  });
+  arrive(T, 5.6, 1150, 470, 'kitty', 5, p => {
+    pal('kitty', 'sleep', T, 1150, 470, 5, { sx: p, sy: p });
+    for (let i = 0; i < 3; i++) { const z = ((T - 5.9) * .8 + i / 3) % 1; if (T > 5.9) text('z', 1200 + z * 40, 420 - z * 90, { size: 22 + z * 18, fam: PIX, weight: 400, color: C.violet, alpha: 1 - z }); }
+  });
+  arrive(T, 5.85, 560, 600, 'pip', 5, p => pal('pip', T < 6.4 ? 'idle' : 'peck', T, 560, 600 + press, 5, { sx: p, sy: p, flip: true }));
+  arrive(T, 6.1, 970, 730, 'boing', 5, p => {
+    const b = Math.abs(Math.sin((T - 6.1) * Math.PI * 2)), clip = b > .25 ? 'air' : 'land';
+    pal('boing', clip, T, 970, 730 - b * 70, 5, { sx: p * (b < .1 ? 1.15 : 1), sy: p * (b < .1 ? .85 : 1) });
+  });
+  arrive(T, 6.35, 540, 730, 'termi', 5, p => pal('termi', 'typing', T, 540, 730, 5, { sx: p, sy: p }));
+  arrive(T, 6.6, 1290, 730, 'shel', 5, p => pal('shel', 'walk', T, 1290 + cl(T - 6.8, 0, 2) * 60, 730, 5, { sx: p, sy: p }));
+  arrive(T, 6.85, 1250, capTop, 'penguin', 5, p => pal('penguin', 'walk', T, 1250 - cl(T - 7, 0, 2) * 70, capTop, 5, { sx: p, sy: p, flip: true }));
+  arrive(T, 7.1, 900, 540, 'frog', 5, p => pal('frog', T > 7.4 ? 'happy' : 'sit', T, 900, 540, 5, { sx: p, sy: p }));
+  g.restore();
+  reset();
+
+  /* the words: they start in the middle and move up out of the way */
+  g.save();
+  g.translate(W / 2, lerp(575, 150, up)); g.scale(lerp(1, .62, up), lerp(1, .62, up));
+  words(['Every', 'website', 'looks', { w: 'the' }, { w: 'same.', color: C.muted }], T, { x: 0, y: 0, size: 136, t0: .2, stagger: .25, out: 4.05 });
+  words(['Until', 'something', { w: 'moved', color: C.lime }, { w: 'in.', color: C.lime }], T, { x: 0, y: 0, size: 136, t0: 4.3, stagger: .12, out: 7.2 });
+  g.restore();
+  vignette(.5);
+  flash(T, 7.75, C.lime, 0, 0);
+  if (T > 7.7) { g.save(); g.globalAlpha = E.inCubic(prog(T, 7.7, 8)); g.fillStyle = C.lime; g.fillRect(0, 0, W, H); g.restore(); }
+}
+
