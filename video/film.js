@@ -524,3 +524,28 @@ function play(T) {
   text('08 / 08', W - 110, 985, { size: 26, weight: 600, fam: MONO, color: 'rgba(255,255,255,.5)', align: 'right' });
 }
 
+/* 22 – 26s: the numbers, one slam per beat pair */
+function stats(T) {
+  g.fillStyle = C.ink; g.fillRect(0, 0, W, H); grid('rgba(255,255,255,.03)', 48);
+  const S4 = [
+    [22, 118, 'components', C.lime, 'bitbug', 'walk'],
+    [23, 23, 'superpowers', '#a996ff', 'pix', 'happy'],
+    [24, 0, 'dependencies', C.coral, 'squish', 'calm'],
+    [25, 1, 'line to start', C.sky, 'termi', 'typing']
+  ];
+  const i = Math.min(3, Math.floor(T - 22)), [t0, n, what, col, who, clip] = S4[i];
+  const k = E.outExpo(prog(T, t0, t0 + .45));
+  camera(lerp(1.5, 1, k), W / 2, 520, T, [22, 23, 24, 25], 22);
+  const shown = n > 1 ? Math.round(n * E.outCubic(prog(T, t0, t0 + .5))) : n;
+  const sz = 420, base = 640, str = String(shown), m = measure(String(n), sz, 800, SANS, -12), top = base - measure('8', sz).asc;
+  g.globalAlpha = cl(k * 3);
+  text(str, W / 2, base, { size: sz, color: col, align: 'center', track: -12 });
+  g.globalAlpha = 1;
+  const walk = who === 'bitbug' ? (T - t0) * 260 : 0;
+  pal(who, clip, T, W / 2 + m.w / 2 - 70 - walk, top, 8, { flip: who === 'bitbug', sx: E.outBack(prog(T, t0 + .2, t0 + .5)), sy: E.outBack(prog(T, t0 + .2, t0 + .5)) });
+  reset();
+  words([what], T, { x: W / 2, y: 790, size: 92, weight: 650, color: C.white, t0: t0 + .08 });
+  vignette(.6);
+  flash(T, t0, col, .18, .5);
+}
+
