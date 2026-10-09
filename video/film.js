@@ -696,3 +696,8 @@ function draw(T) {
   wipe(T, 12, C.ink); wipe(T, 22, C.lime); wipe(T, 26, C.violet); wipe(T, 31, C.ink);
 }
 
+const ready = Promise.all(['800 100px "Bricolage Grotesque"', '650 100px "Bricolage Grotesque"', '500 40px "Bricolage Grotesque"', '400 30px Silkscreen', '600 30px "JetBrains Mono"', '400 30px "JetBrains Mono"'].map(f => document.fonts.load(f)))
+  .then(() => document.fonts.ready);
+/* the renderer calls this once per frame; it moves the library's clock to T too */
+window.__film = { DUR, ready, cues, frame(T) { bigSprites(T); __clock.step(T * 1000 - __clock.ms); draw(T); } };
+
