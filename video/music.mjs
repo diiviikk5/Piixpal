@@ -5,7 +5,7 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
 const OUT = join(import.meta.dirname, 'out');
-const SR = 44100, DUR = 38, N = SR * DUR, BEAT = .5;
+const SR = 44100, DUR = 36, N = SR * DUR, BEAT = .5;
 const L = new Float32Array(N), R = new Float32Array(N);
 const cues = existsSync(join(OUT, 'cues.json')) ? JSON.parse(readFileSync(join(OUT, 'cues.json'), 'utf8')) : [];
 
@@ -47,6 +47,8 @@ function pad(t0, len, notes, g = 1) {
   notes.forEach((n, j) => { const f = lp(.035); voice(t0, len + .6, t => { const a = Math.min(1, t / .5) * (t > len ? Math.max(0, 1 - (t - len) / .6) : 1); return f(saw(t * hz(n) * 1.003) + saw(t * hz(n) * .997)) * a; }, .05 * g, j % 2 ? .4 : -.4); });
 }
 function stab(t0, notes, g = 1) { notes.forEach((n, j) => { const f = lp(.25); voice(t0, 1.2, t => f(saw(t * hz(n)) + pulse(t * hz(n) * 1.005, .5) * .5) * env(t, .003, .28), .09 * g, j % 2 ? .3 : -.3); }); }
+/* a soft felt-key pluck, for the quiet parts */
+function pluck(t0, note, g = 1, pan = 0) { voice(t0, 1.4, t => (Math.sin(t * hz(note) * 6.283) + tri(t * hz(note) * 2) * .25) * env(t, .003, .35), .11 * g, pan); }
 function sub(t0, g = 1) { let ph = 0; voice(t0, 1.2, t => { ph += (38 + 30 * Math.exp(-t * 6)) / SR; return Math.sin(ph * 2 * Math.PI) * env(t, .005, .45); }, .7 * g); }
 
 /* ---------- sound effects ---------- */
@@ -65,6 +67,19 @@ const FX = {
   slam: t => { kick(t, 1.2); sub(t); crash(t, .8); clap(t, 1); },
   key: t => { const f = lp(.6); voice(t, .03, u => f(noise()) * env(u, .0005, .006), .3 + noise() * .05, noise() * .4); },
   chip: (t, i) => { const n = [m('C6'), m('E6'), m('G6'), m('C7'), m('E7'), m('G7')][i % 6]; voice(t, .25, u => pulse(u * hz(n), .25) * env(u, .002, .08), .08); },
+  card: (t, i) => { const f = lp(.08 + i * .01); voice(t, .35, u => f(noise()) * env(u, .08, .1), .3, (i % 3 - 1) * .5); },
+  suck: t => { const f = lp(.06); voice(t, .6, u => { const k = u / .6; return f(noise()) * k * k * 1.5 + Math.sin(u * lerpExp(200, 1600, k) * 6.283) * .15 * k; }, .4); },
+  blip: t => { sweep(t, .1, 2000, 2600, p => Math.sin(p * 6.283), .12); },
+  logo: t => { crash(t, .5); sub(t, .9); [m('C5'), m('G5'), m('E6')].forEach((n, i) => voice(t + i * .03, 1.6, u => Math.sin(u * hz(n) * 6.283) * env(u, .004, .5), .12, (i - 1) * .4)); },
+  click: t => { voice(t, .04, u => noise() * env(u, .0005, .005), .5); sweep(t, .05, 900, 600, p => pulse(p, .5), .06); },
+  heat: t => { const f = lp(.04); voice(t, .9, u => { const k = u / .9; return (f(noise()) * (.4 + k * 2) + saw(u * lerpExp(80, 640, k)) * .1) * k * k; }, .4); },
+  whoosh: t => { const f = lp(.12); voice(t - .1, .45, u => f(noise()) * Math.sin(Math.min(1, u / .45) * Math.PI), .45, .2); },
+  tick: (t, i) => { voice(t, .06, u => Math.sin(u * hz(m('C6') + [0, 2, 4, 7, 9][i % 5]) * 6.283) * env(u, .001, .03), .1, .3); },
+  style: (t, i) => { const n = [m('C6'), m('D6'), m('E6'), m('G6'), m('A6'), m('C7')][i % 6]; voice(t, .3, u => pulse(u * hz(n), .25) * env(u, .002, .09), .07); FX.whoosh(t); },
+  swish: (t, i) => { const f = lp(.2); voice(t, .3, u => f(noise()) * env(u, .01, .06), .35, .6 - i * .3); },
+  select: t => { sweep(t, .12, 600, 1200, p => tri(p), .14); },
+  tile: (t, i) => { voice(t, .12, u => Math.sin(u * hz(m('G5') + i * 2) * 6.283) * env(u, .002, .05), .08, (i % 2 ? .4 : -.4)); },
+  step: (t, i) => { sweep(t, .06, 400 + i * 40, 250, p => tri(p), .14); },
   bigpop: (t, i) => { sweep(t, .22, 200 + i * 60, 900 + i * 120, p => pulse(p, .5), .1); sub(t, .25); }
 };
 
@@ -79,44 +94,46 @@ const MEL = {
   Am: ['C5', 0, 'E5', 'A5', 'C6', 0, 'B5', 'A5'],
   F: ['A5', 0, 'G5', 'F5', 'E5', 0, 'D5', 0]
 };
-/* sections: [from, to, parts] */
-const parts = (t) => {
-  if (t < 4) return { pad: 2, tick: 1.4 };
-  if (t < 8) return { pad: 1, tick: 1, bass: t >= 4 ? .7 : 0, kick: t >= 6 ? .55 : 0, roll: t >= 7 && t < 7.875 };
-  if (t < 22) return { pad: 1, bass: 1, kick: 1, snare: 1, hats: 1, arp: 1, lead: 1 };
-  if (t < 26) return { pad: .6, tick: .7 };
-  if (t < 31) return { pad: .8, bass: 1, kick: 1, snare: .7, hats: .8, arp: 1.2 };
-  if (t < 34) return { pad: 1, bass: 1, kick: 1, snare: 1, hats: 1, arp: 1, lead: 1.1 };
+/* sections, by time */
+const parts = t => {
+  if (t < 3.6) return { pad: 1.6, pluck: 1 };
+  if (t < 7) return { pad: 1.4, pluck: 1, bass: .6, kick: t >= 4 ? .55 : 0, tick: .8 };
+  if (t < 8.75) return { pad: 1.2, pluck: 1, hats: .6, bass: .5 };
+  if (t < 9.6) return { pad: 1 };
+  if (t < 13.6) return { pad: 1.2, bass: 1, kick: 1, snare: .8, hats: .8 };
+  if (t < 26.2) return { pad: 1, bass: 1, kick: 1, snare: 1, hats: 1, arp: 1, lead: 1 };
+  if (t < 29.6) return { pad: 1.1, half: 1, hats: .6, arp: .8, bass: .6 };
+  if (t < 32.6) return { pad: 1, bass: 1, kick: 1, snare: 1, hats: 1, arp: 1, lead: 1.1 };
   return {};
 };
 for (let bar = 0; bar < 17; bar++) {
-  const t0 = bar * 2, c = chordAt(t0), P = parts(t0 + .01);
-  if (P.pad) pad(t0, 2, tones(c, 4).concat(m(CH[c][0] + 3)), P.pad);
+  const t0 = bar * 2, c = chordAt(t0);
+  if (parts(t0 + .01).pad) pad(t0, 2, tones(c, 4).concat(m(CH[c][0] + 3)), parts(t0 + .01).pad);
   for (let s = 0; s < 16; s++) {                                     /* sixteenths */
     const t = t0 + s * BEAT / 4, Q = parts(t + .001);
     if (Q.kick && s % 4 === 0) kick(t, Q.kick);
+    if (Q.half && s === 0) { kick(t, .9); sub(t, .6); }
+    if (Q.half && s === 8) { snare(t, .7); clap(t, .7); }
     if (Q.snare && (s === 4 || s === 12)) { snare(t, Q.snare); clap(t, .6 * Q.snare); }
     if (Q.hats) hat(t, (s % 2 ? .55 : 1) * Q.hats * (s % 4 === 2 ? 1.3 : 1), s % 8 === 6);
     if (Q.tick && s % 2 === 0) hat(t, .35 * Q.tick);
     if (Q.bass && s % 2 === 0) bass(t, BEAT / 2, ROOT[c] + (s % 4 === 2 ? 12 : 0), Q.bass);
+    if (Q.pluck && s % 2 === 0) { const tn = tones(c, 5); pluck(t, tn[[0, 2, 1, 2, 0, 2, 1, 2][s / 2]] - (s >= 8 ? 0 : 12), Q.pluck, s % 4 ? .35 : -.35); }
     if (Q.arp) { const tn = tones(c, 5); arp(t, .12, tn[[0, 1, 2, 1][s % 4]] + (s >= 8 ? 12 : 0), Q.arp); }
     if (Q.lead && s % 2 === 0) { const n = MEL[c][s / 2]; if (n) lead(t, BEAT / 2 * .9, m(n), Q.lead); }
-    if (Q.roll) { const sub16 = t >= 7.5 ? 2 : 1; for (let k = 0; k < sub16; k++) snare(t + k * BEAT / 8, .25 + (t - 7) * .7); }
   }
 }
-/* the riser into the drop, and the gap right before it */
-{ const f = lp(.05); voice(6, 1.9, t => { const k = t / 1.9; return (f(noise()) * (.3 + k * 2.4) + saw(t * lerpExp(110, 880, k)) * .08) * k * k; }, .35); }
-crash(8, 1.2); sub(8, 1.2); kick(8, 1.3);
-stab(8, tones('C', 4).concat(m('C5')), 1.2);
-/* the stats: one big chord per slam */
-[['C', 22], ['G', 23], ['Am', 24], ['F', 25]].forEach(([c, t]) => stab(t, tones(c, 4).concat(m(CH[c][0] + 5)), 1.3));
+/* the drop out of the heat map: a beat of silence, then everything */
+crash(9.6, 1.1); sub(9.6, 1.3); kick(9.6, 1.3); stab(9.6, tones('Am', 4).concat(m('A4')), 1);
+/* the lead arrives with the site shot, the finale gets its own crash */
+crash(13.6, .7); crash(29.6, 1.1); sub(29.6, 1);
 /* fills into each new section */
-[21.5, 30.5].forEach(t0 => { for (let k = 0; k < 8; k++) snare(t0 + k * BEAT / 4, .5 + k * .08); });
+[13.1, 25.7, 29.1].forEach(t0 => { for (let k = 0; k < 8; k++) snare(t0 + k * BEAT / 8, .3 + k * .07); });
 /* the end: one held chord and a little sign-off */
-crash(34, 1.3); kick(34, 1.3); sub(34, 1.4);
-stab(34, tones('C', 4).concat(m('C5'), m('G5')), 1.4);
-pad(34, 3, tones('C', 4).concat(m('C3'), m('E5')), 1.6);
-['C6', 'E6', 'G6', 'C7'].forEach((n, i) => lead(35.2 + i * .125, .2, m(n), .6, i % 2 ? .3 : -.3));
+crash(32.6, 1); kick(32.6, 1.2); sub(32.6, 1.2);
+stab(32.6, tones('C', 4).concat(m('C5'), m('G5')), 1.2);
+pad(32.6, 2.8, tones('C', 4).concat(m('C3'), m('E5')), 1.6);
+['C6', 'E6', 'G6', 'C7'].forEach((n, i) => pluck(33.4 + i * .25, m(n), 1.2, i % 2 ? .3 : -.3));
 
 /* every sound effect, on its cue */
 const seen = {};
