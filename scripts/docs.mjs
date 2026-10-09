@@ -207,32 +207,20 @@ const GH = `<svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor
 const LOGO = `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true"><rect width="16" height="16" rx="3" fill="#17121f"/><path fill="#c6f432" d="M4 4h8v1h1v6h-1v1H4v-1H3V5h1z"/><path fill="#17121f" d="M5 6h2v2H5zM9 6h2v2H9zM6 9h4v1H6z"/><path fill="#fff" d="M5 6h1v1H5zM9 6h1v1H9z"/></svg>`;
 
 const sidebar = active => {
-  const link = (href, label, key, extra = '') => `<a href="${href}"${key === active ? ' aria-current="page"' : ''}${extra}>${label}</a>`;
+  const link = (href, label, key) => `<a href="${href}"${key === active ? ' aria-current="page"' : ''}>${label}</a>`;
+  const item = (href, name, accent) => `<a href="${href}" style="--dot:${accent}"><i></i>${title(name)}</a>`;
+  const group = (key, label, href, count, subs) => `<details class="sg"${key === active ? ' open' : ''}>
+      <summary><a href="${href}"${key === active ? ' aria-current="page"' : ''}>${label}</a><span class="n">${count}</span></summary>
+      ${subs.filter(([, list]) => list.length).map(([h, list]) => `<h5>${h}</h5>${list.join('')}`).join('\n      ')}
+    </details>`;
   return `<aside class="side" aria-label="Components">
-    <h4>Start</h4>
-    ${link('./', 'Overview', 'index')}
-    ${link('install.html', 'Install', 'install')}
-    ${link('builder.html', 'Builder', 'builder')}
-    <h4>Components</h4>
-    ${link('sprites.html', `Sprites <span class="n">${sprites.length}</span>`, 'sprites')}
-    ${link('pals.html', `Pals <span class="n">${PALS.length}</span>`, 'pals')}
-    ${link('powers.html', `Superpowers <span class="n">${POWERS.length}</span>`, 'powers')}
-    ${link('crowd.html', 'Crowd <span class="n">3</span>', 'crowd')}
-    ${link('type.html', 'Pixel type', 'type')}
-    <h4>Superpowers</h4>
-    ${POWERS.map(p => `<a href="powers.html#${p.id}" style="--dot:${p.accent}"><i></i>${title(p.id)}</a>`).join('\n    ')}
-    <h4>Big sprites</h4>
-    ${bigs.map(s => `<a href="sprites.html#s-${s.name}" style="--dot:${s.accent}"><i></i>${title(s.name)}</a>`).join('\n    ')}
-    <h4>Sprites</h4>
-    ${smalls.map(s => `<a href="sprites.html#s-${s.name}" style="--dot:${s.accent}"><i></i>${title(s.name)}</a>`).join('\n    ')}
-    <h4>Pals</h4>
-    ${kinds.pal.map(p => `<a href="pals.html#${p.id}" style="--dot:${p.accent}"><i></i>${title(p.id)}</a>`).join('\n    ')}
-    <h4>New ways to play</h4>
-    ${kinds.play.map(p => `<a href="pals.html#${p.id}" style="--dot:${p.accent}"><i></i>${title(p.id)}</a>`).join('\n    ')}
-    <h4>Toy box</h4>
-    ${kinds.toy.map(p => `<a href="pals.html#${p.id}" style="--dot:${p.accent}"><i></i>${title(p.id)}</a>`).join('\n    ')}
-    <h4>Groups</h4>
-    ${kinds.group.map(p => `<a href="pals.html#${p.id}" style="--dot:${p.accent}"><i></i>${title(p.id)}</a>`).join('\n    ')}
+    <input class="side-find" type="search" placeholder="Find a component…" aria-label="Find a component">
+    <nav class="side-start">${link('./', 'Overview', 'index')}${link('install.html', 'Install', 'install')}${link('builder.html', 'Builder', 'builder')}</nav>
+    ${group('sprites', 'Sprites', 'sprites.html', sprites.length, [['Big 3D', bigs.map(x => item('sprites.html#s-' + x.name, x.name, x.accent))], ['Small', smalls.map(x => item('sprites.html#s-' + x.name, x.name, x.accent))]])}
+    ${group('pals', 'Pals', 'pals.html', PALS.length, [['Characters', kinds.pal.map(p => item('pals.html#' + p.id, p.id, p.accent))], ['Interactions', kinds.play.map(p => item('pals.html#' + p.id, p.id, p.accent))], ['Toys', kinds.toy.map(p => item('pals.html#' + p.id, p.id, p.accent))], ['Groups', kinds.group.map(p => item('pals.html#' + p.id, p.id, p.accent))]])}
+    ${group('powers', 'Superpowers', 'powers.html', POWERS.length, FAMILIES.map(([id, name]) => [name, POWERS.filter(p => p.fam === id).map(p => item('powers.html#' + p.id, p.id, p.accent))]))}
+    <nav class="side-start">${link('crowd.html', 'Crowd', 'crowd')}${link('type.html', 'Pixel type', 'type')}</nav>
+    <p class="side-none" hidden>Nothing by that name.</p>
   </aside>`;
 };
 
@@ -453,67 +441,56 @@ ${smalls.map(spriteCard).join('\n')}
 // <piix-sprite name="blob"></piix-sprite>`)}
 </section>`;
 
-/* ---------- pals ---------- */
-const palSection = p => `
-<section class="doc-sec" id="${p.id}" aria-labelledby="${p.id}-h" style="--accent:${p.accent}">
-  <h2 id="${p.id}-h">${title(p.id)} <span class="pal-no">do="${p.does}"</span></h2>
-  <p>${p.desc}</p>
-  <div class="pal-doc">
-    <div class="habitat">${boxed(p.hab)}</div>
-    <div class="info">
-      <dl class="kv">
-        <dt>lives on</dt><dd>${p.lives}</dd>
-        <dt>scared of</dt><dd>${p.scared}</dd>
-        <dt>poke it</dt><dd>${p.poke}</dd>
-        ${p.attrs.map(([a, d]) => `<dt>${a}</dt><dd>${d}</dd>`).join('\n        ')}
-      </dl>
-      ${installTabs(p.id, 'pal', p.code, p.where || (p.kind === 'group' || p.does === 'bounce' || p.does === 'sweep' || p.does === 'pop' ? 'footer' : p.does === 'perch' ? '.btn' : p.does === 'peek' || p.does === 'climb' ? '.card' : p.does === 'hang' ? 'nav' : 'h1'))}
-    </div>
+/* ---------- component sections ---------- */
+/* one line per component, for the top of its section */
+const BRIEF = { "bitbug": "A lime beetle that crawls along the real outline of your letters.", "boing": "A jelly drop that bounces on your footer and lands with a splat.", "moss": "A mushroom that sits on your text reading its book, ignoring you (mostly).", "lurk": "A shy creature that peeks over the edge of your cards.", "thread": "A spider that dangles from your nav on a long thread.", "pip": "A round bird that hops between your buttons and perches on them.", "bumble": "A fuzzy bee that buzzes about your element.", "shel": "A snail that creeps along your text, leaving a shiny trail.", "gecko": "A gecko that climbs up and around the sides of your cards.", "mole": "Whack-a-mole: it pops out of your element, you bop it.", "balloon": "A balloon with a face, tied to your element, bobbing in the breeze.", "para": "A parachutist who drops onto your section when it scrolls into view.", "roomba": "A robot vacuum that sweeps along your footer, very seriously.", "kitty": "A black cat that lounges on your element and swats at the cursor.", "hiss": "A snake that slithers along your headings.", "pinch": "A crab that walks sideways along your text.", "shibe": "A shiba that lounges on your text, tail wagging.", "capy": "A capybara with a yuzu on its head, completely unbothered.", "peeper": "Guards your inputs: follows the caret, covers its eyes for passwords.", "scrolly": "A little runner on a reading-progress bar.", "echo": "A copycat cursor that replays your moves half a second late.", "snip": "A highlighter that hops to whatever text you select.", "beep": "A robot that panics when someone ticks “I’m not a robot”.", "router": "A Wi-Fi router whose signal bars follow your cursor.", "termi": "A tiny terminal that types out your lines, one character at a time.", "frog": "A frog that snaps its tongue at your cursor.", "penguin": "A penguin that belly-slides along your element.", "rocket": "Sits on your Deploy button. Click it: countdown, lift-off, landing.", "ball": "A beach ball you can throw around your page.", "duck": "A rubber duck you can throw. It squeaks when it lands.", "dice": "Throw it and it lands on a random face.", "pebble": "A heavy rock that lands with a thud every pal hears.", "cube": "A jelly cube that bounces high and wobbles.", "can": "A soda can that rolls off the edge of everything.", "fish": "A school of fish that swims inside any box and flees your cursor.", "sparrows": "Birds on a wire that scatter when you get close.", "polly": "Reads your page aloud, hopping along each word as it is spoken.", "gist": "An owl that sums up your article in a few key points.", "tabby": "A cat that lives in your browser tab’s icon and naps while you’re away.", "sprout": "A focus-timer plant that pops out into its own always-on-top window.", "plane": "A plane that tows your announcement banner across the page.", "fetch": "A dog that runs off on every fetch() and brings back the response.", "scout": "Onboarding tours, guided by a tiny explorer.", "drone": "Flies the product picture into your cart when someone adds to cart.", "crumb": "A mouse that eats your cookie banner when someone accepts or rejects.", "buff": "A password-strength meter that lifts heavier as the password gets stronger.", "meh": "A face that rides your rating slider, from furious to delighted.", "squish": "A marshmallow that gets squashed as the text nears its limit.", "gulp": "A pelican that gulps down files dropped on your drop zone.", "plug": "Shows up when the connection drops, plugs back in when it returns.", "pix": "A tiny hero that lets visitors play your page as a platformer.", "hatch": "Every visitor hatches their own one-of-a-kind pet.", "weather": "Snow that settles on your letters, plus rain, leaves and petals.", "stickers": "A sheet of stickers visitors peel off and stick anywhere on your page.", "avatar": "A unique animated pixel avatar for any name." };
+/* the first sentence of a description */
+const brief = d => { const m = String(d || '').match(/^[\s\S]*?[.!?](?=\s|$)/); return m ? m[0] : String(d || ''); };
+/* options, folded away under the code */
+const options = rows => rows.length ? `<details class="opts"><summary>Options</summary><dl>${rows.map(([a, d]) => `<dt><code>${esc(a)}</code></dt><dd>${d}</dd>`).join('')}</dl></details>` : '';
+const cmpSection = ({ id, accent, tag, desc, hab, tall, code, opts }) => `
+<section class="cmp" id="${id}" aria-labelledby="${id}-h" style="--accent:${accent}">
+  <header class="cmp-head"><h2 id="${id}-h">${title(id)}</h2><code class="cmp-tag">${esc(tag)}</code><p>${BRIEF[id] || brief(desc)}</p></header>
+  <div class="cmp-body pal-doc">
+    <div class="habitat${tall ? ' tall' : ''}">${boxed(hab || '')}</div>
+    <div class="cmp-code">${code}${opts}</div>
   </div>
 </section>`;
-const family = (id, name, blurb, list, render = palSection) => `
-<section class="doc-sec family" id="${id}" aria-labelledby="${id}-h">
-  <h2 id="${id}-h" class="fam-h">${name} <span class="pill">${list.length}</span></h2>
-  <p>${blurb}</p>
-</section>${list.map(render).join('\n')}`;
+const family = (id, name, list, render) => `
+<h2 class="fam-h" id="${id}">${name} <span class="n">${list.length}</span></h2>${list.map(render).join('\n')}`;
+
+/* ---------- pals ---------- */
+const palWhere = p => p.where || (p.kind === 'group' || p.does === 'bounce' || p.does === 'sweep' || p.does === 'pop' ? 'footer' : p.does === 'perch' ? '.btn' : p.does === 'peek' || p.does === 'climb' ? '.card' : p.does === 'hang' ? 'nav' : 'h1');
+const palSection = p => cmpSection({
+  id: p.id, accent: p.accent, tag: `pal="${p.id}"`, desc: p.desc, hab: p.hab,
+  code: installTabs(p.id, 'pal', p.code, palWhere(p)),
+  opts: options([...p.attrs, ['poke it', p.poke]])
+});
+const jump = list => `<div class="pills">${list.map(([id, name, n]) => `<a class="pill" href="#${id}">${name} · ${n}</a>`).join('')}</div>`;
 const palsBody = `<header class="doc-head">
   <div class="crumbs"><a href="./">Components</a><span>/</span><span>Pals</span></div>
   <h1>Pals</h1>
-  <p>Pals live <em>on</em> your page. Each one has a job: something it lives on, something that scares it, something that happens when you poke it. Put one inside an element and it figures out the rest. They notice each other, too.</p>
-  <div class="pills"><span class="pill">${kinds.pal.length} characters</span><span class="pill">${kinds.play.length} interactions</span><span class="pill">${kinds.toy.length} toys</span><span class="pill">${kinds.group.length} groups</span><span class="pill">never blocks clicks</span></div>
+  <p>Characters that live on your page. Put one inside an element and it does the rest.</p>
+  ${jump([['characters', 'Characters', kinds.pal.length], ['play', 'Interactions', kinds.play.length], ['toys', 'Toys', kinds.toy.length], ['groups', 'Groups', kinds.group.length]])}
 </header>
-${family('characters', 'Characters', 'One pal, one job. Crawlers, peekers, perchers, sweepers and loungers.', kinds.pal)}
-${family('play', 'New ways to play', 'Pals that react to what people actually do on your site: typing, passwords, selecting and copying text, scrolling, ticking a checkbox, clicking a deploy button.', kinds.play)}
-${family('toys', 'Toy box', 'Things to throw around the page. They land on real elements, roll off edges onto whatever is below, and can be batted with a fast swipe. Try throwing one onto another pal.', kinds.toy)}
-${family('groups', 'Groups', 'One tag, a whole crew: families, flocks, lines and choirs that move and react together.', kinds.group)}`;
+${family('characters', 'Characters', kinds.pal, palSection)}
+${family('play', 'Interactions', kinds.play, palSection)}
+${family('toys', 'Toys', kinds.toy, palSection)}
+${family('groups', 'Groups', kinds.group, palSection)}`;
 
 /* ---------- superpowers ---------- */
-const powerSection = p => `
-<section class="doc-sec power" id="${p.id}" aria-labelledby="${p.id}-h" style="--accent:${p.accent}">
-  <h2 id="${p.id}-h">${title(p.id)} <span class="pal-no">${p.kind === 'element' ? '&lt;' + p.tag + '&gt;' : 'do="' + p.does + '"'}</span></h2>
-  <p>${p.desc || ''}</p>
-  <div class="pal-doc">
-    <div class="habitat${p.tall ? ' tall' : ''}">${boxed(p.hab || '')}</div>
-    <div class="info">
-      <dl class="kv">
-        ${p.uses ? `<dt>uses</dt><dd>${p.uses}</dd>` : ''}
-        ${p.support ? `<dt>works in</dt><dd>${p.support}</dd>` : ''}
-        ${p.try ? `<dt>try it</dt><dd>${p.try}</dd>` : ''}
-        ${(p.attrs || []).map(([a, d]) => `<dt>${a}</dt><dd>${d}</dd>`).join('\n        ')}
-        ${p.api ? `<dt>api</dt><dd><code>${esc(p.api)}</code></dd>` : ''}
-        ${p.events ? `<dt>events</dt><dd>${p.events}</dd>` : ''}
-      </dl>
-      ${p.code ? installTabs(p.id, p.kind === 'element' ? 'element' : 'pal', p.code, p.where || 'body', p.query || '') : ''}
-    </div>
-  </div>
-</section>`;
+const powerSection = p => cmpSection({
+  id: p.id, accent: p.accent, tall: p.tall, tag: p.kind === 'element' ? `<${p.tag}>` : `pal="${p.id}"`, desc: p.desc, hab: p.hab,
+  code: p.code ? installTabs(p.id, p.kind === 'element' ? 'element' : 'pal', p.code, p.where || 'body', p.query || '') : '',
+  opts: options([...(p.attrs || []), ...(p.api ? [['API', `<code>${esc(p.api)}</code>`]] : []), ...(p.events ? [['events', p.events]] : [])])
+});
 const powersBody = `<header class="doc-head">
   <div class="crumbs"><a href="./">Components</a><span>/</span><span>Superpowers</span></div>
   <h1>Superpowers</h1>
-  <p>Pals that go further than the page. Some step out of it, into your browser tab, your other windows, your desktop and your speakers. Some do real interface jobs. Some turn your site into a game. Every one works with a single tag, and on this page every one stays inside its own box.</p>
-  <div class="pills">${FAMILIES.map(([id, name]) => `<a class="pill" href="#${id}">${name} · ${POWERS.filter(p => p.fam === id).length}</a>`).join('')}<span class="pill">uses the browser itself</span></div>
+  <p>Pals that step out of the page, do real interface jobs, or turn your site into a game.</p>
+  ${jump(FAMILIES.map(([id, name]) => [id, name, POWERS.filter(p => p.fam === id).length]))}
 </header>
-${FAMILIES.map(([id, name, blurb]) => POWERS.some(p => p.fam === id) ? family(id, name, blurb, POWERS.filter(p => p.fam === id), powerSection) : '').join('\n')}`;
+${FAMILIES.map(([id, name]) => POWERS.some(p => p.fam === id) ? family(id, name, POWERS.filter(p => p.fam === id), powerSection) : '').join('\n')}`;
 
 /* ---------- type ---------- */
 const typeBody = `<header class="doc-head">
