@@ -1,149 +1,244 @@
 // node video/music.mjs -> video/out/music.wav
-// The soundtrack, synthesised from nothing: a 120 BPM chiptune score plus sound effects placed
-// on the film's own cues (video/out/cues.json, written by render.mjs --cues).
+// The soundtrack, synthesised from nothing: a 120 BPM electronic score with a chiptune hook,
+// plus sound effects placed on the film's own cues (video/out/cues.json, written by render.mjs --cues).
+// Band-limited oscillators, state-variable filters, a sidechain pump, a stereo reverb and a soft master.
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
 const OUT = join(import.meta.dirname, 'out');
-const SR = 44100, DUR = 36, N = SR * DUR, BEAT = .5;
-const L = new Float32Array(N), R = new Float32Array(N);
+const SR = 44100, DUR = 37, N = SR * DUR, BEAT = .5, BAR = 2;
 const cues = existsSync(join(OUT, 'cues.json')) ? JSON.parse(readFileSync(join(OUT, 'cues.json'), 'utf8')) : [];
 
-/* ---------- tiny synth ---------- */
+/* ---------- buses: dry, pumped (ducked by the kick), and the reverb send ---------- */
+const bus = () => [new Float32Array(N), new Float32Array(N)];
+const DRY = bus(), PUMP = bus(), SEND = bus();
 let seed = 3;
 const noise = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 2147483648) - 1;
-const hz = n => 440 * Math.pow(2, (n - 69) / 12);                 /* midi note -> Hz */
+const rand = () => (noise() + 1) / 2;
+const hz = n => 440 * Math.pow(2, (n - 69) / 12);
 const NOTE = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
 const m = s => (+s.slice(-1) + 1) * 12 + NOTE[s[0]] + (s[1] === '#' ? 1 : s[1] === 'b' ? -1 : 0);
-/* write a voice into the mix: fn(t, i) returns a sample, pan -1..1 */
-function voice(start, len, fn, gain = 1, pan = 0) {
-  const a = Math.max(0, Math.floor(start * SR)), b = Math.min(N, Math.floor((start + len) * SR));
-  const gl = gain * Math.min(1, 1 - pan), gr = gain * Math.min(1, 1 + pan);
-  for (let i = a; i < b; i++) { const v = fn((i - a) / SR, i); L[i] += v * gl; R[i] += v * gr; }
-}
+const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const lerp = (a, b, k) => a + (b - a) * k;
 const env = (t, a, d) => t < a ? t / a : Math.exp(-(t - a) / d);
-const pulse = (ph, duty) => (ph % 1) < duty ? 1 : -1;
-const tri = ph => 1 - 4 * Math.abs((ph % 1) - .5);
-const saw = ph => 2 * (ph % 1) - 1;
-/* one-pole lowpass held per voice */
-const lp = k => { let y = 0; return x => (y += k * (x - y)); };
+/* write a voice: fn(t) -> sample. o: { pan, rev (send amount), pump (true = ducked bus) } */
+function voice(start, len, fn, gain = 1, o = {}) {
+  const pan = o.pan || 0, a = Math.max(0, Math.floor(start * SR)), b = Math.min(N, Math.floor((start + len) * SR));
+  const gl = gain * Math.cos((pan + 1) * Math.PI / 4) * 1.414, gr = gain * Math.sin((pan + 1) * Math.PI / 4) * 1.414;
+  const T = o.pump ? PUMP : DRY, rv = o.rev || 0;
+  for (let i = a; i < b; i++) {
+    const v = fn((i - a) / SR);
+    T[0][i] += v * gl; T[1][i] += v * gr;
+    if (rv) { SEND[0][i] += v * gl * rv; SEND[1][i] += v * gr * rv; }
+  }
+}
+
+/* ---------- oscillators that don't alias (polyBLEP) ---------- */
+const blep = (p, dt) => p < dt ? (p /= dt, p + p - p * p - 1) : p > 1 - dt ? (p = (p - 1) / dt, p * p + p + p + 1) : 0;
+function osc(shape, detune = 0) {
+  let p = rand();
+  return f => {
+    f *= Math.pow(2, detune / 1200);
+    const dt = f / SR; p += dt; if (p >= 1) p -= 1;
+    if (shape === 'saw') return 2 * p - 1 - blep(p, dt);
+    if (shape === 'sq') { let q = p + .5; if (q >= 1) q -= 1; return (2 * p - 1 - blep(p, dt)) - (2 * q - 1 - blep(q, dt)); }
+    if (shape === 'tri') return 1 - 4 * Math.abs(p - .5);
+    return Math.sin(p * 2 * Math.PI);
+  };
+}
+/* state-variable filter: low / high / band */
+function svf(q = .8) {
+  let lo = 0, bp = 0;
+  return (x, cut, mode = 'lp') => {
+    const f = 2 * Math.sin(Math.PI * clamp(cut, 20, SR / 6.5) / SR);
+    lo += f * bp; const hi = x - lo - bp / q; bp += f * hi;
+    return mode === 'lp' ? lo : mode === 'hp' ? hi : bp;
+  };
+}
 
 /* ---------- drums ---------- */
-const kick = (t0, g = 1) => { let ph = 0; voice(t0, .45, t => { const f = 45 + 120 * Math.exp(-t * 28); ph += f / SR; return Math.sin(ph * 2 * Math.PI) * env(t, .002, .16) + (t < .004 ? .5 : 0); }, .95 * g); };
-const snare = (t0, g = 1) => { const f = lp(.55); voice(t0, .3, t => (f(noise()) * .9 * env(t, .001, .09) + Math.sin(t * 2 * Math.PI * 190) * .5 * env(t, .001, .05)), .55 * g); };
-const hat = (t0, g = 1, open = false) => { let p = 0; voice(t0, open ? .3 : .08, t => { const n = noise(), v = n - p; p = n; return v * env(t, .001, open ? .12 : .022); }, .16 * g, .25); };
-const crash = (t0, g = 1) => { let p = 0; const f = lp(.7); voice(t0, 2.6, t => { const n = noise(), v = n - p; p = n; return f(v) * env(t, .002, .7); }, .3 * g, -.15); };
-const clap = (t0, g = 1) => { const f = lp(.4); voice(t0, .25, t => f(noise()) * (env(t, .001, .012) + env(Math.max(0, t - .012), .001, .012) * .8 + env(Math.max(0, t - .025), .001, .08)), .4 * g, .1); };
-
-/* ---------- tonal ---------- */
-function bass(t0, len, note, g = 1) { const f = lp(.08); voice(t0, len, t => f(pulse(t * hz(note), .25)) * env(t, .004, len * .7), .42 * g); }
-function lead(t0, len, note, g = 1, pan = 0) {
-  const f = lp(.32);
-  const draw = (dl, gg, pp) => voice(t0 + dl, len + .1, t => { const v = 1 + Math.sin(t * 2 * Math.PI * 6) * .004 * Math.min(1, t * 4); return f(pulse(t * hz(note) * v, .5)) * env(t, .006, len * .9) * (t > len ? Math.max(0, 1 - (t - len) * 12) : 1); }, gg, pp);
-  draw(0, .2 * g, pan); draw(.375, .07 * g, .5); draw(.75, .035 * g, -.5);            /* dotted-eighth echoes */
+const KICKS = [];
+function kick(t0, g = 1) {
+  KICKS.push(t0);
+  const o = osc('sine'), hp = svf(.7);
+  voice(t0, .5, t => {
+    const body = o(48 + 130 * Math.exp(-t * 38)) * env(t, .001, .22);
+    const click = hp(noise(), 2500, 'hp') * env(t, .0005, .004) * .6;
+    return Math.tanh((body + click) * 1.6) * .9;
+  }, .9 * g);
 }
-function arp(t0, len, note, g = 1) { voice(t0, len, t => pulse(t * hz(note), .125) * env(t, .002, .06), .07 * g, -.3); }
-function pad(t0, len, notes, g = 1) {
-  notes.forEach((n, j) => { const f = lp(.035); voice(t0, len + .6, t => { const a = Math.min(1, t / .5) * (t > len ? Math.max(0, 1 - (t - len) / .6) : 1); return f(saw(t * hz(n) * 1.003) + saw(t * hz(n) * .997)) * a; }, .05 * g, j % 2 ? .4 : -.4); });
+function clap(t0, g = 1) {
+  const f = svf(1.2);
+  voice(t0, .4, t => { const e = env(t, .0005, .01) + env(Math.max(0, t - .011), .0005, .01) * .8 + env(Math.max(0, t - .022), .0005, .09); return f(noise(), 1400, 'bp') * e; }, .5 * g, { pan: .05, rev: .35 });
 }
-function stab(t0, notes, g = 1) { notes.forEach((n, j) => { const f = lp(.25); voice(t0, 1.2, t => f(saw(t * hz(n)) + pulse(t * hz(n) * 1.005, .5) * .5) * env(t, .003, .28), .09 * g, j % 2 ? .3 : -.3); }); }
-/* a soft felt-key pluck, for the quiet parts */
-function pluck(t0, note, g = 1, pan = 0) { voice(t0, 1.4, t => (Math.sin(t * hz(note) * 6.283) + tri(t * hz(note) * 2) * .25) * env(t, .003, .35), .11 * g, pan); }
-function sub(t0, g = 1) { let ph = 0; voice(t0, 1.2, t => { ph += (38 + 30 * Math.exp(-t * 6)) / SR; return Math.sin(ph * 2 * Math.PI) * env(t, .005, .45); }, .7 * g); }
+function hat(t0, g = 1, open = false) {
+  const f = svf(.7);
+  voice(t0, open ? .35 : .08, t => f(noise(), 9000, 'hp') * env(t, .0005, open ? .11 : .022), .14 * g, { pan: .3, rev: open ? .1 : 0 });
+}
+function crash(t0, g = 1) { const f = svf(.6); voice(t0, 3, t => f(noise(), 6000, 'hp') * env(t, .002, .9), .11 * g, { pan: -.2, rev: .4 }); }
+function snare(t0, g = 1) {
+  const f = svf(.9), o = osc('tri');
+  voice(t0, .3, t => f(noise(), 3000, 'bp') * env(t, .001, .08) + o(185) * env(t, .001, .04) * .5, .35 * g, { rev: .2 });
+}
 
-/* ---------- sound effects ---------- */
-const sweep = (t0, len, f0, f1, shape, g, pan = 0) => { let ph = 0; voice(t0, len, t => { ph += lerpExp(f0, f1, t / len) / SR; return shape(ph) * env(t, .002, len * .4); }, g, pan); };
-const lerpExp = (a, b, k) => a * Math.pow(b / a, Math.min(1, k));
+/* ---------- instruments ---------- */
+/* sub bass, on the pumped bus */
+function subBass(t0, len, note, g = 1) {
+  const o = osc('sine'), o2 = osc('tri');
+  voice(t0, len, t => (o(hz(note)) + o2(hz(note) * 2) * .12) * Math.min(1, t / .005) * Math.min(1, (len - t) / .02), .42 * g, { pump: true });
+}
+/* a wide supersaw chord, filtered; the cutoff can sweep over the note */
+function chord(t0, len, notes, g = 1, cut = 2400, cutTo = cut) {
+  notes.forEach(n => [-14, -6, 0, 6, 14].forEach((dt, v) => {
+    const o = osc('saw', dt), f = svf(.9);
+    voice(t0, len + .3, t => f(o(hz(n)), lerp(cut, cutTo, clamp(t / len, 0, 1))) * Math.min(1, t / .02) * (t > len ? Math.max(0, 1 - (t - len) / .3) : 1),
+      .028 * g, { pan: (v - 2) * .35, pump: true, rev: .25 });
+  }));
+}
+/* electric piano: two-operator FM */
+function keys(t0, notes, g = 1, len = 1.8) {
+  notes.forEach((n, j) => {
+    const mo = osc('sine');
+    voice(t0 + j * .012, len, t => Math.sin(2 * Math.PI * hz(n) * t + (1.4 * Math.exp(-t * 5) + .15) * mo(hz(n))) * env(t, .004, .8) * (1 + .15 * Math.sin(t * 2 * Math.PI * 4.5)),
+      .07 * g, { pan: j % 2 ? .3 : -.3, rev: .45 });
+  });
+}
+function pluck(t0, note, g = 1, pan = 0) {
+  const o = osc('saw'), f = svf(.7);
+  voice(t0, .9, t => f(o(hz(note)), 300 + 3500 * Math.exp(-t * 18)) * env(t, .002, .25), .09 * g, { pan, rev: .4 });
+}
+/* the hook: a band-limited square, filtered, with dotted-eighth echoes */
+function lead(t0, len, note, g = 1) {
+  const draw = (dl, gg, pan) => { const o = osc('sq'), f = svf(1); voice(t0 + dl, len + .05, t => f(o(hz(note) * (1 + Math.sin(t * 2 * Math.PI * 5.5) * .005 * Math.min(1, t * 3))), 3200) * Math.min(1, t / .006) * env(Math.max(0, t - len * .6), .001, .05), gg, { pan, rev: .3 }); };
+  draw(0, .085 * g, 0); draw(.375, .035 * g, .45); draw(.75, .018 * g, -.45);
+}
+function arp(t0, note, g = 1) { const o = osc('sq'), f = svf(.8); voice(t0, .14, t => f(o(hz(note)), 2400) * env(t, .002, .05), .03 * g, { pan: -.35, rev: .2 }); }
+function bell(t0, note, g = 1, pan = 0) {
+  const mo = osc('sine');
+  voice(t0, 2.4, t => Math.sin(2 * Math.PI * hz(note) * t + 2 * Math.exp(-t * 3) * mo(hz(note) * 3.5)) * env(t, .002, .7), .08 * g, { pan, rev: .5 });
+}
+function boom(t0, g = 1) { const o = osc('sine'); voice(t0, 1.6, t => o(34 + 60 * Math.exp(-t * 7)) * env(t, .004, .6), .6 * g); }
+function riser(t0, len, g = 1) {
+  const f = svf(2), o = osc('saw'), o2 = osc('saw', 9);
+  voice(t0, len, t => { const k = t / len; return (f(noise(), 300 + k * k * 9000, 'bp') * 1.2 + (o(lerp(110, 880, k * k)) + o2(lerp(110, 880, k * k))) * .1) * k * k; }, .3 * g, { rev: .3 });
+}
+function swell(t0, len, g = 1) { const f = svf(.7); voice(t0, len, t => f(noise(), 200 + Math.pow(t / len, 2) * 6000) * Math.pow(t / len, 2.5), .35 * g, { rev: .3 }); }
+
+/* ---------- sound effects: small, soft, modern ---------- */
 const FX = {
-  word: t => { sweep(t, .07, 1400, 1900, p => pulse(p, .5), .08); hat(t, .6); },
-  pop: t => { sweep(t, .16, 500, 1500, p => pulse(p, .25), .12); sweep(t + .05, .12, 1000, 2400, p => tri(p), .1, .3); },
-  land: t => { sweep(t, .12, 320, 110, p => tri(p), .3); },
-  block: t => { sweep(t, .08, 180, 70, p => pulse(p, .5), .12, -.2); },
-  cut: t => { const f = lp(.15); voice(t, .2, (u) => f(noise()) * env(u, .03, .05), .35); },
-  wipe: t => { let k = 0; voice(t, .45, u => { k = Math.min(.9, .02 + u * 1.6); const n = noise(); return n * k * env(u, .25, .07); }, .22); },
-  throw: t => { sweep(t, .18, 300, 900, p => saw(p), .07, .3); },
-  ding: t => { [m('E6'), m('B6')].forEach((n, i) => voice(t + i * .07, .6, u => Math.sin(u * hz(n) * 2 * Math.PI) * env(u, .002, .18), .14)); },
-  coin: t => { voice(t, .05, u => pulse(u * hz(m('B5')), .5) * .9, .09); voice(t + .05, .3, u => pulse(u * hz(m('E6')), .5) * env(u, .002, .12), .09); },
-  slam: t => { kick(t, 1.2); sub(t); crash(t, .8); clap(t, 1); },
-  key: t => { const f = lp(.6); voice(t, .03, u => f(noise()) * env(u, .0005, .006), .3 + noise() * .05, noise() * .4); },
-  chip: (t, i) => { const n = [m('C6'), m('E6'), m('G6'), m('C7'), m('E7'), m('G7')][i % 6]; voice(t, .25, u => pulse(u * hz(n), .25) * env(u, .002, .08), .08); },
-  card: (t, i) => { const f = lp(.08 + i * .01); voice(t, .35, u => f(noise()) * env(u, .08, .1), .3, (i % 3 - 1) * .5); },
-  suck: t => { const f = lp(.06); voice(t, .6, u => { const k = u / .6; return f(noise()) * k * k * 1.5 + Math.sin(u * lerpExp(200, 1600, k) * 6.283) * .15 * k; }, .4); },
-  blip: t => { sweep(t, .1, 2000, 2600, p => Math.sin(p * 6.283), .12); },
-  logo: t => { crash(t, .5); sub(t, .9); [m('C5'), m('G5'), m('E6')].forEach((n, i) => voice(t + i * .03, 1.6, u => Math.sin(u * hz(n) * 6.283) * env(u, .004, .5), .12, (i - 1) * .4)); },
-  click: t => { voice(t, .04, u => noise() * env(u, .0005, .005), .5); sweep(t, .05, 900, 600, p => pulse(p, .5), .06); },
-  heat: t => { const f = lp(.04); voice(t, .9, u => { const k = u / .9; return (f(noise()) * (.4 + k * 2) + saw(u * lerpExp(80, 640, k)) * .1) * k * k; }, .4); },
-  whoosh: t => { const f = lp(.12); voice(t - .1, .45, u => f(noise()) * Math.sin(Math.min(1, u / .45) * Math.PI), .45, .2); },
-  tick: (t, i) => { voice(t, .06, u => Math.sin(u * hz(m('C6') + [0, 2, 4, 7, 9][i % 5]) * 6.283) * env(u, .001, .03), .1, .3); },
-  style: (t, i) => { const n = [m('C6'), m('D6'), m('E6'), m('G6'), m('A6'), m('C7')][i % 6]; voice(t, .3, u => pulse(u * hz(n), .25) * env(u, .002, .09), .07); FX.whoosh(t); },
-  swish: (t, i) => { const f = lp(.2); voice(t, .3, u => f(noise()) * env(u, .01, .06), .35, .6 - i * .3); },
-  select: t => { sweep(t, .12, 600, 1200, p => tri(p), .14); },
-  tile: (t, i) => { voice(t, .12, u => Math.sin(u * hz(m('G5') + i * 2) * 6.283) * env(u, .002, .05), .08, (i % 2 ? .4 : -.4)); },
-  step: (t, i) => { sweep(t, .06, 400 + i * 40, 250, p => tri(p), .14); },
-  bigpop: (t, i) => { sweep(t, .22, 200 + i * 60, 900 + i * 120, p => pulse(p, .5), .1); sub(t, .25); }
+  word: t => voice(t, .25, u => Math.sin(u * 2 * Math.PI * 1320) * env(u, .002, .05), .05, { rev: .5 }),
+  pop: t => { const o = osc('sine'); voice(t, .25, u => o(lerp(320, 980, Math.min(1, u * 9))) * env(u, .002, .07), .14, { rev: .3 }); },
+  card: (t, i) => { const f = svf(1.5); voice(t, .4, u => f(noise(), 600 + u * 5000, 'bp') * env(u, .1, .08), .1, { pan: (i % 3 - 1) * .6, rev: .2 }); },
+  suck: t => swell(t, .55, .8),
+  blip: t => voice(t, .3, u => Math.sin(u * 2 * Math.PI * 1760) * env(u, .002, .07), .06, { rev: .4 }),
+  logo: t => { boom(t, .8); [m('A5'), m('E6'), m('C#7')].forEach((n, i) => bell(t + i * .02, n, .8, (i - 1) * .4)); },
+  key: t => { const f = svf(.7); voice(t, .03, u => f(noise(), 4000, 'hp') * env(u, .0004, .005), .1 + noise() * .02, { pan: noise() * .4 }); },
+  click: t => { const f = svf(.7); voice(t, .05, u => f(noise(), 2000, 'bp') * env(u, .0005, .008), .35); },
+  whoosh: t => { const f = svf(1.4); voice(t - .15, .5, u => f(noise(), 300 + Math.sin(u / .5 * Math.PI) * 3500, 'bp') * Math.sin(Math.min(1, u / .5) * Math.PI), .22, { rev: .15 }); },
+  style: (t, i) => voice(t, .3, u => Math.sin(u * 2 * Math.PI * hz(m('A5') + [0, 2, 4, 7, 9, 12][i % 6])) * env(u, .002, .08), .06, { rev: .3 }),
+  swish: (t, i) => { const f = svf(1.2); voice(t, .3, u => f(noise(), 4000 - u * 8000, 'bp') * env(u, .02, .05), .12, { pan: .6 - i * .3 }); },
+  coin: t => { const o = osc('sq'), o2 = osc('sq'), f = svf(.8); voice(t, .06, () => f(o(hz(m('B5'))), 3000), .035); voice(t + .06, .3, u => f(o2(hz(m('E6'))), 3000) * env(u, .002, .1), .035, { rev: .25 }); },
+  select: t => voice(t, .2, u => Math.sin(u * 2 * Math.PI * lerp(600, 1200, Math.min(1, u * 8))) * env(u, .002, .06), .08, { rev: .3 }),
+  tile: (t, i) => voice(t, .2, u => (Math.sin(u * 2 * Math.PI * hz(m('E6') + [0, 3, 5, 7, 10, 12][i % 6])) + Math.sin(u * 2 * Math.PI * hz(m('E6')) * 4) * .2 * Math.exp(-u * 40)) * env(u, .001, .06), .05, { pan: i % 2 ? .4 : -.4, rev: .3 }),
+  step: (t, i) => { const o = osc('sine'); voice(t, .1, u => o(lerp(260, 140, u * 10)) * env(u, .001, .03), .1, { pan: i % 2 ? .3 : -.3 }); },
+  swarm: t => { const f = svf(.6); voice(t, 1.6, u => f(noise(), 2500, 'bp') * (.5 + .5 * Math.sin(u * 37)) * Math.sin(Math.min(1, u / 1.6) * Math.PI), .07, { rev: .3 }); },
+  form: t => [m('A4'), m('C5'), m('E5'), m('A5')].forEach((n, i) => bell(t + i * .04, n, .7, (i - 1.5) * .3)),
+  scatter: t => FX.whoosh(t + .1)
 };
 
 /* ---------- the score ---------- */
-const CH = { C: ['C', 'E', 'G'], G: ['G', 'B', 'D'], Am: ['A', 'C', 'E'], F: ['F', 'A', 'C'] };
-const ROOT = { C: m('C2'), G: m('G1'), Am: m('A1'), F: m('F1') };
-const chordAt = t => ['C', 'G', 'Am', 'F'][Math.floor(t / 2) % 4];
-const tones = (c, oct) => CH[c].map(n => m(n + oct)).map((n, i, a) => n < a[0] ? n + 12 : n);
-const MEL = {
-  C: ['E5', 0, 'G5', 'E5', 'C6', 0, 'G5', 0],
-  G: ['D5', 0, 'G5', 'D5', 'B5', 0, 'A5', 'G5'],
-  Am: ['C5', 0, 'E5', 'A5', 'C6', 0, 'B5', 'A5'],
-  F: ['A5', 0, 'G5', 'F5', 'E5', 0, 'D5', 0]
+/* Am F C G, a bar each, lined up so the first drop (10s, bar 5) lands on Am */
+const PROG = ['Am', 'F', 'C', 'G'];
+const chordOf = bar => PROG[((bar - 5) % 4 + 4) % 4];
+const CHORD = { Am: ['A3', 'C4', 'E4', 'A4'], F: ['F3', 'A3', 'C4', 'F4'], C: ['C4', 'E4', 'G4', 'C5'], G: ['G3', 'B3', 'D4', 'G4'] };
+const ROOT = { Am: m('A1'), F: m('F1'), C: m('C2'), G: m('G1') };
+const HOOK = {
+  Am: ['E5', 0, 'A5', 0, 'C6', 'B5', 'A5', 0],
+  F: ['C6', 0, 'A5', 0, 'F5', 0, 'A5', 'C6'],
+  C: ['E6', 0, 'D6', 'C6', 'G5', 0, 'E5', 0],
+  G: ['D6', 0, 'B5', 0, 'G5', 'A5', 'B5', 0]
 };
-/* sections, by time */
-const parts = t => {
-  if (t < 3.6) return { pad: 1.6, pluck: 1 };
-  if (t < 7) return { pad: 1.4, pluck: 1, bass: .6, kick: t >= 4 ? .55 : 0, tick: .8 };
-  if (t < 8.75) return { pad: 1.2, pluck: 1, hats: .6, bass: .5 };
-  if (t < 9.6) return { pad: 1 };
-  if (t < 13.6) return { pad: 1.2, bass: 1, kick: 1, snare: .8, hats: .8 };
-  if (t < 26.2) return { pad: 1, bass: 1, kick: 1, snare: 1, hats: 1, arp: 1, lead: 1 };
-  if (t < 29.6) return { pad: 1.1, half: 1, hats: .6, arp: .8, bass: .6 };
-  if (t < 32.6) return { pad: 1, bass: 1, kick: 1, snare: 1, hats: 1, arp: 1, lead: 1.1 };
-  return {};
-};
-for (let bar = 0; bar < 17; bar++) {
-  const t0 = bar * 2, c = chordAt(t0);
-  if (parts(t0 + .01).pad) pad(t0, 2, tones(c, 4).concat(m(CH[c][0] + 3)), parts(t0 + .01).pad);
-  for (let s = 0; s < 16; s++) {                                     /* sixteenths */
-    const t = t0 + s * BEAT / 4, Q = parts(t + .001);
-    if (Q.kick && s % 4 === 0) kick(t, Q.kick);
-    if (Q.half && s === 0) { kick(t, .9); sub(t, .6); }
-    if (Q.half && s === 8) { snare(t, .7); clap(t, .7); }
-    if (Q.snare && (s === 4 || s === 12)) { snare(t, Q.snare); clap(t, .6 * Q.snare); }
-    if (Q.hats) hat(t, (s % 2 ? .55 : 1) * Q.hats * (s % 4 === 2 ? 1.3 : 1), s % 8 === 6);
-    if (Q.tick && s % 2 === 0) hat(t, .35 * Q.tick);
-    if (Q.bass && s % 2 === 0) bass(t, BEAT / 2, ROOT[c] + (s % 4 === 2 ? 12 : 0), Q.bass);
-    if (Q.pluck && s % 2 === 0) { const tn = tones(c, 5); pluck(t, tn[[0, 2, 1, 2, 0, 2, 1, 2][s / 2]] - (s >= 8 ? 0 : 12), Q.pluck, s % 4 ? .35 : -.35); }
-    if (Q.arp) { const tn = tones(c, 5); arp(t, .12, tn[[0, 1, 2, 1][s % 4]] + (s >= 8 ? 12 : 0), Q.arp); }
-    if (Q.lead && s % 2 === 0) { const n = MEL[c][s / 2]; if (n) lead(t, BEAT / 2 * .9, m(n), Q.lead); }
+const sect = t =>
+  t < 4 ? 'intro' : t < 7 ? 'build' : t < 9 ? 'prompt' : t < 10 ? 'dive' :
+  t < 14 ? 'drop' : t < 26 ? 'main' : t < 30 ? 'dark' : t < 32.5 ? 'final' : 'outro';
+const ARP8 = [0, 2, 1, 3, 2, 1, 3, 2];
+
+for (let bar = 0; bar < Math.ceil(DUR / BAR); bar++) {
+  const t0 = bar * BAR, c = chordOf(bar), S = sect(t0 + .01), notes = CHORD[c].map(m);
+  if (S === 'intro' || S === 'build' || S === 'prompt') { keys(t0, notes, S === 'intro' ? 1.7 : 1.1, 1.9); keys(t0 + 1.25, notes.slice(1), .6, 1); }
+  if (S === 'build' || S === 'prompt') chord(t0, BAR, notes, .5, 500, 1100);
+  if (S === 'drop' || S === 'main' || S === 'final') chord(t0, BAR, notes, S === 'drop' ? 1 : .85, S === 'final' ? 3600 : 2600);
+  if (S === 'dark') { chord(t0, BAR, notes, .8, 420, 700); keys(t0, notes, .6, 1.9); }
+  for (let s = 0; s < 16; s++) {
+    const t = t0 + s * BEAT / 4, Q = sect(t + .001), groove = Q === 'drop' || Q === 'main' || Q === 'final';
+    if ((Q === 'intro' || Q === 'build' || Q === 'prompt') && s % 2 === 0) pluck(t, notes[ARP8[s / 2]] + 12, Q === 'intro' ? .95 : .8, s % 4 ? .4 : -.4);
+    if ((Q === 'build' || Q === 'prompt') && s % 4 === 0 && t >= 4.5) kick(t, .55);
+    if (Q === 'prompt' && s % 4 === 2) hat(t, .7);
+    if (groove) {
+      if (s % 4 === 0) kick(t);
+      if (s === 4 || s === 12) clap(t);
+      if (s % 4 === 2) hat(t, 1.1, true); else if (s % 2 === 1) hat(t, .5);
+      if (s % 2 === 0) subBass(t, BEAT / 2 - .02, ROOT[c] + (s % 4 === 2 ? 12 : 0));
+      const n = HOOK[c][s / 2];
+      if (s % 2 === 0 && n && (Q !== 'drop' || t >= 12)) lead(t, BEAT / 2 * .85, m(n) + (Q === 'final' ? 12 : 0), Q === 'final' ? .8 : 1);
+      if (Q === 'main' || Q === 'final') arp(t, notes[[1, 2, 3, 2][s % 4]] + 12, .9);
+    }
+    if (Q === 'dark') {
+      if (s === 0 || s === 10) kick(t, .9);
+      if (s === 8) clap(t, .9);
+      if (s % 2 === 0) subBass(t, BEAT / 2 - .02, ROOT[c], .8);
+      if (s % 4 === 2) hat(t, .6);
+      if (s % 2 === 0) pluck(t, notes[ARP8[s / 2] % 4] + 12, .5, s % 4 ? .3 : -.3);
+    }
   }
 }
-/* the drop out of the heat map: a beat of silence, then everything */
-crash(9.6, 1.1); sub(9.6, 1.3); kick(9.6, 1.3); stab(9.6, tones('Am', 4).concat(m('A4')), 1);
-/* the lead arrives with the site shot, the finale gets its own crash */
-crash(13.6, .7); crash(29.6, 1.1); sub(29.6, 1);
-/* fills into each new section */
-[13.1, 25.7, 29.1].forEach(t0 => { for (let k = 0; k < 8; k++) snare(t0 + k * BEAT / 8, .3 + k * .07); });
-/* the end: one held chord and a little sign-off */
-crash(32.6, 1); kick(32.6, 1.2); sub(32.6, 1.2);
-stab(32.6, tones('C', 4).concat(m('C5'), m('G5')), 1.2);
-pad(32.6, 2.8, tones('C', 4).concat(m('C3'), m('E5')), 1.6);
-['C6', 'E6', 'G6', 'C7'].forEach((n, i) => pluck(33.4 + i * .25, m(n), 1.2, i % 2 ? .3 : -.3));
+/* into the first drop: the chords open up, a riser, a snare roll, a beat of nothing, then everything */
+chord(9, .875, CHORD.G.map(m), .7, 600, 5000);
+riser(8.6, 1.3, 1.1);
+for (let i = 0; i < 12; i++) snare(9 + i * .07, .2 + i * .05);
+[10, 30].forEach(t => { crash(t, 1.2); boom(t, 1.1); });
+crash(14, .6); crash(22, .5);
+/* out of the dark section */
+riser(28.9, 1.0, 1); for (let i = 0; i < 14; i++) snare(29 + i * .064, .15 + i * .045);
+/* the end: one held chord that closes down, keys, a bell, ring out */
+crash(32.5, .9); boom(32.5, .9);
+chord(32.5, 3.4, CHORD.Am.map(m), .9, 2600, 500);
+keys(32.5, CHORD.Am.map(m), 1, 3);
+keys(34.0, [m('C5'), m('E5'), m('A5')], .9, 3);
 
 /* every sound effect, on its cue */
 const seen = {};
 for (const [t, kind] of cues) { const i = (seen[kind] = (seen[kind] ?? -1) + 1); FX[kind]?.(t, i); }
 
-/* ---------- master: gentle glue, soft clip, fade, normalise ---------- */
-let peak = 0;
+/* ---------- mix ---------- */
+/* sidechain: the pumped bus ducks under every kick */
+const duck = new Float32Array(N).fill(1);
+for (const k of KICKS) { const a = Math.floor(k * SR); for (let i = 0; i < SR * .35 && a + i < N; i++) { const t = i / SR, d = 1 - .72 * Math.exp(-t / .1) * Math.min(1, t / .004 + .3); duck[a + i] = Math.min(duck[a + i], d); } }
+/* reverb: Freeverb-style combs and allpasses on the send */
+function reverb(inp, spread) {
+  const out = new Float32Array(N);
+  const combs = [1116, 1188, 1277, 1356, 1422, 1491, 1557, 1617].map(n => ({ b: new Float32Array(n + spread), i: 0, s: 0 }));
+  const aps = [556, 441, 341, 225].map(n => ({ b: new Float32Array(n + spread), i: 0 }));
+  for (let n = 0; n < N; n++) {
+    const x = inp[n] * .015; let y = 0;
+    for (const c of combs) { const o = c.b[c.i]; c.s = o * .8 + c.s * .2; c.b[c.i] = x + c.s * .86; c.i = (c.i + 1) % c.b.length; y += o; }
+    for (const a of aps) { const o = a.b[a.i]; a.b[a.i] = y + o * .5; y = o - y; a.i = (a.i + 1) % a.b.length; }
+    out[n] = y;
+  }
+  return out;
+}
+const RL = reverb(SEND[0], 0), RR = reverb(SEND[1], 23);
+const L = new Float32Array(N), R = new Float32Array(N);
+for (let i = 0; i < N; i++) { L[i] = DRY[0][i] + PUMP[0][i] * duck[i] + RL[i] * 1.6; R[i] = DRY[1][i] + PUMP[1][i] * duck[i] + RR[i] * 1.6; }
+/* master: high-pass the rumble, gentle compression, soft clip, fade, normalise */
+const hpL = svf(.7), hpR = svf(.7);
+let lev = 0, peak = 0;
 for (let i = 0; i < N; i++) {
-  const t = i / SR, fade = t > DUR - .8 ? Math.max(0, (DUR - t) / .8) : 1;
-  L[i] = Math.tanh(L[i] * 1.25) * fade; R[i] = Math.tanh(R[i] * 1.25) * fade;
+  const l = hpL(L[i], 28, 'hp'), r = hpR(R[i], 28, 'hp');
+  const v = Math.max(Math.abs(l), Math.abs(r)); lev = v > lev ? lev + (v - lev) * .01 : lev + (v - lev) * .0002;
+  const gr = lev > .5 ? Math.pow(.5 / lev, .5) : 1;
+  const t = i / SR, fade = t > DUR - 1 ? Math.max(0, DUR - t) : 1;
+  L[i] = Math.tanh(l * gr * 1.1) * fade; R[i] = Math.tanh(r * gr * 1.1) * fade;
   peak = Math.max(peak, Math.abs(L[i]), Math.abs(R[i]));
 }
 const gain = .89 / peak, buf = Buffer.alloc(44 + N * 4);
