@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "wizard",
+  "type": "registry:component",
+  "title": "Wizard",
+  "description": "A very small wizard whose hat does most of the work. Sparkles on request.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/wizard.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/wizard.tsx",
+      "content": "\"use client\";\n/* Wizard, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Wizard(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"wizard\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"wizard\", ...piixAttrs(props) });\n}\n\nexport default Wizard;\n"
+    }
+  ]
+}

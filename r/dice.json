@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "dice",
+  "type": "registry:component",
+  "title": "Dice",
+  "description": "Throw it and it lands on a random face.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/dice.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/dice.tsx",
+      "content": "\"use client\";\n/* Dice, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Dice(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"dice\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"dice\", ...piixAttrs(props) });\n}\n\nexport default Dice;\n"
+    }
+  ]
+}

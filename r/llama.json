@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "llama",
+  "type": "registry:component",
+  "title": "Llama",
+  "description": "A fluffy llama with a long neck and a calm, knowing look.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/llama.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/llama.tsx",
+      "content": "\"use client\";\n/* Llama, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Llama(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"llama\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"llama\", ...piixAttrs(props) });\n}\n\nexport default Llama;\n"
+    }
+  ]
+}

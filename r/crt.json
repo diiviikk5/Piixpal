@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "crt",
+  "type": "registry:component",
+  "title": "Crt",
+  "description": "A beige monitor from the old internet. Its face glows on the screen.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/crt.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/crt.tsx",
+      "content": "\"use client\";\n/* Crt, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Crt(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"crt\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"crt\", ...piixAttrs(props) });\n}\n\nexport default Crt;\n"
+    }
+  ]
+}

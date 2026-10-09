@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "planet",
+  "type": "registry:component",
+  "title": "Planet",
+  "description": "A small ringed planet. Spins slowly, shines a little, thinks big.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/planet.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/planet.tsx",
+      "content": "\"use client\";\n/* Planet, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Planet(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"planet\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"planet\", ...piixAttrs(props) });\n}\n\nexport default Planet;\n"
+    }
+  ]
+}

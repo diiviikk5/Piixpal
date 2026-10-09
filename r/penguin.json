@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "penguin",
+  "type": "registry:component",
+  "title": "Penguin",
+  "description": "A penguin that belly-slides along your element.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/penguin.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/penguin.tsx",
+      "content": "\"use client\";\n/* Penguin, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Penguin(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"penguin\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"penguin\", ...piixAttrs(props) });\n}\n\nexport default Penguin;\n"
+    }
+  ]
+}

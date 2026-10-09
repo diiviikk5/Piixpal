@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "star",
+  "type": "registry:component",
+  "title": "Star",
+  "description": "A little star who twinkles on purpose. Main-character energy.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/star.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/star.tsx",
+      "content": "\"use client\";\n/* Star, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Star(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"star\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"star\", ...piixAttrs(props) });\n}\n\nexport default Star;\n"
+    }
+  ]
+}

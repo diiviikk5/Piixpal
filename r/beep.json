@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "beep",
+  "type": "registry:component",
+  "title": "Beep",
+  "description": "A robot that panics when someone ticks “I’m not a robot”.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/beep.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/beep.tsx",
+      "content": "\"use client\";\n/* Beep, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Beep(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"beep\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"beep\", ...piixAttrs(props) });\n}\n\nexport default Beep;\n"
+    }
+  ]
+}

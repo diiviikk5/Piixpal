@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "hatch",
+  "type": "registry:component",
+  "title": "Hatch",
+  "description": "Every visitor hatches their own one-of-a-kind pet.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/hatch.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/hatch.tsx",
+      "content": "\"use client\";\n/* Hatch, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Hatch(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"hatch\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"hatch\", ...piixAttrs(props) });\n}\n\nexport default Hatch;\n"
+    }
+  ]
+}

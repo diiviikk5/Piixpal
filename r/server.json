@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "server",
+  "type": "registry:component",
+  "title": "Server",
+  "description": "A server rack keeping your site alive. Its drive lights never stop.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/server.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/server.tsx",
+      "content": "\"use client\";\n/* Server, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Server(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"server\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"server\", ...piixAttrs(props) });\n}\n\nexport default Server;\n"
+    }
+  ]
+}

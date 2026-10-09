@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "drone",
+  "type": "registry:component",
+  "title": "Drone",
+  "description": "Flies the product picture into your cart when someone adds to cart.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/drone.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/drone.tsx",
+      "content": "\"use client\";\n/* Drone, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Drone(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"drone\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"drone\", ...piixAttrs(props) });\n}\n\nexport default Drone;\n"
+    }
+  ]
+}

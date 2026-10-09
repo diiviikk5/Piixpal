@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "plug",
+  "type": "registry:component",
+  "title": "Plug",
+  "description": "Shows up when the connection drops, plugs back in when it returns.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/plug.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/plug.tsx",
+      "content": "\"use client\";\n/* Plug, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Plug(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"plug\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"plug\", ...piixAttrs(props) });\n}\n\nexport default Plug;\n"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "snip",
+  "type": "registry:component",
+  "title": "Snip",
+  "description": "A highlighter that hops to whatever text you select.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/snip.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/snip.tsx",
+      "content": "\"use client\";\n/* Snip, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Snip(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"snip\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"snip\", ...piixAttrs(props) });\n}\n\nexport default Snip;\n"
+    }
+  ]
+}

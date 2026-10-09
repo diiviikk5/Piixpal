@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "fluff",
+  "type": "registry:component",
+  "title": "Fluff",
+  "description": "A sheep made almost entirely of cloud. Trots in place, very proudly.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/fluff.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/fluff.tsx",
+      "content": "\"use client\";\n/* Fluff, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Fluff(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"fluff\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"fluff\", ...piixAttrs(props) });\n}\n\nexport default Fluff;\n"
+    }
+  ]
+}

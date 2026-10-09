@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "dragon",
+  "type": "registry:component",
+  "title": "Dragon",
+  "description": "A pocket dragon. Flaps its little wings. Breathes a little fire now and then.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/dragon.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/dragon.tsx",
+      "content": "\"use client\";\n/* Dragon, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Dragon(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"dragon\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"dragon\", ...piixAttrs(props) });\n}\n\nexport default Dragon;\n"
+    }
+  ]
+}

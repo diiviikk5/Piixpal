@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "sprout",
+  "type": "registry:component",
+  "title": "Sprout",
+  "description": "A focus-timer plant that pops out into its own always-on-top window.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/sprout.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/sprout.tsx",
+      "content": "\"use client\";\n/* Sprout, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Sprout(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"sprout\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"sprout\", ...piixAttrs(props) });\n}\n\nexport default Sprout;\n"
+    }
+  ]
+}

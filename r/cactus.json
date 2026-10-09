@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "cactus",
+  "type": "registry:component",
+  "title": "Cactus",
+  "description": "A potted cactus who blooms when it is in a good mood. Do not hug.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/cactus.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/cactus.tsx",
+      "content": "\"use client\";\n/* Cactus, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Cactus(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"cactus\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"cactus\", ...piixAttrs(props) });\n}\n\nexport default Cactus;\n"
+    }
+  ]
+}

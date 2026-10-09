@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "rocket",
+  "type": "registry:component",
+  "title": "Rocket",
+  "description": "Sits on your Deploy button. Click it: countdown, lift-off, landing.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/rocket.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/rocket.tsx",
+      "content": "\"use client\";\n/* Rocket, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Rocket(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"rocket\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"rocket\", ...piixAttrs(props) });\n}\n\nexport default Rocket;\n"
+    }
+  ]
+}

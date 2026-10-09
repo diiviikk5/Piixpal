@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "keycap",
+  "type": "registry:component",
+  "title": "Keycap",
+  "description": "A chunky mechanical keycap. Thocky. Click it for a satisfying press.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/keycap.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/keycap.tsx",
+      "content": "\"use client\";\n/* Keycap, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Keycap(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"keycap\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"keycap\", ...piixAttrs(props) });\n}\n\nexport default Keycap;\n"
+    }
+  ]
+}

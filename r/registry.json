@@ -1,0 +1,709 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "piixpal",
+  "homepage": "https://piixpal.vercel.app",
+  "items": [
+    {
+      "name": "piixpal",
+      "type": "registry:lib",
+      "title": "Piixpal",
+      "description": "The shared loader for Piixpal components: loads each one from the CDN, once, in the browser."
+    },
+    {
+      "name": "bitbug",
+      "type": "registry:component",
+      "title": "Bitbug",
+      "description": "A lime beetle that crawls along the real outline of your letters."
+    },
+    {
+      "name": "boing",
+      "type": "registry:component",
+      "title": "Boing",
+      "description": "A jelly drop that bounces on your footer and lands with a splat."
+    },
+    {
+      "name": "moss",
+      "type": "registry:component",
+      "title": "Moss",
+      "description": "A mushroom that sits on your text reading its book, ignoring you (mostly)."
+    },
+    {
+      "name": "lurk",
+      "type": "registry:component",
+      "title": "Lurk",
+      "description": "A shy creature that peeks over the edge of your cards."
+    },
+    {
+      "name": "thread",
+      "type": "registry:component",
+      "title": "Thread",
+      "description": "A spider that dangles from your nav on a long thread."
+    },
+    {
+      "name": "pip",
+      "type": "registry:component",
+      "title": "Pip",
+      "description": "A round bird that hops between your buttons and perches on them."
+    },
+    {
+      "name": "bumble",
+      "type": "registry:component",
+      "title": "Bumble",
+      "description": "A fuzzy bee that buzzes about your element."
+    },
+    {
+      "name": "shel",
+      "type": "registry:component",
+      "title": "Shel",
+      "description": "A snail that creeps along your text, leaving a shiny trail."
+    },
+    {
+      "name": "gecko",
+      "type": "registry:component",
+      "title": "Gecko",
+      "description": "A gecko that climbs up and around the sides of your cards."
+    },
+    {
+      "name": "mole",
+      "type": "registry:component",
+      "title": "Mole",
+      "description": "Whack-a-mole: it pops out of your element, you bop it."
+    },
+    {
+      "name": "balloon",
+      "type": "registry:component",
+      "title": "Balloon",
+      "description": "A balloon with a face, tied to your element, bobbing in the breeze."
+    },
+    {
+      "name": "para",
+      "type": "registry:component",
+      "title": "Para",
+      "description": "A parachutist who drops onto your section when it scrolls into view."
+    },
+    {
+      "name": "roomba",
+      "type": "registry:component",
+      "title": "Roomba",
+      "description": "A robot vacuum that sweeps along your footer, very seriously."
+    },
+    {
+      "name": "kitty",
+      "type": "registry:component",
+      "title": "Kitty",
+      "description": "A black cat that lounges on your element and swats at the cursor."
+    },
+    {
+      "name": "hiss",
+      "type": "registry:component",
+      "title": "Hiss",
+      "description": "A snake that slithers along your headings."
+    },
+    {
+      "name": "pinch",
+      "type": "registry:component",
+      "title": "Pinch",
+      "description": "A crab that walks sideways along your text."
+    },
+    {
+      "name": "shibe",
+      "type": "registry:component",
+      "title": "Shibe",
+      "description": "A shiba that lounges on your text, tail wagging."
+    },
+    {
+      "name": "capy",
+      "type": "registry:component",
+      "title": "Capy",
+      "description": "A capybara with a yuzu on its head, completely unbothered."
+    },
+    {
+      "name": "peeper",
+      "type": "registry:component",
+      "title": "Peeper",
+      "description": "Guards your inputs: follows the caret, covers its eyes for passwords."
+    },
+    {
+      "name": "scrolly",
+      "type": "registry:component",
+      "title": "Scrolly",
+      "description": "A little runner on a reading-progress bar."
+    },
+    {
+      "name": "echo",
+      "type": "registry:component",
+      "title": "Echo",
+      "description": "A copycat cursor that replays your moves half a second late."
+    },
+    {
+      "name": "snip",
+      "type": "registry:component",
+      "title": "Snip",
+      "description": "A highlighter that hops to whatever text you select."
+    },
+    {
+      "name": "beep",
+      "type": "registry:component",
+      "title": "Beep",
+      "description": "A robot that panics when someone ticks “I’m not a robot”."
+    },
+    {
+      "name": "router",
+      "type": "registry:component",
+      "title": "Router",
+      "description": "A Wi-Fi router whose signal bars follow your cursor."
+    },
+    {
+      "name": "termi",
+      "type": "registry:component",
+      "title": "Termi",
+      "description": "A tiny terminal that types out your lines, one character at a time."
+    },
+    {
+      "name": "frog",
+      "type": "registry:component",
+      "title": "Frog",
+      "description": "A frog that snaps its tongue at your cursor."
+    },
+    {
+      "name": "penguin",
+      "type": "registry:component",
+      "title": "Penguin",
+      "description": "A penguin that belly-slides along your element."
+    },
+    {
+      "name": "rocket",
+      "type": "registry:component",
+      "title": "Rocket",
+      "description": "Sits on your Deploy button. Click it: countdown, lift-off, landing."
+    },
+    {
+      "name": "ball",
+      "type": "registry:component",
+      "title": "Ball",
+      "description": "A beach ball you can throw around your page."
+    },
+    {
+      "name": "duck",
+      "type": "registry:component",
+      "title": "Duck",
+      "description": "A rubber duck you can throw. It squeaks when it lands."
+    },
+    {
+      "name": "dice",
+      "type": "registry:component",
+      "title": "Dice",
+      "description": "Throw it and it lands on a random face."
+    },
+    {
+      "name": "pebble",
+      "type": "registry:component",
+      "title": "Pebble",
+      "description": "A heavy rock that lands with a thud every pal hears."
+    },
+    {
+      "name": "cube",
+      "type": "registry:component",
+      "title": "Cube",
+      "description": "A jelly cube that bounces high and wobbles."
+    },
+    {
+      "name": "can",
+      "type": "registry:component",
+      "title": "Can",
+      "description": "A soda can that rolls off the edge of everything."
+    },
+    {
+      "name": "ducks",
+      "type": "registry:component",
+      "title": "Ducks",
+      "description": "A mother duck and her ducklings."
+    },
+    {
+      "name": "ants",
+      "type": "registry:component",
+      "title": "Ants",
+      "description": "A marching line of ants, some carrying crumbs."
+    },
+    {
+      "name": "fish",
+      "type": "registry:component",
+      "title": "Fish",
+      "description": "A school of fish that swims inside any box and flees your cursor."
+    },
+    {
+      "name": "sparrows",
+      "type": "registry:component",
+      "title": "Sparrows",
+      "description": "Birds on a wire that scatter when you get close."
+    },
+    {
+      "name": "choir",
+      "type": "registry:component",
+      "title": "Choir",
+      "description": "A choir who sway and sing in perfect time from a shared score."
+    },
+    {
+      "name": "fireflies",
+      "type": "registry:component",
+      "title": "Fireflies",
+      "description": "Soft blinking lights drifting around an element."
+    },
+    {
+      "name": "sheep",
+      "type": "registry:component",
+      "title": "Sheep",
+      "description": "Sheep trot along and jump the fence one at a time, forever."
+    },
+    {
+      "name": "bees",
+      "type": "registry:component",
+      "title": "Bees",
+      "description": "Worker bees buzzing round their hive."
+    },
+    {
+      "name": "bulb",
+      "type": "registry:component",
+      "title": "Bulb",
+      "description": "A pull-chain light switch for dark mode."
+    },
+    {
+      "name": "pix",
+      "type": "registry:component",
+      "title": "Pix",
+      "description": "A tiny hero that lets visitors play your page as a platformer."
+    },
+    {
+      "name": "weather",
+      "type": "registry:component",
+      "title": "Weather",
+      "description": "Snow that settles on your letters, plus rain, leaves and petals."
+    },
+    {
+      "name": "pidge",
+      "type": "registry:component",
+      "title": "Pidge",
+      "description": "Toast notifications, delivered by pigeon."
+    },
+    {
+      "name": "plane",
+      "type": "registry:component",
+      "title": "Plane",
+      "description": "A plane that tows your announcement banner across the page."
+    },
+    {
+      "name": "fetch",
+      "type": "registry:component",
+      "title": "Fetch",
+      "description": "A dog that runs off on every fetch() and brings back the response."
+    },
+    {
+      "name": "scout",
+      "type": "registry:component",
+      "title": "Scout",
+      "description": "Onboarding tours, guided by a tiny explorer."
+    },
+    {
+      "name": "drone",
+      "type": "registry:component",
+      "title": "Drone",
+      "description": "Flies the product picture into your cart when someone adds to cart."
+    },
+    {
+      "name": "crumb",
+      "type": "registry:component",
+      "title": "Crumb",
+      "description": "A mouse that eats your cookie banner when someone accepts or rejects."
+    },
+    {
+      "name": "polly",
+      "type": "registry:component",
+      "title": "Polly",
+      "description": "Reads your page aloud, hopping along each word as it is spoken."
+    },
+    {
+      "name": "gist",
+      "type": "registry:component",
+      "title": "Gist",
+      "description": "An owl that sums up your article in a few key points."
+    },
+    {
+      "name": "tabby",
+      "type": "registry:component",
+      "title": "Tabby",
+      "description": "A cat that lives in your browser tab’s icon and naps while you’re away."
+    },
+    {
+      "name": "sprout",
+      "type": "registry:component",
+      "title": "Sprout",
+      "description": "A focus-timer plant that pops out into its own always-on-top window."
+    },
+    {
+      "name": "nomad",
+      "type": "registry:component",
+      "title": "Nomad",
+      "description": "A little traveller who walks between your browser windows."
+    },
+    {
+      "name": "hatch",
+      "type": "registry:component",
+      "title": "Hatch",
+      "description": "Every visitor hatches their own one-of-a-kind pet."
+    },
+    {
+      "name": "avatar",
+      "type": "registry:component",
+      "title": "Avatar",
+      "description": "A unique animated pixel avatar for any name."
+    },
+    {
+      "name": "gem",
+      "type": "registry:component",
+      "title": "Gem",
+      "description": "A treasure hunt across your whole site."
+    },
+    {
+      "name": "stickers",
+      "type": "registry:component",
+      "title": "Stickers",
+      "description": "A sheet of stickers visitors peel off and stick anywhere on your page."
+    },
+    {
+      "name": "buff",
+      "type": "registry:component",
+      "title": "Buff",
+      "description": "A password-strength meter that lifts heavier as the password gets stronger."
+    },
+    {
+      "name": "meh",
+      "type": "registry:component",
+      "title": "Meh",
+      "description": "A face that rides your rating slider, from furious to delighted."
+    },
+    {
+      "name": "squish",
+      "type": "registry:component",
+      "title": "Squish",
+      "description": "A marshmallow that gets squashed as the text nears its limit."
+    },
+    {
+      "name": "gulp",
+      "type": "registry:component",
+      "title": "Gulp",
+      "description": "A pelican that gulps down files dropped on your drop zone."
+    },
+    {
+      "name": "plug",
+      "type": "registry:component",
+      "title": "Plug",
+      "description": "Shows up when the connection drops, plugs back in when it returns."
+    },
+    {
+      "name": "alien",
+      "type": "registry:component",
+      "title": "Alien",
+      "description": "A tiny visitor with three eyes and one antenna. Has questions about your CSS."
+    },
+    {
+      "name": "avocado",
+      "type": "registry:component",
+      "title": "Avocado",
+      "description": "Half an avocado, proudly showing off its pit. Ripe for exactly one day."
+    },
+    {
+      "name": "battery",
+      "type": "registry:component",
+      "title": "Battery",
+      "description": "A battery that is always charging and always at one percent. Brave."
+    },
+    {
+      "name": "astronaut",
+      "type": "registry:component",
+      "title": "Astronaut",
+      "description": "A tiny astronaut floating in place. Eyes glow behind the visor."
+    },
+    {
+      "name": "bolt",
+      "type": "registry:component",
+      "title": "Bolt",
+      "description": "A chunky robot whose face is a little screen. Its eyes glow."
+    },
+    {
+      "name": "brain",
+      "type": "registry:component",
+      "title": "Brain",
+      "description": "A very big brain, thinking very hard. Sparks race along its folds."
+    },
+    {
+      "name": "crt",
+      "type": "registry:component",
+      "title": "Crt",
+      "description": "A beige monitor from the old internet. Its face glows on the screen."
+    },
+    {
+      "name": "elephant",
+      "type": "registry:component",
+      "title": "Elephant",
+      "description": "A baby elephant with big ears and a trunk that never sits still."
+    },
+    {
+      "name": "flick",
+      "type": "registry:component",
+      "title": "Flick",
+      "description": "A little flame with big feelings. Never, ever stands still."
+    },
+    {
+      "name": "fluff",
+      "type": "registry:component",
+      "title": "Fluff",
+      "description": "A sheep made almost entirely of cloud. Trots in place, very proudly."
+    },
+    {
+      "name": "gloop",
+      "type": "registry:component",
+      "title": "Gloop",
+      "description": "A slow, happy blob that drips a little. Mostly harmless."
+    },
+    {
+      "name": "gpu",
+      "type": "registry:component",
+      "title": "Gpu",
+      "description": "A graphics card whose two fans are its eyes. RGB strip included, obviously."
+    },
+    {
+      "name": "hops",
+      "type": "registry:component",
+      "title": "Hops",
+      "description": "Long ears, short attention span. One ear never quite stays up."
+    },
+    {
+      "name": "inky",
+      "type": "registry:component",
+      "title": "Inky",
+      "description": "A small squid with five wiggly arms and one very big question."
+    },
+    {
+      "name": "keycap",
+      "type": "registry:component",
+      "title": "Keycap",
+      "description": "A chunky mechanical keycap. Thocky. Click it for a satisfying press."
+    },
+    {
+      "name": "llama",
+      "type": "registry:component",
+      "title": "Llama",
+      "description": "A fluffy llama with a long neck and a calm, knowing look."
+    },
+    {
+      "name": "mumu",
+      "type": "registry:component",
+      "title": "Mumu",
+      "description": "A round little bear who would like a snack, please. Ears wiggle."
+    },
+    {
+      "name": "server",
+      "type": "registry:component",
+      "title": "Server",
+      "description": "A server rack keeping your site alive. Its drive lights never stop."
+    },
+    {
+      "name": "spud",
+      "type": "registry:component",
+      "title": "Spud",
+      "description": "A lumpy potato with a tiny sprout and a lot of potential."
+    },
+    {
+      "name": "tofu",
+      "type": "registry:component",
+      "title": "Tofu",
+      "description": "A block of tofu on two stubby legs, marching on the spot. Firm but fair."
+    },
+    {
+      "name": "unicorn",
+      "type": "registry:component",
+      "title": "Unicorn",
+      "description": "The startup kind. A golden horn, a rainbow mane, a billion-dollar smile."
+    },
+    {
+      "name": "whale",
+      "type": "registry:component",
+      "title": "Whale",
+      "description": "A friendly whale who surfaces now and then for a little spout."
+    },
+    {
+      "name": "boba",
+      "type": "registry:component",
+      "title": "Boba",
+      "description": "A cup of milk tea with a straw and a lot of pearls. Chewy personality."
+    },
+    {
+      "name": "cactus",
+      "type": "registry:component",
+      "title": "Cactus",
+      "description": "A potted cactus who blooms when it is in a good mood. Do not hug."
+    },
+    {
+      "name": "candle",
+      "type": "registry:component",
+      "title": "Candle",
+      "description": "A little candle with a flame that never sits still."
+    },
+    {
+      "name": "cherries",
+      "type": "registry:component",
+      "title": "Cherries",
+      "description": "Two cherries on one stem. Inseparable. Four eyes, one opinion."
+    },
+    {
+      "name": "cloud",
+      "type": "registry:component",
+      "title": "Cloud",
+      "description": "A little cloud with a light, cheerful drizzle."
+    },
+    {
+      "name": "coffee",
+      "type": "registry:component",
+      "title": "Coffee",
+      "description": "A mug of coffee, steaming gently, quietly judging your sleep schedule."
+    },
+    {
+      "name": "cookie",
+      "type": "registry:component",
+      "title": "Cookie",
+      "description": "A chocolate chip cookie with one bite missing. It knows who did it."
+    },
+    {
+      "name": "donut",
+      "type": "registry:component",
+      "title": "Donut",
+      "description": "A strawberry donut with sprinkles. Has a hole in its life and is fine with it."
+    },
+    {
+      "name": "dragon",
+      "type": "registry:component",
+      "title": "Dragon",
+      "description": "A pocket dragon. Flaps its little wings. Breathes a little fire now and then."
+    },
+    {
+      "name": "egg",
+      "type": "registry:component",
+      "title": "Egg",
+      "description": "An egg with a crack and a lot of questions."
+    },
+    {
+      "name": "floppy",
+      "type": "registry:component",
+      "title": "Floppy",
+      "description": "A floppy disk who remembers when 1.44 MB was a lot. Also, the save icon."
+    },
+    {
+      "name": "heart",
+      "type": "registry:component",
+      "title": "Heart",
+      "description": "A like button with feelings. Beats steadily, blushes easily."
+    },
+    {
+      "name": "inbox",
+      "type": "registry:component",
+      "title": "Inbox",
+      "description": "An envelope with a notification badge it cannot stop checking."
+    },
+    {
+      "name": "loaf",
+      "type": "registry:component",
+      "title": "Loaf",
+      "description": "A ginger cat in its most efficient shape. Ears twitch when you are not looking."
+    },
+    {
+      "name": "mochi",
+      "type": "registry:component",
+      "title": "Mochi",
+      "description": "A soft pink rice cake. Squishy, blushy, easily delighted."
+    },
+    {
+      "name": "modem",
+      "type": "registry:component",
+      "title": "Modem",
+      "description": "A dial-up modem. Its lights blink in a pattern only it understands."
+    },
+    {
+      "name": "onigiri",
+      "type": "registry:component",
+      "title": "Onigiri",
+      "description": "A rice ball in a seaweed jacket. Calm, round-ish, triangular."
+    },
+    {
+      "name": "planet",
+      "type": "registry:component",
+      "title": "Planet",
+      "description": "A small ringed planet. Spins slowly, shines a little, thinks big."
+    },
+    {
+      "name": "prompty",
+      "type": "registry:component",
+      "title": "Prompty",
+      "description": "A chat bubble who is always just about to reply. Thinking… thinking…"
+    },
+    {
+      "name": "pudding",
+      "type": "registry:component",
+      "title": "Pudding",
+      "description": "A caramel pudding on a plate. Cannot stop jiggling."
+    },
+    {
+      "name": "robo",
+      "type": "registry:component",
+      "title": "Robo",
+      "description": "A tiny robot head. The antenna light means it is thinking. It is always thinking."
+    },
+    {
+      "name": "star",
+      "type": "registry:component",
+      "title": "Star",
+      "description": "A little star who twinkles on purpose. Main-character energy."
+    },
+    {
+      "name": "sushi",
+      "type": "registry:component",
+      "title": "Sushi",
+      "description": "A piece of salmon nigiri wearing its fish like a very good blanket."
+    },
+    {
+      "name": "toast",
+      "type": "registry:component",
+      "title": "Toast",
+      "description": "A slice of toast with a pat of butter slowly giving up."
+    },
+    {
+      "name": "token",
+      "type": "registry:component",
+      "title": "Token",
+      "description": "A little gold token that spins. Every model wants it. Context is everything."
+    },
+    {
+      "name": "ufo",
+      "type": "registry:component",
+      "title": "Ufo",
+      "description": "A very small visitor. Came in peace, stayed for the cursor."
+    },
+    {
+      "name": "wizard",
+      "type": "registry:component",
+      "title": "Wizard",
+      "description": "A very small wizard whose hat does most of the work. Sparkles on request."
+    },
+    {
+      "name": "crowd",
+      "type": "registry:component",
+      "title": "Crowd",
+      "description": "Hundreds of tiny agents on one canvas: they wander, swarm your cursor, or spell a word."
+    },
+    {
+      "name": "pixel-type",
+      "type": "registry:component",
+      "title": "PixelType",
+      "description": "Any font as chunky extruded pixel blocks that pals can walk on."
+    }
+  ]
+}

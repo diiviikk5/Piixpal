@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "brain",
+  "type": "registry:component",
+  "title": "Brain",
+  "description": "A very big brain, thinking very hard. Sparks race along its folds.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/brain.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/brain.tsx",
+      "content": "\"use client\";\n/* Brain, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Brain(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"brain\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"brain\", ...piixAttrs(props) });\n}\n\nexport default Brain;\n"
+    }
+  ]
+}

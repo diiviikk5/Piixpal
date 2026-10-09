@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "bulb",
+  "type": "registry:component",
+  "title": "Bulb",
+  "description": "A pull-chain light switch for dark mode.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/bulb.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/bulb.tsx",
+      "content": "\"use client\";\n/* Bulb, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Bulb(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"bulb\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"bulb\", ...piixAttrs(props) });\n}\n\nexport default Bulb;\n"
+    }
+  ]
+}

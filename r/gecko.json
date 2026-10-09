@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "gecko",
+  "type": "registry:component",
+  "title": "Gecko",
+  "description": "A gecko that climbs up and around the sides of your cards.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/gecko.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/gecko.tsx",
+      "content": "\"use client\";\n/* Gecko, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Gecko(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"gecko\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"gecko\", ...piixAttrs(props) });\n}\n\nexport default Gecko;\n"
+    }
+  ]
+}

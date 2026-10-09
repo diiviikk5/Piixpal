@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "squish",
+  "type": "registry:component",
+  "title": "Squish",
+  "description": "A marshmallow that gets squashed as the text nears its limit.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/squish.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/squish.tsx",
+      "content": "\"use client\";\n/* Squish, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Squish(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"squish\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"squish\", ...piixAttrs(props) });\n}\n\nexport default Squish;\n"
+    }
+  ]
+}

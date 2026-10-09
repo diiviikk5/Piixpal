@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "balloon",
+  "type": "registry:component",
+  "title": "Balloon",
+  "description": "A balloon with a face, tied to your element, bobbing in the breeze.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/balloon.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/balloon.tsx",
+      "content": "\"use client\";\n/* Balloon, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Balloon(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"balloon\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"balloon\", ...piixAttrs(props) });\n}\n\nexport default Balloon;\n"
+    }
+  ]
+}

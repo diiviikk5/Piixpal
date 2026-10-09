@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "bumble",
+  "type": "registry:component",
+  "title": "Bumble",
+  "description": "A fuzzy bee that buzzes about your element.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/bumble.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/bumble.tsx",
+      "content": "\"use client\";\n/* Bumble, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Bumble(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"bumble\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"bumble\", ...piixAttrs(props) });\n}\n\nexport default Bumble;\n"
+    }
+  ]
+}

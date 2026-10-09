@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "can",
+  "type": "registry:component",
+  "title": "Can",
+  "description": "A soda can that rolls off the edge of everything.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/can.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/can.tsx",
+      "content": "\"use client\";\n/* Can, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Can(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"can\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"can\", ...piixAttrs(props) });\n}\n\nexport default Can;\n"
+    }
+  ]
+}

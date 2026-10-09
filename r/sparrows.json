@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "sparrows",
+  "type": "registry:component",
+  "title": "Sparrows",
+  "description": "Birds on a wire that scatter when you get close.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/sparrows.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/sparrows.tsx",
+      "content": "\"use client\";\n/* Sparrows, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Sparrows(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"sparrows\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"sparrows\", ...piixAttrs(props) });\n}\n\nexport default Sparrows;\n"
+    }
+  ]
+}

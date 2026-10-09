@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "toast",
+  "type": "registry:component",
+  "title": "Toast",
+  "description": "A slice of toast with a pat of butter slowly giving up.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/toast.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/toast.tsx",
+      "content": "\"use client\";\n/* Toast, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Toast(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"toast\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"toast\", ...piixAttrs(props) });\n}\n\nexport default Toast;\n"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "elephant",
+  "type": "registry:component",
+  "title": "Elephant",
+  "description": "A baby elephant with big ears and a trunk that never sits still.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/elephant.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/elephant.tsx",
+      "content": "\"use client\";\n/* Elephant, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Elephant(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"elephant\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"elephant\", ...piixAttrs(props) });\n}\n\nexport default Elephant;\n"
+    }
+  ]
+}

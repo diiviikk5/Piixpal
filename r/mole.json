@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "mole",
+  "type": "registry:component",
+  "title": "Mole",
+  "description": "Whack-a-mole: it pops out of your element, you bop it.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/mole.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/mole.tsx",
+      "content": "\"use client\";\n/* Mole, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Mole(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"mole\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"mole\", ...piixAttrs(props) });\n}\n\nexport default Mole;\n"
+    }
+  ]
+}

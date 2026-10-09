@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "sushi",
+  "type": "registry:component",
+  "title": "Sushi",
+  "description": "A piece of salmon nigiri wearing its fish like a very good blanket.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/sushi.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/sushi.tsx",
+      "content": "\"use client\";\n/* Sushi, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Sushi(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"sushi\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"sushi\", ...piixAttrs(props) });\n}\n\nexport default Sushi;\n"
+    }
+  ]
+}

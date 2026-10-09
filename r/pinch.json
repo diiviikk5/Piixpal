@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "pinch",
+  "type": "registry:component",
+  "title": "Pinch",
+  "description": "A crab that walks sideways along your text.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/pinch.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/pinch.tsx",
+      "content": "\"use client\";\n/* Pinch, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Pinch(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"pinch\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"pinch\", ...piixAttrs(props) });\n}\n\nexport default Pinch;\n"
+    }
+  ]
+}

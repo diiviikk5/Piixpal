@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "unicorn",
+  "type": "registry:component",
+  "title": "Unicorn",
+  "description": "The startup kind. A golden horn, a rainbow mane, a billion-dollar smile.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/unicorn.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/unicorn.tsx",
+      "content": "\"use client\";\n/* Unicorn, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Unicorn(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"unicorn\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"unicorn\", ...piixAttrs(props) });\n}\n\nexport default Unicorn;\n"
+    }
+  ]
+}

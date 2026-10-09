@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "flick",
+  "type": "registry:component",
+  "title": "Flick",
+  "description": "A little flame with big feelings. Never, ever stands still.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/flick.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/flick.tsx",
+      "content": "\"use client\";\n/* Flick, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Flick(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"flick\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"flick\", ...piixAttrs(props) });\n}\n\nexport default Flick;\n"
+    }
+  ]
+}

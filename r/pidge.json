@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "pidge",
+  "type": "registry:component",
+  "title": "Pidge",
+  "description": "Toast notifications, delivered by pigeon.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/pidge.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/pidge.tsx",
+      "content": "\"use client\";\n/* Pidge, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Pidge(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"pidge\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"pidge\", ...piixAttrs(props) });\n}\n\nexport default Pidge;\n"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "crowd",
+  "type": "registry:component",
+  "title": "Crowd",
+  "description": "Hundreds of tiny agents on one canvas: they wander, swarm your cursor, or spell a word.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/crowd.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/crowd.tsx",
+      "content": "\"use client\";\n/* Crowd, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Crowd(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"core\"); }, []);\n  return React.createElement(\"piix-crowd\", piixAttrs(props));\n}\n\nexport default Crowd;\n"
+    }
+  ]
+}

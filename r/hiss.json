@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "hiss",
+  "type": "registry:component",
+  "title": "Hiss",
+  "description": "A snake that slithers along your headings.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/hiss.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/hiss.tsx",
+      "content": "\"use client\";\n/* Hiss, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Hiss(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"hiss\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"hiss\", ...piixAttrs(props) });\n}\n\nexport default Hiss;\n"
+    }
+  ]
+}

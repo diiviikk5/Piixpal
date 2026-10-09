@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "robo",
+  "type": "registry:component",
+  "title": "Robo",
+  "description": "A tiny robot head. The antenna light means it is thinking. It is always thinking.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/robo.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/robo.tsx",
+      "content": "\"use client\";\n/* Robo, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Robo(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"robo\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"robo\", ...piixAttrs(props) });\n}\n\nexport default Robo;\n"
+    }
+  ]
+}

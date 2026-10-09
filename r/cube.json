@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "cube",
+  "type": "registry:component",
+  "title": "Cube",
+  "description": "A jelly cube that bounces high and wobbles.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/cube.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/cube.tsx",
+      "content": "\"use client\";\n/* Cube, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Cube(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"cube\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"cube\", ...piixAttrs(props) });\n}\n\nexport default Cube;\n"
+    }
+  ]
+}

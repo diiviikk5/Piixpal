@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "cherries",
+  "type": "registry:component",
+  "title": "Cherries",
+  "description": "Two cherries on one stem. Inseparable. Four eyes, one opinion.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/cherries.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/cherries.tsx",
+      "content": "\"use client\";\n/* Cherries, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Cherries(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"cherries\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"cherries\", ...piixAttrs(props) });\n}\n\nexport default Cherries;\n"
+    }
+  ]
+}

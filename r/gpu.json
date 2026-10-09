@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "gpu",
+  "type": "registry:component",
+  "title": "Gpu",
+  "description": "A graphics card whose two fans are its eyes. RGB strip included, obviously.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/gpu.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/gpu.tsx",
+      "content": "\"use client\";\n/* Gpu, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Gpu(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"gpu\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"gpu\", ...piixAttrs(props) });\n}\n\nexport default Gpu;\n"
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "moss",
+  "type": "registry:component",
+  "title": "Moss",
+  "description": "A mushroom that sits on your text reading its book, ignoring you (mostly).",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/moss.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/moss.tsx",
+      "content": "\"use client\";\n/* Moss, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Moss(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"moss\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"moss\", ...piixAttrs(props) });\n}\n\nexport default Moss;\n"
+    }
+  ]
+}

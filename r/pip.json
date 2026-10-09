@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "pip",
+  "type": "registry:component",
+  "title": "Pip",
+  "description": "A round bird that hops between your buttons and perches on them.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/pip.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/pip.tsx",
+      "content": "\"use client\";\n/* Pip, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Pip(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"pip\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"pip\", ...piixAttrs(props) });\n}\n\nexport default Pip;\n"
+    }
+  ]
+}

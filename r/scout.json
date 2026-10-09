@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "scout",
+  "type": "registry:component",
+  "title": "Scout",
+  "description": "Onboarding tours, guided by a tiny explorer.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/scout.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/scout.tsx",
+      "content": "\"use client\";\n/* Scout, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Scout(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"scout\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"scout\", ...piixAttrs(props) });\n}\n\nexport default Scout;\n"
+    }
+  ]
+}

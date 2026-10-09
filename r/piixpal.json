@@ -1,0 +1,15 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "piixpal",
+  "type": "registry:lib",
+  "title": "Piixpal",
+  "description": "The shared loader for Piixpal components: loads each one from the CDN, once, in the browser.",
+  "files": [
+    {
+      "path": "registry/lib/piixpal.ts",
+      "type": "registry:lib",
+      "target": "lib/piixpal.ts",
+      "content": "import type * as React from \"react\";\n\n/* Piixpal loader, from the Piixpal shadcn registry (https://piixpal.vercel.app).\n * Loads a component's file from the CDN once, in the browser only. */\nconst CDN = \"https://cdn.jsdelivr.net/npm/piixpal@0.4.0/\";\nconst loading = new Map<string, Promise<void>>();\n\n/** load one component (\"bitbug\"), the engine alone (\"core\"), or everything (\"all\") */\nexport function loadPiixpal(name: string = \"all\"): Promise<void> {\n  if (typeof window === \"undefined\") return Promise.resolve();\n  const src = name === \"all\" ? CDN + \"piixpal.min.js\" : name === \"core\" ? CDN + \"dist/core.min.js\" : CDN + \"dist/c/\" + name + \".min.js\";\n  if (!loading.has(src)) {\n    loading.set(src, new Promise((resolve, reject) => {\n      const s = document.createElement(\"script\");\n      s.src = src; s.async = true;\n      s.onload = () => resolve();\n      s.onerror = () => { loading.delete(src); reject(new Error(\"Piixpal could not load \" + src)); };\n      document.head.appendChild(s);\n    }));\n  }\n  return loading.get(src)!;\n}\n\nexport type PiixProps = Omit<React.HTMLAttributes<HTMLElement>, \"color\"> & Record<string, string | number | boolean | undefined>;\n\n/** React props to custom-element attributes: true becomes \"\", false and undefined are dropped */\nexport function piixAttrs(props: PiixProps): Record<string, string> {\n  const out: Record<string, string> = {};\n  for (const [k, v] of Object.entries(props)) {\n    if (v === false || v == null) continue;\n    out[k === \"className\" ? \"class\" : k] = v === true ? \"\" : String(v);\n  }\n  return out;\n}\n"
+    }
+  ]
+}

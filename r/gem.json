@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "gem",
+  "type": "registry:component",
+  "title": "Gem",
+  "description": "A treasure hunt across your whole site.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/gem.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/gem.tsx",
+      "content": "\"use client\";\n/* Gem, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Gem(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"gem\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"gem\", ...piixAttrs(props) });\n}\n\nexport default Gem;\n"
+    }
+  ]
+}

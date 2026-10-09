@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "termi",
+  "type": "registry:component",
+  "title": "Termi",
+  "description": "A tiny terminal that types out your lines, one character at a time.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/termi.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/termi.tsx",
+      "content": "\"use client\";\n/* Termi, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Termi(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"termi\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"termi\", ...piixAttrs(props) });\n}\n\nexport default Termi;\n"
+    }
+  ]
+}

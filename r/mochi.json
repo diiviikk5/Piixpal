@@ -1,0 +1,18 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry-item.json",
+  "name": "mochi",
+  "type": "registry:component",
+  "title": "Mochi",
+  "description": "A soft pink rice cake. Squishy, blushy, easily delighted.",
+  "registryDependencies": [
+    "https://piixpal.vercel.app/r/piixpal.json"
+  ],
+  "files": [
+    {
+      "path": "registry/piixpal/mochi.tsx",
+      "type": "registry:component",
+      "target": "components/piixpal/mochi.tsx",
+      "content": "\"use client\";\n/* Mochi, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Mochi(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"mochi\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"mochi\", ...piixAttrs(props) });\n}\n\nexport default Mochi;\n"
+    }
+  ]
+}
