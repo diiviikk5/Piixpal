@@ -281,12 +281,14 @@ const spriteCard = s => `    <article class="scard${s.big ? ' big' : ''}" id="s-
       <div class="s-body">
         <h3>${title(s.name)} <small>${s.big ? 'big · 3d' : s.name}</small></h3>
         <p>${esc(s.tag)}</p>
-        <div class="s-actions"><button type="button" class="dark" data-copy="${esc(`<piix-sprite name="${s.name}"></piix-sprite>`)}">Copy</button><button type="button" data-pick="${s.name}">Customise</button></div>
+        <div class="s-actions"><button type="button" class="dark" data-pick="${s.name}">Use</button></div>
       </div>
     </article>`;
 const CDN_ALL = 'https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js';
 const CDN_ONE = n => `https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/${n}.min.js`;
 /* every way to add one component, as tabs: like a UI library's install box */
+const pascal = n => n.split('-').map(w => w[0].toUpperCase() + w.slice(1)).join('');
+const tagComp = { weather: 'piix-weather', stickers: 'piix-stickers', avatar: 'piix-avatar' };
 const installTabs = (name, kind, markup, where = 'h1', query = '') => {
   if (kind === 'element') {
     const tabs = [
@@ -294,7 +296,8 @@ const installTabs = (name, kind, markup, where = 'h1', query = '') => {
       ['Single file', `<!-- just ${name} (the shared engine loads itself, once) -->\n<script src="${CDN_ONE(name)}"></script>\n\n${markup}`],
       ['No markup', `<script src="${CDN_ONE(name)}"\n  data-pals="${name}@${where}${query ? '?' + query : ''}"></script>`],
       ['JS', `await import("${CDN_ONE(name)}");\nPiixpal.add("${name}", "${where}"${query ? ', ' + JSON.stringify(Object.fromEntries(new URLSearchParams(query))).replace(/"(\w+)":/g, '$1: ') : ''});`],
-      ['React', `// load the script once (wrappers/load.js), then it's a plain tag\n${markup}`],
+      ['React', `// npm install piixpal\nimport { ${pascal(tagComp[name] || name)} } from "piixpal/react";\n\n<${pascal(tagComp[name] || name)} />`],
+      ['shadcn', `npx shadcn@latest add https://piixpal.dvkk.dev/r/${name}.json\n\nimport { ${pascal(name)} } from "@/components/piixpal/${name}";\n\n<${pascal(name)} />`],
       ['Vue', `// main.js: app.use(Piixpal) from "piixpal/vue"\n\n${markup}`],
       ['Svelte', `<script>import Piixpal from "piixpal/svelte";</script>\n<Piixpal />\n\n${markup}`]
     ];
@@ -312,7 +315,8 @@ const installTabs = (name, kind, markup, where = 'h1', query = '') => {
       ? `<script src="${CDN_ONE(name)}"\n  data-pals="${name}@${where}"></script>`
       : `<!-- attaches itself to the first ${where}: nothing else to add -->\n<script src="${CDN_ONE(name)}"\n  data-pals="${name}@${where}"></script>`],
     ['JS', `await import("${CDN_ONE(name)}");\nPiixpal.add("${name}", "${where}");`],
-    ['React', `import { ${Comp} } from "piixpal/react"; // or copy wrappers/react.jsx\n\n<h1>\n  Hello\n  <${Comp} ${attr}="${name}" />\n</h1>`],
+    ['React', `// npm install piixpal\nimport { ${Comp} } from "piixpal/react";\n\n<h1>\n  Hello\n  <${Comp} ${attr}="${name}" />\n</h1>`],
+    ['shadcn', `npx shadcn@latest add https://piixpal.dvkk.dev/r/${name}.json\n\nimport { ${pascal(name)} } from "@/components/piixpal/${name}";\n\n<h1>\n  Hello\n  <${pascal(name)} />\n</h1>`],
     ['Vue', `// main.js: app.use(Piixpal) from "piixpal/vue"\n\n<h1>\n  Hello\n  <${tag} ${attr}="${name}" />\n</h1>`],
     ['Svelte', `<script>import Piixpal from "piixpal/svelte";</script>\n<Piixpal />\n\n<h1>Hello <${tag} ${attr}="${name}"></${tag}></h1>`]
   ];
@@ -336,7 +340,7 @@ const spritesBody = `<header class="doc-head">
 
 <section class="doc-sec" id="customise" aria-labelledby="customise-h">
   <h2 id="customise-h">Customise</h2>
-  <p>Pick a sprite from the grid below or the list, then tune it. The tag updates as you go.</p>
+  <p>Press <b>Use</b> on any sprite below, tune it, and copy the code for your setup.</p>
   <div class="custom" id="custom">
     <div class="c-stage" id="c-stage" data-bg="paper">
       <span class="c-name" id="c-name">gloop</span>
@@ -382,6 +386,7 @@ const spritesBody = `<header class="doc-head">
           </div>
         </div>
       </div>
+      <div class="c-tabs" id="c-tabs" role="tablist"></div>
       <pre class="c-code" id="c-code"></pre>
     </div>
   </div>
@@ -397,7 +402,7 @@ ${bigs.map(spriteCard).join('\n')}
 
 <section class="doc-sec" id="all" aria-labelledby="all-h">
   <h2 id="all-h">Sprites</h2>
-  <p>Small inline characters. Click one to see it hop. Copy grabs the tag; Customise loads it into the panel above.</p>
+  <p>Small inline characters. Click one to see it hop; press Use to tune it and get the code.</p>
   <div class="sgrid">
 ${smalls.map(spriteCard).join('\n')}
   </div>
