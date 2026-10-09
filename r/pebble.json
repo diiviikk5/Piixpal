@@ -5,14 +5,14 @@
   "title": "Pebble",
   "description": "A heavy rock that lands with a thud every pal hears.",
   "registryDependencies": [
-    "https://piixpal.vercel.app/r/piixpal.json"
+    "https://piixpal.dvkk.dev/r/piixpal.json"
   ],
   "files": [
     {
       "path": "registry/piixpal/pebble.tsx",
       "type": "registry:component",
       "target": "components/piixpal/pebble.tsx",
-      "content": "\"use client\";\n/* Pebble, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Pebble(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"pebble\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"pebble\", ...piixAttrs(props) });\n}\n\nexport default Pebble;\n"
+      "content": "\"use client\";\n/* Pebble, from the Piixpal shadcn registry. Options: https://piixpal.dvkk.dev/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Pebble(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"pebble\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"pebble\", ...piixAttrs(props) });\n}\n\nexport default Pebble;\n"
     }
   ]
 }

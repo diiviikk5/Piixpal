@@ -5,14 +5,14 @@
   "title": "Boba",
   "description": "A cup of milk tea with a straw and a lot of pearls. Chewy personality.",
   "registryDependencies": [
-    "https://piixpal.vercel.app/r/piixpal.json"
+    "https://piixpal.dvkk.dev/r/piixpal.json"
   ],
   "files": [
     {
       "path": "registry/piixpal/boba.tsx",
       "type": "registry:component",
       "target": "components/piixpal/boba.tsx",
-      "content": "\"use client\";\n/* Boba, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Boba(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"boba\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"boba\", ...piixAttrs(props) });\n}\n\nexport default Boba;\n"
+      "content": "\"use client\";\n/* Boba, from the Piixpal shadcn registry. Options: https://piixpal.dvkk.dev/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Boba(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"boba\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"boba\", ...piixAttrs(props) });\n}\n\nexport default Boba;\n"
     }
   ]
 }

@@ -5,14 +5,14 @@
   "title": "Stickers",
   "description": "A sheet of stickers visitors peel off and stick anywhere on your page.",
   "registryDependencies": [
-    "https://piixpal.vercel.app/r/piixpal.json"
+    "https://piixpal.dvkk.dev/r/piixpal.json"
   ],
   "files": [
     {
       "path": "registry/piixpal/stickers.tsx",
       "type": "registry:component",
       "target": "components/piixpal/stickers.tsx",
-      "content": "\"use client\";\n/* Stickers, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Stickers(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"stickers\"); }, []);\n  return React.createElement(\"piix-stickers\", piixAttrs(props));\n}\n\nexport default Stickers;\n"
+      "content": "\"use client\";\n/* Stickers, from the Piixpal shadcn registry. Options: https://piixpal.dvkk.dev/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Stickers(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"stickers\"); }, []);\n  return React.createElement(\"piix-stickers\", piixAttrs(props));\n}\n\nexport default Stickers;\n"
     }
   ]
 }

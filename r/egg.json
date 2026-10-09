@@ -5,14 +5,14 @@
   "title": "Egg",
   "description": "An egg with a crack and a lot of questions.",
   "registryDependencies": [
-    "https://piixpal.vercel.app/r/piixpal.json"
+    "https://piixpal.dvkk.dev/r/piixpal.json"
   ],
   "files": [
     {
       "path": "registry/piixpal/egg.tsx",
       "type": "registry:component",
       "target": "components/piixpal/egg.tsx",
-      "content": "\"use client\";\n/* Egg, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Egg(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"egg\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"egg\", ...piixAttrs(props) });\n}\n\nexport default Egg;\n"
+      "content": "\"use client\";\n/* Egg, from the Piixpal shadcn registry. Options: https://piixpal.dvkk.dev/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Egg(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"egg\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"egg\", ...piixAttrs(props) });\n}\n\nexport default Egg;\n"
     }
   ]
 }

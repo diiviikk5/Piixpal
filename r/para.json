@@ -5,14 +5,14 @@
   "title": "Para",
   "description": "A parachutist who drops onto your section when it scrolls into view.",
   "registryDependencies": [
-    "https://piixpal.vercel.app/r/piixpal.json"
+    "https://piixpal.dvkk.dev/r/piixpal.json"
   ],
   "files": [
     {
       "path": "registry/piixpal/para.tsx",
       "type": "registry:component",
       "target": "components/piixpal/para.tsx",
-      "content": "\"use client\";\n/* Para, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Para(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"para\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"para\", ...piixAttrs(props) });\n}\n\nexport default Para;\n"
+      "content": "\"use client\";\n/* Para, from the Piixpal shadcn registry. Options: https://piixpal.dvkk.dev/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Para(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"para\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"para\", ...piixAttrs(props) });\n}\n\nexport default Para;\n"
     }
   ]
 }

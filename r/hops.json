@@ -5,14 +5,14 @@
   "title": "Hops",
   "description": "Long ears, short attention span. One ear never quite stays up.",
   "registryDependencies": [
-    "https://piixpal.vercel.app/r/piixpal.json"
+    "https://piixpal.dvkk.dev/r/piixpal.json"
   ],
   "files": [
     {
       "path": "registry/piixpal/hops.tsx",
       "type": "registry:component",
       "target": "components/piixpal/hops.tsx",
-      "content": "\"use client\";\n/* Hops, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Hops(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"hops\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"hops\", ...piixAttrs(props) });\n}\n\nexport default Hops;\n"
+      "content": "\"use client\";\n/* Hops, from the Piixpal shadcn registry. Options: https://piixpal.dvkk.dev/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Hops(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"hops\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"hops\", ...piixAttrs(props) });\n}\n\nexport default Hops;\n"
     }
   ]
 }

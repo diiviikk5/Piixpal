@@ -5,14 +5,14 @@
   "title": "Fetch",
   "description": "A dog that runs off on every fetch() and brings back the response.",
   "registryDependencies": [
-    "https://piixpal.vercel.app/r/piixpal.json"
+    "https://piixpal.dvkk.dev/r/piixpal.json"
   ],
   "files": [
     {
       "path": "registry/piixpal/fetch.tsx",
       "type": "registry:component",
       "target": "components/piixpal/fetch.tsx",
-      "content": "\"use client\";\n/* Fetch, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Fetch(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"fetch\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"fetch\", ...piixAttrs(props) });\n}\n\nexport default Fetch;\n"
+      "content": "\"use client\";\n/* Fetch, from the Piixpal shadcn registry. Options: https://piixpal.dvkk.dev/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Fetch(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"fetch\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"fetch\", ...piixAttrs(props) });\n}\n\nexport default Fetch;\n"
     }
   ]
 }

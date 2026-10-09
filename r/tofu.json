@@ -5,14 +5,14 @@
   "title": "Tofu",
   "description": "A block of tofu on two stubby legs, marching on the spot. Firm but fair.",
   "registryDependencies": [
-    "https://piixpal.vercel.app/r/piixpal.json"
+    "https://piixpal.dvkk.dev/r/piixpal.json"
   ],
   "files": [
     {
       "path": "registry/piixpal/tofu.tsx",
       "type": "registry:component",
       "target": "components/piixpal/tofu.tsx",
-      "content": "\"use client\";\n/* Tofu, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Tofu(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"tofu\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"tofu\", ...piixAttrs(props) });\n}\n\nexport default Tofu;\n"
+      "content": "\"use client\";\n/* Tofu, from the Piixpal shadcn registry. Options: https://piixpal.dvkk.dev/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Tofu(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"tofu\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"tofu\", ...piixAttrs(props) });\n}\n\nexport default Tofu;\n"
     }
   ]
 }

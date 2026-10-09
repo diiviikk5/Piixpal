@@ -5,14 +5,14 @@
   "title": "Fish",
   "description": "A school of fish that swims inside any box and flees your cursor.",
   "registryDependencies": [
-    "https://piixpal.vercel.app/r/piixpal.json"
+    "https://piixpal.dvkk.dev/r/piixpal.json"
   ],
   "files": [
     {
       "path": "registry/piixpal/fish.tsx",
       "type": "registry:component",
       "target": "components/piixpal/fish.tsx",
-      "content": "\"use client\";\n/* Fish, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Fish(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"fish\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"fish\", ...piixAttrs(props) });\n}\n\nexport default Fish;\n"
+      "content": "\"use client\";\n/* Fish, from the Piixpal shadcn registry. Options: https://piixpal.dvkk.dev/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Fish(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"fish\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"fish\", ...piixAttrs(props) });\n}\n\nexport default Fish;\n"
     }
   ]
 }

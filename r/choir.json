@@ -5,14 +5,14 @@
   "title": "Choir",
   "description": "A choir who sway and sing in perfect time from a shared score.",
   "registryDependencies": [
-    "https://piixpal.vercel.app/r/piixpal.json"
+    "https://piixpal.dvkk.dev/r/piixpal.json"
   ],
   "files": [
     {
       "path": "registry/piixpal/choir.tsx",
       "type": "registry:component",
       "target": "components/piixpal/choir.tsx",
-      "content": "\"use client\";\n/* Choir, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Choir(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"choir\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"choir\", ...piixAttrs(props) });\n}\n\nexport default Choir;\n"
+      "content": "\"use client\";\n/* Choir, from the Piixpal shadcn registry. Options: https://piixpal.dvkk.dev/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Choir(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"choir\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"choir\", ...piixAttrs(props) });\n}\n\nexport default Choir;\n"
     }
   ]
 }

@@ -5,14 +5,14 @@
   "title": "Snip",
   "description": "A highlighter that hops to whatever text you select.",
   "registryDependencies": [
-    "https://piixpal.vercel.app/r/piixpal.json"
+    "https://piixpal.dvkk.dev/r/piixpal.json"
   ],
   "files": [
     {
       "path": "registry/piixpal/snip.tsx",
       "type": "registry:component",
       "target": "components/piixpal/snip.tsx",
-      "content": "\"use client\";\n/* Snip, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Snip(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"snip\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"snip\", ...piixAttrs(props) });\n}\n\nexport default Snip;\n"
+      "content": "\"use client\";\n/* Snip, from the Piixpal shadcn registry. Options: https://piixpal.dvkk.dev/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Snip(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"snip\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"snip\", ...piixAttrs(props) });\n}\n\nexport default Snip;\n"
     }
   ]
 }

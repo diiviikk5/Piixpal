@@ -5,14 +5,14 @@
   "title": "Gulp",
   "description": "A pelican that gulps down files dropped on your drop zone.",
   "registryDependencies": [
-    "https://piixpal.vercel.app/r/piixpal.json"
+    "https://piixpal.dvkk.dev/r/piixpal.json"
   ],
   "files": [
     {
       "path": "registry/piixpal/gulp.tsx",
       "type": "registry:component",
       "target": "components/piixpal/gulp.tsx",
-      "content": "\"use client\";\n/* Gulp, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Gulp(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"gulp\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"gulp\", ...piixAttrs(props) });\n}\n\nexport default Gulp;\n"
+      "content": "\"use client\";\n/* Gulp, from the Piixpal shadcn registry. Options: https://piixpal.dvkk.dev/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Gulp(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"gulp\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"gulp\", ...piixAttrs(props) });\n}\n\nexport default Gulp;\n"
     }
   ]
 }

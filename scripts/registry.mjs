@@ -118,3 +118,27 @@ writeFileSync(join(out, 'registry.json'), JSON.stringify({
   items: [{ name: 'piixpal', type: 'registry:lib', title: 'Piixpal', description: base.description }, ...items.map(i => ({ name: i.name, type: 'registry:component', title: i.title, description: i.description }))]
 }, null, 2));
 console.log(`r/  ${items.length} components + the loader`);
+
+/* llms.txt: a plain list AI coding tools can read to use Piixpal correctly */
+const line = it => `- ${it.title}: ${it.description} Tag: <${it.tag}${it.attr ? ` ${it.attr[0]}="${it.attr[1]}"` : ''}>. shadcn: npx shadcn@latest add ${SITE}/r/${it.name}.json`;
+writeFileSync(join(root, 'llms.txt'), `# Piixpal
+
+> Pixel characters that live on your website: drop-in web components, zero dependencies, free and open source (MIT).
+
+## Install (pick one)
+- Script tag: <script src="https://cdn.jsdelivr.net/npm/piixpal@${pkg.version.split('.').slice(0, 2).join('.')}/piixpal.min.js"></script> then use the tags anywhere.
+- One component only: <script src="https://cdn.jsdelivr.net/npm/piixpal@${pkg.version.split('.').slice(0, 2).join('.')}/dist/c/NAME.min.js"></script>
+- npm: npm install piixpal; React: import { PiixPal } from "piixpal/react"; <PiixPal pal="bitbug" />. Vue: app.use(Piixpal) from "piixpal/vue". Anything else: import "piixpal" in browser code.
+- shadcn: npx shadcn@latest add ${SITE}/r/NAME.json, then import { Name } from "@/components/piixpal/NAME".
+- No markup: <script src="…/piixpal.min.js" data-pals="bitbug@h1, boing@footer"></script>
+
+## Rules
+- A pal lives on the element it is placed inside (or on="css selector"). It never blocks clicks.
+- box="selector" keeps any pal inside one element.
+- Pals are browser-only; in Next.js use the React wrappers or shadcn components (they are client components).
+- Docs and live demos: ${SITE}/components/
+
+## Components
+${items.map(line).join('\n')}
+`);
+console.log('llms.txt');

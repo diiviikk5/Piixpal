@@ -5,14 +5,14 @@
   "title": "Bitbug",
   "description": "A lime beetle that crawls along the real outline of your letters.",
   "registryDependencies": [
-    "https://piixpal.vercel.app/r/piixpal.json"
+    "https://piixpal.dvkk.dev/r/piixpal.json"
   ],
   "files": [
     {
       "path": "registry/piixpal/bitbug.tsx",
       "type": "registry:component",
       "target": "components/piixpal/bitbug.tsx",
-      "content": "\"use client\";\n/* Bitbug, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Bitbug(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"bitbug\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"bitbug\", ...piixAttrs(props) });\n}\n\nexport default Bitbug;\n"
+      "content": "\"use client\";\n/* Bitbug, from the Piixpal shadcn registry. Options: https://piixpal.dvkk.dev/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Bitbug(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"bitbug\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"bitbug\", ...piixAttrs(props) });\n}\n\nexport default Bitbug;\n"
     }
   ]
 }

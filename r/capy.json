@@ -5,14 +5,14 @@
   "title": "Capy",
   "description": "A capybara with a yuzu on its head, completely unbothered.",
   "registryDependencies": [
-    "https://piixpal.vercel.app/r/piixpal.json"
+    "https://piixpal.dvkk.dev/r/piixpal.json"
   ],
   "files": [
     {
       "path": "registry/piixpal/capy.tsx",
       "type": "registry:component",
       "target": "components/piixpal/capy.tsx",
-      "content": "\"use client\";\n/* Capy, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Capy(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"capy\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"capy\", ...piixAttrs(props) });\n}\n\nexport default Capy;\n"
+      "content": "\"use client\";\n/* Capy, from the Piixpal shadcn registry. Options: https://piixpal.dvkk.dev/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Capy(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"capy\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"capy\", ...piixAttrs(props) });\n}\n\nexport default Capy;\n"
     }
   ]
 }

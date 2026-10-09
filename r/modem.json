@@ -5,14 +5,14 @@
   "title": "Modem",
   "description": "A dial-up modem. Its lights blink in a pattern only it understands.",
   "registryDependencies": [
-    "https://piixpal.vercel.app/r/piixpal.json"
+    "https://piixpal.dvkk.dev/r/piixpal.json"
   ],
   "files": [
     {
       "path": "registry/piixpal/modem.tsx",
       "type": "registry:component",
       "target": "components/piixpal/modem.tsx",
-      "content": "\"use client\";\n/* Modem, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Modem(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"modem\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"modem\", ...piixAttrs(props) });\n}\n\nexport default Modem;\n"
+      "content": "\"use client\";\n/* Modem, from the Piixpal shadcn registry. Options: https://piixpal.dvkk.dev/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Modem(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"modem\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"modem\", ...piixAttrs(props) });\n}\n\nexport default Modem;\n"
     }
   ]
 }

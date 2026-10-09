@@ -5,14 +5,14 @@
   "title": "Hatch",
   "description": "Every visitor hatches their own one-of-a-kind pet.",
   "registryDependencies": [
-    "https://piixpal.vercel.app/r/piixpal.json"
+    "https://piixpal.dvkk.dev/r/piixpal.json"
   ],
   "files": [
     {
       "path": "registry/piixpal/hatch.tsx",
       "type": "registry:component",
       "target": "components/piixpal/hatch.tsx",
-      "content": "\"use client\";\n/* Hatch, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Hatch(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"hatch\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"hatch\", ...piixAttrs(props) });\n}\n\nexport default Hatch;\n"
+      "content": "\"use client\";\n/* Hatch, from the Piixpal shadcn registry. Options: https://piixpal.dvkk.dev/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Hatch(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"hatch\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"hatch\", ...piixAttrs(props) });\n}\n\nexport default Hatch;\n"
     }
   ]
 }

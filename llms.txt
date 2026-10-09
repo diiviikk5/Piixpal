@@ -1,0 +1,134 @@
+# Piixpal
+
+> Pixel characters that live on your website: drop-in web components, zero dependencies, free and open source (MIT).
+
+## Install (pick one)
+- Script tag: <script src="https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js"></script> then use the tags anywhere.
+- One component only: <script src="https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/NAME.min.js"></script>
+- npm: npm install piixpal; React: import { PiixPal } from "piixpal/react"; <PiixPal pal="bitbug" />. Vue: app.use(Piixpal) from "piixpal/vue". Anything else: import "piixpal" in browser code.
+- shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/NAME.json, then import { Name } from "@/components/piixpal/NAME".
+- No markup: <script src="…/piixpal.min.js" data-pals="bitbug@h1, boing@footer"></script>
+
+## Rules
+- A pal lives on the element it is placed inside (or on="css selector"). It never blocks clicks.
+- box="selector" keeps any pal inside one element.
+- Pals are browser-only; in Next.js use the React wrappers or shadcn components (they are client components).
+- Docs and live demos: https://piixpal.dvkk.dev/components/
+
+## Components
+- Bitbug: A lime beetle that crawls along the real outline of your letters. Tag: <piix-pal pal="bitbug">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/bitbug.json
+- Boing: A jelly drop that bounces on your footer and lands with a splat. Tag: <piix-pal pal="boing">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/boing.json
+- Moss: A mushroom that sits on your text reading its book, ignoring you (mostly). Tag: <piix-pal pal="moss">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/moss.json
+- Lurk: A shy creature that peeks over the edge of your cards. Tag: <piix-pal pal="lurk">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/lurk.json
+- Thread: A spider that dangles from your nav on a long thread. Tag: <piix-pal pal="thread">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/thread.json
+- Pip: A round bird that hops between your buttons and perches on them. Tag: <piix-pal pal="pip">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/pip.json
+- Bumble: A fuzzy bee that buzzes about your element. Tag: <piix-pal pal="bumble">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/bumble.json
+- Shel: A snail that creeps along your text, leaving a shiny trail. Tag: <piix-pal pal="shel">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/shel.json
+- Gecko: A gecko that climbs up and around the sides of your cards. Tag: <piix-pal pal="gecko">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/gecko.json
+- Mole: Whack-a-mole: it pops out of your element, you bop it. Tag: <piix-pal pal="mole">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/mole.json
+- Balloon: A balloon with a face, tied to your element, bobbing in the breeze. Tag: <piix-pal pal="balloon">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/balloon.json
+- Para: A parachutist who drops onto your section when it scrolls into view. Tag: <piix-pal pal="para">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/para.json
+- Roomba: A robot vacuum that sweeps along your footer, very seriously. Tag: <piix-pal pal="roomba">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/roomba.json
+- Kitty: A black cat that lounges on your element and swats at the cursor. Tag: <piix-pal pal="kitty">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/kitty.json
+- Hiss: A snake that slithers along your headings. Tag: <piix-pal pal="hiss">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/hiss.json
+- Pinch: A crab that walks sideways along your text. Tag: <piix-pal pal="pinch">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/pinch.json
+- Shibe: A shiba that lounges on your text, tail wagging. Tag: <piix-pal pal="shibe">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/shibe.json
+- Capy: A capybara with a yuzu on its head, completely unbothered. Tag: <piix-pal pal="capy">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/capy.json
+- Peeper: Guards your inputs: follows the caret, covers its eyes for passwords. Tag: <piix-pal pal="peeper">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/peeper.json
+- Scrolly: A little runner on a reading-progress bar. Tag: <piix-pal pal="scrolly">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/scrolly.json
+- Echo: A copycat cursor that replays your moves half a second late. Tag: <piix-pal pal="echo">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/echo.json
+- Snip: A highlighter that hops to whatever text you select. Tag: <piix-pal pal="snip">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/snip.json
+- Beep: A robot that panics when someone ticks “I’m not a robot”. Tag: <piix-pal pal="beep">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/beep.json
+- Router: A Wi-Fi router whose signal bars follow your cursor. Tag: <piix-pal pal="router">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/router.json
+- Termi: A tiny terminal that types out your lines, one character at a time. Tag: <piix-pal pal="termi">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/termi.json
+- Frog: A frog that snaps its tongue at your cursor. Tag: <piix-pal pal="frog">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/frog.json
+- Penguin: A penguin that belly-slides along your element. Tag: <piix-pal pal="penguin">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/penguin.json
+- Rocket: Sits on your Deploy button. Click it: countdown, lift-off, landing. Tag: <piix-pal pal="rocket">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/rocket.json
+- Ball: A beach ball you can throw around your page. Tag: <piix-pal pal="ball">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/ball.json
+- Duck: A rubber duck you can throw. It squeaks when it lands. Tag: <piix-pal pal="duck">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/duck.json
+- Dice: Throw it and it lands on a random face. Tag: <piix-pal pal="dice">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/dice.json
+- Pebble: A heavy rock that lands with a thud every pal hears. Tag: <piix-pal pal="pebble">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/pebble.json
+- Cube: A jelly cube that bounces high and wobbles. Tag: <piix-pal pal="cube">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/cube.json
+- Can: A soda can that rolls off the edge of everything. Tag: <piix-pal pal="can">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/can.json
+- Ducks: A mother duck and her ducklings. Tag: <piix-pal pal="ducks">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/ducks.json
+- Ants: A marching line of ants, some carrying crumbs. Tag: <piix-pal pal="ants">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/ants.json
+- Fish: A school of fish that swims inside any box and flees your cursor. Tag: <piix-pal pal="fish">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/fish.json
+- Sparrows: Birds on a wire that scatter when you get close. Tag: <piix-pal pal="sparrows">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/sparrows.json
+- Choir: A choir who sway and sing in perfect time from a shared score. Tag: <piix-pal pal="choir">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/choir.json
+- Fireflies: Soft blinking lights drifting around an element. Tag: <piix-pal pal="fireflies">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/fireflies.json
+- Sheep: Sheep trot along and jump the fence one at a time, forever. Tag: <piix-pal pal="sheep">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/sheep.json
+- Bees: Worker bees buzzing round their hive. Tag: <piix-pal pal="bees">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/bees.json
+- Bulb: A pull-chain light switch for dark mode. Tag: <piix-pal pal="bulb">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/bulb.json
+- Pix: A tiny hero that lets visitors play your page as a platformer. Tag: <piix-pal pal="pix">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/pix.json
+- Weather: Snow that settles on your letters, plus rain, leaves and petals. Tag: <piix-weather>. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/weather.json
+- Pidge: Toast notifications, delivered by pigeon. Tag: <piix-pal pal="pidge">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/pidge.json
+- Plane: A plane that tows your announcement banner across the page. Tag: <piix-pal pal="plane">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/plane.json
+- Fetch: A dog that runs off on every fetch() and brings back the response. Tag: <piix-pal pal="fetch">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/fetch.json
+- Scout: Onboarding tours, guided by a tiny explorer. Tag: <piix-pal pal="scout">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/scout.json
+- Drone: Flies the product picture into your cart when someone adds to cart. Tag: <piix-pal pal="drone">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/drone.json
+- Crumb: A mouse that eats your cookie banner when someone accepts or rejects. Tag: <piix-pal pal="crumb">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/crumb.json
+- Polly: Reads your page aloud, hopping along each word as it is spoken. Tag: <piix-pal pal="polly">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/polly.json
+- Gist: An owl that sums up your article in a few key points. Tag: <piix-pal pal="gist">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/gist.json
+- Tabby: A cat that lives in your browser tab’s icon and naps while you’re away. Tag: <piix-pal pal="tabby">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/tabby.json
+- Sprout: A focus-timer plant that pops out into its own always-on-top window. Tag: <piix-pal pal="sprout">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/sprout.json
+- Nomad: A little traveller who walks between your browser windows. Tag: <piix-pal pal="nomad">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/nomad.json
+- Hatch: Every visitor hatches their own one-of-a-kind pet. Tag: <piix-pal pal="hatch">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/hatch.json
+- Avatar: A unique animated pixel avatar for any name. Tag: <piix-avatar>. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/avatar.json
+- Gem: A treasure hunt across your whole site. Tag: <piix-pal pal="gem">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/gem.json
+- Stickers: A sheet of stickers visitors peel off and stick anywhere on your page. Tag: <piix-stickers>. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/stickers.json
+- Buff: A password-strength meter that lifts heavier as the password gets stronger. Tag: <piix-pal pal="buff">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/buff.json
+- Meh: A face that rides your rating slider, from furious to delighted. Tag: <piix-pal pal="meh">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/meh.json
+- Squish: A marshmallow that gets squashed as the text nears its limit. Tag: <piix-pal pal="squish">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/squish.json
+- Gulp: A pelican that gulps down files dropped on your drop zone. Tag: <piix-pal pal="gulp">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/gulp.json
+- Plug: Shows up when the connection drops, plugs back in when it returns. Tag: <piix-pal pal="plug">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/plug.json
+- Alien: A tiny visitor with three eyes and one antenna. Has questions about your CSS. Tag: <piix-sprite name="alien">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/alien.json
+- Avocado: Half an avocado, proudly showing off its pit. Ripe for exactly one day. Tag: <piix-sprite name="avocado">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/avocado.json
+- Battery: A battery that is always charging and always at one percent. Brave. Tag: <piix-sprite name="battery">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/battery.json
+- Astronaut: A tiny astronaut floating in place. Eyes glow behind the visor. Tag: <piix-sprite name="astronaut">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/astronaut.json
+- Bolt: A chunky robot whose face is a little screen. Its eyes glow. Tag: <piix-sprite name="bolt">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/bolt.json
+- Brain: A very big brain, thinking very hard. Sparks race along its folds. Tag: <piix-sprite name="brain">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/brain.json
+- Crt: A beige monitor from the old internet. Its face glows on the screen. Tag: <piix-sprite name="crt">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/crt.json
+- Elephant: A baby elephant with big ears and a trunk that never sits still. Tag: <piix-sprite name="elephant">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/elephant.json
+- Flick: A little flame with big feelings. Never, ever stands still. Tag: <piix-sprite name="flick">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/flick.json
+- Fluff: A sheep made almost entirely of cloud. Trots in place, very proudly. Tag: <piix-sprite name="fluff">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/fluff.json
+- Gloop: A slow, happy blob that drips a little. Mostly harmless. Tag: <piix-sprite name="gloop">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/gloop.json
+- Gpu: A graphics card whose two fans are its eyes. RGB strip included, obviously. Tag: <piix-sprite name="gpu">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/gpu.json
+- Hops: Long ears, short attention span. One ear never quite stays up. Tag: <piix-sprite name="hops">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/hops.json
+- Inky: A small squid with five wiggly arms and one very big question. Tag: <piix-sprite name="inky">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/inky.json
+- Keycap: A chunky mechanical keycap. Thocky. Click it for a satisfying press. Tag: <piix-sprite name="keycap">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/keycap.json
+- Llama: A fluffy llama with a long neck and a calm, knowing look. Tag: <piix-sprite name="llama">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/llama.json
+- Mumu: A round little bear who would like a snack, please. Ears wiggle. Tag: <piix-sprite name="mumu">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/mumu.json
+- Server: A server rack keeping your site alive. Its drive lights never stop. Tag: <piix-sprite name="server">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/server.json
+- Spud: A lumpy potato with a tiny sprout and a lot of potential. Tag: <piix-sprite name="spud">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/spud.json
+- Tofu: A block of tofu on two stubby legs, marching on the spot. Firm but fair. Tag: <piix-sprite name="tofu">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/tofu.json
+- Unicorn: The startup kind. A golden horn, a rainbow mane, a billion-dollar smile. Tag: <piix-sprite name="unicorn">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/unicorn.json
+- Whale: A friendly whale who surfaces now and then for a little spout. Tag: <piix-sprite name="whale">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/whale.json
+- Boba: A cup of milk tea with a straw and a lot of pearls. Chewy personality. Tag: <piix-sprite name="boba">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/boba.json
+- Cactus: A potted cactus who blooms when it is in a good mood. Do not hug. Tag: <piix-sprite name="cactus">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/cactus.json
+- Candle: A little candle with a flame that never sits still. Tag: <piix-sprite name="candle">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/candle.json
+- Cherries: Two cherries on one stem. Inseparable. Four eyes, one opinion. Tag: <piix-sprite name="cherries">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/cherries.json
+- Cloud: A little cloud with a light, cheerful drizzle. Tag: <piix-sprite name="cloud">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/cloud.json
+- Coffee: A mug of coffee, steaming gently, quietly judging your sleep schedule. Tag: <piix-sprite name="coffee">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/coffee.json
+- Cookie: A chocolate chip cookie with one bite missing. It knows who did it. Tag: <piix-sprite name="cookie">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/cookie.json
+- Donut: A strawberry donut with sprinkles. Has a hole in its life and is fine with it. Tag: <piix-sprite name="donut">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/donut.json
+- Dragon: A pocket dragon. Flaps its little wings. Breathes a little fire now and then. Tag: <piix-sprite name="dragon">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/dragon.json
+- Egg: An egg with a crack and a lot of questions. Tag: <piix-sprite name="egg">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/egg.json
+- Floppy: A floppy disk who remembers when 1.44 MB was a lot. Also, the save icon. Tag: <piix-sprite name="floppy">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/floppy.json
+- Heart: A like button with feelings. Beats steadily, blushes easily. Tag: <piix-sprite name="heart">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/heart.json
+- Inbox: An envelope with a notification badge it cannot stop checking. Tag: <piix-sprite name="inbox">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/inbox.json
+- Loaf: A ginger cat in its most efficient shape. Ears twitch when you are not looking. Tag: <piix-sprite name="loaf">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/loaf.json
+- Mochi: A soft pink rice cake. Squishy, blushy, easily delighted. Tag: <piix-sprite name="mochi">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/mochi.json
+- Modem: A dial-up modem. Its lights blink in a pattern only it understands. Tag: <piix-sprite name="modem">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/modem.json
+- Onigiri: A rice ball in a seaweed jacket. Calm, round-ish, triangular. Tag: <piix-sprite name="onigiri">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/onigiri.json
+- Planet: A small ringed planet. Spins slowly, shines a little, thinks big. Tag: <piix-sprite name="planet">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/planet.json
+- Prompty: A chat bubble who is always just about to reply. Thinking… thinking… Tag: <piix-sprite name="prompty">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/prompty.json
+- Pudding: A caramel pudding on a plate. Cannot stop jiggling. Tag: <piix-sprite name="pudding">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/pudding.json
+- Robo: A tiny robot head. The antenna light means it is thinking. It is always thinking. Tag: <piix-sprite name="robo">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/robo.json
+- Star: A little star who twinkles on purpose. Main-character energy. Tag: <piix-sprite name="star">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/star.json
+- Sushi: A piece of salmon nigiri wearing its fish like a very good blanket. Tag: <piix-sprite name="sushi">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/sushi.json
+- Toast: A slice of toast with a pat of butter slowly giving up. Tag: <piix-sprite name="toast">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/toast.json
+- Token: A little gold token that spins. Every model wants it. Context is everything. Tag: <piix-sprite name="token">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/token.json
+- Ufo: A very small visitor. Came in peace, stayed for the cursor. Tag: <piix-sprite name="ufo">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/ufo.json
+- Wizard: A very small wizard whose hat does most of the work. Sparkles on request. Tag: <piix-sprite name="wizard">. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/wizard.json
+- Crowd: Hundreds of tiny agents on one canvas: they wander, swarm your cursor, or spell a word. Tag: <piix-crowd>. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/crowd.json
+- PixelType: Any font as chunky extruded pixel blocks that pals can walk on. Tag: <piix-type>. shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/pixel-type.json

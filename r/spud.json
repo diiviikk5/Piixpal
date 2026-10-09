@@ -5,14 +5,14 @@
   "title": "Spud",
   "description": "A lumpy potato with a tiny sprout and a lot of potential.",
   "registryDependencies": [
-    "https://piixpal.vercel.app/r/piixpal.json"
+    "https://piixpal.dvkk.dev/r/piixpal.json"
   ],
   "files": [
     {
       "path": "registry/piixpal/spud.tsx",
       "type": "registry:component",
       "target": "components/piixpal/spud.tsx",
-      "content": "\"use client\";\n/* Spud, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Spud(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"spud\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"spud\", ...piixAttrs(props) });\n}\n\nexport default Spud;\n"
+      "content": "\"use client\";\n/* Spud, from the Piixpal shadcn registry. Options: https://piixpal.dvkk.dev/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Spud(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"spud\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"spud\", ...piixAttrs(props) });\n}\n\nexport default Spud;\n"
     }
   ]
 }

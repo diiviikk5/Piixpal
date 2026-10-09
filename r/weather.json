@@ -5,14 +5,14 @@
   "title": "Weather",
   "description": "Snow that settles on your letters, plus rain, leaves and petals.",
   "registryDependencies": [
-    "https://piixpal.vercel.app/r/piixpal.json"
+    "https://piixpal.dvkk.dev/r/piixpal.json"
   ],
   "files": [
     {
       "path": "registry/piixpal/weather.tsx",
       "type": "registry:component",
       "target": "components/piixpal/weather.tsx",
-      "content": "\"use client\";\n/* Weather, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Weather(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"weather\"); }, []);\n  return React.createElement(\"piix-weather\", piixAttrs(props));\n}\n\nexport default Weather;\n"
+      "content": "\"use client\";\n/* Weather, from the Piixpal shadcn registry. Options: https://piixpal.dvkk.dev/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Weather(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"weather\"); }, []);\n  return React.createElement(\"piix-weather\", piixAttrs(props));\n}\n\nexport default Weather;\n"
     }
   ]
 }

@@ -5,14 +5,14 @@
   "title": "Mumu",
   "description": "A round little bear who would like a snack, please. Ears wiggle.",
   "registryDependencies": [
-    "https://piixpal.vercel.app/r/piixpal.json"
+    "https://piixpal.dvkk.dev/r/piixpal.json"
   ],
   "files": [
     {
       "path": "registry/piixpal/mumu.tsx",
       "type": "registry:component",
       "target": "components/piixpal/mumu.tsx",
-      "content": "\"use client\";\n/* Mumu, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Mumu(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"mumu\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"mumu\", ...piixAttrs(props) });\n}\n\nexport default Mumu;\n"
+      "content": "\"use client\";\n/* Mumu, from the Piixpal shadcn registry. Options: https://piixpal.dvkk.dev/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Mumu(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"mumu\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"mumu\", ...piixAttrs(props) });\n}\n\nexport default Mumu;\n"
     }
   ]
 }

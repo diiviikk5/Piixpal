@@ -5,14 +5,14 @@
   "title": "Bolt",
   "description": "A chunky robot whose face is a little screen. Its eyes glow.",
   "registryDependencies": [
-    "https://piixpal.vercel.app/r/piixpal.json"
+    "https://piixpal.dvkk.dev/r/piixpal.json"
   ],
   "files": [
     {
       "path": "registry/piixpal/bolt.tsx",
       "type": "registry:component",
       "target": "components/piixpal/bolt.tsx",
-      "content": "\"use client\";\n/* Bolt, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Bolt(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"bolt\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"bolt\", ...piixAttrs(props) });\n}\n\nexport default Bolt;\n"
+      "content": "\"use client\";\n/* Bolt, from the Piixpal shadcn registry. Options: https://piixpal.dvkk.dev/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Bolt(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"bolt\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"bolt\", ...piixAttrs(props) });\n}\n\nexport default Bolt;\n"
     }
   ]
 }

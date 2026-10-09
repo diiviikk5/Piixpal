@@ -5,14 +5,14 @@
   "title": "Gloop",
   "description": "A slow, happy blob that drips a little. Mostly harmless.",
   "registryDependencies": [
-    "https://piixpal.vercel.app/r/piixpal.json"
+    "https://piixpal.dvkk.dev/r/piixpal.json"
   ],
   "files": [
     {
       "path": "registry/piixpal/gloop.tsx",
       "type": "registry:component",
       "target": "components/piixpal/gloop.tsx",
-      "content": "\"use client\";\n/* Gloop, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Gloop(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"gloop\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"gloop\", ...piixAttrs(props) });\n}\n\nexport default Gloop;\n"
+      "content": "\"use client\";\n/* Gloop, from the Piixpal shadcn registry. Options: https://piixpal.dvkk.dev/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Gloop(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"gloop\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"gloop\", ...piixAttrs(props) });\n}\n\nexport default Gloop;\n"
     }
   ]
 }

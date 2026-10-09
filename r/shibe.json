@@ -5,14 +5,14 @@
   "title": "Shibe",
   "description": "A shiba that lounges on your text, tail wagging.",
   "registryDependencies": [
-    "https://piixpal.vercel.app/r/piixpal.json"
+    "https://piixpal.dvkk.dev/r/piixpal.json"
   ],
   "files": [
     {
       "path": "registry/piixpal/shibe.tsx",
       "type": "registry:component",
       "target": "components/piixpal/shibe.tsx",
-      "content": "\"use client\";\n/* Shibe, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Shibe(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"shibe\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"shibe\", ...piixAttrs(props) });\n}\n\nexport default Shibe;\n"
+      "content": "\"use client\";\n/* Shibe, from the Piixpal shadcn registry. Options: https://piixpal.dvkk.dev/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Shibe(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"shibe\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"shibe\", ...piixAttrs(props) });\n}\n\nexport default Shibe;\n"
     }
   ]
 }

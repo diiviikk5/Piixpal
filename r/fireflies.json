@@ -5,14 +5,14 @@
   "title": "Fireflies",
   "description": "Soft blinking lights drifting around an element.",
   "registryDependencies": [
-    "https://piixpal.vercel.app/r/piixpal.json"
+    "https://piixpal.dvkk.dev/r/piixpal.json"
   ],
   "files": [
     {
       "path": "registry/piixpal/fireflies.tsx",
       "type": "registry:component",
       "target": "components/piixpal/fireflies.tsx",
-      "content": "\"use client\";\n/* Fireflies, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Fireflies(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"fireflies\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"fireflies\", ...piixAttrs(props) });\n}\n\nexport default Fireflies;\n"
+      "content": "\"use client\";\n/* Fireflies, from the Piixpal shadcn registry. Options: https://piixpal.dvkk.dev/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Fireflies(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"fireflies\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"fireflies\", ...piixAttrs(props) });\n}\n\nexport default Fireflies;\n"
     }
   ]
 }

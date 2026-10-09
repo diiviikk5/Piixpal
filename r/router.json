@@ -5,14 +5,14 @@
   "title": "Router",
   "description": "A Wi-Fi router whose signal bars follow your cursor.",
   "registryDependencies": [
-    "https://piixpal.vercel.app/r/piixpal.json"
+    "https://piixpal.dvkk.dev/r/piixpal.json"
   ],
   "files": [
     {
       "path": "registry/piixpal/router.tsx",
       "type": "registry:component",
       "target": "components/piixpal/router.tsx",
-      "content": "\"use client\";\n/* Router, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Router(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"router\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"router\", ...piixAttrs(props) });\n}\n\nexport default Router;\n"
+      "content": "\"use client\";\n/* Router, from the Piixpal shadcn registry. Options: https://piixpal.dvkk.dev/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Router(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"router\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"router\", ...piixAttrs(props) });\n}\n\nexport default Router;\n"
     }
   ]
 }

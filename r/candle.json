@@ -5,14 +5,14 @@
   "title": "Candle",
   "description": "A little candle with a flame that never sits still.",
   "registryDependencies": [
-    "https://piixpal.vercel.app/r/piixpal.json"
+    "https://piixpal.dvkk.dev/r/piixpal.json"
   ],
   "files": [
     {
       "path": "registry/piixpal/candle.tsx",
       "type": "registry:component",
       "target": "components/piixpal/candle.tsx",
-      "content": "\"use client\";\n/* Candle, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Candle(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"candle\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"candle\", ...piixAttrs(props) });\n}\n\nexport default Candle;\n"
+      "content": "\"use client\";\n/* Candle, from the Piixpal shadcn registry. Options: https://piixpal.dvkk.dev/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Candle(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"candle\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"candle\", ...piixAttrs(props) });\n}\n\nexport default Candle;\n"
     }
   ]
 }

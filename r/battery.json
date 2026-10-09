@@ -5,14 +5,14 @@
   "title": "Battery",
   "description": "A battery that is always charging and always at one percent. Brave.",
   "registryDependencies": [
-    "https://piixpal.vercel.app/r/piixpal.json"
+    "https://piixpal.dvkk.dev/r/piixpal.json"
   ],
   "files": [
     {
       "path": "registry/piixpal/battery.tsx",
       "type": "registry:component",
       "target": "components/piixpal/battery.tsx",
-      "content": "\"use client\";\n/* Battery, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Battery(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"battery\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"battery\", ...piixAttrs(props) });\n}\n\nexport default Battery;\n"
+      "content": "\"use client\";\n/* Battery, from the Piixpal shadcn registry. Options: https://piixpal.dvkk.dev/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Battery(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"battery\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"battery\", ...piixAttrs(props) });\n}\n\nexport default Battery;\n"
     }
   ]
 }

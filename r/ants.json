@@ -5,14 +5,14 @@
   "title": "Ants",
   "description": "A marching line of ants, some carrying crumbs.",
   "registryDependencies": [
-    "https://piixpal.vercel.app/r/piixpal.json"
+    "https://piixpal.dvkk.dev/r/piixpal.json"
   ],
   "files": [
     {
       "path": "registry/piixpal/ants.tsx",
       "type": "registry:component",
       "target": "components/piixpal/ants.tsx",
-      "content": "\"use client\";\n/* Ants, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Ants(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"ants\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"ants\", ...piixAttrs(props) });\n}\n\nexport default Ants;\n"
+      "content": "\"use client\";\n/* Ants, from the Piixpal shadcn registry. Options: https://piixpal.dvkk.dev/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Ants(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"ants\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"ants\", ...piixAttrs(props) });\n}\n\nexport default Ants;\n"
     }
   ]
 }

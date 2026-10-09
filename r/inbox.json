@@ -5,14 +5,14 @@
   "title": "Inbox",
   "description": "An envelope with a notification badge it cannot stop checking.",
   "registryDependencies": [
-    "https://piixpal.vercel.app/r/piixpal.json"
+    "https://piixpal.dvkk.dev/r/piixpal.json"
   ],
   "files": [
     {
       "path": "registry/piixpal/inbox.tsx",
       "type": "registry:component",
       "target": "components/piixpal/inbox.tsx",
-      "content": "\"use client\";\n/* Inbox, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Inbox(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"inbox\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"inbox\", ...piixAttrs(props) });\n}\n\nexport default Inbox;\n"
+      "content": "\"use client\";\n/* Inbox, from the Piixpal shadcn registry. Options: https://piixpal.dvkk.dev/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Inbox(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"inbox\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"inbox\", ...piixAttrs(props) });\n}\n\nexport default Inbox;\n"
     }
   ]
 }

@@ -5,14 +5,14 @@
   "title": "Shel",
   "description": "A snail that creeps along your text, leaving a shiny trail.",
   "registryDependencies": [
-    "https://piixpal.vercel.app/r/piixpal.json"
+    "https://piixpal.dvkk.dev/r/piixpal.json"
   ],
   "files": [
     {
       "path": "registry/piixpal/shel.tsx",
       "type": "registry:component",
       "target": "components/piixpal/shel.tsx",
-      "content": "\"use client\";\n/* Shel, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Shel(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"shel\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"shel\", ...piixAttrs(props) });\n}\n\nexport default Shel;\n"
+      "content": "\"use client\";\n/* Shel, from the Piixpal shadcn registry. Options: https://piixpal.dvkk.dev/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Shel(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"shel\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"shel\", ...piixAttrs(props) });\n}\n\nexport default Shel;\n"
     }
   ]
 }

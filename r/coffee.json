@@ -5,14 +5,14 @@
   "title": "Coffee",
   "description": "A mug of coffee, steaming gently, quietly judging your sleep schedule.",
   "registryDependencies": [
-    "https://piixpal.vercel.app/r/piixpal.json"
+    "https://piixpal.dvkk.dev/r/piixpal.json"
   ],
   "files": [
     {
       "path": "registry/piixpal/coffee.tsx",
       "type": "registry:component",
       "target": "components/piixpal/coffee.tsx",
-      "content": "\"use client\";\n/* Coffee, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Coffee(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"coffee\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"coffee\", ...piixAttrs(props) });\n}\n\nexport default Coffee;\n"
+      "content": "\"use client\";\n/* Coffee, from the Piixpal shadcn registry. Options: https://piixpal.dvkk.dev/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Coffee(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"coffee\"); }, []);\n  return React.createElement(\"piix-sprite\", { \"name\": \"coffee\", ...piixAttrs(props) });\n}\n\nexport default Coffee;\n"
     }
   ]
 }

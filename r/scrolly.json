@@ -5,14 +5,14 @@
   "title": "Scrolly",
   "description": "A little runner on a reading-progress bar.",
   "registryDependencies": [
-    "https://piixpal.vercel.app/r/piixpal.json"
+    "https://piixpal.dvkk.dev/r/piixpal.json"
   ],
   "files": [
     {
       "path": "registry/piixpal/scrolly.tsx",
       "type": "registry:component",
       "target": "components/piixpal/scrolly.tsx",
-      "content": "\"use client\";\n/* Scrolly, from the Piixpal shadcn registry. Options: https://piixpal.vercel.app/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Scrolly(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"scrolly\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"scrolly\", ...piixAttrs(props) });\n}\n\nexport default Scrolly;\n"
+      "content": "\"use client\";\n/* Scrolly, from the Piixpal shadcn registry. Options: https://piixpal.dvkk.dev/components/ */\nimport * as React from \"react\";\nimport { loadPiixpal, piixAttrs, type PiixProps } from \"@/lib/piixpal\";\n\nexport function Scrolly(props: PiixProps) {\n  React.useEffect(() => { loadPiixpal(\"scrolly\"); }, []);\n  return React.createElement(\"piix-pal\", { \"pal\": \"scrolly\", ...piixAttrs(props) });\n}\n\nexport default Scrolly;\n"
     }
   ]
 }
