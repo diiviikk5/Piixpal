@@ -701,3 +701,8 @@ const ready = Promise.all(['800 100px "Bricolage Grotesque"', '650 100px "Bricol
 /* the renderer calls this once per frame; it moves the library's clock to T too */
 window.__film = { DUR, ready, cues, frame(T) { bigSprites(T); __clock.step(T * 1000 - __clock.ms); draw(T); } };
 
+/* watching in a normal browser: play in real time */
+if (!navigator.webdriver && !location.search.includes('render')) {
+  const start = +(new URLSearchParams(location.search).get('t') || 0);
+  ready.then(() => { const t0 = __realNow(); setInterval(() => { const T = (start + (__realNow() - t0) / 1000) % DUR; window.__film.frame(T); }, 1000 / 30); });
+}
