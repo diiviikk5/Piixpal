@@ -4,3 +4,8 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
+const OUT = join(import.meta.dirname, 'out');
+const SR = 44100, DUR = 38, N = SR * DUR, BEAT = .5;
+const L = new Float32Array(N), R = new Float32Array(N);
+const cues = existsSync(join(OUT, 'cues.json')) ? JSON.parse(readFileSync(join(OUT, 'cues.json'), 'utf8')) : [];
+
