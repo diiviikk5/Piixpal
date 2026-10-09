@@ -249,9 +249,10 @@ ${fonts}<link rel="stylesheet" href="../site/site.css">
   <div class="wrap nav-in">
     <a class="logo" href="../" aria-label="Piixpal home">${LOGO}<span>p<span class="i">ı</span><span class="i">ı</span>xpal</span></a>
     <nav class="links" aria-label="Site">
-      <a href="../">Home</a>
-      <a href="./" ${key !== 'home' ? 'aria-current="page"' : ''}>Components</a>
-      <a href="../#api">API</a>
+      <a href="./"${key === 'index' || key === 'sprites' || key === 'pals' || key === 'crowd' || key === 'type' ? ' aria-current="page"' : ''}>Components</a>
+      <a href="powers.html"${key === 'powers' ? ' aria-current="page"' : ''}>Superpowers</a>
+      <a href="install.html"${key === 'install' ? ' aria-current="page"' : ''}>Install</a>
+      <a href="builder.html"${key === 'builder' ? ' aria-current="page"' : ''}>Builder</a>
     </nav>
     <div class="theme" role="group" aria-label="Theme">
       <button type="button" data-theme-set="white" title="White" aria-label="White theme"><svg viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M3 0h2v1H3zM3 7h2v1H3zM0 3h1v2H0zM7 3h1v2H7zM2 2h4v4H2z"/></svg></button>
