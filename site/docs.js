@@ -247,3 +247,6 @@ document.addEventListener('click', e => {
   const cur = () => { const a = side.querySelector('a.on'); if (a && side.scrollHeight > side.clientHeight) { const r = a.getBoundingClientRect(), s = side.getBoundingClientRect(); if (r.top < s.top + 40 || r.bottom > s.bottom - 40) side.scrollTop += r.top - s.top - s.height / 2; } };
   new MutationObserver(cur).observe(side, { subtree: true, attributes: true, attributeFilter: ['class'] });
 })();
+
+/* ---------- on phones the sidebar sits above the page: start it folded ---------- */
+if (matchMedia('(max-width: 900px)').matches) document.querySelectorAll('.side .sg').forEach(g => { g.open = false; });
