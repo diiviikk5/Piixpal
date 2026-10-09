@@ -46,7 +46,7 @@
 <section class="hero" aria-labelledby="lede">
   <div class="hero-bg" aria-hidden="true"></div>
   <div class="wrap">
-    <a class="chip rv" href="#install"><span class="blip" aria-hidden="true"></span> v0.3 · 95 components · free &amp; open source <span class="arr" aria-hidden="true">→</span></a>
+    <a class="chip rv" href="#install"><span class="blip" aria-hidden="true"></span> v0.4 · 118 components · free &amp; open source <span class="arr" aria-hidden="true">→</span></a>
 
     <div class="wordmark rv">
       <piix-type id="mark" text="piixpal" rows="22" cell="15" depth="1" gap=".08" shade="#c6f432" fit></piix-type>
@@ -232,6 +232,22 @@
   <piix-pal pal="scrolly"></piix-pal>
 </section>
 
+<section class="sec" id="powers" aria-labelledby="powers-h">
+  <div class="wrap">
+    <header class="sec-head">
+      <div><span class="eyebrow rv" style="--accent:var(--violet)">Superpowers</span><h2 class="rv" id="powers-h">They leave the page.</h2></div>
+      <p class="rv">Play your site as a game. Snow that settles on your letters. Toasts by pigeon. A pull-chain for dark mode. Pets in browser tabs, desktop plants, tours, uploads, carts, cookie banners.</p>
+    </header>
+    <div class="pw-grid">
+      <div class="pw-card rv" id="pw-pix"><span class="pw-name">pix · click it, then ← → ↑</span><h3 class="pw-h" id="pw-pix-h">Play me</h3><span class="btn btn-sm pw-b1">Jump</span><span class="btn btn-sm btn-lime pw-b2">Higher</span><piix-pal pal="pix" on="#pw-pix-h" box="#pw-pix" coins="3"></piix-pal></div>
+      <div class="pw-card rv" id="pw-snow"><span class="pw-name">weather · swipe through it</span><h3 class="pw-h" style="font-size:44px">Let it snow</h3><piix-weather kind="snow" amount="2"></piix-weather></div>
+      <div class="pw-card rv" id="pw-toast"><span class="pw-name">pidge · toasts by pigeon</span><button type="button" class="btn btn-sm btn-lime" onclick="document.getElementById('pw-pidge').ctl.toast('Saved your changes',{type:'ok'})">Save</button><piix-pal pal="pidge" id="pw-pidge" box="#pw-toast"></piix-pal></div>
+      <div class="pw-card rv" id="pw-bulb"><span class="pw-name">bulb · pull the chain</span><h3 class="pw-h">Lights?</h3><piix-pal pal="bulb" box="#pw-bulb" target="#pw-bulb" at=".8" length="80"></piix-pal></div>
+    </div>
+    <div class="more rv"><a class="btn" href="components/powers.html">All 23 superpowers <span aria-hidden="true">→</span></a></div>
+  </div>
+</section>
+
 <section class="sec" id="how" aria-labelledby="how-h">
   <div class="wrap">
     <header class="sec-head">
@@ -330,7 +346,7 @@ pal.<span class="c-a">poke</span>()
       <div class="way rv" style="--accent:var(--lime)">
         <span class="tag">Everything</span>
         <h3>One script tag</h3>
-        <p>All 95 components, about 45 KB gzipped, served free by jsDelivr. Then paste any tag.</p>
+        <p>All 118 components, about 95 KB gzipped, served free by jsDelivr. Then paste any tag.</p>
         <div class="snip"><code>&lt;script src="…/piixpal.min.js"&gt;</code><button class="copy" type="button" data-copy-tag>Copy</button></div>
       </div>
       <div class="way rv" style="--accent:var(--sky)">
