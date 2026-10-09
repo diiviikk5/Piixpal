@@ -110,3 +110,37 @@ function pill(str, cx, cy, { size = 34, fam = MONO, weight = 600, bg = C.lime, f
   return w;
 }
 
+/* ---------- pixel type: chunky extruded blocks, like <piix-type> ---------- */
+const GLYPH = {
+  P: ['11110', '10001', '10001', '11110', '10000', '10000', '10000'],
+  I: ['111', '010', '010', '010', '010', '010', '111'],
+  X: ['10001', '10001', '01010', '00100', '01010', '10001', '10001'],
+  A: ['01110', '10001', '10001', '11111', '10001', '10001', '10001'],
+  L: ['10000', '10000', '10000', '10000', '10000', '10000', '11111']
+};
+function pixelWord(word, cx, top, B, T, t0) {
+  const letters = [...word].map(ch => GLYPH[ch]);
+  const cols = letters.reduce((a, l) => a + l[0].length, 0) + letters.length - 1;
+  let x = cx - cols * B / 2, col = 0;
+  const blocks = [], spots = [];
+  letters.forEach(l => {
+    const lw = l[0].length;
+    spots.push({ x0: x, x1: x + lw * B, mid: x + lw * B / 2 });
+    for (let c = 0; c < lw; c++, col++) for (let r = 0; r < 7; r++) if (l[r][c] === '1') {
+      const st = t0 + col * .032 + (6 - r) * .014;
+      const k = prog(T, st, st + .42);
+      if (k > 0) blocks.push([x + c * B, top + r * B - (1 - E.outBack(k)) * 520, k]);
+    }
+    x += (lw + 1) * B; col++;
+  });
+  const d = B * .3;
+  g.fillStyle = '#5d8a12';
+  for (const [bx, by] of blocks) g.fillRect(bx + d, by + d, B, B);
+  for (const [bx, by] of blocks) {
+    g.fillStyle = C.lime; g.fillRect(bx, by, B, B);
+    g.fillStyle = 'rgba(255,255,255,.35)'; g.fillRect(bx, by, B, B * .16);
+    g.strokeStyle = C.ink; g.lineWidth = 3; g.strokeRect(bx + 1.5, by + 1.5, B - 3, B - 3);
+  }
+  return spots;
+}
+
