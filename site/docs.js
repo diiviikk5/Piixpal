@@ -276,3 +276,16 @@ document.addEventListener('click', e => {
 
 /* ---------- on phones the sidebar sits above the page: start it folded ---------- */
 if (matchMedia('(max-width: 900px)').matches) document.querySelectorAll('.side .sg').forEach(g => { g.open = false; });
+
+/* ---------- on phones the whole sidebar folds into one "Browse" button ---------- */
+(() => {
+  const side = document.querySelector('.side');
+  if (!side || !matchMedia('(max-width: 900px)').matches) return;
+  const d = document.createElement('details');
+  d.className = 'side-fold';
+  const s = document.createElement('summary');
+  s.textContent = 'Browse all components';
+  d.appendChild(s);
+  while (side.firstChild) d.appendChild(side.firstChild);
+  side.appendChild(d);
+})();

@@ -255,3 +255,8 @@
 .c-tabs button:hover{color:#fff}
 .c-tabs button[aria-selected=true]{background:var(--lime);color:#17121f}
 .c-tabs + .c-code{margin-top:0}
+.side-fold > summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border:2px solid var(--ink);border-radius:12px;background:var(--card);font:700 15px/1 var(--f-sans)}
+.side-fold > summary::-webkit-details-marker{display:none}
+.side-fold > summary::after{content:"+";font:600 18px/1 var(--f-mono)}
+.side-fold[open] > summary::after{content:"–"}
+.side-fold[open] > summary{margin-bottom:12px}
