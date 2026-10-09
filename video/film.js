@@ -602,3 +602,41 @@ function code(T) {
   vignette(.45);
 }
 
+/* 31 – 34s: everyone */
+const BIG = [['whale', 330, C.sky], ['astronaut', 620], ['unicorn', 900], ['gpu', 1180], ['llama', 1440], ['crt', 1700]];
+let PARADE;
+function parade(T) {
+  const t0 = 31;
+  g.fillStyle = C.lime; g.fillRect(0, 0, W, H); grid('rgba(23,18,31,.07)', 48, -(T - t0) * 120);
+  words(['Free.', 'Open', 'source.', { w: 'Yours.', color: C.violet }], T, { x: W / 2, y: 210, size: 128, color: C.ink, t0: t0 + .1, stagger: .14 });
+  g.fillStyle = C.ink; g.fillRect(0, 900, W, 180);
+  for (let x = -((T * 300) % 96); x < W; x += 96) { g.fillStyle = C.ink2; g.fillRect(x, 930, 48, 14); }
+  if (!PARADE) PARADE = Object.keys(S).filter(n => n[0] !== '_' && !['fence', 'molehill', 'fireflies', 'ants', 'fish', 'bees', 'duckling'].includes(n));
+  const gap = 190, speed = 640;
+  PARADE.forEach((n, i) => {
+    const x = (T - t0) * speed - i * gap + 300;
+    if (x < -150 || x > W + 150) return;
+    const clips = Object.keys(S[n].frames), clip = ['walk', 'run', 'fly', 'go', 'slide', 'swim', 'roam'].find(c => clips.includes(c)) || clips[0];
+    const hop = clip === clips[0] && !['walk', 'run'].includes(clip) ? -Math.abs(Math.sin(T * 9 + i)) * 26 : 0;
+    const s = Math.max(4, Math.round(124 / Math.max(S[n].w, S[n].h)));
+    pal(n, clip, T + i * .13, x, 900 + hop, s);
+  });
+  vignette(.25);
+}
+function bigSprites(T) {
+  const on = T >= 31 && T < 34;
+  BIG.forEach(([n, x], i) => {
+    const el = BIG_EL[i], at = 31.5 + i * .25, k = E.outBack(prog(T, at, at + .4));
+    el.style.display = on && k > 0 ? '' : 'none';
+    el._vis = true; /* drawn every frame, the observer is too slow for a frame-by-frame render */
+    el.style.transform = `translate(-50%,-100%) scale(${k}) translateY(${Math.sin(T * 6 + i) * 6}px)`;
+  });
+}
+const BIG_EL = BIG.map(([n, x]) => {
+  const el = document.createElement('piix-sprite');
+  el.setAttribute('name', n); el.setAttribute('scale', '8'); el.setAttribute('look', 'none'); el.setAttribute('sleep-after', '0');
+  el.style.left = x + 'px'; el.style.top = '720px'; el.style.display = 'none';
+  document.getElementById('big').append(el);
+  return el;
+});
+
