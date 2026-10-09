@@ -72,7 +72,7 @@
   <div class="cmp-body pal-doc">
     <div class="habitat"><button type="button" class="h-btn lime" id="d-listen" style="position:absolute;left:22px;bottom:22px">Listen</button><article class="h-article" id="d-polly"><h4>A short story</h4><p>Once there was a parrot who loved words. It read every page it could find, out loud, hopping from word to word so nobody lost their place.</p></article><piix-pal box=".habitat" pal="polly" on="#d-polly" button="#d-listen"></piix-pal></div>
     <div class="cmp-code"><div class="tabs" data-tabs>
-  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
+  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">shadcn</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
   <pre class="codebox tab-pane"><button class="copy" type="button" data-copy="&lt;!-- once, anywhere on the page --&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js&quot;&gt;&lt;/script&gt;
 
@@ -119,16 +119,33 @@
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/polly.min.js&quot;);
 Piixpal.add(&quot;polly&quot;, &quot;article&quot;);">Copy</button>await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/polly.min.js&quot;);
 Piixpal.add(&quot;polly&quot;, &quot;article&quot;);</pre>
-  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;polly&quot; /&gt;
-&lt;/h1&gt;">Copy</button>import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+&lt;/h1&gt;">Copy</button>// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;polly&quot; /&gt;
+&lt;/h1&gt;</pre>
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="npx shadcn@latest add https://piixpal.dvkk.dev/r/polly.json
+
+import { Polly } from &quot;@/components/piixpal/polly&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Polly /&gt;
+&lt;/h1&gt;">Copy</button>npx shadcn@latest add https://piixpal.dvkk.dev/r/polly.json
+
+import { Polly } from &quot;@/components/piixpal/polly&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Polly /&gt;
 &lt;/h1&gt;</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// main.js: app.use(Piixpal) from &quot;piixpal/vue&quot;
 
@@ -157,7 +174,7 @@ Piixpal.add(&quot;polly&quot;, &quot;article&quot;);</pre>
   <div class="cmp-body pal-doc">
     <div class="habitat tall"><article class="h-article" id="d-gist"><h4>Why pixel pals?</h4><p>Websites got very serious. Every page looks like every other page. Pixel pals give a site a little life without getting in the way. They never block a click and they stay out of the way of screen readers. They are small, free and made for anyone.</p></article><piix-pal box=".habitat" pal="gist" on="#d-gist" points="2"></piix-pal></div>
     <div class="cmp-code"><div class="tabs" data-tabs>
-  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
+  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">shadcn</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
   <pre class="codebox tab-pane"><button class="copy" type="button" data-copy="&lt;!-- once, anywhere on the page --&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js&quot;&gt;&lt;/script&gt;
 
@@ -196,16 +213,33 @@ Piixpal.add(&quot;polly&quot;, &quot;article&quot;);</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/gist.min.js&quot;);
 Piixpal.add(&quot;gist&quot;, &quot;article&quot;);">Copy</button>await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/gist.min.js&quot;);
 Piixpal.add(&quot;gist&quot;, &quot;article&quot;);</pre>
-  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;gist&quot; /&gt;
-&lt;/h1&gt;">Copy</button>import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+&lt;/h1&gt;">Copy</button>// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;gist&quot; /&gt;
+&lt;/h1&gt;</pre>
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="npx shadcn@latest add https://piixpal.dvkk.dev/r/gist.json
+
+import { Gist } from &quot;@/components/piixpal/gist&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Gist /&gt;
+&lt;/h1&gt;">Copy</button>npx shadcn@latest add https://piixpal.dvkk.dev/r/gist.json
+
+import { Gist } from &quot;@/components/piixpal/gist&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Gist /&gt;
 &lt;/h1&gt;</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// main.js: app.use(Piixpal) from &quot;piixpal/vue&quot;
 
@@ -234,7 +268,7 @@ Piixpal.add(&quot;gist&quot;, &quot;article&quot;);</pre>
   <div class="cmp-body pal-doc">
     <div class="habitat"><div class="h-tab"><canvas class="d-tabicon" width="32" height="32"></canvas><span>Superpowers · Piixpal</span><i>×</i></div><canvas class="h-fav d-tabicon" width="128" height="128" aria-label="Tabby, as this tab’s icon, close up"></canvas><div class="h-floor" id="d-tabby"><i></i><i></i><i></i></div><piix-pal box=".habitat" pal="tabby" on="#d-tabby" at=".2" preview=".d-tabicon"></piix-pal></div>
     <div class="cmp-code"><div class="tabs" data-tabs>
-  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
+  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">shadcn</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
   <pre class="codebox tab-pane"><button class="copy" type="button" data-copy="&lt;!-- once, anywhere on the page --&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js&quot;&gt;&lt;/script&gt;
 
@@ -269,16 +303,33 @@ Piixpal.add(&quot;gist&quot;, &quot;article&quot;);</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/tabby.min.js&quot;);
 Piixpal.add(&quot;tabby&quot;, &quot;footer&quot;);">Copy</button>await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/tabby.min.js&quot;);
 Piixpal.add(&quot;tabby&quot;, &quot;footer&quot;);</pre>
-  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;tabby&quot; /&gt;
-&lt;/h1&gt;">Copy</button>import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+&lt;/h1&gt;">Copy</button>// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;tabby&quot; /&gt;
+&lt;/h1&gt;</pre>
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="npx shadcn@latest add https://piixpal.dvkk.dev/r/tabby.json
+
+import { Tabby } from &quot;@/components/piixpal/tabby&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Tabby /&gt;
+&lt;/h1&gt;">Copy</button>npx shadcn@latest add https://piixpal.dvkk.dev/r/tabby.json
+
+import { Tabby } from &quot;@/components/piixpal/tabby&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Tabby /&gt;
 &lt;/h1&gt;</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// main.js: app.use(Piixpal) from &quot;piixpal/vue&quot;
 
@@ -307,7 +358,7 @@ Piixpal.add(&quot;tabby&quot;, &quot;footer&quot;);</pre>
   <div class="cmp-body pal-doc">
     <div class="habitat"><p class="h-line" style="bottom:auto;top:30px">A focus timer that grows. Click the plant.</p><div class="h-floor" id="d-sprout"><i></i><i></i><i></i></div><piix-pal box=".habitat" pal="sprout" on="#d-sprout" at=".5" minutes="1" break=".5"></piix-pal></div>
     <div class="cmp-code"><div class="tabs" data-tabs>
-  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
+  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">shadcn</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
   <pre class="codebox tab-pane"><button class="copy" type="button" data-copy="&lt;!-- once, anywhere on the page --&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js&quot;&gt;&lt;/script&gt;
 
@@ -338,16 +389,33 @@ Piixpal.add(&quot;tabby&quot;, &quot;footer&quot;);</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/sprout.min.js&quot;);
 Piixpal.add(&quot;sprout&quot;, &quot;footer&quot;);">Copy</button>await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/sprout.min.js&quot;);
 Piixpal.add(&quot;sprout&quot;, &quot;footer&quot;);</pre>
-  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;sprout&quot; /&gt;
-&lt;/h1&gt;">Copy</button>import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+&lt;/h1&gt;">Copy</button>// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;sprout&quot; /&gt;
+&lt;/h1&gt;</pre>
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="npx shadcn@latest add https://piixpal.dvkk.dev/r/sprout.json
+
+import { Sprout } from &quot;@/components/piixpal/sprout&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Sprout /&gt;
+&lt;/h1&gt;">Copy</button>npx shadcn@latest add https://piixpal.dvkk.dev/r/sprout.json
+
+import { Sprout } from &quot;@/components/piixpal/sprout&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Sprout /&gt;
 &lt;/h1&gt;</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// main.js: app.use(Piixpal) from &quot;piixpal/vue&quot;
 
@@ -376,7 +444,7 @@ Piixpal.add(&quot;sprout&quot;, &quot;footer&quot;);</pre>
   <div class="cmp-body pal-doc">
     <div class="habitat"><button type="button" class="h-btn lime" style="position:absolute;left:22px;top:22px" data-call="#d-nomad:invite">Open a second window</button><p class="h-line" style="bottom:auto;top:90px">Nomad walks out of this box and into the other window, then back again.</p><div class="h-floor"><i></i><i></i><i></i></div><piix-pal box=".habitat" pal="nomad" id="d-nomad" window="nomad.html"></piix-pal></div>
     <div class="cmp-code"><div class="tabs" data-tabs>
-  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
+  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">shadcn</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
   <pre class="codebox tab-pane"><button class="copy" type="button" data-copy="&lt;!-- once, anywhere on the page --&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js&quot;&gt;&lt;/script&gt;
 
@@ -403,16 +471,33 @@ Piixpal.add(&quot;sprout&quot;, &quot;footer&quot;);</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/nomad.min.js&quot;);
 Piixpal.add(&quot;nomad&quot;, &quot;body&quot;);">Copy</button>await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/nomad.min.js&quot;);
 Piixpal.add(&quot;nomad&quot;, &quot;body&quot;);</pre>
-  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;nomad&quot; /&gt;
-&lt;/h1&gt;">Copy</button>import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+&lt;/h1&gt;">Copy</button>// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;nomad&quot; /&gt;
+&lt;/h1&gt;</pre>
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="npx shadcn@latest add https://piixpal.dvkk.dev/r/nomad.json
+
+import { Nomad } from &quot;@/components/piixpal/nomad&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Nomad /&gt;
+&lt;/h1&gt;">Copy</button>npx shadcn@latest add https://piixpal.dvkk.dev/r/nomad.json
+
+import { Nomad } from &quot;@/components/piixpal/nomad&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Nomad /&gt;
 &lt;/h1&gt;</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// main.js: app.use(Piixpal) from &quot;piixpal/vue&quot;
 
@@ -442,7 +527,7 @@ Piixpal.add(&quot;nomad&quot;, &quot;body&quot;);</pre>
   <div class="cmp-body pal-doc">
     <div class="habitat"><div class="h-nav"><i></i><i></i><i></i></div><p class="h-text" style="bottom:56px">Lights?</p><piix-pal box=".habitat" pal="bulb" target=".habitat" at=".8" top="46" length="96"></piix-pal></div>
     <div class="cmp-code"><div class="tabs" data-tabs>
-  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
+  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">shadcn</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
   <pre class="codebox tab-pane"><button class="copy" type="button" data-copy="&lt;!-- once, anywhere on the page --&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js&quot;&gt;&lt;/script&gt;
 
@@ -469,16 +554,33 @@ Piixpal.add(&quot;nomad&quot;, &quot;body&quot;);</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/bulb.min.js&quot;);
 Piixpal.add(&quot;bulb&quot;, &quot;body&quot;);">Copy</button>await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/bulb.min.js&quot;);
 Piixpal.add(&quot;bulb&quot;, &quot;body&quot;);</pre>
-  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;bulb&quot; /&gt;
-&lt;/h1&gt;">Copy</button>import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+&lt;/h1&gt;">Copy</button>// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;bulb&quot; /&gt;
+&lt;/h1&gt;</pre>
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="npx shadcn@latest add https://piixpal.dvkk.dev/r/bulb.json
+
+import { Bulb } from &quot;@/components/piixpal/bulb&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Bulb /&gt;
+&lt;/h1&gt;">Copy</button>npx shadcn@latest add https://piixpal.dvkk.dev/r/bulb.json
+
+import { Bulb } from &quot;@/components/piixpal/bulb&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Bulb /&gt;
 &lt;/h1&gt;</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// main.js: app.use(Piixpal) from &quot;piixpal/vue&quot;
 
@@ -507,7 +609,7 @@ Piixpal.add(&quot;bulb&quot;, &quot;body&quot;);</pre>
   <div class="cmp-body pal-doc">
     <div class="habitat"><div class="h-btns" style="top:26px;bottom:auto;justify-content:flex-start;padding-left:22px;gap:10px;flex-wrap:wrap;right:22px"><button type="button" class="h-btn lime" data-call="#d-pidge:toast" data-args='["Saved your changes",{"type":"ok"}]'>Save</button><button type="button" class="h-btn" data-call="#d-pidge:toast" data-args='["Could not reach the server",{"type":"error","title":"Upload failed"}]'>Fail</button><button type="button" class="h-btn" data-call="#d-pidge:toast" data-args='["Mia liked your post",{"type":"info"}]'>Notify</button></div><piix-pal box=".habitat" pal="pidge" id="d-pidge"></piix-pal></div>
     <div class="cmp-code"><div class="tabs" data-tabs>
-  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
+  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">shadcn</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
   <pre class="codebox tab-pane"><button class="copy" type="button" data-copy="&lt;!-- once, anywhere on the page --&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js&quot;&gt;&lt;/script&gt;
 
@@ -542,16 +644,33 @@ Piixpal.add(&quot;bulb&quot;, &quot;body&quot;);</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/pidge.min.js&quot;);
 Piixpal.add(&quot;pidge&quot;, &quot;body&quot;);">Copy</button>await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/pidge.min.js&quot;);
 Piixpal.add(&quot;pidge&quot;, &quot;body&quot;);</pre>
-  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;pidge&quot; /&gt;
-&lt;/h1&gt;">Copy</button>import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+&lt;/h1&gt;">Copy</button>// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;pidge&quot; /&gt;
+&lt;/h1&gt;</pre>
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="npx shadcn@latest add https://piixpal.dvkk.dev/r/pidge.json
+
+import { Pidge } from &quot;@/components/piixpal/pidge&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Pidge /&gt;
+&lt;/h1&gt;">Copy</button>npx shadcn@latest add https://piixpal.dvkk.dev/r/pidge.json
+
+import { Pidge } from &quot;@/components/piixpal/pidge&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Pidge /&gt;
 &lt;/h1&gt;</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// main.js: app.use(Piixpal) from &quot;piixpal/vue&quot;
 
@@ -580,7 +699,7 @@ Piixpal.add(&quot;pidge&quot;, &quot;body&quot;);</pre>
   <div class="cmp-body pal-doc">
     <div class="habitat"><p class="h-line" style="bottom:40px">Banners are real links, so they work with keyboards and screen readers too.</p><piix-pal box=".habitat" pal="plane" text="Piixpal v0.4 is out →" top="34" repeat="1.5" always></piix-pal></div>
     <div class="cmp-code"><div class="tabs" data-tabs>
-  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
+  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">shadcn</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
   <pre class="codebox tab-pane"><button class="copy" type="button" data-copy="&lt;!-- once, anywhere on the page --&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js&quot;&gt;&lt;/script&gt;
 
@@ -611,16 +730,33 @@ Piixpal.add(&quot;pidge&quot;, &quot;body&quot;);</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/plane.min.js&quot;);
 Piixpal.add(&quot;plane&quot;, &quot;body&quot;);">Copy</button>await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/plane.min.js&quot;);
 Piixpal.add(&quot;plane&quot;, &quot;body&quot;);</pre>
-  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;plane&quot; /&gt;
-&lt;/h1&gt;">Copy</button>import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+&lt;/h1&gt;">Copy</button>// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;plane&quot; /&gt;
+&lt;/h1&gt;</pre>
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="npx shadcn@latest add https://piixpal.dvkk.dev/r/plane.json
+
+import { Plane } from &quot;@/components/piixpal/plane&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Plane /&gt;
+&lt;/h1&gt;">Copy</button>npx shadcn@latest add https://piixpal.dvkk.dev/r/plane.json
+
+import { Plane } from &quot;@/components/piixpal/plane&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Plane /&gt;
 &lt;/h1&gt;</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// main.js: app.use(Piixpal) from &quot;piixpal/vue&quot;
 
@@ -649,7 +785,7 @@ Piixpal.add(&quot;plane&quot;, &quot;body&quot;);</pre>
   <div class="cmp-body pal-doc">
     <div class="habitat"><div class="h-btns" style="top:26px;bottom:auto;gap:10px"><button type="button" class="h-btn lime" onclick="fetch('../dist/components.json?'+Date.now())">Fetch</button><button type="button" class="h-btn" onclick="Piixpal.busy(new Promise(r=>setTimeout(r,2200)))">Slow job</button><button type="button" class="h-btn" onclick="fetch('../nothing-here-'+Date.now()).catch(()=>{})">Broken link</button></div><div class="h-floor" id="d-fetch"><i></i><i></i><i></i></div><piix-pal box=".habitat" pal="fetch" on="#d-fetch" at=".5"></piix-pal></div>
     <div class="cmp-code"><div class="tabs" data-tabs>
-  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
+  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">shadcn</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
   <pre class="codebox tab-pane"><button class="copy" type="button" data-copy="&lt;!-- once, anywhere on the page --&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js&quot;&gt;&lt;/script&gt;
 
@@ -684,16 +820,33 @@ Piixpal.add(&quot;plane&quot;, &quot;body&quot;);</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/fetch.min.js&quot;);
 Piixpal.add(&quot;fetch&quot;, &quot;footer&quot;);">Copy</button>await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/fetch.min.js&quot;);
 Piixpal.add(&quot;fetch&quot;, &quot;footer&quot;);</pre>
-  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;fetch&quot; /&gt;
-&lt;/h1&gt;">Copy</button>import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+&lt;/h1&gt;">Copy</button>// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;fetch&quot; /&gt;
+&lt;/h1&gt;</pre>
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="npx shadcn@latest add https://piixpal.dvkk.dev/r/fetch.json
+
+import { Fetch } from &quot;@/components/piixpal/fetch&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Fetch /&gt;
+&lt;/h1&gt;">Copy</button>npx shadcn@latest add https://piixpal.dvkk.dev/r/fetch.json
+
+import { Fetch } from &quot;@/components/piixpal/fetch&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Fetch /&gt;
 &lt;/h1&gt;</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// main.js: app.use(Piixpal) from &quot;piixpal/vue&quot;
 
@@ -722,7 +875,7 @@ Piixpal.add(&quot;fetch&quot;, &quot;footer&quot;);</pre>
   <div class="cmp-body pal-doc">
     <div class="habitat"><div class="h-nav" style="height:64px"><i></i></div><button type="button" class="h-btn lime" style="position:absolute;left:70px;top:12px" data-tour="Start a new project here" data-tour-step="1">+ New</button><input class="h-search" aria-label="Search" placeholder="Search…" style="left:178px;top:14px" data-tour="Search every project and file" data-tour-step="2"><span class="h-avatar" style="right:20px;top:14px" data-tour="Your profile and settings" data-tour-step="3">MK</span><p class="h-line" style="bottom:auto;top:118px">Click Scout to take the tour.</p><div class="h-floor" id="d-scout"><i></i><i></i><i></i></div><piix-pal box=".habitat" pal="scout" on="#d-scout" at=".12"></piix-pal></div>
     <div class="cmp-code"><div class="tabs" data-tabs>
-  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
+  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">shadcn</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
   <pre class="codebox tab-pane"><button class="copy" type="button" data-copy="&lt;!-- once, anywhere on the page --&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js&quot;&gt;&lt;/script&gt;
 
@@ -765,16 +918,33 @@ Piixpal.add(&quot;fetch&quot;, &quot;footer&quot;);</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/scout.min.js&quot;);
 Piixpal.add(&quot;scout&quot;, &quot;header&quot;);">Copy</button>await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/scout.min.js&quot;);
 Piixpal.add(&quot;scout&quot;, &quot;header&quot;);</pre>
-  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;scout&quot; /&gt;
-&lt;/h1&gt;">Copy</button>import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+&lt;/h1&gt;">Copy</button>// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;scout&quot; /&gt;
+&lt;/h1&gt;</pre>
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="npx shadcn@latest add https://piixpal.dvkk.dev/r/scout.json
+
+import { Scout } from &quot;@/components/piixpal/scout&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Scout /&gt;
+&lt;/h1&gt;">Copy</button>npx shadcn@latest add https://piixpal.dvkk.dev/r/scout.json
+
+import { Scout } from &quot;@/components/piixpal/scout&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Scout /&gt;
 &lt;/h1&gt;</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// main.js: app.use(Piixpal) from &quot;piixpal/vue&quot;
 
@@ -803,7 +973,7 @@ Piixpal.add(&quot;scout&quot;, &quot;header&quot;);</pre>
   <div class="cmp-body pal-doc">
     <div class="habitat tall"><span class="h-cart" id="d-cart">Cart <b class="count">0</b></span><div class="prods"><div class="prod" data-product><img src="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%2016'%20shape-rendering%3D'crispEdges'%3E%3Crect%20width%3D'16'%20height%3D'16'%20fill%3D'%23fff3d6'%2F%3E%3Cpath%20fill%3D'%23ff4d6d'%20d%3D'M4%203h3v1h2V3h3l3%203-2%202-1-1v7H5V7L4%208%202%206z'%2F%3E%3C%2Fsvg%3E" alt="Pixel tee"><button type="button" class="h-btn add-to-cart">Add tee</button></div><div class="prod" data-product><img src="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%2016'%20shape-rendering%3D'crispEdges'%3E%3Crect%20width%3D'16'%20height%3D'16'%20fill%3D'%23eef6ff'%2F%3E%3Cpath%20fill%3D'%2358c8ff'%20d%3D'M3%204h8v8H3z'%2F%3E%3Cpath%20fill%3D'%2358c8ff'%20d%3D'M11%206h3v4h-3V9h2V7h-2z'%2F%3E%3C%2Fsvg%3E" alt="Mug"><button type="button" class="h-btn add-to-cart">Add mug</button></div><div class="prod" data-product><img src="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'0%200%2016%2016'%20shape-rendering%3D'crispEdges'%3E%3Crect%20width%3D'16'%20height%3D'16'%20fill%3D'%23f3ffe0'%2F%3E%3Cpath%20fill%3D'%238ac926'%20d%3D'M3%209V7l2-2h5l2%202v2z'%2F%3E%3Cpath%20fill%3D'%235c8a12'%20d%3D'M10%209h4v1h-4z'%2F%3E%3C%2Fsvg%3E" alt="Cap"><button type="button" class="h-btn add-to-cart">Add cap</button></div></div><piix-pal box=".habitat" pal="drone" on="#d-cart"></piix-pal></div>
     <div class="cmp-code"><div class="tabs" data-tabs>
-  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
+  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">shadcn</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
   <pre class="codebox tab-pane"><button class="copy" type="button" data-copy="&lt;!-- once, anywhere on the page --&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js&quot;&gt;&lt;/script&gt;
 
@@ -854,16 +1024,33 @@ Piixpal.add(&quot;scout&quot;, &quot;header&quot;);</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/drone.min.js&quot;);
 Piixpal.add(&quot;drone&quot;, &quot;#cart&quot;);">Copy</button>await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/drone.min.js&quot;);
 Piixpal.add(&quot;drone&quot;, &quot;#cart&quot;);</pre>
-  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;drone&quot; /&gt;
-&lt;/h1&gt;">Copy</button>import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+&lt;/h1&gt;">Copy</button>// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;drone&quot; /&gt;
+&lt;/h1&gt;</pre>
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="npx shadcn@latest add https://piixpal.dvkk.dev/r/drone.json
+
+import { Drone } from &quot;@/components/piixpal/drone&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Drone /&gt;
+&lt;/h1&gt;">Copy</button>npx shadcn@latest add https://piixpal.dvkk.dev/r/drone.json
+
+import { Drone } from &quot;@/components/piixpal/drone&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Drone /&gt;
 &lt;/h1&gt;</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// main.js: app.use(Piixpal) from &quot;piixpal/vue&quot;
 
@@ -892,7 +1079,7 @@ Piixpal.add(&quot;drone&quot;, &quot;#cart&quot;);</pre>
   <div class="cmp-body pal-doc">
     <div class="habitat"><button type="button" class="h-btn" style="position:absolute;left:18px;top:18px" onclick="const h=this.closest('.habitat');h.querySelector('.h-cookie').style.display='';const p=h.querySelector('piix-pal');p.replaceWith(p.cloneNode(true))">Bring it back</button><div class="h-cookie" id="d-cookie"><p>We use cookies to remember your theme. That is all.</p><button type="button" class="h-btn lime" onclick="this.closest('.h-cookie').style.display='none'">Accept</button><button type="button" class="h-btn" onclick="this.closest('.h-cookie').style.display='none'">Reject</button></div><piix-pal box=".habitat" pal="crumb" on="#d-cookie"></piix-pal></div>
     <div class="cmp-code"><div class="tabs" data-tabs>
-  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
+  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">shadcn</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
   <pre class="codebox tab-pane"><button class="copy" type="button" data-copy="&lt;!-- once, anywhere on the page --&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js&quot;&gt;&lt;/script&gt;
 
@@ -935,16 +1122,33 @@ Piixpal.add(&quot;drone&quot;, &quot;#cart&quot;);</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/crumb.min.js&quot;);
 Piixpal.add(&quot;crumb&quot;, &quot;#cookie-banner&quot;);">Copy</button>await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/crumb.min.js&quot;);
 Piixpal.add(&quot;crumb&quot;, &quot;#cookie-banner&quot;);</pre>
-  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;crumb&quot; /&gt;
-&lt;/h1&gt;">Copy</button>import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+&lt;/h1&gt;">Copy</button>// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;crumb&quot; /&gt;
+&lt;/h1&gt;</pre>
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="npx shadcn@latest add https://piixpal.dvkk.dev/r/crumb.json
+
+import { Crumb } from &quot;@/components/piixpal/crumb&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Crumb /&gt;
+&lt;/h1&gt;">Copy</button>npx shadcn@latest add https://piixpal.dvkk.dev/r/crumb.json
+
+import { Crumb } from &quot;@/components/piixpal/crumb&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Crumb /&gt;
 &lt;/h1&gt;</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// main.js: app.use(Piixpal) from &quot;piixpal/vue&quot;
 
@@ -973,7 +1177,7 @@ Piixpal.add(&quot;crumb&quot;, &quot;#cookie-banner&quot;);</pre>
   <div class="cmp-body pal-doc">
     <div class="habitat"><div class="h-comments"><div class="h-c"><piix-avatar seed="mia" size="40"></piix-avatar><p><b>mia</b> These little guys are so good.</p></div><div class="h-c"><piix-avatar seed="sam" size="40"></piix-avatar><p><b>sam</b> Mine has horns!</p></div><div class="h-c"><piix-avatar id="d-av" seed="you" size="40" render="voxel"></piix-avatar><input class="h-search" style="position:static;width:220px" aria-label="Your name" placeholder="type your name…" oninput="document.getElementById('d-av').setAttribute('seed', this.value.trim() || 'you')"></div></div></div>
     <div class="cmp-code"><div class="tabs" data-tabs>
-  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
+  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">shadcn</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
   <pre class="codebox tab-pane"><button class="copy" type="button" data-copy="&lt;!-- once, anywhere on the page --&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js&quot;&gt;&lt;/script&gt;
 
@@ -1006,15 +1210,22 @@ Piixpal.add(&quot;crumb&quot;, &quot;#cookie-banner&quot;);</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/avatar.min.js&quot;);
 Piixpal.add(&quot;avatar&quot;, &quot;.comment&quot;, {seed: &quot;someone&quot;});">Copy</button>await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/avatar.min.js&quot;);
 Piixpal.add(&quot;avatar&quot;, &quot;.comment&quot;, {seed: &quot;someone&quot;});</pre>
-  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// load the script once (wrappers/load.js), then it's a plain tag
-&lt;div class=&quot;comment&quot;&gt;
-  &lt;piix-avatar seed=&quot;mia&quot; size=&quot;40&quot;&gt;&lt;/piix-avatar&gt;
-  &lt;p&gt;&lt;b&gt;mia&lt;/b&gt; Hello!&lt;/p&gt;
-&lt;/div&gt;">Copy</button>// load the script once (wrappers/load.js), then it's a plain tag
-&lt;div class=&quot;comment&quot;&gt;
-  &lt;piix-avatar seed=&quot;mia&quot; size=&quot;40&quot;&gt;&lt;/piix-avatar&gt;
-  &lt;p&gt;&lt;b&gt;mia&lt;/b&gt; Hello!&lt;/p&gt;
-&lt;/div&gt;</pre>
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// npm install piixpal
+import { PiixAvatar } from &quot;piixpal/react&quot;;
+
+&lt;PiixAvatar /&gt;">Copy</button>// npm install piixpal
+import { PiixAvatar } from &quot;piixpal/react&quot;;
+
+&lt;PiixAvatar /&gt;</pre>
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="npx shadcn@latest add https://piixpal.dvkk.dev/r/avatar.json
+
+import { Avatar } from &quot;@/components/piixpal/avatar&quot;;
+
+&lt;Avatar /&gt;">Copy</button>npx shadcn@latest add https://piixpal.dvkk.dev/r/avatar.json
+
+import { Avatar } from &quot;@/components/piixpal/avatar&quot;;
+
+&lt;Avatar /&gt;</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// main.js: app.use(Piixpal) from &quot;piixpal/vue&quot;
 
 &lt;div class=&quot;comment&quot;&gt;
@@ -1048,7 +1259,7 @@ Piixpal.add(&quot;avatar&quot;, &quot;.comment&quot;, {seed: &quot;someone&quot;
   <div class="cmp-body pal-doc">
     <div class="habitat"><p class="h-line" style="bottom:auto;top:30px">Choose a password:</p><div class="h-form"><input id="d-pw" type="password" placeholder="type a password…" aria-label="Password" autocomplete="new-password"></div><piix-pal box=".habitat" pal="buff" on="#d-pw"></piix-pal></div>
     <div class="cmp-code"><div class="tabs" data-tabs>
-  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
+  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">shadcn</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
   <pre class="codebox tab-pane"><button class="copy" type="button" data-copy="&lt;!-- once, anywhere on the page --&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js&quot;&gt;&lt;/script&gt;
 
@@ -1087,16 +1298,33 @@ Piixpal.add(&quot;avatar&quot;, &quot;.comment&quot;, {seed: &quot;someone&quot;
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/buff.min.js&quot;);
 Piixpal.add(&quot;buff&quot;, &quot;label&quot;);">Copy</button>await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/buff.min.js&quot;);
 Piixpal.add(&quot;buff&quot;, &quot;label&quot;);</pre>
-  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;buff&quot; /&gt;
-&lt;/h1&gt;">Copy</button>import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+&lt;/h1&gt;">Copy</button>// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;buff&quot; /&gt;
+&lt;/h1&gt;</pre>
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="npx shadcn@latest add https://piixpal.dvkk.dev/r/buff.json
+
+import { Buff } from &quot;@/components/piixpal/buff&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Buff /&gt;
+&lt;/h1&gt;">Copy</button>npx shadcn@latest add https://piixpal.dvkk.dev/r/buff.json
+
+import { Buff } from &quot;@/components/piixpal/buff&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Buff /&gt;
 &lt;/h1&gt;</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// main.js: app.use(Piixpal) from &quot;piixpal/vue&quot;
 
@@ -1125,7 +1353,7 @@ Piixpal.add(&quot;buff&quot;, &quot;label&quot;);</pre>
   <div class="cmp-body pal-doc">
     <div class="habitat"><p class="h-line" style="bottom:auto;top:30px">How was your day?</p><div class="h-form" style="bottom:70px"><input id="d-rate" type="range" min="0" max="10" value="5" aria-label="How was your day?"></div><piix-pal box=".habitat" pal="meh" on="#d-rate"></piix-pal></div>
     <div class="cmp-code"><div class="tabs" data-tabs>
-  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
+  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">shadcn</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
   <pre class="codebox tab-pane"><button class="copy" type="button" data-copy="&lt;!-- once, anywhere on the page --&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js&quot;&gt;&lt;/script&gt;
 
@@ -1164,16 +1392,33 @@ Piixpal.add(&quot;buff&quot;, &quot;label&quot;);</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/meh.min.js&quot;);
 Piixpal.add(&quot;meh&quot;, &quot;label&quot;);">Copy</button>await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/meh.min.js&quot;);
 Piixpal.add(&quot;meh&quot;, &quot;label&quot;);</pre>
-  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;meh&quot; /&gt;
-&lt;/h1&gt;">Copy</button>import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+&lt;/h1&gt;">Copy</button>// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;meh&quot; /&gt;
+&lt;/h1&gt;</pre>
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="npx shadcn@latest add https://piixpal.dvkk.dev/r/meh.json
+
+import { Meh } from &quot;@/components/piixpal/meh&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Meh /&gt;
+&lt;/h1&gt;">Copy</button>npx shadcn@latest add https://piixpal.dvkk.dev/r/meh.json
+
+import { Meh } from &quot;@/components/piixpal/meh&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Meh /&gt;
 &lt;/h1&gt;</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// main.js: app.use(Piixpal) from &quot;piixpal/vue&quot;
 
@@ -1202,7 +1447,7 @@ Piixpal.add(&quot;meh&quot;, &quot;label&quot;);</pre>
   <div class="cmp-body pal-doc">
     <div class="habitat"><p class="h-line" style="bottom:auto;top:30px">Write a very short bio:</p><div class="h-form" style="bottom:40px"><textarea id="d-bio" maxlength="40" rows="3" placeholder="Hi! I make…" aria-label="Bio"></textarea></div><piix-pal box=".habitat" pal="squish" on="#d-bio"></piix-pal></div>
     <div class="cmp-code"><div class="tabs" data-tabs>
-  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
+  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">shadcn</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
   <pre class="codebox tab-pane"><button class="copy" type="button" data-copy="&lt;!-- once, anywhere on the page --&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js&quot;&gt;&lt;/script&gt;
 
@@ -1241,16 +1486,33 @@ Piixpal.add(&quot;meh&quot;, &quot;label&quot;);</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/squish.min.js&quot;);
 Piixpal.add(&quot;squish&quot;, &quot;label&quot;);">Copy</button>await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/squish.min.js&quot;);
 Piixpal.add(&quot;squish&quot;, &quot;label&quot;);</pre>
-  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;squish&quot; /&gt;
-&lt;/h1&gt;">Copy</button>import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+&lt;/h1&gt;">Copy</button>// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;squish&quot; /&gt;
+&lt;/h1&gt;</pre>
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="npx shadcn@latest add https://piixpal.dvkk.dev/r/squish.json
+
+import { Squish } from &quot;@/components/piixpal/squish&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Squish /&gt;
+&lt;/h1&gt;">Copy</button>npx shadcn@latest add https://piixpal.dvkk.dev/r/squish.json
+
+import { Squish } from &quot;@/components/piixpal/squish&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Squish /&gt;
 &lt;/h1&gt;</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// main.js: app.use(Piixpal) from &quot;piixpal/vue&quot;
 
@@ -1279,7 +1541,7 @@ Piixpal.add(&quot;squish&quot;, &quot;label&quot;);</pre>
   <div class="cmp-body pal-doc">
     <div class="habitat"><label class="h-drop" id="d-drop">Drop a file here<small>or click to pick one</small><input type="file" multiple></label><piix-pal box=".habitat" pal="gulp" on="#d-drop" accept></piix-pal></div>
     <div class="cmp-code"><div class="tabs" data-tabs>
-  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
+  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">shadcn</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
   <pre class="codebox tab-pane"><button class="copy" type="button" data-copy="&lt;!-- once, anywhere on the page --&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js&quot;&gt;&lt;/script&gt;
 
@@ -1306,16 +1568,33 @@ Piixpal.add(&quot;squish&quot;, &quot;label&quot;);</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/gulp.min.js&quot;);
 Piixpal.add(&quot;gulp&quot;, &quot;#drop&quot;);">Copy</button>await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/gulp.min.js&quot;);
 Piixpal.add(&quot;gulp&quot;, &quot;#drop&quot;);</pre>
-  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;gulp&quot; /&gt;
-&lt;/h1&gt;">Copy</button>import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+&lt;/h1&gt;">Copy</button>// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;gulp&quot; /&gt;
+&lt;/h1&gt;</pre>
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="npx shadcn@latest add https://piixpal.dvkk.dev/r/gulp.json
+
+import { Gulp } from &quot;@/components/piixpal/gulp&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Gulp /&gt;
+&lt;/h1&gt;">Copy</button>npx shadcn@latest add https://piixpal.dvkk.dev/r/gulp.json
+
+import { Gulp } from &quot;@/components/piixpal/gulp&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Gulp /&gt;
 &lt;/h1&gt;</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// main.js: app.use(Piixpal) from &quot;piixpal/vue&quot;
 
@@ -1344,7 +1623,7 @@ Piixpal.add(&quot;gulp&quot;, &quot;#drop&quot;);</pre>
   <div class="cmp-body pal-doc">
     <div class="habitat"><div class="h-btns" style="top:26px;bottom:auto;gap:10px"><button type="button" class="h-btn" data-call="#d-plug:offline">Go offline</button><button type="button" class="h-btn lime" data-call="#d-plug:online">Back online</button></div><piix-pal box=".habitat" pal="plug" id="d-plug"></piix-pal></div>
     <div class="cmp-code"><div class="tabs" data-tabs>
-  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
+  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">shadcn</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
   <pre class="codebox tab-pane"><button class="copy" type="button" data-copy="&lt;!-- once, anywhere on the page --&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js&quot;&gt;&lt;/script&gt;
 
@@ -1371,16 +1650,33 @@ Piixpal.add(&quot;gulp&quot;, &quot;#drop&quot;);</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/plug.min.js&quot;);
 Piixpal.add(&quot;plug&quot;, &quot;body&quot;);">Copy</button>await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/plug.min.js&quot;);
 Piixpal.add(&quot;plug&quot;, &quot;body&quot;);</pre>
-  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;plug&quot; /&gt;
-&lt;/h1&gt;">Copy</button>import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+&lt;/h1&gt;">Copy</button>// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;plug&quot; /&gt;
+&lt;/h1&gt;</pre>
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="npx shadcn@latest add https://piixpal.dvkk.dev/r/plug.json
+
+import { Plug } from &quot;@/components/piixpal/plug&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Plug /&gt;
+&lt;/h1&gt;">Copy</button>npx shadcn@latest add https://piixpal.dvkk.dev/r/plug.json
+
+import { Plug } from &quot;@/components/piixpal/plug&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Plug /&gt;
 &lt;/h1&gt;</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// main.js: app.use(Piixpal) from &quot;piixpal/vue&quot;
 
@@ -1410,7 +1706,7 @@ Piixpal.add(&quot;plug&quot;, &quot;body&quot;);</pre>
   <div class="cmp-body pal-doc">
     <div class="habitat tall"><div class="lv"><h4 class="lv-h" id="d-pix" style="left:26px;top:178px">Play me</h4><p class="lv-p" style="left:196px;top:92px;width:220px">Every line of text is a platform. Bump the buttons from below.</p><button type="button" class="h-btn lime lv-b" style="left:40px;top:292px">Jump</button><button type="button" class="h-btn lv-b" style="left:236px;top:236px">Coin</button><button type="button" class="h-btn lv-b" style="left:340px;top:176px">Higher</button></div><piix-pal box=".habitat" pal="pix" on="#d-pix" coins="5"></piix-pal></div>
     <div class="cmp-code"><div class="tabs" data-tabs>
-  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
+  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">shadcn</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
   <pre class="codebox tab-pane"><button class="copy" type="button" data-copy="&lt;!-- once, anywhere on the page --&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js&quot;&gt;&lt;/script&gt;
 
@@ -1445,16 +1741,33 @@ Piixpal.add(&quot;plug&quot;, &quot;body&quot;);</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/pix.min.js&quot;);
 Piixpal.add(&quot;pix&quot;, &quot;h1&quot;);">Copy</button>await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/pix.min.js&quot;);
 Piixpal.add(&quot;pix&quot;, &quot;h1&quot;);</pre>
-  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;pix&quot; /&gt;
-&lt;/h1&gt;">Copy</button>import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+&lt;/h1&gt;">Copy</button>// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;pix&quot; /&gt;
+&lt;/h1&gt;</pre>
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="npx shadcn@latest add https://piixpal.dvkk.dev/r/pix.json
+
+import { Pix } from &quot;@/components/piixpal/pix&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Pix /&gt;
+&lt;/h1&gt;">Copy</button>npx shadcn@latest add https://piixpal.dvkk.dev/r/pix.json
+
+import { Pix } from &quot;@/components/piixpal/pix&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Pix /&gt;
 &lt;/h1&gt;</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// main.js: app.use(Piixpal) from &quot;piixpal/vue&quot;
 
@@ -1483,7 +1796,7 @@ Piixpal.add(&quot;pix&quot;, &quot;h1&quot;);</pre>
   <div class="cmp-body pal-doc">
     <div class="habitat tall"><p class="h-text" style="bottom:auto;top:96px;font-size:56px">Let it snow</p><div class="h-btns" style="bottom:22px;gap:10px"><button type="button" class="h-btn" data-call="#d-wx:setAttribute" data-args='["kind","snow"]'>Snow</button><button type="button" class="h-btn" data-call="#d-wx:setAttribute" data-args='["kind","rain"]'>Rain</button><button type="button" class="h-btn" data-call="#d-wx:setAttribute" data-args='["kind","leaves"]'>Leaves</button><button type="button" class="h-btn" data-call="#d-wx:setAttribute" data-args='["kind","petals"]'>Petals</button></div><piix-weather id="d-wx" kind="snow" amount="2"></piix-weather></div>
     <div class="cmp-code"><div class="tabs" data-tabs>
-  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
+  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">shadcn</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
   <pre class="codebox tab-pane"><button class="copy" type="button" data-copy="&lt;!-- once, anywhere on the page --&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js&quot;&gt;&lt;/script&gt;
 
@@ -1532,23 +1845,22 @@ Piixpal.add(&quot;pix&quot;, &quot;h1&quot;);</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/weather.min.js&quot;);
 Piixpal.add(&quot;weather&quot;, &quot;body&quot;, {kind: &quot;snow&quot;});">Copy</button>await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/weather.min.js&quot;);
 Piixpal.add(&quot;weather&quot;, &quot;body&quot;, {kind: &quot;snow&quot;});</pre>
-  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// load the script once (wrappers/load.js), then it's a plain tag
-&lt;!-- the whole page --&gt;
-&lt;piix-weather kind=&quot;snow&quot;&gt;&lt;/piix-weather&gt;
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// npm install piixpal
+import { PiixWeather } from &quot;piixpal/react&quot;;
 
-&lt;!-- or just inside one element --&gt;
-&lt;header class=&quot;hero&quot;&gt;
-  &lt;h1&gt;Happy holidays&lt;/h1&gt;
-  &lt;piix-weather kind=&quot;snow&quot; amount=&quot;2&quot;&gt;&lt;/piix-weather&gt;
-&lt;/header&gt;">Copy</button>// load the script once (wrappers/load.js), then it's a plain tag
-&lt;!-- the whole page --&gt;
-&lt;piix-weather kind=&quot;snow&quot;&gt;&lt;/piix-weather&gt;
+&lt;PiixWeather /&gt;">Copy</button>// npm install piixpal
+import { PiixWeather } from &quot;piixpal/react&quot;;
 
-&lt;!-- or just inside one element --&gt;
-&lt;header class=&quot;hero&quot;&gt;
-  &lt;h1&gt;Happy holidays&lt;/h1&gt;
-  &lt;piix-weather kind=&quot;snow&quot; amount=&quot;2&quot;&gt;&lt;/piix-weather&gt;
-&lt;/header&gt;</pre>
+&lt;PiixWeather /&gt;</pre>
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="npx shadcn@latest add https://piixpal.dvkk.dev/r/weather.json
+
+import { Weather } from &quot;@/components/piixpal/weather&quot;;
+
+&lt;Weather /&gt;">Copy</button>npx shadcn@latest add https://piixpal.dvkk.dev/r/weather.json
+
+import { Weather } from &quot;@/components/piixpal/weather&quot;;
+
+&lt;Weather /&gt;</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// main.js: app.use(Piixpal) from &quot;piixpal/vue&quot;
 
 &lt;!-- the whole page --&gt;
@@ -1598,7 +1910,7 @@ Piixpal.add(&quot;weather&quot;, &quot;body&quot;, {kind: &quot;snow&quot;});</p
   <div class="cmp-body pal-doc">
     <div class="habitat"><button type="button" class="h-btn" style="position:absolute;right:20px;top:20px" data-call="#d-hatch:reset">Start over</button><p class="h-line" style="bottom:auto;top:28px;right:150px">Tap the egg. What hatches is yours alone.</p><div class="h-floor" id="d-hatchfloor"><i></i><i></i><i></i></div><piix-pal box=".habitat" pal="hatch" id="d-hatch" on="#d-hatchfloor" at=".5"></piix-pal></div>
     <div class="cmp-code"><div class="tabs" data-tabs>
-  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
+  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">shadcn</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
   <pre class="codebox tab-pane"><button class="copy" type="button" data-copy="&lt;!-- once, anywhere on the page --&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js&quot;&gt;&lt;/script&gt;
 
@@ -1629,16 +1941,33 @@ Piixpal.add(&quot;weather&quot;, &quot;body&quot;, {kind: &quot;snow&quot;});</p
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/hatch.min.js&quot;);
 Piixpal.add(&quot;hatch&quot;, &quot;footer&quot;);">Copy</button>await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/hatch.min.js&quot;);
 Piixpal.add(&quot;hatch&quot;, &quot;footer&quot;);</pre>
-  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;hatch&quot; /&gt;
-&lt;/h1&gt;">Copy</button>import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+&lt;/h1&gt;">Copy</button>// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;hatch&quot; /&gt;
+&lt;/h1&gt;</pre>
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="npx shadcn@latest add https://piixpal.dvkk.dev/r/hatch.json
+
+import { Hatch } from &quot;@/components/piixpal/hatch&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Hatch /&gt;
+&lt;/h1&gt;">Copy</button>npx shadcn@latest add https://piixpal.dvkk.dev/r/hatch.json
+
+import { Hatch } from &quot;@/components/piixpal/hatch&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Hatch /&gt;
 &lt;/h1&gt;</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// main.js: app.use(Piixpal) from &quot;piixpal/vue&quot;
 
@@ -1667,7 +1996,7 @@ Piixpal.add(&quot;hatch&quot;, &quot;footer&quot;);</pre>
   <div class="cmp-body pal-doc">
     <div class="habitat"><button type="button" class="h-btn" style="position:absolute;right:20px;top:20px" onclick="document.querySelectorAll('#gem piix-pal').forEach(p => p.ctl && p.ctl.reset())">Hide them again</button><h4 class="lv-h" id="d-gem1" style="position:absolute;left:24px;top:40px;margin:0">Treasure</h4><p class="h-line" id="d-gem2" style="bottom:auto;top:110px">Gems hide on headings, on lines of text, on buttons, anywhere.</p><div class="h-btns" style="bottom:70px"><span class="h-btn" id="d-gem3">A button</span></div><piix-pal box=".habitat" pal="gem" hunt="docs" gem="1" total="3" reward="PIXPAL" on="#d-gem1" at=".9"></piix-pal><piix-pal box=".habitat" pal="gem" hunt="docs" gem="2" total="3" color="#ff4d6d" on="#d-gem2" at=".7"></piix-pal><piix-pal box=".habitat" pal="gem" hunt="docs" gem="3" total="3" color="#7bd63a" on="#d-gem3" at=".2"></piix-pal></div>
     <div class="cmp-code"><div class="tabs" data-tabs>
-  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
+  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">shadcn</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
   <pre class="codebox tab-pane"><button class="copy" type="button" data-copy="&lt;!-- once, anywhere on the page --&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js&quot;&gt;&lt;/script&gt;
 
@@ -1698,16 +2027,33 @@ Piixpal.add(&quot;hatch&quot;, &quot;footer&quot;);</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/gem.min.js&quot;);
 Piixpal.add(&quot;gem&quot;, &quot;footer&quot;);">Copy</button>await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/gem.min.js&quot;);
 Piixpal.add(&quot;gem&quot;, &quot;footer&quot;);</pre>
-  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;gem&quot; /&gt;
-&lt;/h1&gt;">Copy</button>import { PiixPal } from &quot;piixpal/react&quot;; // or copy wrappers/react.jsx
+&lt;/h1&gt;">Copy</button>// npm install piixpal
+import { PiixPal } from &quot;piixpal/react&quot;;
 
 &lt;h1&gt;
   Hello
   &lt;PiixPal pal=&quot;gem&quot; /&gt;
+&lt;/h1&gt;</pre>
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="npx shadcn@latest add https://piixpal.dvkk.dev/r/gem.json
+
+import { Gem } from &quot;@/components/piixpal/gem&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Gem /&gt;
+&lt;/h1&gt;">Copy</button>npx shadcn@latest add https://piixpal.dvkk.dev/r/gem.json
+
+import { Gem } from &quot;@/components/piixpal/gem&quot;;
+
+&lt;h1&gt;
+  Hello
+  &lt;Gem /&gt;
 &lt;/h1&gt;</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// main.js: app.use(Piixpal) from &quot;piixpal/vue&quot;
 
@@ -1736,7 +2082,7 @@ Piixpal.add(&quot;gem&quot;, &quot;footer&quot;);</pre>
   <div class="cmp-body pal-doc">
     <div class="habitat"><button type="button" class="h-btn" style="position:absolute;right:20px;top:20px" data-call="#d-stickers:clear">Peel them all</button><p class="h-text" style="bottom:auto;top:110px;left:210px;right:20px;font-size:40px">Stick it here</p><div style="position:absolute;left:20px;top:20px"><piix-stickers id="d-stickers" box=".habitat" names="heart,star,bolt,smile,crown,wow,mochi,ufo,toast"></piix-stickers></div></div>
     <div class="cmp-code"><div class="tabs" data-tabs>
-  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
+  <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">shadcn</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
   <pre class="codebox tab-pane"><button class="copy" type="button" data-copy="&lt;!-- once, anywhere on the page --&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js&quot;&gt;&lt;/script&gt;
 
@@ -1757,9 +2103,22 @@ Piixpal.add(&quot;gem&quot;, &quot;footer&quot;);</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/stickers.min.js&quot;);
 Piixpal.add(&quot;stickers&quot;, &quot;footer&quot;);">Copy</button>await import(&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/stickers.min.js&quot;);
 Piixpal.add(&quot;stickers&quot;, &quot;footer&quot;);</pre>
-  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// load the script once (wrappers/load.js), then it's a plain tag
-&lt;piix-stickers names=&quot;heart,star,bolt,mochi,ufo&quot;&gt;&lt;/piix-stickers&gt;">Copy</button>// load the script once (wrappers/load.js), then it's a plain tag
-&lt;piix-stickers names=&quot;heart,star,bolt,mochi,ufo&quot;&gt;&lt;/piix-stickers&gt;</pre>
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// npm install piixpal
+import { PiixStickers } from &quot;piixpal/react&quot;;
+
+&lt;PiixStickers /&gt;">Copy</button>// npm install piixpal
+import { PiixStickers } from &quot;piixpal/react&quot;;
+
+&lt;PiixStickers /&gt;</pre>
+  <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="npx shadcn@latest add https://piixpal.dvkk.dev/r/stickers.json
+
+import { Stickers } from &quot;@/components/piixpal/stickers&quot;;
+
+&lt;Stickers /&gt;">Copy</button>npx shadcn@latest add https://piixpal.dvkk.dev/r/stickers.json
+
+import { Stickers } from &quot;@/components/piixpal/stickers&quot;;
+
+&lt;Stickers /&gt;</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// main.js: app.use(Piixpal) from &quot;piixpal/vue&quot;
 
 &lt;piix-stickers names=&quot;heart,star,bolt,mochi,ufo&quot;&gt;&lt;/piix-stickers&gt;">Copy</button>// main.js: app.use(Piixpal) from &quot;piixpal/vue&quot;
