@@ -353,7 +353,8 @@ export const POWERS = [
     where: "body",
     uses: "the browser’s online and offline events",
     support: "every modern browser",
-    try: "press Go offline, then Back online"
+    try: "press Go offline, then Back online",
+    desc: "An offline indicator with feelings. When the connection drops, a little plug slides into the corner, unplugged and sparking. When it comes back, it hops into its socket and slides away."
   }
   // new powers go above this line
 ];
