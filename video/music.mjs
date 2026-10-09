@@ -118,3 +118,7 @@ stab(34, tones('C', 4).concat(m('C5'), m('G5')), 1.4);
 pad(34, 3, tones('C', 4).concat(m('C3'), m('E5')), 1.6);
 ['C6', 'E6', 'G6', 'C7'].forEach((n, i) => lead(35.2 + i * .125, .2, m(n), .6, i % 2 ? .3 : -.3));
 
+/* every sound effect, on its cue */
+const seen = {};
+for (const [t, kind] of cues) { const i = (seen[kind] = (seen[kind] ?? -1) + 1); FX[kind]?.(t, i); }
+
