@@ -212,3 +212,13 @@ function arrive(T, at, x, y, name, s, draw) {
   draw(p);
 }
 
+/* ---------- the browser window the opening happens in ---------- */
+function browser(x, y, w, h, { bg = C.card, url = 'yourwebsite.com', dots = [C.line, C.line, C.line], chrome = '#ebe4d4', dark = false } = {}) {
+  rrect(x + 10, y + 14, w, h, 22, 'rgba(0,0,0,.35)');
+  rrect(x, y, w, h, 22, bg);
+  g.save(); g.beginPath(); g.roundRect(x, y, w, 58, [22, 22, 0, 0]); g.fillStyle = chrome; g.fill(); g.restore();
+  dots.forEach((d, i) => { g.beginPath(); g.arc(x + 34 + i * 30, y + 29, 9, 0, 7); g.fillStyle = d; g.fill(); });
+  rrect(x + w / 2 - 200, y + 13, 400, 32, 16, dark ? 'rgba(255,255,255,.07)' : 'rgba(0,0,0,.06)');
+  text(url, x + w / 2, y + 30, { size: 19, weight: 400, fam: MONO, color: dark ? C.soft : C.muted, align: 'center', base: 'middle' });
+}
+
