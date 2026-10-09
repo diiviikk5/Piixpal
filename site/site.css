@@ -364,3 +364,18 @@ code,kbd,pre{font-family:var(--f-mono)}
 .pw-b2{position:absolute;right:30px;bottom:170px}
 #pw-toast .btn{position:absolute;left:22px;top:48px}
 .links a[aria-current=page]{background:var(--paper-2);color:var(--ink)}
+
+/* ---------- nav on small screens: links get their own swipeable row ---------- */
+@media (max-width:820px){
+  .nav-in{flex-wrap:wrap;height:auto;row-gap:2px;column-gap:12px;padding:10px 0 6px}
+  .links{display:flex;order:5;flex-basis:100%;margin:0 -4px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .links::-webkit-scrollbar{display:none}
+  .links a{flex:none;font-size:14.5px;padding:7px 10px}
+  .theme{margin-left:auto}
+  .nav .btn{margin-left:0}
+}
+@media (max-width:520px){
+  .nav .btn-sm{font-size:0;gap:0;width:40px;padding:0;justify-content:center}
+  .nav .btn-sm svg{width:18px;height:18px}
+  .logo span{font-size:inherit}
+}
