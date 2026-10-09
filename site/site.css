@@ -363,3 +363,4 @@ code,kbd,pre{font-family:var(--f-mono)}
 .pw-b1{position:absolute;left:210px;bottom:120px}
 .pw-b2{position:absolute;right:30px;bottom:170px}
 #pw-toast .btn{position:absolute;left:22px;top:48px}
+.links a[aria-current=page]{background:var(--paper-2);color:var(--ink)}
