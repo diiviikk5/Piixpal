@@ -357,7 +357,8 @@ export const POWERS = [
     desc: "An offline indicator with feelings. When the connection drops, a little plug slides into the corner, unplugged and sparking. When it comes back, it hops into its socket and slides away.",
     attrs: [["always","stay in the corner, plugged in, even when online"]],
     api: "el.ctl.offline()  el.ctl.online()",
-    events: "piix:offline, piix:online"
+    events: "piix:offline, piix:online",
+    hab: "<div class=\"h-btns\" style=\"top:26px;bottom:auto;gap:10px\"><button type=\"button\" class=\"h-btn\" data-call=\"#d-plug:offline\">Go offline</button><button type=\"button\" class=\"h-btn lime\" data-call=\"#d-plug:online\">Back online</button></div><piix-pal pal=\"plug\" id=\"d-plug\"></piix-pal>"
   }
   // new powers go above this line
 ];
