@@ -283,8 +283,8 @@ const spriteCard = s => `    <article class="scard${s.big ? ' big' : ''}" id="s-
         <div class="s-actions"><button type="button" class="dark" data-copy="${esc(`<piix-sprite name="${s.name}"></piix-sprite>`)}">Copy</button><button type="button" data-pick="${s.name}">Customise</button></div>
       </div>
     </article>`;
-const CDN_ALL = 'https://cdn.jsdelivr.net/gh/diiviikk5/Piixpal@main/piixpal.min.js';
-const CDN_ONE = n => `https://cdn.jsdelivr.net/gh/diiviikk5/Piixpal@main/dist/c/${n}.min.js`;
+const CDN_ALL = 'https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js';
+const CDN_ONE = n => `https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/${n}.min.js`;
 /* every way to add one component, as tabs: like a UI library's install box */
 const installTabs = (name, kind, markup, where = 'h1', query = '') => {
   if (kind === 'element') {
@@ -633,7 +633,7 @@ const indexBody = `<header class="doc-head">
 <section class="doc-sec" aria-labelledby="ins-h">
   <h2 id="ins-h">Install once</h2>
   <p>Then every tag on these pages just works.</p>
-  ${codeBox('<script src="https://cdn.jsdelivr.net/gh/diiviikk5/Piixpal@main/piixpal.min.js"></script>')}
+  ${codeBox('<script src="https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js"></script>')}
 </section>`;
 
 /* ---------- install ---------- */
@@ -644,27 +644,48 @@ const installBody = `<header class="doc-head">
   <p>Pick whatever suits your site. Nothing to download, no build step, no account. Every option below works on its own.</p>
 </header>
 
-<section class="doc-sec" id="cdn" aria-labelledby="i1"><h2 id="i1">1. Everything, one tag</h2>
+<section class="doc-sec" id="cdn" aria-labelledby="i1"><h2 id="i1">Everything, one tag</h2>
   <p>All ${sprites.length + PALS.length + POWERS.length + 4} components in one file (about ${GZ} KB gzipped), served free by jsDelivr. Then use any tag from these pages.</p>
   ${codeBox(`<script src="${CDN_ALL}"></script>\n\n<h1>Hello <piix-pal pal="bitbug"></piix-pal></h1>`)}
 </section>
 
-<section class="doc-sec" id="single" aria-labelledby="i2"><h2 id="i2">2. Just the ones you use</h2>
+<section class="doc-sec" id="npm" aria-labelledby="i-npm"><h2 id="i-npm">npm</h2>
+  <p>For projects with a bundler. Everything ships in the package; nothing loads from a CDN.</p>
+  ${codeBox('npm install piixpal')}
+  <div class="tabs" data-tabs style="margin-top:12px">
+    <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">React / Next</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button><button type="button" role="tab" aria-selected="false">Anything else</button></div>
+    ${[
+      'import { PiixPal, PiixSprite } from "piixpal/react";\n\nexport default function Hero() {\n  return (\n    <h1>\n      Hello <PiixPal pal="bitbug" />\n      <PiixSprite name="gloop" size={200} />\n    </h1>\n  );\n}',
+      '// main.js\nimport Piixpal from "piixpal/vue";\ncreateApp(App).use(Piixpal).mount("#app");\n\n<!-- any template -->\n<h1>Hello <piix-pal pal="bitbug" /></h1>',
+      '<script>\n  import Piixpal from "piixpal/svelte";\n</script>\n\n<Piixpal />\n<h1>Hello <piix-pal pal="bitbug"></piix-pal></h1>',
+      '// once, in code that runs in the browser\nimport "piixpal";\n\n// then the tags work anywhere\n// <h1>Hello <piix-pal pal="bitbug"></piix-pal></h1>'
+    ].map((code, i) => `<pre class="codebox tab-pane"${i ? ' hidden' : ''}><button class="copy" type="button" data-copy="${esc(code)}">Copy</button>${esc(code)}</pre>`).join('\n    ')}
+  </div>
+</section>
+
+<section class="doc-sec" id="shadcn" aria-labelledby="i-shadcn"><h2 id="i-shadcn">shadcn</h2>
+  <p>Add a component straight into your project as a file you own, like any shadcn component. Every component on these pages has its own entry.</p>
+  ${codeBox('npx shadcn@latest add https://piixpal.dvkk.dev/r/bitbug.json')}
+  ${codeBox('import { Bitbug } from "@/components/piixpal/bitbug";\n\n<h1>Hello <Bitbug /></h1>')}
+  <p style="margin-top:14px">Swap <code>bitbug</code> for any component's name. The full list is at <a href="../r/registry.json">/r/registry.json</a>.</p>
+</section>
+
+<section class="doc-sec" id="single" aria-labelledby="i2"><h2 id="i2">Just the ones you use</h2>
   <p>Every pal and sprite has its own tiny file (1–4 KB). The shared engine loads itself the first time, once, however many you add.</p>
   ${codeBox(`<script src="${CDN_ONE('kitty')}"></script>\n<script src="${CDN_ONE('gloop')}"></script>\n\n<h2>Nap spot <piix-pal pal="kitty"></piix-pal></h2>\n<piix-sprite name="gloop"></piix-sprite>`)}
 </section>
 
-<section class="doc-sec" id="nomarkup" aria-labelledby="i3"><h2 id="i3">3. No markup at all</h2>
+<section class="doc-sec" id="nomarkup" aria-labelledby="i3"><h2 id="i3">No markup at all</h2>
   <p>For Webflow, Framer, WordPress, Shopify, Squarespace, Notion sites: anywhere with a "custom code" box. Say which pal goes where, right on the script tag. Format: <code>name@css-selector</code>, comma separated, optional <code>?attr=value</code>.</p>
   ${codeBox(`<script src="${CDN_ALL}"\n  data-pals="bitbug@h1, boing@footer, pip@.button, moss@p?at=.9"></script>`)}
   <p style="margin-top:14px">Not sure what to pick? The <a href="builder.html">Builder</a> writes this line for you.</p>
 </section>
 
-<section class="doc-sec" id="js" aria-labelledby="i4"><h2 id="i4">4. From JavaScript</h2>
+<section class="doc-sec" id="js" aria-labelledby="i4"><h2 id="i4">From JavaScript</h2>
   ${codeBox(`Piixpal.add("bitbug", "h1");                 // a pal on the first h1\nPiixpal.add("pip", ".btn");                  // every .btn is a perch\nPiixpal.add("gloop", "#hero", { size: 220 }); // sprites go inside the element\nPiixpal.add("kitty", someElement);           // or pass an element\n\nPiixpal.list();   // everything registered\nPiixpal.clear();  // remove them all`)}
 </section>
 
-<section class="doc-sec" id="frameworks" aria-labelledby="i5"><h2 id="i5">5. React, Next.js, Vue, Svelte, Astro</h2>
+<section class="doc-sec" id="frameworks" aria-labelledby="i5"><h2 id="i5">React, Next.js, Vue, Svelte, Astro</h2>
   <p>Pals are standard web components, so plain tags work everywhere once the script is loaded. The wrappers just load it for you.</p>
   <div class="tabs" data-tabs>
     <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">React / Next</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button><button type="button" role="tab" aria-selected="false">Astro</button></div>
@@ -677,8 +698,8 @@ const installBody = `<header class="doc-head">
   </div>
 </section>
 
-<section class="doc-sec" id="selfhost" aria-labelledby="i6"><h2 id="i6">6. Host it yourself</h2>
-  <p>Download <a href="https://raw.githubusercontent.com/diiviikk5/Piixpal/main/piixpal.min.js" download>piixpal.min.js</a> (or anything in <code>dist/</code>) and point a script tag at your copy. MIT licensed, no tracking, works offline. An npm package is on the way.</p>
+<section class="doc-sec" id="selfhost" aria-labelledby="i6"><h2 id="i6">Host it yourself</h2>
+  <p>Download <a href="../piixpal.min.js" download>piixpal.min.js</a> (or anything in <code>dist/</code>) and point a script tag at your copy. MIT licensed, no tracking, works offline.</p>
 </section>
 
 <section class="doc-sec" id="bookmarklet" aria-labelledby="i7"><h2 id="i7">Try it on any website</h2>
