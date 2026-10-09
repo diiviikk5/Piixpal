@@ -42,3 +42,12 @@ defineSprite('_socket', {
   frames: { idle: [['.kkkkkkk.', 'kwwwwwwwk', 'kwwwwwwwk', 'kwssswwwk', 'kwwwwwwwk', 'kwwwwwwwk', 'kwwwwwwwk', 'kwssswwwk', 'kwwwwwwwk', 'kWWWWWWWk', '.kkkkkkk.', '.........']] }
 });
 
+/* sparks: little yellow pixels that fizz off the prongs */
+const plugSpark = (layer, x, y, S) => {
+  const d = document.createElement('div');
+  const s = Math.round(2 * S + Math.random() * 2 * S);
+  d.style.cssText = `position:absolute;left:0;top:0;width:${s}px;height:${s}px;background:${pick(['#ffd23f', '#ffffff', '#ff9a2f'])};pointer-events:none`;
+  layer.appendChild(d);
+  return { d, x, y, vx: rnd(-60, 160) * S, vy: -rnd(40, 160) * S, life: rnd(.25, .5) };
+};
+
