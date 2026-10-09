@@ -1,0 +1,39 @@
+<!doctype html>
+<!-- Piixpal launch film. A 1920x1080 stage drawn from the real pals, rendered frame by frame by video/render.mjs.
+     Open it in a browser to watch it play live; ?t=12 starts at 12s. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Piixpal: launch film</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@400;600&family=Silkscreen&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; background: #000; overflow: hidden }
+  #stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #17121f }
+  #c { position: absolute; inset: 0 }
+  #big { position: absolute; inset: 0; pointer-events: none }
+  #big piix-sprite { position: absolute; transform-origin: 50% 100% }
+</style>
+<script>
+/* a clock the renderer owns: the page only moves when it is told to */
+(() => {
+  let now = 0, seed = 7;
+  window.__realNow = performance.now.bind(performance);
+  const queue = [];
+  performance.now = () => now;
+  Date.now = () => 1767225600000 + now;
+  window.requestAnimationFrame = cb => queue.push(cb);
+  window.cancelAnimationFrame = () => {};
+  Math.random = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+  window.__clock = {
+    get ms() { return now; },
+    step(dt) { now += dt; queue.splice(0).forEach(cb => cb(now)); }
+  };
+})();
+</script>
+</head>
+<body>
+<div id="stage"><canvas id="c" width="1920" height="1080"></canvas><div id="big"></div></div>
+<script src="../piixpal.js"></script>
+<script src="film.js"></script>
+</body>
+</html>
