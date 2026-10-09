@@ -54,7 +54,7 @@ export const POWERS = [
     attrs: [['type', '<code>{ type: "ok" | "error" | "info" }</code>'], ['title', '<code>{ title: "Mia" }</code> a bold first line'], ['time', '<code>{ time: 6000 }</code> ms on screen, 0 = until dismissed (default 4200)']],
     api: 'Piixpal.toast(msg, opts)  el.ctl.toast(msg, opts)  el.ctl.clear()',
     hab: '<div class="h-btns" style="top:26px;bottom:auto;justify-content:flex-start;padding-left:22px;gap:10px;flex-wrap:wrap;right:22px"><button type="button" class="h-btn lime" data-call="#d-pidge:toast" data-args=\'["Saved your changes",{"type":"ok"}]\'>Save</button><button type="button" class="h-btn" data-call="#d-pidge:toast" data-args=\'["Could not reach the server",{"type":"error","title":"Upload failed"}]\'>Fail</button><button type="button" class="h-btn" data-call="#d-pidge:toast" data-args=\'["Mia liked your post",{"type":"info"}]\'>Notify</button></div><piix-pal pal="pidge" id="d-pidge"></piix-pal>',
-    code: '<script src="https://cdn.jsdelivr.net/gh/diiviikk5/Piixpal@main/dist/c/pidge.min.js"></script>\n<script>\n  Piixpal.toast("Saved!", { type: "ok" });\n</script>'
+    code: '<script src="https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/pidge.min.js"></script>\n<script>\n  Piixpal.toast("Saved!", { type: "ok" });\n</script>'
   },
   {
     id: 'plane', fam: 'jobs', accent: 'var(--coral)', kind: 'pal', does: 'banner', where: 'body', query: 'text=v2 is out',

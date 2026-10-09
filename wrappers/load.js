@@ -1,6 +1,6 @@
 /* Load Piixpal once, from the CDN or a URL you host yourself. Safe to call many times
  * and safe during server rendering (it does nothing without a window). */
-export const PIIXPAL_CDN = 'https://cdn.jsdelivr.net/gh/diiviikk5/Piixpal@main/piixpal.min.js';
+export const PIIXPAL_CDN = 'https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js';
 let loading = null;
 export function loadPiixpal(src = PIIXPAL_CDN) {
   if (typeof window === 'undefined') return Promise.resolve(null);

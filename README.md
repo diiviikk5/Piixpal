@@ -11,7 +11,7 @@ One script tag. Zero dependencies. Free and open source (MIT).
 </div>
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/diiviikk5/Piixpal@main/piixpal.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js"></script>
 
 <h1>
   Hello world
@@ -27,8 +27,8 @@ No download, no build step, no account.
 
 | Way | Snippet |
 | --- | --- |
-| **Everything, one tag** (~45 KB gzipped) | `<script src="https://cdn.jsdelivr.net/gh/diiviikk5/Piixpal@main/piixpal.min.js"></script>` |
-| **Just one component** (1–4 KB, the shared 16 KB engine loads itself once) | `<script src="https://cdn.jsdelivr.net/gh/diiviikk5/Piixpal@main/dist/c/kitty.min.js"></script>` |
+| **Everything, one tag** (~45 KB gzipped) | `<script src="https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js"></script>` |
+| **Just one component** (1–4 KB, the shared 16 KB engine loads itself once) | `<script src="https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/kitty.min.js"></script>` |
 | **No markup at all** (Webflow, Framer, WordPress, Shopify custom-code boxes) | `<script src="…/piixpal.min.js" data-pals="bitbug@h1, boing@footer, pip@.btn"></script>` |
 | **JavaScript** | `Piixpal.add("kitty", "h1")` |
 | **React / Next** | `import { PiixPal } from "piixpal/react"` → `<PiixPal pal="bitbug" />` (or copy `wrappers/react.jsx`) |

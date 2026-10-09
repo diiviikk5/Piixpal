@@ -188,7 +188,7 @@ document.querySelectorAll('[data-tabs]').forEach(box => {
       else { const t = map(where); if (t) Piixpal.add(id, t); }
     });
     const items = [...picked].map(([id, w]) => id + '@' + w).join(', ');
-    const base = 'https://cdn.jsdelivr.net/gh/diiviikk5/Piixpal@main/';
+    const base = 'https://cdn.jsdelivr.net/npm/piixpal@0.4/';
     const out = !picked.size ? '<!-- tick a pal on the left -->'
       : mode === 'all' ? '<script src="' + base + 'piixpal.min.js"\n  data-pals="' + items + '"></script>'
       : [...picked.keys()].map((id, i) => '<script src="' + base + 'dist/c/' + id + '.min.js"' + (i === 0 ? '\n  data-pals="' + items + '"' : '') + '></script>').join('\n');
