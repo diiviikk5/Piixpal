@@ -35,3 +35,17 @@ const hat = (t0, g = 1, open = false) => { let p = 0; voice(t0, open ? .3 : .08,
 const crash = (t0, g = 1) => { let p = 0; const f = lp(.7); voice(t0, 2.6, t => { const n = noise(), v = n - p; p = n; return f(v) * env(t, .002, .7); }, .3 * g, -.15); };
 const clap = (t0, g = 1) => { const f = lp(.4); voice(t0, .25, t => f(noise()) * (env(t, .001, .012) + env(Math.max(0, t - .012), .001, .012) * .8 + env(Math.max(0, t - .025), .001, .08)), .4 * g, .1); };
 
+/* ---------- tonal ---------- */
+function bass(t0, len, note, g = 1) { const f = lp(.08); voice(t0, len, t => f(pulse(t * hz(note), .25)) * env(t, .004, len * .7), .42 * g); }
+function lead(t0, len, note, g = 1, pan = 0) {
+  const f = lp(.32);
+  const draw = (dl, gg, pp) => voice(t0 + dl, len + .1, t => { const v = 1 + Math.sin(t * 2 * Math.PI * 6) * .004 * Math.min(1, t * 4); return f(pulse(t * hz(note) * v, .5)) * env(t, .006, len * .9) * (t > len ? Math.max(0, 1 - (t - len) * 12) : 1); }, gg, pp);
+  draw(0, .2 * g, pan); draw(.375, .07 * g, .5); draw(.75, .035 * g, -.5);            /* dotted-eighth echoes */
+}
+function arp(t0, len, note, g = 1) { voice(t0, len, t => pulse(t * hz(note), .125) * env(t, .002, .06), .07 * g, -.3); }
+function pad(t0, len, notes, g = 1) {
+  notes.forEach((n, j) => { const f = lp(.035); voice(t0, len + .6, t => { const a = Math.min(1, t / .5) * (t > len ? Math.max(0, 1 - (t - len) / .6) : 1); return f(saw(t * hz(n) * 1.003) + saw(t * hz(n) * .997)) * a; }, .05 * g, j % 2 ? .4 : -.4); });
+}
+function stab(t0, notes, g = 1) { notes.forEach((n, j) => { const f = lp(.25); voice(t0, 1.2, t => f(saw(t * hz(n)) + pulse(t * hz(n) * 1.005, .5) * .5) * env(t, .003, .28), .09 * g, j % 2 ? .3 : -.3); }); }
+function sub(t0, g = 1) { let ph = 0; voice(t0, 1.2, t => { ph += (38 + 30 * Math.exp(-t * 6)) / SR; return Math.sin(ph * 2 * Math.PI) * env(t, .005, .45); }, .7 * g); }
+
