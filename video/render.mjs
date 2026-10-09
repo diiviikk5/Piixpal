@@ -11,3 +11,12 @@ mkdirSync(OUT, { recursive: true });
 const arg = process.argv.indexOf('--stills');
 const stills = arg > 0 ? process.argv[arg + 1].split(',').map(Number) : null;
 
+const srv = await serve(8812), b = await browser({ port: 9342 });
+await b.send('Page.navigate', { url: 'http://127.0.0.1:8812/video/launch.html?render' });
+await sleep(1500);
+await b.evaluate('window.__film.ready.then(() => true)');
+const DUR = await b.evaluate('window.__film.DUR');
+const { writeFileSync } = await import('node:fs');
+writeFileSync(join(OUT, 'cues.json'), JSON.stringify(await b.evaluate('window.__film.cues()')));
+if (process.argv.includes('--cues')) { console.log('wrote cues.json'); b.close(); srv.close(); process.exit(0); }
+
