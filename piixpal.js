@@ -1141,6 +1141,19 @@ ${this._css()}</style>${this._html()}`;
 }
 Piixpal.gl = { palettes: GL_PALETTES, draw: glDraw, supported: () => glInit() };
 
+/* the frame shader buttons and cards share: a pixel border with light running round it, a dark
+ * face with a little grain, a spotlight that follows the pointer, and a ring where you click.
+ * u_k = (click x, click y, seconds since the click, border width in pixels), u_j.x = face lift */
+const GL_FRAME = `vec4 effect(vec2 uv,vec2 cell){
+  vec2 sz=u_res,d=min(cell,sz-1.-cell);float b=u_k.w,e=min(d.x,d.y);
+  if(d.x+d.y<b*1.5)return vec4(0.);
+  vec2 q=aspect(uv),m=aspect(u_mouse);
+  if(e<b){float a=atan(uv.y-.5,(uv.x-.5)*sz.x/sz.y)/6.2831+.5;
+    float v=.5+.5*sin((a-u_time*.22)*6.2831*2.);v=mix(v*.9+.1,1.,u_hover*.35);return vec4(dpal(v,cell),1.);}
+  float v=.05+u_j.x+.05*hash(cell)+.3*exp(-length(q-m)*2.8)*u_hover;
+  if(u_k.z<1.2){vec2 c=aspect(u_k.xy);float r=u_k.z*1.5,ring=smoothstep(.07,0.,abs(length(q-c)-r))*(1.-u_k.z/1.2);v+=ring*.75;}
+  return vec4(dpal(v,cell),1.);}`;
+
 /* ---- elements/kit.js ---- */
 /* KIT: the shared look of the pixel UI kit. Stepped pixel corners, chunky ink borders, a hard
  * shadow the control presses down into, a few colour tones, and a tiny pal painter. Every kit
@@ -2200,10 +2213,10 @@ Object.assign(Piixpal, {
   clear: () => document.querySelectorAll(['piix-pal', 'piix-sprite', ...Object.values(ELEMENTS)].join()).forEach(e => e.remove())
 });
 
-Piixpal._k = { reduceMQ, reduced, clamp, rnd, chance, pick, lerp, now, hexRGBA, ptr, ptrDist, scroll, subs, raf, frame, sub, unsub, rectOf, docW, boxOf, pin, areaOf, onScreen, surfaceAt, LAYER_CSS, layer, origin, getLayer, layerOrigin, SPRITES, bake, defineSprite, baked, ACTORS, shout, Actor, recruit, BEHAVIORS, defineBehavior, Piixpal, art, lastT, layerRoot, ICON_PAL, ICONS, DIGITS, numberIcon, iconCache, iconPal, bakeIcon, UI_INK, UI_PAPER, UI_FONT, UI_MONO, UI_CSS, uiHost, uiRoot, uiStyles, uiStyle, uiEl, uiIcon, uiCard, uiPlace, uiAt, uiClose, uiAnnounce, uiShadow, uiLive, measureCtx, glyphTop, textProfile, segAt, LAND, platCache, TEXTY, surfaceOf, platforms, drag, BLIP, CROWD_COLORS, PiixCrowdElement, GL, GL_PALETTES, glPalette, GL_VERT, GL_PRELUDE, GL_MAIN, glInit, glProgram, glDraw, GLStage, KIT_U, kitCorners, KIT_TONES, kitTone, KIT_FONT, kitCss, kitPal, kitClip, FIGURES, defineFigure, mixHex, figurePalette, bakeFigure, HEAD, PiixSpriteElement, RENDERS, lum, BAYER, ASCII, TEXTURES, BIG, PiixTypeElement, CELL_SHAPES, VOX_LOOKS, VOX_DIRS, voxKey, voxNorm, voxArt, voxModel, VOX_MODELS, voxFromArt, voxCells, voxDraw, VOX_BUF, voxBuf, VOX_BAYER, VOX_RAMP, voxPaint, VoxStage, PiixPalElement, define, ELEMENTS, add, autoAttach, SCRIPT, start };
+Piixpal._k = { reduceMQ, reduced, clamp, rnd, chance, pick, lerp, now, hexRGBA, ptr, ptrDist, scroll, subs, raf, frame, sub, unsub, rectOf, docW, boxOf, pin, areaOf, onScreen, surfaceAt, LAYER_CSS, layer, origin, getLayer, layerOrigin, SPRITES, bake, defineSprite, baked, ACTORS, shout, Actor, recruit, BEHAVIORS, defineBehavior, Piixpal, art, lastT, layerRoot, ICON_PAL, ICONS, DIGITS, numberIcon, iconCache, iconPal, bakeIcon, UI_INK, UI_PAPER, UI_FONT, UI_MONO, UI_CSS, uiHost, uiRoot, uiStyles, uiStyle, uiEl, uiIcon, uiCard, uiPlace, uiAt, uiClose, uiAnnounce, uiShadow, uiLive, measureCtx, glyphTop, textProfile, segAt, LAND, platCache, TEXTY, surfaceOf, platforms, drag, BLIP, CROWD_COLORS, PiixCrowdElement, GL, GL_PALETTES, glPalette, GL_VERT, GL_PRELUDE, GL_MAIN, glInit, glProgram, glDraw, GLStage, GL_FRAME, KIT_U, kitCorners, KIT_TONES, kitTone, KIT_FONT, kitCss, kitPal, kitClip, FIGURES, defineFigure, mixHex, figurePalette, bakeFigure, HEAD, PiixSpriteElement, RENDERS, lum, BAYER, ASCII, TEXTURES, BIG, PiixTypeElement, CELL_SHAPES, VOX_LOOKS, VOX_DIRS, voxKey, voxNorm, voxArt, voxModel, VOX_MODELS, voxFromArt, voxCells, voxDraw, VOX_BUF, voxBuf, VOX_BAYER, VOX_RAMP, voxPaint, VoxStage, PiixPalElement, define, ELEMENTS, add, autoAttach, SCRIPT, start };
 return Piixpal._k;
 })();
-const { reduceMQ, reduced, clamp, rnd, chance, pick, lerp, now, hexRGBA, ptr, ptrDist, scroll, subs, raf, frame, sub, unsub, rectOf, docW, boxOf, pin, areaOf, onScreen, surfaceAt, LAYER_CSS, layer, origin, getLayer, layerOrigin, SPRITES, bake, defineSprite, baked, ACTORS, shout, Actor, recruit, BEHAVIORS, defineBehavior, Piixpal, art, lastT, layerRoot, ICON_PAL, ICONS, DIGITS, numberIcon, iconCache, iconPal, bakeIcon, UI_INK, UI_PAPER, UI_FONT, UI_MONO, UI_CSS, uiHost, uiRoot, uiStyles, uiStyle, uiEl, uiIcon, uiCard, uiPlace, uiAt, uiClose, uiAnnounce, uiShadow, uiLive, measureCtx, glyphTop, textProfile, segAt, LAND, platCache, TEXTY, surfaceOf, platforms, drag, BLIP, CROWD_COLORS, PiixCrowdElement, GL, GL_PALETTES, glPalette, GL_VERT, GL_PRELUDE, GL_MAIN, glInit, glProgram, glDraw, GLStage, KIT_U, kitCorners, KIT_TONES, kitTone, KIT_FONT, kitCss, kitPal, kitClip, FIGURES, defineFigure, mixHex, figurePalette, bakeFigure, HEAD, PiixSpriteElement, RENDERS, lum, BAYER, ASCII, TEXTURES, BIG, PiixTypeElement, CELL_SHAPES, VOX_LOOKS, VOX_DIRS, voxKey, voxNorm, voxArt, voxModel, VOX_MODELS, voxFromArt, voxCells, voxDraw, VOX_BUF, voxBuf, VOX_BAYER, VOX_RAMP, voxPaint, VoxStage, PiixPalElement, define, ELEMENTS, add, autoAttach, SCRIPT, start } = K;
+const { reduceMQ, reduced, clamp, rnd, chance, pick, lerp, now, hexRGBA, ptr, ptrDist, scroll, subs, raf, frame, sub, unsub, rectOf, docW, boxOf, pin, areaOf, onScreen, surfaceAt, LAYER_CSS, layer, origin, getLayer, layerOrigin, SPRITES, bake, defineSprite, baked, ACTORS, shout, Actor, recruit, BEHAVIORS, defineBehavior, Piixpal, art, lastT, layerRoot, ICON_PAL, ICONS, DIGITS, numberIcon, iconCache, iconPal, bakeIcon, UI_INK, UI_PAPER, UI_FONT, UI_MONO, UI_CSS, uiHost, uiRoot, uiStyles, uiStyle, uiEl, uiIcon, uiCard, uiPlace, uiAt, uiClose, uiAnnounce, uiShadow, uiLive, measureCtx, glyphTop, textProfile, segAt, LAND, platCache, TEXTY, surfaceOf, platforms, drag, BLIP, CROWD_COLORS, PiixCrowdElement, GL, GL_PALETTES, glPalette, GL_VERT, GL_PRELUDE, GL_MAIN, glInit, glProgram, glDraw, GLStage, GL_FRAME, KIT_U, kitCorners, KIT_TONES, kitTone, KIT_FONT, kitCss, kitPal, kitClip, FIGURES, defineFigure, mixHex, figurePalette, bakeFigure, HEAD, PiixSpriteElement, RENDERS, lum, BAYER, ASCII, TEXTURES, BIG, PiixTypeElement, CELL_SHAPES, VOX_LOOKS, VOX_DIRS, voxKey, voxNorm, voxArt, voxModel, VOX_MODELS, voxFromArt, voxCells, voxDraw, VOX_BUF, voxBuf, VOX_BAYER, VOX_RAMP, voxPaint, VoxStage, PiixPalElement, define, ELEMENTS, add, autoAttach, SCRIPT, start } = K;
 
 /* ---- behaviors/beeline.js ---- */
 /* beeline: a little line of worker bees buzzing round their element. Come close and
@@ -11487,6 +11500,203 @@ canvas{position:absolute;bottom:${KIT_U + 2}px;left:0;image-rendering:pixelated;
 define('piix-toggle', PiixToggleElement);
 ELEMENTS.toggle = 'piix-toggle';
 
+/* ---- gl/glowbutton.js ---- */
+/* GLOW BUTTON: a button with light running round its pixel border.   @component glow-button
+ *
+ *   <piix-glow-button>Get started</piix-glow-button>
+ *   <piix-glow-button palette="sunset">Launch</piix-glow-button>
+ *
+ * A band of light chases round the pixel border, drawn on the GPU and dithered into the palette.
+ * Hover and a spotlight follows your pointer across the face; click and a ring ripples out from
+ * where you clicked. It's a real button: it focuses, works with the keyboard, and submits or
+ * resets the form it's in.
+ *
+ *   palette   the colours of the light                    default: lime
+ *   pixel     size of one pixel, px                       default: 3
+ *   type      button | submit | reset                     default: button
+ *   disabled  greyed out */
+class PiixGlowButtonElement extends GLStage {
+  static get formAssociated() { return true; }
+  constructor() { super(); this._defPx = 3; this._defPal = 'lime'; this._click = [.5, .5, -9]; this._int = this.attachInternals ? this.attachInternals() : null; }
+  _hostCss() { return 'display:inline-block;vertical-align:middle;cursor:pointer;-webkit-tap-highlight-color:transparent'; }
+  _css() {
+    return `button{all:unset;position:relative;display:block;box-sizing:border-box;padding:16px 26px;color:${this._pal.list[this._pal.list.length - 1]};font:700 15px/1 "Bricolage Grotesque",system-ui,sans-serif;letter-spacing:.01em;text-shadow:0 1px 0 rgba(0,0,0,.5);transition:transform .08s}
+button:focus-visible{outline:2px dashed ${this._pal.list[this._pal.list.length - 2]};outline-offset:4px}
+:host(:active) button{transform:translateY(1px)}
+:host([disabled]){opacity:.45;cursor:not-allowed;filter:grayscale(.7)}`;
+  }
+  _html() { return `<canvas aria-hidden="true"></canvas><button part="button" type="button"${this.hasAttribute('disabled') ? ' disabled' : ''}><slot></slot></button>`; }
+  _setup() {
+    this.shadowRoot.querySelector('button').addEventListener('click', e => {
+      if (this.hasAttribute('disabled')) return;
+      const r = this.getBoundingClientRect();
+      this._click = [(e.clientX - r.left) / r.width || .5, 1 - (e.clientY - r.top) / r.height || .5, now()];
+      const form = this._int && this._int.form, t = this.getAttribute('type');
+      if (form && t === 'submit') form.requestSubmit ? form.requestSubmit() : form.submit();
+      if (form && t === 'reset') form.reset();
+    });
+  }
+  _shader() { return GL_FRAME; }
+  _uniforms() { return { u_k: [this._click[0], this._click[1], (now() - this._click[2]) / 1000, 2], u_j: [this._hov * .04, 0, 0, 0] }; }
+}
+define('piix-glow-button', PiixGlowButtonElement);
+ELEMENTS['glow-button'] = 'piix-glow-button';
+
+/* ---- gl/glowcard.js ---- */
+/* GLOW CARD: a card lit from inside, with light running round its border.   @component glow-card
+ *
+ *   <piix-glow-card>
+ *     <h3>Realtime</h3>
+ *     <p>Everything updates the moment it changes.</p>
+ *   </piix-glow-card>
+ *
+ * A dark pixel card with a band of light chasing round its edge and a spotlight that follows your
+ * pointer under the content. It tilts a little toward the pointer, and a click sends a ring out
+ * across it. Put anything inside.
+ *
+ *   palette   the colours of the light                    default: violet
+ *   pixel     size of one pixel, px                       default: 3
+ *   tilt      "none" keeps it flat */
+class PiixGlowCardElement extends GLStage {
+  constructor() { super(); this._defPx = 3; this._defPal = 'violet'; this._click = [.5, .5, -9]; this._tilt = [0, 0]; }
+  _hostCss() { return 'display:block;color:#f2eef8;transform-style:preserve-3d;transition:transform .2s cubic-bezier(.2,.8,.2,1)'; }
+  _css() {
+    return `.in{position:relative;padding:28px 26px 26px;font:400 15px/1.5 "Bricolage Grotesque",system-ui,sans-serif}
+::slotted(h3),::slotted(h2){margin:0 0 .4em!important;font-weight:750!important;font-size:22px!important;letter-spacing:-.02em;color:#fff}
+::slotted(p){margin:0!important;opacity:.8}`;
+  }
+  _html() { return '<canvas aria-hidden="true"></canvas><div class="in" part="content"><slot></slot></div>'; }
+  _setup() {
+    this.addEventListener('pointerdown', e => { const r = this.getBoundingClientRect(); this._click = [(e.clientX - r.left) / r.width, 1 - (e.clientY - r.top) / r.height, now()]; });
+  }
+  _shader() { return GL_FRAME; }
+  _uniforms(T, dt) {
+    /* lean toward the pointer while it's over the card */
+    if (this.getAttribute('tilt') !== 'none' && !reduced()) {
+      const want = this._hov > .05 ? [(this._m[1] - .5) * 7, (this._m[0] - .5) * -9] : [0, 0];
+      this._tilt[0] = lerp(this._tilt[0], want[0] * this._hov, Math.min(1, dt * 8)); this._tilt[1] = lerp(this._tilt[1], want[1] * this._hov, Math.min(1, dt * 8));
+      this.style.transform = `perspective(900px) rotateX(${this._tilt[0].toFixed(2)}deg) rotateY(${(-this._tilt[1]).toFixed(2)}deg)`;
+    }
+    return { u_k: [this._click[0], this._click[1], (now() - this._click[2]) / 1000, 1], u_j: [.02, 0, 0, 0] };
+  }
+}
+define('piix-glow-card', PiixGlowCardElement);
+ELEMENTS['glow-card'] = 'piix-glow-card';
+
+/* ---- gl/hero.js ---- */
+/* HERO: a whole hero section on a GPU pixel background.   @component hero  @needs shader
+ *
+ *   <piix-hero kind="horizon">
+ *     <p class="eyebrow">New · v1.0</p>
+ *     <h1>Build something loud</h1>
+ *     <p>One line of HTML and your landing page glows.</p>
+ *     <piix-glow-button>Get started</piix-glow-button>
+ *   </piix-hero>
+ *
+ * The background is any of the shader kinds. It dissolves in pixel by pixel when the hero scrolls
+ * into view, then the content rises in after it. Scanlines and a soft vignette sit over the top;
+ * the pointer bends the background. Put anything inside: it's laid out centred, and headings,
+ * paragraphs and buttons get hero-sized type.
+ *
+ *   kind      mesh | warp | aurora | crystal | liquid | horizon | nebula | topo | dots | fire   default: mesh
+ *   palette   any palette name or your own colours        default: the kind's own
+ *   pixel     size of one background pixel, px             default: 5
+ *   align     center | left                                default: center
+ *   height    any CSS length                               default: min(88vh, 780px) */
+class PiixHeroElement extends HTMLElement {
+  static get observedAttributes() { return ['kind', 'palette', 'pixel', 'align', 'height', 'dither', 'speed']; }
+  constructor() { super(); this.attachShadow({ mode: 'open' }); }
+  connectedCallback() {
+    this._build();
+    this._io = new IntersectionObserver(es => { if (es[es.length - 1].isIntersecting) { this.toggleAttribute('data-in', true); this._io.disconnect(); } }, { threshold: .2 });
+    this._io.observe(this);
+  }
+  disconnectedCallback() { if (this._io) this._io.disconnect(); }
+  attributeChangedCallback(n, a, b) { if (a !== b && this.shadowRoot.firstChild) this._build(); }
+  _build() {
+    const at = n => this.getAttribute(n), left = at('align') === 'left';
+    const pass = ['kind', 'palette', 'dither', 'speed'].filter(n => this.hasAttribute(n)).map(n => ` ${n}="${String(at(n)).replace(/"/g, '&quot;')}"`).join('');
+    this.shadowRoot.innerHTML = `<style>
+:host{display:block;position:relative;isolation:isolate;overflow:hidden;min-height:${at('height') || 'min(88vh,780px)'};color:#fff;font-family:"Bricolage Grotesque",system-ui,sans-serif}
+.bg{position:absolute;inset:0;z-index:0}
+.veil{position:absolute;inset:0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,transparent 35%,rgba(5,3,10,.55) 100%),repeating-linear-gradient(0deg,rgba(0,0,0,.12) 0 2px,transparent 2px 4px)}
+.in{position:relative;z-index:2;min-height:inherit;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;align-items:${left ? 'flex-start' : 'center'};text-align:${left ? 'left' : 'center'};padding:clamp(48px,8vw,120px) clamp(20px,6vw,96px);gap:4px;opacity:0;transform:translateY(18px);transition:opacity .7s .9s,transform .7s .9s cubic-bezier(.2,.8,.2,1)}
+:host([data-in]) .in{opacity:1;transform:none}
+::slotted(h1){margin:0 0 .25em!important;font-weight:800!important;font-size:clamp(40px,7vw,104px)!important;line-height:.95!important;letter-spacing:-.04em!important;text-shadow:0 4px 0 rgba(0,0,0,.35),0 0 40px rgba(0,0,0,.35)}
+::slotted(p){margin:0 0 1.3em!important;max-width:48ch;font-size:clamp(16px,1.9vw,21px)!important;line-height:1.45!important;opacity:.9;text-shadow:0 2px 12px rgba(0,0,0,.6)}
+::slotted(.eyebrow){margin:0 0 1em!important;padding:6px 12px;font:400 12px/1 "Silkscreen",ui-monospace,monospace!important;letter-spacing:.08em;text-transform:uppercase;background:rgba(10,8,16,.55);border:2px solid rgba(255,255,255,.35)}
+.cue{position:absolute;z-index:2;left:50%;bottom:22px;width:12px;height:12px;margin-left:-6px;border-right:4px solid #fff;border-bottom:4px solid #fff;transform:rotate(45deg);opacity:.7;animation:cue 1.6s steps(4) infinite}
+@keyframes cue{50%{transform:translateY(6px) rotate(45deg)}}
+@media (prefers-reduced-motion:reduce){.in{transition:none;opacity:1;transform:none}.cue{animation:none}}
+</style><div class="bg"><piix-shader${pass} pixel="${at('pixel') || 5}" fill></piix-shader></div><div class="veil"></div><div class="in" part="content"><slot></slot></div><i class="cue" aria-hidden="true"></i>`;
+    const sh = this.shadowRoot.querySelector('piix-shader');
+    sh._introLen = 1.2;
+  }
+}
+define('piix-hero', PiixHeroElement);
+ELEMENTS.hero = 'piix-hero';
+
+/* ---- gl/pixelimage.js ---- */
+/* PIXEL IMAGE: any picture, pixelated and dithered on the GPU, with a lens.   @component pixel-image
+ *
+ *   <piix-pixel-image src="photo.jpg" alt="Our team"></piix-pixel-image>
+ *
+ * Shows your image as dithered pixels in the palette, as a mosaic, or as halftone dots. Move the
+ * pointer over it and a lens shows the real picture underneath; hover a mosaic and it resolves.
+ * It crops to fill its box like object-fit: cover, and keeps the image's own shape if you don't
+ * give it a height. The image needs to be on your site or served with CORS.
+ *
+ *   src       the image
+ *   alt       what it shows, for screen readers
+ *   effect    dither | mosaic | halftone                    default: dither
+ *   palette   the colours for dither and halftone           default: mono
+ *   pixel     size of one pixel, px                         default: 3
+ *   lens      "none" turns the lens off
+ *   height    any CSS length (default: the image's shape) */
+const PI_FX = { dither: 0, mosaic: 1, halftone: 2 };
+const PI_SHADER = `vec3 img(vec2 p){vec2 s=u_j.xy;p=(p-.5)*s+.5;return texture2D(u_tex,p).rgb;}
+float lum(vec3 c){return dot(c,vec3(.3,.59,.11));}
+vec4 effect(vec2 uv,vec2 cell){
+  vec3 c=img(uv);float L=lum(c),fx=u_k.x;vec3 o;
+  if(fx==1.){float b=mix(14.,2.,u_hover);vec2 g=(floor(cell/b)+.5)*b/u_res;o=floor(img(g)*6.+.5)/6.;}
+  else if(fx==2.){vec2 g=floor(cell/4.),f=mod(cell,4.)-1.5;float l=lum(img((g*4.+2.)/u_res)),k=lum(pal(0.))>.5?1.-l:l;o=length(f)<k*2.3?pal(1.):pal(0.);}
+  else o=dpal(pow(L,.9),cell);
+  if(u_k.y>0.){float d=length(aspect(uv)-aspect(u_mouse));float lens=smoothstep(.2,.17,d)*u_hover;o=mix(o,c,lens);if(abs(d-.19)<.012*u_hover&&u_hover>.1)o=pal(1.);}
+  return vec4(o,1.);}`;
+class PiixPixelImageElement extends GLStage {
+  static get observedAttributes() { return [...GLStage.observedAttributes, 'alt', 'effect', 'lens']; }
+  constructor() { super(); this._defPx = 3; this._defPal = 'mono'; this._img = new Image(); this._img.crossOrigin = 'anonymous'; this._ready = false; }
+  _hostCss() { return 'display:block;overflow:hidden;background:#0b0a10'; }
+  _setup() {
+    this.setAttribute('role', 'img');
+    if (this.getAttribute('alt')) this.setAttribute('aria-label', this.getAttribute('alt'));
+    const src = this.getAttribute('src');
+    if (src && this._img.getAttribute('src') !== src) {
+      this._ready = false;
+      this._img.onload = () => {
+        this._ready = 'upload';
+        if (!this.getAttribute('height')) this.style.aspectRatio = `${this._img.naturalWidth} / ${this._img.naturalHeight}`;
+        this._fit();
+      };
+      this._img.src = src;
+    } else if (!this.getAttribute('height') && !this.style.aspectRatio) this.style.aspectRatio = '16 / 10';
+  }
+  _texture() {
+    if (!this._ready) return null;
+    const t = { owner: this, src: this._img, dirty: this._ready === 'upload' };
+    this._ready = true;
+    return t;
+  }
+  _shader() { return PI_SHADER; }
+  _uniforms() {
+    /* cover: scale the image coordinates so it fills the box and crops the overflow */
+    const ia = this._img.naturalWidth / (this._img.naturalHeight || 1) || 1, ea = this._W / this._H, s = ea > ia ? [1, ia / ea] : [ea / ia, 1];
+    return { u_k: [PI_FX[this.getAttribute('effect')] ?? 0, this.getAttribute('lens') === 'none' ? 0 : 1, 0, 0], u_j: [s[0], s[1], 0, 0] };
+  }
+}
+define('piix-pixel-image', PiixPixelImageElement);
+ELEMENTS['pixel-image'] = 'piix-pixel-image';
+
 /* ---- gl/shader.js ---- */
 /* SHADER: GPU pixel backgrounds.   @component shader
  *
@@ -11574,6 +11784,69 @@ class PiixShaderElement extends GLStage {
 }
 define('piix-shader', PiixShaderElement);
 ELEMENTS.shader = 'piix-shader';
+
+/* ---- gl/text.js ---- */
+/* TEXT: headlines with GPU pixel effects.   @component text
+ *
+ *   <h1><piix-text effect="shine">Pixel perfect</piix-text></h1>
+ *
+ * The words are drawn into a texture and run through a shader, on a pixel grid, in the palette:
+ * a dithered colour sweep, a mosaic that resolves when it scrolls into view, a glitch with
+ * colour split and slipping rows, a wave, a melt that drips, and a scanline. It takes the size,
+ * font and weight of wherever you put it, and the real words stay in the page for screen
+ * readers, search and copy-paste. One line of text.
+ *
+ *   effect    shine | reveal | glitch | wave | melt | scan        default: shine
+ *   palette   the colours                                       default: lime
+ *   pixel     size of one pixel, px                             default: 2 */
+const TX_FX = { shine: 0, reveal: 1, glitch: 2, wave: 3, melt: 4, scan: 5 };
+const TX_SHADER = `float A(vec2 p){if(p.x<0.||p.y<0.||p.x>1.||p.y>1.)return 0.;return texture2D(u_tex,p).a;}
+vec4 effect(vec2 uv,vec2 cell){
+  float fx=u_k.x,t=u_time,a,v=fract(uv.x*.7-uv.y*.25-t*.18);vec2 p=uv;
+  if(fx==1.){float b=mix(.09,0.,u_intro*u_intro);if(b>.001)p=(floor(uv/vec2(b*u_res.y/u_res.x,b))+.5)*vec2(b*u_res.y/u_res.x,b);}
+  if(fx==3.){p.y+=sin(uv.x*9.+t*3.)*.09;p.x+=sin(uv.y*7.+t*2.)*.006;}
+  if(fx==4.){float col=floor(uv.x*u_res.x/3.),d=max(0.,sin(t*.7+hash(vec2(col,1.))*6.2831))*hash(vec2(col,7.))*.5;p.y+=d*uv.y;}
+  if(fx==2.){float g=step(.8,hash(vec2(floor(t*7.),3.)))+u_hover*.6,row=floor(uv.y*12.);
+    p.x+=(hash(vec2(row,floor(t*15.)))-.5)*.08*g;float s=.012*g+.004;
+    float r=A(p+vec2(s,0.)),gg=A(p),b=A(p-vec2(s,0.));a=max(r,max(gg,b));if(a<.5)return vec4(0.);
+    vec3 c=dpal(.55+.45*gg,cell);return vec4(vec3(r>.5?c.r:.15,gg>.5?c.g:.1,b>.5?c.b:.35)*1.,1.);}
+  a=A(p);if(a<.5)return vec4(0.);
+  if(fx==5.){float sc=fract(uv.y*.9-t*.35);v=.35+.65*smoothstep(.12,0.,abs(sc-.5)-.02)+.12*step(.5,fract(cell.y*.5));}
+  if(fx==1.)v=.55+.45*uv.y;
+  v+=.25*exp(-length(aspect(uv)-aspect(u_mouse))*4.)*u_hover;
+  return vec4(dpal(.5+.5*v,cell),1.);}`;
+class PiixTextElement extends GLStage {
+  constructor() { super(); this._defPx = 2; this._defPal = 'lime'; this._texCv = document.createElement('canvas'); this._texDirty = true; }
+  get effect() { const e = this.getAttribute('effect'); return e in TX_FX ? e : 'shine'; }
+  _hostCss() { return 'display:inline-block;position:relative;color:transparent;white-space:nowrap;padding:0 .04em;-webkit-text-fill-color:transparent'; }
+  _html() { return '<slot></slot><canvas aria-hidden="true"></canvas>'; }
+  _setup() {
+    this._introLen = this.effect === 'reveal' ? 1.4 : 0;
+    if (!this._mo) { this._mo = new MutationObserver(() => { this._texDirty = true; }); this._mo.observe(this, { characterData: true, childList: true, subtree: true }); }
+    if (document.fonts) document.fonts.ready.then(() => { this._texDirty = true; });
+  }
+  _resized() { this._texDirty = true; }
+  /* the words, in white, at full resolution, where the browser laid them out */
+  _texture() {
+    const r = this.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2), w = Math.max(2, Math.round(r.width * dpr)), h = Math.max(2, Math.round(r.height * dpr));
+    if (this._texDirty || this._texCv.width !== w || this._texCv.height !== h) {
+      const c = this._texCv, x = c.getContext('2d'), cs = getComputedStyle(this);
+      c.width = w; c.height = h; x.clearRect(0, 0, w, h);
+      x.font = `${cs.fontStyle} ${cs.fontWeight} ${parseFloat(cs.fontSize) * dpr}px ${cs.fontFamily}`;
+      x.letterSpacing = cs.letterSpacing === 'normal' ? '0px' : (parseFloat(cs.letterSpacing) * dpr) + 'px';
+      x.textBaseline = 'middle'; x.fillStyle = '#fff';
+      x.fillText(this.textContent.trim(), parseFloat(cs.paddingLeft) * dpr, h / 2 + parseFloat(cs.fontSize) * dpr * .04);
+      this._texDirty = 'upload';
+    }
+    const t = { owner: this, src: this._texCv, dirty: this._texDirty === 'upload' };
+    this._texDirty = false;
+    return t;
+  }
+  _shader() { return TX_SHADER; }
+  _uniforms() { return { u_k: [TX_FX[this.effect], 0, 0, 0] }; }
+}
+define('piix-text', PiixTextElement);
+ELEMENTS.text = 'piix-text';
 
 K.start(document.currentScript);
 })();
