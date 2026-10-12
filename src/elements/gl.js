@@ -99,10 +99,11 @@ const glDraw = (body, w, h, u, tex) => {
   gl.bindBuffer(gl.ARRAY_BUFFER, GL.buf); gl.enableVertexAttribArray(P.pos); gl.vertexAttribPointer(P.pos, 2, gl.FLOAT, false, 0, 0);
   for (const k in u) {
     let loc = P.u[k];
-    if (loc === undefined) loc = P.u[k] = gl.getUniformLocation(P.prog, k === 'u_pal' ? 'u_pal[0]' : k);
+    if (loc === undefined) loc = P.u[k] = gl.getUniformLocation(P.prog, k === 'u_pal' || (u[k] instanceof Float32Array && u[k].length > 4) ? k + '[0]' : k);
     if (!loc) continue;
     const v = u[k];
     if (k === 'u_pal') gl.uniform3fv(loc, v);
+    else if (v instanceof Float32Array && v.length > 4) gl.uniform4fv(loc, v);
     else if (typeof v === 'number') gl.uniform1f(loc, v);
     else if (v.length === 2) gl.uniform2f(loc, v[0], v[1]);
     else if (v.length === 3) gl.uniform3f(loc, v[0], v[1], v[2]);
@@ -173,7 +174,7 @@ ${this._css()}</style>${this._html()}`;
   }
   _fit() {
     if (!this._cv) return;
-    const r = this.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2);
+    const r = (this._box ? this._box() : this).getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2);
     const px = Math.max(1, (+this.getAttribute('pixel') || this._defPx || 4) * dpr);
     this._px = px;
     this._W = Math.max(2, Math.ceil(r.width * dpr / px)); this._H = Math.max(2, Math.ceil(r.height * dpr / px));
@@ -185,6 +186,9 @@ ${this._css()}</style>${this._html()}`;
     if (!this._vis || !this._W || !GL.ok) return;
     const R = reduced();
     if (R && this._still && !this._dirty) return;
+    /* nothing to show (an idle cursor trail, a finished reveal): clear once and rest */
+    if (this._skip && this._skip()) { if (!this._cleared) { this._g.clearRect(0, 0, this._W, this._H); this._cleared = true; } return; }
+    this._cleared = false;
     const r = this.getBoundingClientRect();
     const over = ptr.seen && ptr.cx >= r.left - 40 && ptr.cx <= r.right + 40 && ptr.cy >= r.top - 40 && ptr.cy <= r.bottom + 40;
     if (over) { const mx = (ptr.cx - r.left) / r.width, my = 1 - (ptr.cy - r.top) / r.height; this._m[0] = lerp(this._m[0], mx, Math.min(1, dt * 10)); this._m[1] = lerp(this._m[1], my, Math.min(1, dt * 10)); }
@@ -218,3 +222,11 @@ const GL_FRAME = `vec4 effect(vec2 uv,vec2 cell){
   float v=.05+u_j.x+.05*hash(cell)+.3*exp(-length(q-m)*2.8)*u_hover;
   if(u_k.z<1.2){vec2 c=aspect(u_k.xy);float r=u_k.z*1.5,ring=smoothstep(.07,0.,abs(length(q-c)-r))*(1.-u_k.z/1.2);v+=ring*.75;}
   return vec4(dpal(v,cell),1.);}`;
+
+/* any CSS colour, as 0..1 rgb for a shader */
+const glRGB = c => {
+  const x = document.createElement('canvas').getContext('2d'); x.fillStyle = '#000'; x.fillStyle = c;
+  const s = x.fillStyle;
+  if (s[0] === '#') return hexRGBA(s).slice(0, 3).map(v => v / 255);
+  return (s.match(/[\d.]+/g) || [0, 0, 0]).slice(0, 3).map(v => +v / 255);
+};
