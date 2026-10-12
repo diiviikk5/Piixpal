@@ -71,3 +71,17 @@ const glInit = () => {
   } catch (_) { return (GL.ok = false); }
 };
 
+const glProgram = body => {
+  const gl = GL.gl;
+  const sh = (type, src) => {
+    const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { console.warn('[piixpal] shader:', gl.getShaderInfoLog(s)); return null; }
+    return s;
+  };
+  const v = sh(gl.VERTEX_SHADER, GL_VERT), f = sh(gl.FRAGMENT_SHADER, GL_PRELUDE + body + GL_MAIN);
+  if (!v || !f) return null;
+  const p = gl.createProgram(); gl.attachShader(p, v); gl.attachShader(p, f); gl.linkProgram(p);
+  if (!gl.getProgramParameter(p, gl.LINK_STATUS)) { console.warn('[piixpal] link:', gl.getProgramInfoLog(p)); return null; }
+  return { prog: p, pos: gl.getAttribLocation(p, 'p'), u: {} };
+};
+
