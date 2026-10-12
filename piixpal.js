@@ -1034,10 +1034,11 @@ const glDraw = (body, w, h, u, tex) => {
   gl.bindBuffer(gl.ARRAY_BUFFER, GL.buf); gl.enableVertexAttribArray(P.pos); gl.vertexAttribPointer(P.pos, 2, gl.FLOAT, false, 0, 0);
   for (const k in u) {
     let loc = P.u[k];
-    if (loc === undefined) loc = P.u[k] = gl.getUniformLocation(P.prog, k === 'u_pal' ? 'u_pal[0]' : k);
+    if (loc === undefined) loc = P.u[k] = gl.getUniformLocation(P.prog, k === 'u_pal' || (u[k] instanceof Float32Array && u[k].length > 4) ? k + '[0]' : k);
     if (!loc) continue;
     const v = u[k];
     if (k === 'u_pal') gl.uniform3fv(loc, v);
+    else if (v instanceof Float32Array && v.length > 4) gl.uniform4fv(loc, v);
     else if (typeof v === 'number') gl.uniform1f(loc, v);
     else if (v.length === 2) gl.uniform2f(loc, v[0], v[1]);
     else if (v.length === 3) gl.uniform3f(loc, v[0], v[1], v[2]);
@@ -1108,7 +1109,7 @@ ${this._css()}</style>${this._html()}`;
   }
   _fit() {
     if (!this._cv) return;
-    const r = this.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2);
+    const r = (this._box ? this._box() : this).getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2);
     const px = Math.max(1, (+this.getAttribute('pixel') || this._defPx || 4) * dpr);
     this._px = px;
     this._W = Math.max(2, Math.ceil(r.width * dpr / px)); this._H = Math.max(2, Math.ceil(r.height * dpr / px));
@@ -1120,6 +1121,9 @@ ${this._css()}</style>${this._html()}`;
     if (!this._vis || !this._W || !GL.ok) return;
     const R = reduced();
     if (R && this._still && !this._dirty) return;
+    /* nothing to show (an idle cursor trail, a finished reveal): clear once and rest */
+    if (this._skip && this._skip()) { if (!this._cleared) { this._g.clearRect(0, 0, this._W, this._H); this._cleared = true; } return; }
+    this._cleared = false;
     const r = this.getBoundingClientRect();
     const over = ptr.seen && ptr.cx >= r.left - 40 && ptr.cx <= r.right + 40 && ptr.cy >= r.top - 40 && ptr.cy <= r.bottom + 40;
     if (over) { const mx = (ptr.cx - r.left) / r.width, my = 1 - (ptr.cy - r.top) / r.height; this._m[0] = lerp(this._m[0], mx, Math.min(1, dt * 10)); this._m[1] = lerp(this._m[1], my, Math.min(1, dt * 10)); }
@@ -1153,6 +1157,14 @@ const GL_FRAME = `vec4 effect(vec2 uv,vec2 cell){
   float v=.05+u_j.x+.05*hash(cell)+.3*exp(-length(q-m)*2.8)*u_hover;
   if(u_k.z<1.2){vec2 c=aspect(u_k.xy);float r=u_k.z*1.5,ring=smoothstep(.07,0.,abs(length(q-c)-r))*(1.-u_k.z/1.2);v+=ring*.75;}
   return vec4(dpal(v,cell),1.);}`;
+
+/* any CSS colour, as 0..1 rgb for a shader */
+const glRGB = c => {
+  const x = document.createElement('canvas').getContext('2d'); x.fillStyle = '#000'; x.fillStyle = c;
+  const s = x.fillStyle;
+  if (s[0] === '#') return hexRGBA(s).slice(0, 3).map(v => v / 255);
+  return (s.match(/[\d.]+/g) || [0, 0, 0]).slice(0, 3).map(v => +v / 255);
+};
 
 /* ---- elements/kit.js ---- */
 /* KIT: the shared look of the pixel UI kit. Stepped pixel corners, chunky ink borders, a hard
@@ -2213,10 +2225,10 @@ Object.assign(Piixpal, {
   clear: () => document.querySelectorAll(['piix-pal', 'piix-sprite', ...Object.values(ELEMENTS)].join()).forEach(e => e.remove())
 });
 
-Piixpal._k = { reduceMQ, reduced, clamp, rnd, chance, pick, lerp, now, hexRGBA, ptr, ptrDist, scroll, subs, raf, frame, sub, unsub, rectOf, docW, boxOf, pin, areaOf, onScreen, surfaceAt, LAYER_CSS, layer, origin, getLayer, layerOrigin, SPRITES, bake, defineSprite, baked, ACTORS, shout, Actor, recruit, BEHAVIORS, defineBehavior, Piixpal, art, lastT, layerRoot, ICON_PAL, ICONS, DIGITS, numberIcon, iconCache, iconPal, bakeIcon, UI_INK, UI_PAPER, UI_FONT, UI_MONO, UI_CSS, uiHost, uiRoot, uiStyles, uiStyle, uiEl, uiIcon, uiCard, uiPlace, uiAt, uiClose, uiAnnounce, uiShadow, uiLive, measureCtx, glyphTop, textProfile, segAt, LAND, platCache, TEXTY, surfaceOf, platforms, drag, BLIP, CROWD_COLORS, PiixCrowdElement, GL, GL_PALETTES, glPalette, GL_VERT, GL_PRELUDE, GL_MAIN, glInit, glProgram, glDraw, GLStage, GL_FRAME, KIT_U, kitCorners, KIT_TONES, kitTone, KIT_FONT, kitCss, kitPal, kitClip, FIGURES, defineFigure, mixHex, figurePalette, bakeFigure, HEAD, PiixSpriteElement, RENDERS, lum, BAYER, ASCII, TEXTURES, BIG, PiixTypeElement, CELL_SHAPES, VOX_LOOKS, VOX_DIRS, voxKey, voxNorm, voxArt, voxModel, VOX_MODELS, voxFromArt, voxCells, voxDraw, VOX_BUF, voxBuf, VOX_BAYER, VOX_RAMP, voxPaint, VoxStage, PiixPalElement, define, ELEMENTS, add, autoAttach, SCRIPT, start };
+Piixpal._k = { reduceMQ, reduced, clamp, rnd, chance, pick, lerp, now, hexRGBA, ptr, ptrDist, scroll, subs, raf, frame, sub, unsub, rectOf, docW, boxOf, pin, areaOf, onScreen, surfaceAt, LAYER_CSS, layer, origin, getLayer, layerOrigin, SPRITES, bake, defineSprite, baked, ACTORS, shout, Actor, recruit, BEHAVIORS, defineBehavior, Piixpal, art, lastT, layerRoot, ICON_PAL, ICONS, DIGITS, numberIcon, iconCache, iconPal, bakeIcon, UI_INK, UI_PAPER, UI_FONT, UI_MONO, UI_CSS, uiHost, uiRoot, uiStyles, uiStyle, uiEl, uiIcon, uiCard, uiPlace, uiAt, uiClose, uiAnnounce, uiShadow, uiLive, measureCtx, glyphTop, textProfile, segAt, LAND, platCache, TEXTY, surfaceOf, platforms, drag, BLIP, CROWD_COLORS, PiixCrowdElement, GL, GL_PALETTES, glPalette, GL_VERT, GL_PRELUDE, GL_MAIN, glInit, glProgram, glDraw, GLStage, GL_FRAME, glRGB, KIT_U, kitCorners, KIT_TONES, kitTone, KIT_FONT, kitCss, kitPal, kitClip, FIGURES, defineFigure, mixHex, figurePalette, bakeFigure, HEAD, PiixSpriteElement, RENDERS, lum, BAYER, ASCII, TEXTURES, BIG, PiixTypeElement, CELL_SHAPES, VOX_LOOKS, VOX_DIRS, voxKey, voxNorm, voxArt, voxModel, VOX_MODELS, voxFromArt, voxCells, voxDraw, VOX_BUF, voxBuf, VOX_BAYER, VOX_RAMP, voxPaint, VoxStage, PiixPalElement, define, ELEMENTS, add, autoAttach, SCRIPT, start };
 return Piixpal._k;
 })();
-const { reduceMQ, reduced, clamp, rnd, chance, pick, lerp, now, hexRGBA, ptr, ptrDist, scroll, subs, raf, frame, sub, unsub, rectOf, docW, boxOf, pin, areaOf, onScreen, surfaceAt, LAYER_CSS, layer, origin, getLayer, layerOrigin, SPRITES, bake, defineSprite, baked, ACTORS, shout, Actor, recruit, BEHAVIORS, defineBehavior, Piixpal, art, lastT, layerRoot, ICON_PAL, ICONS, DIGITS, numberIcon, iconCache, iconPal, bakeIcon, UI_INK, UI_PAPER, UI_FONT, UI_MONO, UI_CSS, uiHost, uiRoot, uiStyles, uiStyle, uiEl, uiIcon, uiCard, uiPlace, uiAt, uiClose, uiAnnounce, uiShadow, uiLive, measureCtx, glyphTop, textProfile, segAt, LAND, platCache, TEXTY, surfaceOf, platforms, drag, BLIP, CROWD_COLORS, PiixCrowdElement, GL, GL_PALETTES, glPalette, GL_VERT, GL_PRELUDE, GL_MAIN, glInit, glProgram, glDraw, GLStage, GL_FRAME, KIT_U, kitCorners, KIT_TONES, kitTone, KIT_FONT, kitCss, kitPal, kitClip, FIGURES, defineFigure, mixHex, figurePalette, bakeFigure, HEAD, PiixSpriteElement, RENDERS, lum, BAYER, ASCII, TEXTURES, BIG, PiixTypeElement, CELL_SHAPES, VOX_LOOKS, VOX_DIRS, voxKey, voxNorm, voxArt, voxModel, VOX_MODELS, voxFromArt, voxCells, voxDraw, VOX_BUF, voxBuf, VOX_BAYER, VOX_RAMP, voxPaint, VoxStage, PiixPalElement, define, ELEMENTS, add, autoAttach, SCRIPT, start } = K;
+const { reduceMQ, reduced, clamp, rnd, chance, pick, lerp, now, hexRGBA, ptr, ptrDist, scroll, subs, raf, frame, sub, unsub, rectOf, docW, boxOf, pin, areaOf, onScreen, surfaceAt, LAYER_CSS, layer, origin, getLayer, layerOrigin, SPRITES, bake, defineSprite, baked, ACTORS, shout, Actor, recruit, BEHAVIORS, defineBehavior, Piixpal, art, lastT, layerRoot, ICON_PAL, ICONS, DIGITS, numberIcon, iconCache, iconPal, bakeIcon, UI_INK, UI_PAPER, UI_FONT, UI_MONO, UI_CSS, uiHost, uiRoot, uiStyles, uiStyle, uiEl, uiIcon, uiCard, uiPlace, uiAt, uiClose, uiAnnounce, uiShadow, uiLive, measureCtx, glyphTop, textProfile, segAt, LAND, platCache, TEXTY, surfaceOf, platforms, drag, BLIP, CROWD_COLORS, PiixCrowdElement, GL, GL_PALETTES, glPalette, GL_VERT, GL_PRELUDE, GL_MAIN, glInit, glProgram, glDraw, GLStage, GL_FRAME, glRGB, KIT_U, kitCorners, KIT_TONES, kitTone, KIT_FONT, kitCss, kitPal, kitClip, FIGURES, defineFigure, mixHex, figurePalette, bakeFigure, HEAD, PiixSpriteElement, RENDERS, lum, BAYER, ASCII, TEXTURES, BIG, PiixTypeElement, CELL_SHAPES, VOX_LOOKS, VOX_DIRS, voxKey, voxNorm, voxArt, voxModel, VOX_MODELS, voxFromArt, voxCells, voxDraw, VOX_BUF, voxBuf, VOX_BAYER, VOX_RAMP, voxPaint, VoxStage, PiixPalElement, define, ELEMENTS, add, autoAttach, SCRIPT, start } = K;
 
 /* ---- behaviors/beeline.js ---- */
 /* beeline: a little line of worker bees buzzing round their element. Come close and
@@ -11500,6 +11512,103 @@ canvas{position:absolute;bottom:${KIT_U + 2}px;left:0;image-rendering:pixelated;
 define('piix-toggle', PiixToggleElement);
 ELEMENTS.toggle = 'piix-toggle';
 
+/* ---- gl/cursor.js ---- */
+/* CURSOR: a pixel trail, or a glow, that follows the pointer across the whole page.   @component cursor
+ *
+ *   <piix-cursor></piix-cursor>
+ *   <piix-cursor kind="glow" palette="candy"></piix-cursor>
+ *
+ * One tag anywhere on the page. "trail" leaves a comet of dithered pixels behind the pointer
+ * that fade as they fall away; "glow" is a soft pixel halo round it. It never gets in the way
+ * of clicks, rests the GPU when the pointer is still, and stays off on touch screens and for
+ * people who prefer less motion.
+ *
+ *   kind      trail | glow                                default: trail
+ *   palette   its colours                                 default: lime
+ *   size      how big, 0.5 to 3                           default: 1
+ *   pixel     size of one pixel, px                       default: 4 */
+const CR_N = 40;
+const CR_SHADER = `uniform vec4 u_tr[${CR_N}];
+vec4 effect(vec2 uv,vec2 cell){
+  vec2 q=aspect(uv);float v=0.,sz=u_k.y;
+  if(u_k.x==1.){vec4 p=u_tr[0];if(p.w<=0.)return vec4(0.);float d=length(q-aspect(p.xy));v=p.w*smoothstep(.16*sz,0.,d);}
+  else for(int i=0;i<${CR_N};i++){vec4 p=u_tr[i];if(p.w<=0.)continue;float d=length(q-aspect(p.xy));v=max(v,p.w*smoothstep(.028*sz*(.4+.6*p.w),0.,d));}
+  if(v<.04)return vec4(0.);
+  return vec4(dpal(.35+.65*v,cell),step(bayer8(cell)*.95,v*1.4));}`;
+class PiixCursorElement extends GLStage {
+  constructor() { super(); this._defPx = 4; this._defPal = 'lime'; this._defDither = .6; this._tr = new Float32Array(CR_N * 4); this._pts = []; this._last = [-1, -1]; }
+  _hostCss() { return 'position:fixed;inset:0;z-index:2147483000;pointer-events:none'; }
+  _setup() { this.setAttribute('aria-hidden', 'true'); this._off = !matchMedia('(pointer:fine)').matches; }
+  _skip() {
+    if (this._off || reduced() || !ptr.seen) return true;
+    /* record where the pointer is now; age everything */
+    const t = now(), x = ptr.cx / innerWidth, y = 1 - ptr.cy / innerHeight;
+    const gap = Math.hypot(x - this._last[0], y - this._last[1]);
+    if (gap > .002) {
+      /* a fast flick leaves gaps: fill them in so the trail stays one line */
+      const n = this._last[0] < 0 ? 1 : Math.min(6, Math.ceil(gap / .012));
+      for (let k = n; k >= 1; k--) this._pts.unshift([lerp(this._last[0], x, k / n), lerp(this._last[1], y, k / n), t - (n - k) * 4]);
+      this._last = [x, y];
+    }
+    const life = this.getAttribute('kind') === 'glow' ? 1600 : 520;
+    this._pts = this._pts.filter(p => t - p[2] < life).slice(0, CR_N);
+    if (this.getAttribute('kind') === 'glow' && !this._pts.length && x >= 0) this._pts = [[x, y, t - life * .5]];
+    return !this._pts.length;
+  }
+  _shader() { return CR_SHADER; }
+  _uniforms() {
+    const t = now(), life = this.getAttribute('kind') === 'glow' ? 1600 : 520;
+    this._tr.fill(0);
+    this._pts.forEach((p, i) => { this._tr[i * 4] = p[0]; this._tr[i * 4 + 1] = p[1]; this._tr[i * 4 + 3] = 1 - (t - p[2]) / life; });
+    if (this.getAttribute('kind') === 'glow' && this._tr[3] > 0) { this._tr[0] = ptr.cx / innerWidth; this._tr[1] = 1 - ptr.cy / innerHeight; this._tr[3] = Math.max(.6, this._tr[3]); }
+    return { u_tr: this._tr, u_k: [this.getAttribute('kind') === 'glow' ? 1 : 0, clamp(+this.getAttribute('size') || 1, .5, 3), 0, 0] };
+  }
+}
+define('piix-cursor', PiixCursorElement);
+ELEMENTS.cursor = 'piix-cursor';
+
+/* ---- gl/divider.js ---- */
+/* DIVIDER: a moving pixel edge between two sections.   @component divider
+ *
+ *   <section style="background:#17121f">…</section>
+ *   <piix-divider from="#17121f" to="#f3eee3" kind="wave"></piix-divider>
+ *   <section style="background:#f3eee3">…</section>
+ *
+ * Instead of a hard line, one section's colour flows into the next across a living pixel edge:
+ * rolling waves, a mountain ridge, stepped stairs, drips, or a dithered fade. A thin line of
+ * light runs along the edge, and it lifts a little under the pointer.
+ *
+ *   kind      wave | mountains | stairs | drip | dissolve      default: wave
+ *   from      the colour above                                default: #17121f
+ *   to        the colour below                                default: #f3eee3
+ *   palette   the line of light along the edge                default: lime
+ *   height    px or any CSS length                            default: 120px
+ *   pixel     size of one pixel, px                           default: 6
+ *   flip      turn it upside down */
+const DV_KINDS = { wave: 0, mountains: 1, stairs: 2, drip: 3, dissolve: 4 };
+const DV_SHADER = `vec4 effect(vec2 uv,vec2 cell){
+  float k=u_j.w,t=u_time;if(u_k.w>0.)uv.y=1.-uv.y;
+  float x=uv.x*u_res.x/u_res.y,y=uv.y,h;
+  if(k==4.){return vec4(y>bayer8(cell)*.9+.05?u_j.rgb:u_k.xyz,1.);}
+  if(k==1.)h=.3+.5*fbm(vec2(x*.8+t*.02,1.3))+.08*abs(sin(x*1.7));
+  else if(k==2.)h=.25+.5*floor((.5+.5*sin(x*.9+t*.35))*5.+.5)/5.;
+  else if(k==3.){float c=floor(cell.x/2.);h=.8-.55*max(0.,sin(t*.5+hash(vec2(c,1.))*6.28))*hash(vec2(c,2.))-.06*sin(x*2.);}
+  else h=.5+.17*sin(x*1.6+t*.7)+.08*sin(x*4.1-t*1.2);
+  h+=u_hover*.14*exp(-pow((uv.x-u_mouse.x)*u_res.x/u_res.y*2.5,2.));
+  float e=(y-h)*u_res.y;
+  if(e>0.&&e<1.6)return vec4(dpal(.85,cell),1.);
+  return vec4(e>0.?u_j.rgb:u_k.xyz,1.);}`;
+class PiixDividerElement extends GLStage {
+  static get observedAttributes() { return [...GLStage.observedAttributes, 'from', 'to', 'flip']; }
+  constructor() { super(); this._defPx = 6; this._defPal = 'lime'; this._defDither = 0; }
+  _hostCss() { return (this.getAttribute('height') ? '' : 'height:120px;') + 'margin:-1px 0'; }
+  _setup() { this.setAttribute('aria-hidden', 'true'); this._from = glRGB(this.getAttribute('from') || '#17121f'); this._to = glRGB(this.getAttribute('to') || '#f3eee3'); }
+  _shader() { return DV_SHADER; }
+  _uniforms() { return { u_j: [...this._from, DV_KINDS[this.getAttribute('kind')] || 0], u_k: [...this._to, this.hasAttribute('flip') ? 1 : 0] }; }
+}
+define('piix-divider', PiixDividerElement);
+ELEMENTS.divider = 'piix-divider';
+
 /* ---- gl/glowbutton.js ---- */
 /* GLOW BUTTON: a button with light running round its pixel border.   @component glow-button
  *
@@ -11514,13 +11623,16 @@ ELEMENTS.toggle = 'piix-toggle';
  *   palette   the colours of the light                    default: lime
  *   pixel     size of one pixel, px                       default: 3
  *   type      button | submit | reset                     default: button
+ *   size      sm | md | lg                                default: md
  *   disabled  greyed out */
 class PiixGlowButtonElement extends GLStage {
   static get formAssociated() { return true; }
+  static get observedAttributes() { return [...GLStage.observedAttributes, 'size', 'disabled']; }
   constructor() { super(); this._defPx = 3; this._defPal = 'lime'; this._click = [.5, .5, -9]; this._int = this.attachInternals ? this.attachInternals() : null; }
   _hostCss() { return 'display:inline-block;vertical-align:middle;cursor:pointer;-webkit-tap-highlight-color:transparent'; }
   _css() {
-    return `button{all:unset;position:relative;display:block;box-sizing:border-box;padding:16px 26px;color:${this._pal.list[this._pal.list.length - 1]};font:700 15px/1 "Bricolage Grotesque",system-ui,sans-serif;letter-spacing:.01em;text-shadow:0 1px 0 rgba(0,0,0,.5);transition:transform .08s}
+    const [pad, fs] = { sm: ['11px 18px', 13], lg: ['20px 34px', 18] }[this.getAttribute('size')] || ['16px 26px', 15];
+    return `button{all:unset;position:relative;display:block;box-sizing:border-box;padding:${pad};color:${this._pal.list[this._pal.list.length - 1]};font:700 ${fs}px/1 "Bricolage Grotesque",system-ui,sans-serif;letter-spacing:.01em;text-shadow:0 1px 0 rgba(0,0,0,.5);transition:transform .08s}
 button:focus-visible{outline:2px dashed ${this._pal.list[this._pal.list.length - 2]};outline-offset:4px}
 :host(:active) button{transform:translateY(1px)}
 :host([disabled]){opacity:.45;cursor:not-allowed;filter:grayscale(.7)}`;
@@ -11636,6 +11748,175 @@ class PiixHeroElement extends HTMLElement {
 define('piix-hero', PiixHeroElement);
 ELEMENTS.hero = 'piix-hero';
 
+/* ---- gl/input.js ---- */
+/* INPUT: a text field with a pixel border that lights up as you type.   @component input
+ *
+ *   <piix-input name="email" type="email" placeholder="you@site.com">Email</piix-input>
+ *
+ * A dark pixel field. Focus it and light starts running round its border; every key sends a
+ * little ring out from the caret. Whatever you put inside is its label. It's a real form field:
+ * it has a value, it's labelled for screen readers, and it submits with the form it's in.
+ *
+ *   name, type, value, placeholder, required, disabled, autocomplete, maxlength
+ *   palette   the colours of the light                    default: lime
+ *   pixel     size of one pixel, px                       default: 3
+ *
+ *   events: input, change */
+class PiixInputElement extends GLStage {
+  static get formAssociated() { return true; }
+  static get observedAttributes() { return [...GLStage.observedAttributes, 'placeholder', 'type', 'disabled', 'required']; }
+  constructor() { super(); this._defPx = 3; this._defPal = 'lime'; this._defDither = .4; this._click = [.5, .5, -9]; this._int = this.attachInternals ? this.attachInternals() : null; this._focus = 0; }
+  get value() { return this._in ? this._in.value : this.getAttribute('value') || ''; }
+  set value(v) { if (this._in) this._in.value = v; this._sync(); }
+  _hostCss() { return 'display:block'; }
+  _css() {
+    const l = this._pal.list;
+    return `label{display:block;margin-bottom:8px;font:400 12px/1 ${KIT_FONT};text-transform:uppercase;letter-spacing:.06em;color:inherit;opacity:.8}
+.box{position:relative}
+input{all:unset;position:relative;z-index:1;box-sizing:border-box;width:100%;padding:15px 18px;font:500 16px/1.2 "Bricolage Grotesque",system-ui,sans-serif;color:#f2eef8;caret-color:${l[l.length - 2]}}
+input::placeholder{color:#8e869c}
+:host([disabled]){opacity:.5}`;
+  }
+  _html() {
+    const a = n => this.hasAttribute(n) ? ` ${n}="${String(this.getAttribute(n)).replace(/"/g, '&quot;')}"` : '';
+    return `<label for="f" part="label"><slot></slot></label><div class="box"><canvas aria-hidden="true"></canvas><input id="f" part="input"${a('type')}${a('placeholder')}${a('value')}${a('autocomplete')}${a('maxlength')}${this.hasAttribute('required') ? ' required' : ''}${this.hasAttribute('disabled') ? ' disabled' : ''}></div>`;
+  }
+  _box() { return this.shadowRoot.querySelector('.box'); }
+  _setup() {
+    const i = this._in = this.shadowRoot.querySelector('input');
+    i.addEventListener('focus', () => { this._focused = true; });
+    i.addEventListener('blur', () => { this._focused = false; });
+    i.addEventListener('input', () => {
+      /* a ring from roughly where the caret is */
+      const k = i.value.length ? clamp((i.selectionStart || i.value.length) / Math.max(12, i.value.length * 1.6), .05, .95) : .05;
+      this._click = [k, .5, now()];
+      this._sync();
+      this.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
+    });
+    i.addEventListener('change', () => this.dispatchEvent(new Event('change', { bubbles: true })));
+    this._sync();
+  }
+  _sync() {
+    if (!this._int || !this._in) return;
+    this._int.setFormValue(this._in.value);
+    if (this._in.validity) this._int.setValidity(this._in.validity.valid ? {} : this._in.validity, this._in.validationMessage, this._in);
+  }
+  _shader() { return GL_FRAME; }
+  _uniforms(T, dt) {
+    this._focus = lerp(this._focus, this._focused ? 1 : 0, Math.min(1, dt * 6));
+    return { u_hover: Math.max(this._hov * .5, this._focus), u_mouse: this._focused ? [this._click[0], .5] : this._m, u_k: [this._click[0], this._click[1], (now() - this._click[2]) / 1000, 1], u_j: [this._focus * .03, 0, 0, 0] };
+  }
+}
+define('piix-input', PiixInputElement);
+ELEMENTS.input = 'piix-input';
+
+/* ---- gl/loader.js ---- */
+/* LOADER: little pixel loaders drawn on the GPU.   @component loader
+ *
+ *   <piix-loader></piix-loader>
+ *   <piix-loader kind="snake" palette="sunset" size="64"></piix-loader>
+ *
+ * A ring that chases its tail, pixels in orbit, a snake running round a square, equaliser bars,
+ * and rings pulsing out. Screen readers hear "Loading" (or your label).
+ *
+ *   kind      ring | orbit | snake | bars | pulse           default: ring
+ *   palette   its colours                                 default: lime
+ *   size      px                                          default: 48
+ *   label     what's loading                              default: Loading
+ *   pixel     size of one pixel, px                       default: 3 */
+const LD_KINDS = { ring: 0, orbit: 1, snake: 2, bars: 3, pulse: 4 };
+const LD_SHADER = `vec4 effect(vec2 uv,vec2 cell){
+  vec2 q=uv-.5;float r=length(q)*2.,a=atan(q.y,q.x)/6.2831+.5,t=u_time,k=u_k.x,v=0.;
+  if(k==0.){float arc=fract(a-t*.9);v=(r>.5&&r<.9&&arc<.75)?.15+.85*arc/.75:0.;}
+  else if(k==1.){for(int i=0;i<4;i++){float fi=float(i),an=-t*3.-fi*.5;vec2 c=vec2(cos(an),sin(an))*.3;v=max(v,step(length(q-c),.11-fi*.015)*(1.-fi*.2));}}
+  else if(k==2.){float n=u_res.x;vec2 g=cell;if(min(min(g.x,g.y),min(n-1.-g.x,n-1.-g.y))>1.)return vec4(0.);
+    float i;if(g.y<=1.)i=g.x;else if(g.x>=n-2.)i=n+g.y;else if(g.y>=n-2.)i=2.*n+n-1.-g.x;else i=3.*n+n-1.-g.y;
+    float d=mod(fract(t*.4)*4.*n-i,4.*n);v=d<n*1.4?1.-d/(n*1.4):0.;}
+  else if(k==3.){float b=floor(uv.x*5.),f=fract(uv.x*5.),h=.2+.7*(.5+.5*sin(t*6.+b*1.2));v=(f>.18&&f<.82&&abs(uv.y-.5)*2.<h)?.35+.65*h:0.;}
+  else{float w=fract(r*1.3-t*.9);v=r<1.?smoothstep(.2,0.,abs(w-.5)-.12)*(1.-r*.8):0.;}
+  if(v<.03)return vec4(0.);return vec4(dpal(.3+.7*v,cell),1.);}`;
+class PiixLoaderElement extends GLStage {
+  static get observedAttributes() { return [...GLStage.observedAttributes, 'size', 'label']; }
+  constructor() { super(); this._defPx = 3; this._defPal = 'lime'; this._defDither = 0; }
+  _hostCss() { const s = +this.getAttribute('size') || 48; return `display:inline-block;vertical-align:middle;width:${s}px;height:${s}px`; }
+  _setup() { this.setAttribute('role', 'status'); this.setAttribute('aria-label', this.getAttribute('label') || 'Loading'); }
+  _shader() { return LD_SHADER; }
+  _uniforms() { return { u_k: [LD_KINDS[this.getAttribute('kind')] || 0, 0, 0, 0] }; }
+}
+define('piix-loader', PiixLoaderElement);
+ELEMENTS.loader = 'piix-loader';
+
+/* ---- gl/marquee.js ---- */
+/* MARQUEE: a row that scrolls forever and fades out at its ends in dithered pixels.   @component marquee
+ *
+ *   <piix-marquee>
+ *     <img src="logo-a.svg" alt="Acme"> <img src="logo-b.svg" alt="Globex"> …
+ *   </piix-marquee>
+ *
+ * Logos, words, anything: they slide past in a loop with no seam, and instead of a soft fade the
+ * edges break up into a pixel dither. Hover to pause it. For people who prefer less motion it
+ * holds still. The copies it makes to loop are hidden from screen readers.
+ *
+ *   speed     pixels a second                              default: 40
+ *   gap       px between items                             default: 48
+ *   fade      px of dithered fade at each end              default: 96
+ *   reverse   scroll the other way */
+class PiixMarqueeElement extends HTMLElement {
+  static get observedAttributes() { return ['speed', 'gap', 'fade', 'reverse']; }
+  constructor() { super(); this.attachShadow({ mode: 'open' }); this._tick = this._tick.bind(this); this._x = 0; }
+  connectedCallback() {
+    this._build();
+    this._ro = new ResizeObserver(() => this._mask()); this._ro.observe(this);
+    this.addEventListener('pointerenter', this._pe = () => { this._paused = true; });
+    this.addEventListener('pointerleave', this._pl = () => { this._paused = false; });
+    sub(this._tick);
+  }
+  disconnectedCallback() { unsub(this._tick); if (this._ro) this._ro.disconnect(); }
+  attributeChangedCallback() { if (this.shadowRoot.firstChild) this._build(); }
+  _build() {
+    const gap = +this.getAttribute('gap') || 48;
+    this.shadowRoot.innerHTML = `<style>
+:host{display:block;overflow:hidden;-webkit-mask-size:100% 100%;mask-size:100% 100%}
+.track{display:flex;width:max-content;will-change:transform}
+.row{display:flex;align-items:center;gap:${gap}px;padding-right:${gap}px;flex:0 0 auto}
+.row ::slotted(*){flex:0 0 auto}
+</style><div class="track"><div class="row" part="row"><slot></slot></div><div class="row copy" aria-hidden="true"></div></div>`;
+    this._track = this.shadowRoot.querySelector('.track');
+    this._copy = this.shadowRoot.querySelector('.copy');
+    /* the second row is a copy of the first, so the loop has no seam */
+    this._copy.innerHTML = '';
+    for (const n of this.childNodes) { const c = n.cloneNode(true); if (c.nodeType === 1) { c.setAttribute('aria-hidden', 'true'); c.setAttribute('tabindex', '-1'); } this._copy.appendChild(c); }
+    this._mask();
+  }
+  /* a mask that's solid in the middle and dithered toward the ends, pixel by pixel */
+  _mask() {
+    const w = Math.max(1, Math.round(this.clientWidth)), f = Math.min(w / 2, +this.getAttribute('fade') || 96), px = 4;
+    if (!w || w === this._mw) return;
+    this._mw = w;
+    const c = document.createElement('canvas'); c.width = Math.ceil(w / px); c.height = 4;
+    const g = c.getContext('2d'), d = g.createImageData(c.width, 4), B = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+    for (let y = 0; y < 4; y++) for (let x = 0; x < c.width; x++) {
+      const at = x * px, k = Math.min(1, at / f, (w - at) / f), i = (y * c.width + x) * 4;
+      d.data[i + 3] = k > (B[(y % 4) * 4 + (x % 4)] + .5) / 16 ? 255 : 0;
+    }
+    g.putImageData(d, 0, 0);
+    const url = `url(${c.toDataURL()})`;
+    this.style.webkitMaskImage = url; this.style.maskImage = url;
+    this.style.imageRendering = 'pixelated';
+  }
+  _tick(dt) {
+    if (!this._track || reduced() || this._paused) return;
+    const w = this._track.firstElementChild.offsetWidth;
+    if (!w) return;
+    const dir = this.hasAttribute('reverse') ? 1 : -1;
+    this._x = (this._x + dir * (+this.getAttribute('speed') || 40) * dt) % w;
+    if (this._x > 0) this._x -= w;
+    this._track.style.transform = `translateX(${this._x.toFixed(1)}px)`;
+  }
+}
+define('piix-marquee', PiixMarqueeElement);
+ELEMENTS.marquee = 'piix-marquee';
+
 /* ---- gl/pixelimage.js ---- */
 /* PIXEL IMAGE: any picture, pixelated and dithered on the GPU, with a lens.   @component pixel-image
  *
@@ -11696,6 +11977,64 @@ class PiixPixelImageElement extends GLStage {
 }
 define('piix-pixel-image', PiixPixelImageElement);
 ELEMENTS['pixel-image'] = 'piix-pixel-image';
+
+/* ---- gl/reveal.js ---- */
+/* REVEAL: content that dissolves in, pixel by pixel, when it scrolls into view.   @component reveal
+ *
+ *   <piix-reveal pattern="rain">
+ *     <img src="screenshot.png" alt="The dashboard">
+ *   </piix-reveal>
+ *
+ * Wrap anything. Until it's on screen it hides under a layer the colour of the page; then that
+ * layer breaks up into pixels and falls away, with a glowing edge where it's dissolving. Once
+ * it's done the layer is gone and the GPU rests. People who prefer less motion just see it.
+ *
+ *   pattern   dither | rain | scan | spiral                default: dither
+ *   color     what it dissolves out of                     default: the background behind it
+ *   palette   the glowing edge                             default: lime
+ *   duration  seconds                                      default: 1.1
+ *   delay     seconds to wait once it's on screen          default: 0
+ *   pixel     size of one pixel, px                        default: 6 */
+const RV_PAT = { dither: 0, rain: 1, scan: 2, spiral: 3 };
+const RV_SHADER = `vec4 effect(vec2 uv,vec2 cell){
+  float p=u_k.y,pat=u_k.x,th;
+  if(pat==1.)th=hash(vec2(cell.x,3.))*.5+(1.-uv.y)*.5;
+  else if(pat==2.)th=uv.x*.82+bayer8(cell)*.18;
+  else if(pat==3.){vec2 q=aspect(uv);th=fract(atan(q.y,q.x)/6.2831+.5+length(q)*1.3)*.72+bayer8(cell)*.28;}
+  else th=bayer8(cell)*.75+hash(cell)*.25;
+  float e=th-p*1.2+.1;
+  if(e<0.)return vec4(0.);
+  if(e<.1)return vec4(dpal(1.-e/.1*.6,cell),1.);
+  return vec4(u_j.rgb,1.);}`;
+class PiixRevealElement extends GLStage {
+  static get observedAttributes() { return [...GLStage.observedAttributes, 'pattern', 'color']; }
+  constructor() { super(); this._defPx = 6; this._defPal = 'lime'; this._defDither = 0; this._start = null; }
+  _hostCss() { return 'display:block;position:relative'; }
+  _html() { return '<slot></slot><canvas aria-hidden="true"></canvas>'; }
+  _css() { return 'canvas{z-index:2}'; }
+  /* the colour behind it: the first ancestor with a background */
+  _bg() { let el = this.parentElement; while (el) { const b = getComputedStyle(el).backgroundColor; if (b && b !== 'transparent' && !/rgba\(0, 0, 0, 0\)/.test(b)) return b; el = el.parentElement; } return '#ffffff'; }
+  _setup() {
+    const css = this.getAttribute('color') || this._bg();
+    this._col = glRGB(css);
+    this._done = reduced() || !glInit();
+    this._cv.style.display = this._done ? 'none' : '';
+    this._cv.style.background = this._done ? '' : css;
+    if (this._rio) this._rio.disconnect();
+    this._rio = new IntersectionObserver(es => { if (es[es.length - 1].isIntersecting && this._start == null) { this._start = now() + (+this.getAttribute('delay') || 0) * 1000; this._rio.disconnect(); } }, { threshold: .25 });
+    this._rio.observe(this);
+  }
+  _skip() { return this._done; }
+  _shader() { return RV_SHADER; }
+  _uniforms() {
+    const p = this._start == null ? 0 : clamp((now() - this._start) / ((+this.getAttribute('duration') || 1.1) * 1000), 0, 1);
+    if (this._cv.style.background) requestAnimationFrame(() => { this._cv.style.background = ''; });
+    if (p >= 1) { this._done = true; this._cv.style.display = 'none'; this.dispatchEvent(new CustomEvent('piix:revealed', { bubbles: true })); }
+    return { u_k: [RV_PAT[this.getAttribute('pattern')] || 0, p, 0, 0], u_j: [this._col[0], this._col[1], this._col[2], 0] };
+  }
+}
+define('piix-reveal', PiixRevealElement);
+ELEMENTS.reveal = 'piix-reveal';
 
 /* ---- gl/shader.js ---- */
 /* SHADER: GPU pixel backgrounds.   @component shader
@@ -11784,6 +12123,145 @@ class PiixShaderElement extends GLStage {
 }
 define('piix-shader', PiixShaderElement);
 ELEMENTS.shader = 'piix-shader';
+
+/* ---- gl/stat.js ---- */
+/* STAT: a big number that counts up in pixel type when it scrolls into view.   @component stat
+ *
+ *   <piix-stat value="12480" suffix="+">teams use it</piix-stat>
+ *
+ * The number rolls up from zero the first time it's on screen, in chunky pixel digits with a hard
+ * shadow, and each digit flickers as it changes. Whatever you put inside is the label under it.
+ * Screen readers get the final number straight away.
+ *
+ *   value     the number
+ *   prefix    before it, like $
+ *   suffix    after it, like + or %
+ *   decimals  digits after the point                       default: 0
+ *   duration  seconds to count                             default: 1.6
+ *   tone      lime | coral | violet | sky | sun | mint | ink | paper   default: lime */
+class PiixStatElement extends HTMLElement {
+  static get observedAttributes() { return ['value', 'prefix', 'suffix', 'decimals', 'tone']; }
+  constructor() { super(); this.attachShadow({ mode: 'open' }); this._tick = this._tick.bind(this); }
+  connectedCallback() {
+    this._build();
+    this._io = new IntersectionObserver(es => { if (es[es.length - 1].isIntersecting && !this._t0) { this._t0 = now(); sub(this._tick); this._io.disconnect(); } }, { threshold: .4 });
+    this._io.observe(this);
+  }
+  disconnectedCallback() { unsub(this._tick); if (this._io) this._io.disconnect(); }
+  attributeChangedCallback() { if (this.shadowRoot.firstChild) { this._build(); if (this._t0) { this._t0 = now(); sub(this._tick); } } }
+  _fmt(n) { const d = +this.getAttribute('decimals') || 0; return (this.getAttribute('prefix') || '') + n.toLocaleString(undefined, { minimumFractionDigits: d, maximumFractionDigits: d }) + (this.getAttribute('suffix') || ''); }
+  _build() {
+    const [c] = kitTone(this), v = +this.getAttribute('value') || 0;
+    this.shadowRoot.innerHTML = `<style>
+:host{display:inline-block;color:inherit}
+.n{font:400 clamp(40px,6vw,72px)/1 ${KIT_FONT};color:${c};letter-spacing:.02em;text-shadow:4px 4px 0 #17121f;white-space:nowrap;font-variant-numeric:tabular-nums}
+.n i{font-style:normal;display:inline-block}
+.n i.f{animation:fl .12s steps(2)}
+@keyframes fl{50%{opacity:.35;transform:translateY(-2px)}}
+.l{margin-top:10px;font:600 14px/1.3 "Bricolage Grotesque",system-ui,sans-serif;opacity:.75}
+@media (prefers-reduced-motion:reduce){.n i.f{animation:none}}
+</style><div class="n" part="number" aria-hidden="true"></div><div class="l" part="label"><slot></slot></div>`;
+    this._n = this.shadowRoot.querySelector('.n');
+    this.setAttribute('role', 'figure');
+    this.setAttribute('aria-label', `${this._fmt(v)} ${this.textContent.trim()}`.trim());
+    this._show(this._t0 && !reduced() ? 0 : (this._t0 || reduced() ? v : 0));
+  }
+  /* draw the number, flickering any digit that changed */
+  _show(n) {
+    const s = this._fmt(n), old = this._s || '';
+    this._n.innerHTML = [...s].map((ch, i) => `<i${ch !== old[i] && old ? ' class="f"' : ''}>${ch.replace(/[<>&]/g, '')}</i>`).join('');
+    this._s = s;
+  }
+  _tick() {
+    const v = +this.getAttribute('value') || 0, dur = (+this.getAttribute('duration') || 1.6) * 1000, k = reduced() ? 1 : clamp((now() - this._t0) / dur, 0, 1);
+    const e = 1 - Math.pow(1 - k, 3), d = +this.getAttribute('decimals') || 0, n = Math.round(v * e * 10 ** d) / 10 ** d;
+    if (this._fmt(n) !== this._s) this._show(n);
+    if (k >= 1) unsub(this._tick);
+  }
+}
+define('piix-stat', PiixStatElement);
+ELEMENTS.stat = 'piix-stat';
+
+/* ---- gl/tabs.js ---- */
+/* TABS: tabs whose highlight slides across with a dithered pixel trail.   @component tabs
+ *
+ *   <piix-tabs>
+ *     <div label="Overview">…</div>
+ *     <div label="Install">…</div>
+ *     <div label="Examples">…</div>
+ *   </piix-tabs>
+ *
+ * Each child with a label becomes a tab. Pick one and the lit block slides over to it on the
+ * GPU, leaving a trail of dithered pixels behind. Arrow keys, Home and End move between tabs,
+ * and it's announced as a proper tab list.
+ *
+ *   selected  which tab is open, from 0                     default: 0
+ *   palette   the colours of the highlight                 default: lime
+ *   pixel     size of one pixel, px                        default: 3
+ *
+ *   events: change { index, label } */
+const TB_SHADER = `vec4 effect(vec2 uv,vec2 cell){
+  float x0=u_k.x,x1=u_k.y,vel=u_k.z,inb=step(x0,uv.x)*step(uv.x,x1),tr=0.;
+  if(vel>.001)tr=clamp(1.-(x0-uv.x)/(vel*.5),0.,1.)*step(uv.x,x0);
+  if(vel<-.001)tr=clamp(1.-(uv.x-x1)/(-vel*.5),0.,1.)*step(x1,uv.x);
+  float v=inb>0.?.7+.3*uv.y:tr*.55;
+  if(max(inb,tr)<.02)return vec4(0.);
+  return vec4(dpal(v,cell),step(bayer8(cell)*.98,max(inb,tr)));}`;
+class PiixTabsElement extends GLStage {
+  static get observedAttributes() { return [...GLStage.observedAttributes, 'selected']; }
+  constructor() { super(); this._defPx = 3; this._defPal = 'lime'; this._defDither = .5; this._x = [0, 0]; this._v = 0; }
+  attributeChangedCallback(n, a, b) { if (n === 'selected') { if (this._tabs) this._pick(this.selected, false); return; } super.attributeChangedCallback(n, a, b); }
+  _hostCss() { return 'display:block'; }
+  _css() {
+    return `.bar{position:relative;display:flex;gap:4px;padding:6px;background:#17121f;clip-path:${kitCorners(3)}}
+.bar canvas{z-index:0}
+[role=tab]{all:unset;position:relative;z-index:1;flex:0 0 auto;padding:10px 16px;font:400 13px/1 ${KIT_FONT};text-transform:uppercase;letter-spacing:.05em;color:#cdc6da;cursor:pointer;transition:color .15s}
+[role=tab][aria-selected=true]{color:#17121f}
+[role=tab]:focus-visible{outline:2px dashed #cdc6da;outline-offset:2px}
+.panels{padding:18px 4px}`;
+  }
+  _html() { return '<div class="bar" role="tablist" part="tablist"><canvas aria-hidden="true"></canvas></div><div class="panels" part="panels"><slot></slot></div>'; }
+  _box() { return this.shadowRoot.querySelector('.bar'); }
+  get selected() { return clamp(+this.getAttribute('selected') || 0, 0, Math.max(0, this._tabs ? this._tabs.length - 1 : 0)); }
+  _setup() {
+    const bar = this._box(), kids = [...this.children].filter(c => c.hasAttribute('label'));
+    this._kids = kids;
+    this._tabs = kids.map((k, i) => {
+      const b = document.createElement('button');
+      b.setAttribute('role', 'tab'); b.type = 'button'; b.textContent = k.getAttribute('label');
+      b.addEventListener('click', () => this._pick(i, true));
+      b.addEventListener('keydown', e => {
+        const n = kids.length, j = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: n - 1 }[e.key];
+        if (j != null) { e.preventDefault(); this._pick((j + n) % n, true); this._tabs[(j + n) % n].focus(); }
+      });
+      bar.appendChild(b);
+      k.setAttribute('role', 'tabpanel'); k.setAttribute('aria-label', k.getAttribute('label'));
+      return b;
+    });
+    this._pick(this.selected, false);
+  }
+  _pick(i, user) {
+    this._tabs.forEach((b, j) => { b.setAttribute('aria-selected', String(i === j)); b.tabIndex = i === j ? 0 : -1; });
+    this._kids.forEach((k, j) => { k.hidden = i !== j; });
+    if (user && i !== this.selected) {
+      this.setAttribute('selected', i);
+      this.dispatchEvent(new CustomEvent('change', { bubbles: true, detail: { index: i, label: this._kids[i].getAttribute('label') } }));
+    }
+  }
+  _shader() { return TB_SHADER; }
+  _uniforms(T, dt) {
+    /* the block eases toward the selected tab; how fast it moves draws the trail */
+    const bar = this._box(), b = this._tabs[this.selected];
+    if (!b) return {};
+    const W = bar.offsetWidth || 1, want = [b.offsetLeft / W, (b.offsetLeft + b.offsetWidth) / W], k = reduced() ? 1 : Math.min(1, dt * 9), was = this._x[0];
+    if (!this._init) { this._x = want.slice(); this._init = true; }
+    this._x[0] = lerp(this._x[0], want[0], k); this._x[1] = lerp(this._x[1], want[1], k);
+    this._v = lerp(this._v, (this._x[0] - was) / Math.max(dt, .001) * .1, .5);
+    return { u_k: [this._x[0], this._x[1], this._v, 0] };
+  }
+}
+define('piix-tabs', PiixTabsElement);
+ELEMENTS.tabs = 'piix-tabs';
 
 /* ---- gl/text.js ---- */
 /* TEXT: headlines with GPU pixel effects.   @component text

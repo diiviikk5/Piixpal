@@ -125,10 +125,18 @@
  "checkbox": "kit",
  "progress": "kit",
  "toggle": "kit",
+ "cursor": "kit",
+ "divider": "kit",
  "glow-button": "kit",
  "glow-card": "kit",
  "hero": "kit",
+ "input": "kit",
+ "loader": "kit",
+ "marquee": "kit",
  "pixel-image": "kit",
+ "reveal": "kit",
  "shader": "kit",
+ "stat": "kit",
+ "tabs": "kit",
  "text": "kit"
 }
