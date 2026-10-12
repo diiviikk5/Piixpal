@@ -125,3 +125,83 @@ const glDraw = (body, w, h, u, tex) => {
   return { cv, sy: cv.height - h };
 };
 
+/* ---------- the stage every shader component stands on ----------
+ * a small canvas in a shadow root, scaled up crisp; the pointer and hover are tracked; it only
+ * draws while on screen; reduced motion gets one still frame; without WebGL it shows a gradient */
+class GLStage extends HTMLElement {
+  static get observedAttributes() { return ['kind', 'effect', 'palette', 'pixel', 'dither', 'speed', 'fill', 'height', 'src', 'tone']; }
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    this._tick = this._tick.bind(this);
+    this._vis = true; this._t0 = now(); this._m = [.5, .5]; this._hov = 0; this._seed = Math.random() * 100;
+  }
+  connectedCallback() {
+    this._build();
+    this._io = new IntersectionObserver(es => { const v = es[es.length - 1].isIntersecting; if (v && !this._seen) { this._seen = now(); } this._vis = v; }, { rootMargin: '60px' });
+    this._io.observe(this);
+    this._ro = new ResizeObserver(() => this._fit()); this._ro.observe(this);
+    sub(this._tick);
+  }
+  disconnectedCallback() { unsub(this._tick); if (this._io) this._io.disconnect(); if (this._ro) this._ro.disconnect(); }
+  attributeChangedCallback(n, a, b) { if (a !== b && this._cv) this._build(); }
+  _css() { return ''; }
+  _html() { return '<canvas part="canvas" aria-hidden="true"></canvas><slot></slot>'; }
+  _build() {
+    const fill = this.hasAttribute('fill');
+    if (fill && this.parentElement) {
+      const p = this.parentElement;
+      if (getComputedStyle(p).position === 'static') p.style.position = 'relative';
+      p.style.isolation = 'isolate';
+    }
+    this._pal = glPalette(this.getAttribute('palette') || this._defPal);
+    const hgt = this.getAttribute('height');
+    this.shadowRoot.innerHTML = `<style>
+:host{display:block;position:${fill ? 'absolute' : 'relative'};${fill ? 'inset:0;z-index:-1;pointer-events:none;' : ''}${!fill && hgt ? `height:${/^\d+$/.test(hgt) ? hgt + 'px' : hgt};` : ''}${this._hostCss ? this._hostCss() : ''}}
+:host([hidden]){display:none}
+canvas{position:absolute;inset:0;width:100%;height:100%;display:block;image-rendering:pixelated;image-rendering:crisp-edges;pointer-events:none}
+${this._css()}</style>${this._html()}`;
+    this._cv = this.shadowRoot.querySelector('canvas');
+    this._g = this._cv.getContext('2d');
+    if (!glInit()) {
+      /* no WebGL: a still gradient in the same colours */
+      const l = this._pal.list;
+      this._cv.style.background = `linear-gradient(135deg,${l[0]},${l[Math.floor(l.length / 2)]},${l[l.length - 1]})`;
+    }
+    if (this._setup) this._setup();
+    this._fit();
+  }
+  _fit() {
+    if (!this._cv) return;
+    const r = this.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2);
+    const px = Math.max(1, (+this.getAttribute('pixel') || this._defPx || 4) * dpr);
+    this._px = px;
+    this._W = Math.max(2, Math.ceil(r.width * dpr / px)); this._H = Math.max(2, Math.ceil(r.height * dpr / px));
+    if (this._cv.width !== this._W || this._cv.height !== this._H) { this._cv.width = this._W; this._cv.height = this._H; }
+    this._still = false;
+    if (this._resized) this._resized();
+  }
+  _tick(dt) {
+    if (!this._vis || !this._W || !GL.ok) return;
+    const R = reduced();
+    if (R && this._still && !this._dirty) return;
+    const r = this.getBoundingClientRect();
+    const over = ptr.seen && ptr.cx >= r.left - 40 && ptr.cx <= r.right + 40 && ptr.cy >= r.top - 40 && ptr.cy <= r.bottom + 40;
+    if (over) { const mx = (ptr.cx - r.left) / r.width, my = 1 - (ptr.cy - r.top) / r.height; this._m[0] = lerp(this._m[0], mx, Math.min(1, dt * 10)); this._m[1] = lerp(this._m[1], my, Math.min(1, dt * 10)); }
+    this._hov = lerp(this._hov, over && ptr.cx >= r.left && ptr.cx <= r.right && ptr.cy >= r.top && ptr.cy <= r.bottom ? 1 : 0, Math.min(1, dt * 5));
+    const speed = this.hasAttribute('speed') ? +this.getAttribute('speed') : 1;
+    const T = R ? 12 : (now() - this._t0) / 1000 * speed;
+    const intro = R || !this._introLen ? 1 : clamp((now() - (this._seen || now())) / 1000 / this._introLen, 0, 1);
+    const u = Object.assign({
+      u_res: [this._W, this._H], u_time: T, u_mouse: this._m, u_hover: this._hov, u_intro: intro, u_pal: this._pal.arr, u_n: this._pal.n,
+      u_dither: this.hasAttribute('dither') ? +this.getAttribute('dither') : this._defDither ?? 1, u_seed: this._seed, u_k: [0, 0, 0, 0], u_j: [0, 0, 0, 0]
+    }, this._uniforms ? this._uniforms(T, dt) : {});
+    const out = glDraw(this._shader(), this._W, this._H, u, this._texture ? this._texture() : null);
+    if (!out) return;
+    this._g.clearRect(0, 0, this._W, this._H);
+    this._g.drawImage(out.cv, 0, out.sy, this._W, this._H, 0, 0, this._W, this._H);
+    this._dirty = false;
+    this._still = R;
+  }
+}
+Piixpal.gl = { palettes: GL_PALETTES, draw: glDraw, supported: () => glInit() };
