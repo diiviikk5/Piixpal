@@ -11,13 +11,16 @@
  *   palette   the colours of the light                    default: lime
  *   pixel     size of one pixel, px                       default: 3
  *   type      button | submit | reset                     default: button
+ *   size      sm | md | lg                                default: md
  *   disabled  greyed out */
 class PiixGlowButtonElement extends GLStage {
   static get formAssociated() { return true; }
+  static get observedAttributes() { return [...GLStage.observedAttributes, 'size', 'disabled']; }
   constructor() { super(); this._defPx = 3; this._defPal = 'lime'; this._click = [.5, .5, -9]; this._int = this.attachInternals ? this.attachInternals() : null; }
   _hostCss() { return 'display:inline-block;vertical-align:middle;cursor:pointer;-webkit-tap-highlight-color:transparent'; }
   _css() {
-    return `button{all:unset;position:relative;display:block;box-sizing:border-box;padding:16px 26px;color:${this._pal.list[this._pal.list.length - 1]};font:700 15px/1 "Bricolage Grotesque",system-ui,sans-serif;letter-spacing:.01em;text-shadow:0 1px 0 rgba(0,0,0,.5);transition:transform .08s}
+    const [pad, fs] = { sm: ['11px 18px', 13], lg: ['20px 34px', 18] }[this.getAttribute('size')] || ['16px 26px', 15];
+    return `button{all:unset;position:relative;display:block;box-sizing:border-box;padding:${pad};color:${this._pal.list[this._pal.list.length - 1]};font:700 ${fs}px/1 "Bricolage Grotesque",system-ui,sans-serif;letter-spacing:.01em;text-shadow:0 1px 0 rgba(0,0,0,.5);transition:transform .08s}
 button:focus-visible{outline:2px dashed ${this._pal.list[this._pal.list.length - 2]};outline-offset:4px}
 :host(:active) button{transform:translateY(1px)}
 :host([disabled]){opacity:.45;cursor:not-allowed;filter:grayscale(.7)}`;
