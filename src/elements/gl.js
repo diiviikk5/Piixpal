@@ -205,3 +205,16 @@ ${this._css()}</style>${this._html()}`;
   }
 }
 Piixpal.gl = { palettes: GL_PALETTES, draw: glDraw, supported: () => glInit() };
+
+/* the frame shader buttons and cards share: a pixel border with light running round it, a dark
+ * face with a little grain, a spotlight that follows the pointer, and a ring where you click.
+ * u_k = (click x, click y, seconds since the click, border width in pixels), u_j.x = face lift */
+const GL_FRAME = `vec4 effect(vec2 uv,vec2 cell){
+  vec2 sz=u_res,d=min(cell,sz-1.-cell);float b=u_k.w,e=min(d.x,d.y);
+  if(d.x+d.y<b*1.5)return vec4(0.);
+  vec2 q=aspect(uv),m=aspect(u_mouse);
+  if(e<b){float a=atan(uv.y-.5,(uv.x-.5)*sz.x/sz.y)/6.2831+.5;
+    float v=.5+.5*sin((a-u_time*.22)*6.2831*2.);v=mix(v*.9+.1,1.,u_hover*.35);return vec4(dpal(v,cell),1.);}
+  float v=.05+u_j.x+.05*hash(cell)+.3*exp(-length(q-m)*2.8)*u_hover;
+  if(u_k.z<1.2){vec2 c=aspect(u_k.xy);float r=u_k.z*1.5,ring=smoothstep(.07,0.,abs(length(q-c)-r))*(1.-u_k.z/1.2);v+=ring*.75;}
+  return vec4(dpal(v,cell),1.);}`;
