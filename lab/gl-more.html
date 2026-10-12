@@ -1,0 +1,83 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Pixel UI (GPU): more components</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Silkscreen&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #0b0a10; color: #f2eef8; font-family: "Bricolage Grotesque", system-ui }
+  section { padding: 64px 24px }
+  .wrap { max-width: 1040px; margin: 0 auto }
+  h2 { margin: 0 0 24px; font-size: 40px; letter-spacing: -.03em }
+  .row { display: flex; gap: 28px; flex-wrap: wrap; align-items: center }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px }
+  .light { background: #f3eee3; color: #17121f }
+  .logo { font: 800 26px/1 "Bricolage Grotesque"; opacity: .85; white-space: nowrap }
+  .shot { height: 240px; display: grid; place-items: center; background: linear-gradient(135deg, #6b4cff, #ff6b4a); font-size: 32px; font-weight: 800; color: #fff }
+  form { display: grid; gap: 18px; max-width: 420px }
+</style>
+<body>
+<piix-cursor></piix-cursor>
+
+<section>
+  <div class="wrap">
+    <h2>Numbers</h2>
+    <div class="stats">
+      <piix-stat value="12480" suffix="+">teams building with it</piix-stat>
+      <piix-stat value="99.98" decimals="2" suffix="%" tone="sky">uptime this year</piix-stat>
+      <piix-stat value="2.4" decimals="1" prefix="$" suffix="M" tone="coral">saved on design</piix-stat>
+    </div>
+  </div>
+</section>
+
+<piix-divider from="#0b0a10" to="#f3eee3" kind="wave"></piix-divider>
+
+<section class="light">
+  <div class="wrap">
+    <h2>Loved by teams at</h2>
+    <piix-marquee>
+      <span class="logo">◆ Acme</span><span class="logo">▲ Globex</span><span class="logo">● Initech</span><span class="logo">■ Umbrella</span><span class="logo">✦ Hooli</span><span class="logo">⬢ Vandelay</span>
+    </piix-marquee>
+  </div>
+</section>
+
+<piix-divider from="#f3eee3" to="#0b0a10" kind="mountains"></piix-divider>
+
+<section>
+  <div class="wrap">
+    <h2>Reveal on scroll</h2>
+    <div class="row" style="display:grid;grid-template-columns:repeat(2,1fr);gap:20px">
+      <piix-reveal><div class="shot">dither</div></piix-reveal>
+      <piix-reveal pattern="rain" delay=".2"><div class="shot">rain</div></piix-reveal>
+      <piix-reveal pattern="scan" delay=".4"><div class="shot">scan</div></piix-reveal>
+      <piix-reveal pattern="spiral" delay=".6"><div class="shot">spiral</div></piix-reveal>
+    </div>
+  </div>
+</section>
+
+<piix-divider from="#0b0a10" to="#17121f" kind="stairs" palette="sunset"></piix-divider>
+
+<section style="background:#17121f">
+  <div class="wrap">
+    <h2>Tabs</h2>
+    <piix-tabs>
+      <div label="Overview"><p>Everything you need to ship a loud landing page.</p></div>
+      <div label="Install"><p>One script tag, or npm install piixpal.</p></div>
+      <div label="Examples"><p>Heroes, pricing, dashboards, 404 pages.</p></div>
+      <div label="Pricing"><p>Free. Forever. MIT.</p></div>
+    </piix-tabs>
+    <h2 style="margin-top:48px">Form</h2>
+    <form onsubmit="event.preventDefault();this.querySelector('output').textContent=JSON.stringify(Object.fromEntries(new FormData(this)))">
+      <piix-input name="email" type="email" placeholder="you@site.com">Email</piix-input>
+      <piix-input name="handle" placeholder="@pixelfan" palette="candy">Handle</piix-input>
+      <div class="row"><piix-glow-button type="submit">Join the waitlist</piix-glow-button><piix-glow-button size="sm" palette="sunset" type="reset">Clear</piix-glow-button></div>
+      <output style="font:12px monospace;opacity:.7"></output>
+    </form>
+    <h2 style="margin-top:48px">Loaders</h2>
+    <div class="row">
+      <piix-loader></piix-loader><piix-loader kind="orbit" palette="candy"></piix-loader><piix-loader kind="snake" palette="sunset"></piix-loader><piix-loader kind="bars" palette="ocean"></piix-loader><piix-loader kind="pulse" palette="violet" size="64"></piix-loader>
+    </div>
+  </div>
+</section>
+
+<piix-divider from="#17121f" to="#0b0a10" kind="drip" palette="candy"></piix-divider>
+<section style="height:120px"></section>
+<script src="../piixpal.js"></script>
