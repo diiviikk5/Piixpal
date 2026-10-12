@@ -124,5 +124,6 @@
  "button": "kit",
  "checkbox": "kit",
  "progress": "kit",
- "toggle": "kit"
+ "toggle": "kit",
+ "shader": "kit"
 }

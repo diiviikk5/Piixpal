@@ -932,6 +932,215 @@ canvas.held{cursor:grabbing}
   }
 }
 
+/* ---- elements/gl.js ---- */
+/* GL: the GPU side of Piixpal. One shared WebGL canvas that every shader component borrows,
+ * so a page can have dozens of them without running out of contexts (browsers allow about 16).
+ * A component renders its shader at a low "pixel grid" resolution, then copies the result into
+ * its own canvas, which the browser scales up crisp. That's the pixel look, and it's also why
+ * these are cheap: a 1200 x 600 hero with 4 px pixels is only 300 x 150 shader pixels.
+ *
+ * Every shader gets the same toolkit: noise, fbm, an 8x8 Bayer matrix, and a palette with
+ * ordered dithering, so gradients fall into the theme's colours in that crunchy pixel way. */
+
+const GL = { cv: null, gl: null, ok: null, lost: false, buf: null, progs: {}, tex: new WeakMap() };
+
+/* the theme's palettes, dark to light. Shaders read them as up to six colours */
+const GL_PALETTES = {
+  lime: ['#0b0a10', '#1b3410', '#4f7d10', '#a8d81c', '#c6f432', '#f2ffd6'],
+  aurora: ['#06050c', '#0d2b3a', '#127a74', '#25d6a0', '#9ef5cf', '#e4dcff'],
+  sunset: ['#160925', '#4d1650', '#b0285e', '#ff5a6e', '#ff9b45', '#ffe08a'],
+  ocean: ['#030b18', '#0a2c55', '#1d6fb0', '#58c8ff', '#bfeaff', '#ffffff'],
+  candy: ['#1c0b2e', '#5b2bd6', '#c43bd8', '#ff6bb5', '#ffd23f', '#fffbe6'],
+  violet: ['#0c0718', '#221048', '#4a2bb0', '#6b4cff', '#a996ff', '#ece6ff'],
+  fire: ['#050202', '#5a0b0b', '#c22a10', '#ff6b1f', '#ffc23a', '#fff4c8'],
+  gameboy: ['#0f380f', '#306230', '#8bac0f', '#9bbc0f'],
+  paper: ['#f3eee3', '#e2d9c6', '#a99d88', '#6c6477', '#17121f'],
+  mono: ['#0b0a10', '#3b3448', '#8e869c', '#f3eee3']
+};
+const glPalette = name => {
+  const list = GL_PALETTES[name] || (name && name.includes('#') ? name.split(',').map(s => s.trim()).filter(Boolean) : null) || GL_PALETTES.lime;
+  const arr = new Float32Array(18);
+  list.slice(0, 6).forEach((c, i) => { const [r, g, b] = hexRGBA(c); arr[i * 3] = r / 255; arr[i * 3 + 1] = g / 255; arr[i * 3 + 2] = b / 255; });
+  return { arr, n: Math.min(6, list.length), list };
+};
+
+const GL_VERT = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
+/* what every fragment shader starts with */
+const GL_PRELUDE = `precision highp float;
+uniform vec2 u_res;uniform float u_time;uniform vec2 u_mouse;uniform float u_hover;uniform float u_intro;
+uniform vec3 u_pal[6];uniform float u_n;uniform float u_dither;uniform float u_seed;uniform vec4 u_k;uniform vec4 u_j;
+uniform sampler2D u_tex;
+float hash(vec2 p){p=fract(p*vec2(123.34,456.21)+u_seed*.013);p+=dot(p,p+45.32);return fract(p.x*p.y);}
+float noise(vec2 p){vec2 i=floor(p),f=fract(p),u=f*f*(3.-2.*f);return mix(mix(hash(i),hash(i+vec2(1,0)),u.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),u.x),u.y);}
+float fbm(vec2 p){float v=0.,a=.5;mat2 m=mat2(1.6,1.2,-1.2,1.6);for(int i=0;i<5;i++){v+=a*noise(p);p=m*p;a*=.5;}return v;}
+float bayer2(vec2 a){a=floor(a);return fract(dot(a,vec2(.5,a.y*.75)));}
+float bayer4(vec2 a){return bayer2(.5*a)*.25+bayer2(a);}
+float bayer8(vec2 a){return bayer4(.5*a)*.25+bayer2(a);}
+vec3 pal(float v){v=clamp(v,0.,1.)*(u_n-1.);vec3 c=u_pal[0];for(int i=1;i<6;i++){if(float(i)<u_n)c=mix(c,u_pal[i],clamp(v-float(i-1),0.,1.));}return c;}
+vec3 dpal(float v,vec2 cell){float n=u_n-1.;float q=clamp(v,0.,1.)*n+(bayer8(cell)-.5)*u_dither;return pal(floor(q+.5)/n);}
+vec2 aspect(vec2 uv){return (uv-.5)*vec2(u_res.x/u_res.y,1.);}
+`;
+/* and ends with: one pixel per fragment, plus the pixel-dissolve intro every component can use */
+const GL_MAIN = `
+void main(){vec2 cell=floor(gl_FragCoord.xy);vec2 uv=(cell+.5)/u_res;vec4 c=effect(uv,cell);
+if(u_intro<1.){float th=bayer8(cell)*.75+(1.-uv.y)*.25;if(th>u_intro)c.a=0.;}
+gl_FragColor=vec4(c.rgb*c.a,c.a);}`;
+
+const glInit = () => {
+  if (GL.ok !== null) return GL.ok && !GL.lost;
+  try {
+    const cv = document.createElement('canvas');
+    const gl = cv.getContext('webgl', { alpha: true, premultipliedAlpha: true, antialias: false, depth: false, stencil: false, preserveDrawingBuffer: false, powerPreference: 'low-power' });
+    if (!gl) return (GL.ok = false);
+    GL.cv = cv; GL.gl = gl;
+    const setup = () => {
+      GL.buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, GL.buf);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+    };
+    setup();
+    /* if the GPU resets, drop everything and rebuild when it comes back */
+    cv.addEventListener('webglcontextlost', e => { e.preventDefault(); GL.lost = true; GL.progs = {}; GL.tex = new WeakMap(); });
+    cv.addEventListener('webglcontextrestored', () => { GL.lost = false; setup(); });
+    return (GL.ok = true);
+  } catch (_) { return (GL.ok = false); }
+};
+
+const glProgram = body => {
+  const gl = GL.gl;
+  const sh = (type, src) => {
+    const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { console.warn('[piixpal] shader:', gl.getShaderInfoLog(s)); return null; }
+    return s;
+  };
+  const v = sh(gl.VERTEX_SHADER, GL_VERT), f = sh(gl.FRAGMENT_SHADER, GL_PRELUDE + body + GL_MAIN);
+  if (!v || !f) return null;
+  const p = gl.createProgram(); gl.attachShader(p, v); gl.attachShader(p, f); gl.linkProgram(p);
+  if (!gl.getProgramParameter(p, gl.LINK_STATUS)) { console.warn('[piixpal] link:', gl.getProgramInfoLog(p)); return null; }
+  return { prog: p, pos: gl.getAttribLocation(p, 'p'), u: {} };
+};
+
+/* draw a shader at w x h into the shared canvas; returns where to copy it from.
+ * u: uniforms by name. tex: { owner, src, dirty } to bind an image or canvas as u_tex */
+const glDraw = (body, w, h, u, tex) => {
+  if (!glInit()) return null;
+  const gl = GL.gl, cv = GL.cv;
+  if (cv.width < w || cv.height < h) { cv.width = Math.max(cv.width, w); cv.height = Math.max(cv.height, h); }
+  const P = GL.progs[body] || (GL.progs[body] = glProgram(body));
+  if (!P) return null;
+  gl.useProgram(P.prog);
+  gl.viewport(0, 0, w, h);
+  gl.disable(gl.SCISSOR_TEST); gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.bindBuffer(gl.ARRAY_BUFFER, GL.buf); gl.enableVertexAttribArray(P.pos); gl.vertexAttribPointer(P.pos, 2, gl.FLOAT, false, 0, 0);
+  for (const k in u) {
+    let loc = P.u[k];
+    if (loc === undefined) loc = P.u[k] = gl.getUniformLocation(P.prog, k === 'u_pal' ? 'u_pal[0]' : k);
+    if (!loc) continue;
+    const v = u[k];
+    if (k === 'u_pal') gl.uniform3fv(loc, v);
+    else if (typeof v === 'number') gl.uniform1f(loc, v);
+    else if (v.length === 2) gl.uniform2f(loc, v[0], v[1]);
+    else if (v.length === 3) gl.uniform3f(loc, v[0], v[1], v[2]);
+    else gl.uniform4f(loc, v[0], v[1], v[2], v[3]);
+  }
+  if (tex && tex.src) {
+    let t = GL.tex.get(tex.owner);
+    const fresh = !t;
+    if (!t) { t = gl.createTexture(); GL.tex.set(tex.owner, t); }
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, t);
+    if (fresh || tex.dirty) {
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, tex.src); } catch (_) { return null; }
+    }
+    if (P.u.u_tex === undefined) P.u.u_tex = gl.getUniformLocation(P.prog, 'u_tex');
+    if (P.u.u_tex) gl.uniform1i(P.u.u_tex, 0);
+  }
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  return { cv, sy: cv.height - h };
+};
+
+/* ---------- the stage every shader component stands on ----------
+ * a small canvas in a shadow root, scaled up crisp; the pointer and hover are tracked; it only
+ * draws while on screen; reduced motion gets one still frame; without WebGL it shows a gradient */
+class GLStage extends HTMLElement {
+  static get observedAttributes() { return ['kind', 'effect', 'palette', 'pixel', 'dither', 'speed', 'fill', 'height', 'src', 'tone']; }
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    this._tick = this._tick.bind(this);
+    this._vis = true; this._t0 = now(); this._m = [.5, .5]; this._hov = 0; this._seed = Math.random() * 100;
+  }
+  connectedCallback() {
+    this._build();
+    this._io = new IntersectionObserver(es => { const v = es[es.length - 1].isIntersecting; if (v && !this._seen) { this._seen = now(); } this._vis = v; }, { rootMargin: '60px' });
+    this._io.observe(this);
+    this._ro = new ResizeObserver(() => this._fit()); this._ro.observe(this);
+    sub(this._tick);
+  }
+  disconnectedCallback() { unsub(this._tick); if (this._io) this._io.disconnect(); if (this._ro) this._ro.disconnect(); }
+  attributeChangedCallback(n, a, b) { if (a !== b && this._cv) this._build(); }
+  _css() { return ''; }
+  _html() { return '<canvas part="canvas" aria-hidden="true"></canvas><slot></slot>'; }
+  _build() {
+    const fill = this.hasAttribute('fill');
+    if (fill && this.parentElement) {
+      const p = this.parentElement;
+      if (getComputedStyle(p).position === 'static') p.style.position = 'relative';
+      p.style.isolation = 'isolate';
+    }
+    this._pal = glPalette(this.getAttribute('palette') || this._defPal);
+    const hgt = this.getAttribute('height');
+    this.shadowRoot.innerHTML = `<style>
+:host{display:block;position:${fill ? 'absolute' : 'relative'};${fill ? 'inset:0;z-index:-1;pointer-events:none;' : ''}${!fill && hgt ? `height:${/^\d+$/.test(hgt) ? hgt + 'px' : hgt};` : ''}${this._hostCss ? this._hostCss() : ''}}
+:host([hidden]){display:none}
+canvas{position:absolute;inset:0;width:100%;height:100%;display:block;image-rendering:pixelated;image-rendering:crisp-edges;pointer-events:none}
+${this._css()}</style>${this._html()}`;
+    this._cv = this.shadowRoot.querySelector('canvas');
+    this._g = this._cv.getContext('2d');
+    if (!glInit()) {
+      /* no WebGL: a still gradient in the same colours */
+      const l = this._pal.list;
+      this._cv.style.background = `linear-gradient(135deg,${l[0]},${l[Math.floor(l.length / 2)]},${l[l.length - 1]})`;
+    }
+    if (this._setup) this._setup();
+    this._fit();
+  }
+  _fit() {
+    if (!this._cv) return;
+    const r = this.getBoundingClientRect(), dpr = Math.min(devicePixelRatio || 1, 2);
+    const px = Math.max(1, (+this.getAttribute('pixel') || this._defPx || 4) * dpr);
+    this._px = px;
+    this._W = Math.max(2, Math.ceil(r.width * dpr / px)); this._H = Math.max(2, Math.ceil(r.height * dpr / px));
+    if (this._cv.width !== this._W || this._cv.height !== this._H) { this._cv.width = this._W; this._cv.height = this._H; }
+    this._still = false;
+    if (this._resized) this._resized();
+  }
+  _tick(dt) {
+    if (!this._vis || !this._W || !GL.ok) return;
+    const R = reduced();
+    if (R && this._still && !this._dirty) return;
+    const r = this.getBoundingClientRect();
+    const over = ptr.seen && ptr.cx >= r.left - 40 && ptr.cx <= r.right + 40 && ptr.cy >= r.top - 40 && ptr.cy <= r.bottom + 40;
+    if (over) { const mx = (ptr.cx - r.left) / r.width, my = 1 - (ptr.cy - r.top) / r.height; this._m[0] = lerp(this._m[0], mx, Math.min(1, dt * 10)); this._m[1] = lerp(this._m[1], my, Math.min(1, dt * 10)); }
+    this._hov = lerp(this._hov, over && ptr.cx >= r.left && ptr.cx <= r.right && ptr.cy >= r.top && ptr.cy <= r.bottom ? 1 : 0, Math.min(1, dt * 5));
+    const speed = this.hasAttribute('speed') ? +this.getAttribute('speed') : 1;
+    const T = R ? 12 : (now() - this._t0) / 1000 * speed;
+    const intro = R || !this._introLen ? 1 : clamp((now() - (this._seen || now())) / 1000 / this._introLen, 0, 1);
+    const u = Object.assign({
+      u_res: [this._W, this._H], u_time: T, u_mouse: this._m, u_hover: this._hov, u_intro: intro, u_pal: this._pal.arr, u_n: this._pal.n,
+      u_dither: this.hasAttribute('dither') ? +this.getAttribute('dither') : this._defDither ?? 1, u_seed: this._seed, u_k: [0, 0, 0, 0], u_j: [0, 0, 0, 0]
+    }, this._uniforms ? this._uniforms(T, dt) : {});
+    const out = glDraw(this._shader(), this._W, this._H, u, this._texture ? this._texture() : null);
+    if (!out) return;
+    this._g.clearRect(0, 0, this._W, this._H);
+    this._g.drawImage(out.cv, 0, out.sy, this._W, this._H, 0, 0, this._W, this._H);
+    this._dirty = false;
+    this._still = R;
+  }
+}
+Piixpal.gl = { palettes: GL_PALETTES, draw: glDraw, supported: () => glInit() };
+
 /* ---- elements/kit.js ---- */
 /* KIT: the shared look of the pixel UI kit. Stepped pixel corners, chunky ink borders, a hard
  * shadow the control presses down into, a few colour tones, and a tiny pal painter. Every kit
@@ -1991,10 +2200,10 @@ Object.assign(Piixpal, {
   clear: () => document.querySelectorAll(['piix-pal', 'piix-sprite', ...Object.values(ELEMENTS)].join()).forEach(e => e.remove())
 });
 
-Piixpal._k = { reduceMQ, reduced, clamp, rnd, chance, pick, lerp, now, hexRGBA, ptr, ptrDist, scroll, subs, raf, frame, sub, unsub, rectOf, docW, boxOf, pin, areaOf, onScreen, surfaceAt, LAYER_CSS, layer, origin, getLayer, layerOrigin, SPRITES, bake, defineSprite, baked, ACTORS, shout, Actor, recruit, BEHAVIORS, defineBehavior, Piixpal, art, lastT, layerRoot, ICON_PAL, ICONS, DIGITS, numberIcon, iconCache, iconPal, bakeIcon, UI_INK, UI_PAPER, UI_FONT, UI_MONO, UI_CSS, uiHost, uiRoot, uiStyles, uiStyle, uiEl, uiIcon, uiCard, uiPlace, uiAt, uiClose, uiAnnounce, uiShadow, uiLive, measureCtx, glyphTop, textProfile, segAt, LAND, platCache, TEXTY, surfaceOf, platforms, drag, BLIP, CROWD_COLORS, PiixCrowdElement, KIT_U, kitCorners, KIT_TONES, kitTone, KIT_FONT, kitCss, kitPal, kitClip, FIGURES, defineFigure, mixHex, figurePalette, bakeFigure, HEAD, PiixSpriteElement, RENDERS, lum, BAYER, ASCII, TEXTURES, BIG, PiixTypeElement, CELL_SHAPES, VOX_LOOKS, VOX_DIRS, voxKey, voxNorm, voxArt, voxModel, VOX_MODELS, voxFromArt, voxCells, voxDraw, VOX_BUF, voxBuf, VOX_BAYER, VOX_RAMP, voxPaint, VoxStage, PiixPalElement, define, ELEMENTS, add, autoAttach, SCRIPT, start };
+Piixpal._k = { reduceMQ, reduced, clamp, rnd, chance, pick, lerp, now, hexRGBA, ptr, ptrDist, scroll, subs, raf, frame, sub, unsub, rectOf, docW, boxOf, pin, areaOf, onScreen, surfaceAt, LAYER_CSS, layer, origin, getLayer, layerOrigin, SPRITES, bake, defineSprite, baked, ACTORS, shout, Actor, recruit, BEHAVIORS, defineBehavior, Piixpal, art, lastT, layerRoot, ICON_PAL, ICONS, DIGITS, numberIcon, iconCache, iconPal, bakeIcon, UI_INK, UI_PAPER, UI_FONT, UI_MONO, UI_CSS, uiHost, uiRoot, uiStyles, uiStyle, uiEl, uiIcon, uiCard, uiPlace, uiAt, uiClose, uiAnnounce, uiShadow, uiLive, measureCtx, glyphTop, textProfile, segAt, LAND, platCache, TEXTY, surfaceOf, platforms, drag, BLIP, CROWD_COLORS, PiixCrowdElement, GL, GL_PALETTES, glPalette, GL_VERT, GL_PRELUDE, GL_MAIN, glInit, glProgram, glDraw, GLStage, KIT_U, kitCorners, KIT_TONES, kitTone, KIT_FONT, kitCss, kitPal, kitClip, FIGURES, defineFigure, mixHex, figurePalette, bakeFigure, HEAD, PiixSpriteElement, RENDERS, lum, BAYER, ASCII, TEXTURES, BIG, PiixTypeElement, CELL_SHAPES, VOX_LOOKS, VOX_DIRS, voxKey, voxNorm, voxArt, voxModel, VOX_MODELS, voxFromArt, voxCells, voxDraw, VOX_BUF, voxBuf, VOX_BAYER, VOX_RAMP, voxPaint, VoxStage, PiixPalElement, define, ELEMENTS, add, autoAttach, SCRIPT, start };
 return Piixpal._k;
 })();
-const { reduceMQ, reduced, clamp, rnd, chance, pick, lerp, now, hexRGBA, ptr, ptrDist, scroll, subs, raf, frame, sub, unsub, rectOf, docW, boxOf, pin, areaOf, onScreen, surfaceAt, LAYER_CSS, layer, origin, getLayer, layerOrigin, SPRITES, bake, defineSprite, baked, ACTORS, shout, Actor, recruit, BEHAVIORS, defineBehavior, Piixpal, art, lastT, layerRoot, ICON_PAL, ICONS, DIGITS, numberIcon, iconCache, iconPal, bakeIcon, UI_INK, UI_PAPER, UI_FONT, UI_MONO, UI_CSS, uiHost, uiRoot, uiStyles, uiStyle, uiEl, uiIcon, uiCard, uiPlace, uiAt, uiClose, uiAnnounce, uiShadow, uiLive, measureCtx, glyphTop, textProfile, segAt, LAND, platCache, TEXTY, surfaceOf, platforms, drag, BLIP, CROWD_COLORS, PiixCrowdElement, KIT_U, kitCorners, KIT_TONES, kitTone, KIT_FONT, kitCss, kitPal, kitClip, FIGURES, defineFigure, mixHex, figurePalette, bakeFigure, HEAD, PiixSpriteElement, RENDERS, lum, BAYER, ASCII, TEXTURES, BIG, PiixTypeElement, CELL_SHAPES, VOX_LOOKS, VOX_DIRS, voxKey, voxNorm, voxArt, voxModel, VOX_MODELS, voxFromArt, voxCells, voxDraw, VOX_BUF, voxBuf, VOX_BAYER, VOX_RAMP, voxPaint, VoxStage, PiixPalElement, define, ELEMENTS, add, autoAttach, SCRIPT, start } = K;
+const { reduceMQ, reduced, clamp, rnd, chance, pick, lerp, now, hexRGBA, ptr, ptrDist, scroll, subs, raf, frame, sub, unsub, rectOf, docW, boxOf, pin, areaOf, onScreen, surfaceAt, LAYER_CSS, layer, origin, getLayer, layerOrigin, SPRITES, bake, defineSprite, baked, ACTORS, shout, Actor, recruit, BEHAVIORS, defineBehavior, Piixpal, art, lastT, layerRoot, ICON_PAL, ICONS, DIGITS, numberIcon, iconCache, iconPal, bakeIcon, UI_INK, UI_PAPER, UI_FONT, UI_MONO, UI_CSS, uiHost, uiRoot, uiStyles, uiStyle, uiEl, uiIcon, uiCard, uiPlace, uiAt, uiClose, uiAnnounce, uiShadow, uiLive, measureCtx, glyphTop, textProfile, segAt, LAND, platCache, TEXTY, surfaceOf, platforms, drag, BLIP, CROWD_COLORS, PiixCrowdElement, GL, GL_PALETTES, glPalette, GL_VERT, GL_PRELUDE, GL_MAIN, glInit, glProgram, glDraw, GLStage, KIT_U, kitCorners, KIT_TONES, kitTone, KIT_FONT, kitCss, kitPal, kitClip, FIGURES, defineFigure, mixHex, figurePalette, bakeFigure, HEAD, PiixSpriteElement, RENDERS, lum, BAYER, ASCII, TEXTURES, BIG, PiixTypeElement, CELL_SHAPES, VOX_LOOKS, VOX_DIRS, voxKey, voxNorm, voxArt, voxModel, VOX_MODELS, voxFromArt, voxCells, voxDraw, VOX_BUF, voxBuf, VOX_BAYER, VOX_RAMP, voxPaint, VoxStage, PiixPalElement, define, ELEMENTS, add, autoAttach, SCRIPT, start } = K;
 
 /* ---- behaviors/beeline.js ---- */
 /* beeline: a little line of worker bees buzzing round their element. Come close and
@@ -11277,6 +11486,94 @@ canvas{position:absolute;bottom:${KIT_U + 2}px;left:0;image-rendering:pixelated;
 }
 define('piix-toggle', PiixToggleElement);
 ELEMENTS.toggle = 'piix-toggle';
+
+/* ---- gl/shader.js ---- */
+/* SHADER: GPU pixel backgrounds.   @component shader
+ *
+ *   <section>
+ *     <piix-shader kind="mesh" fill></piix-shader>
+ *     <h2>Your content sits on top</h2>
+ *   </section>
+ *
+ * Ten shaders running on the GPU, drawn on a pixel grid and dithered into the theme's colours:
+ * a drifting mesh gradient, domain-warped marble, an aurora, glowing crystal cells, liquid metal,
+ * a synthwave horizon, a nebula, topographic contour lines, a dot matrix that ripples from your
+ * pointer, and fire. The pointer bends each of them. With "fill" it sits behind the content of
+ * the element it's in.
+ *
+ *   kind      mesh | warp | aurora | crystal | liquid | horizon | nebula | topo | dots | fire
+ *   palette   lime | aurora | sunset | ocean | candy | violet | fire | gameboy | paper | mono,
+ *             or your own colours, dark to light: "#000,#6b4cff,#fff"
+ *   pixel     size of one pixel, in px                     default: 4
+ *   dither    0 for smooth bands, 1 for full dither         default: 1
+ *   speed     1 is normal, 0 holds still                    default: 1
+ *   height    when not filling: px or any CSS length       default: 360px
+ *   fill      sit behind the content of the parent element */
+const SH_KINDS = {
+  mesh: ['candy', `vec4 effect(vec2 uv,vec2 cell){
+    vec2 q=aspect(uv),m=aspect(u_mouse);float t=u_time*.22,v=0.,w=0.;
+    for(int i=0;i<5;i++){float fi=float(i);vec2 c=vec2(sin(t*(.7+fi*.13)+fi*1.7),cos(t*(.9+fi*.11)+fi*2.3))*vec2(.62,.4);
+      if(i==4)c=mix(c,m,u_hover*.85);float d=length(q-c),k=1./(d*d*7.+.3);v+=k*fi/4.;w+=k;}
+    v=v/w+(fbm(q*3.+t)-.5)*.14;return vec4(dpal(v,cell),1.);}`],
+  warp: ['aurora', `vec4 effect(vec2 uv,vec2 cell){
+    vec2 q=aspect(uv),m=aspect(u_mouse),p=q*2.2;float t=u_time*.1;
+    p+=normalize(q-m+.0001)*.35*exp(-length(q-m)*3.5)*u_hover;
+    vec2 a=vec2(fbm(p+vec2(0,t)),fbm(p+vec2(5.2,1.3)-t));
+    vec2 b=vec2(fbm(p+4.*a+vec2(1.7,9.2)+t*.7),fbm(p+4.*a+vec2(8.3,2.8)-t*.5));
+    float v=fbm(p+4.*b)*1.3-.12+length(b)*.12;return vec4(dpal(v,cell),1.);}`],
+  aurora: ['aurora', `vec4 effect(vec2 uv,vec2 cell){
+    vec2 q=aspect(uv),m=aspect(u_mouse);float t=u_time*.3,v=.06*(1.-uv.y);
+    for(int i=0;i<3;i++){float fi=float(i),x=q.x*1.3+fi*.7;
+      float yc=.64-fi*.13+.08*sin(x*2.+t+fi)+.06*fbm(vec2(x*2.,t*.5+fi))+.06*exp(-length(q-m)*4.)*u_hover;
+      float d=uv.y-yc,band=exp(-d*d*(d>0.?22.:220.));band*=.72+.28*sin(x*14.+t*1.5+fbm(vec2(x*5.,t))*5.);v+=band*(.8-fi*.2);}
+    float s=hash(cell);if(s>.994)v+=.55*(.5+.5*sin(u_time*3.+s*40.));return vec4(dpal(v,cell),1.);}`],
+  crystal: ['violet', `vec4 effect(vec2 uv,vec2 cell){
+    vec2 q=aspect(uv),m=aspect(u_mouse),p=q*4.,i=floor(p),f=fract(p),id=vec2(0.);float d1=8.,d2=8.;
+    for(int y=-1;y<=1;y++)for(int x=-1;x<=1;x++){vec2 g=vec2(float(x),float(y)),o=vec2(hash(i+g),hash(i+g+19.));
+      o=.5+.45*sin(u_time*.5+6.2831*o);float d=length(g+o-f);if(d<d1){d2=d1;d1=d;id=i+g;}else if(d<d2)d2=d;}
+    float e=d2-d1,v=.15+.45*hash(id)*(.6+.4*sin(u_time+hash(id)*9.));v=mix(v,1.,smoothstep(.09,.0,e));
+    v+=.45*exp(-length(q-m)*4.)*u_hover*(1.-smoothstep(.0,.3,e));return vec4(dpal(v,cell),1.);}`],
+  liquid: ['mono', `vec4 effect(vec2 uv,vec2 cell){
+    vec2 q=aspect(uv),m=aspect(u_mouse);float f=0.;
+    for(int i=0;i<6;i++){float fi=float(i);vec2 c=vec2(sin(u_time*.45*(1.+fi*.17)+fi*2.1)*.6,cos(u_time*.4*(1.+fi*.13)+fi*1.3)*.33);f+=.03/dot(q-c,q-c);}
+    f+=.05/dot(q-m,q-m)*u_hover;
+    float v=f>1.?.3+.62*(.5+.5*sin(uv.y*8.+q.x*1.2+clamp(f,1.,3.)*1.1-u_time*.5))*(.75+.25*smoothstep(1.,2.,f)):.05+.08*uv.y+.12*smoothstep(.55,1.,f);return vec4(dpal(v,cell),1.);}`],
+  horizon: ['sunset', `vec4 effect(vec2 uv,vec2 cell){
+    vec2 q=aspect(uv),m=aspect(u_mouse);float hz=.42,v;
+    if(uv.y>hz){v=.12+.45*(1.-(uv.y-hz)/(1.-hz));vec2 s=vec2(q.x-m.x*.15*u_hover,uv.y-(hz+.21));
+      if(length(s)<.22&&!(s.y<0.&&fract(s.y*16.+u_time*.35)<(-s.y/.22)*.7))v=.75+s.y*1.1;
+      float st=hash(cell);if(st>.993&&uv.y>.7)v=.7;}
+    else{float z=.11/(hz-uv.y+.003),gx=q.x*z;
+      float line=max(step(.9,fract(z*.9-u_time*.8)),step(.88,1.-abs(fract(gx*1.4)-.5)*2.));
+      v=line*.8*smoothstep(0.,.04,hz-uv.y)+.05+.45*exp(-(hz-uv.y)*22.);}
+    return vec4(dpal(v,cell),1.);}`],
+  nebula: ['candy', `vec4 effect(vec2 uv,vec2 cell){
+    vec2 q=aspect(uv),m=aspect(u_mouse),p=q*1.7+vec2(u_time*.02,0.);
+    float n=fbm(p*1.4+fbm(p*2.2+u_time*.04)*1.6),v=pow(n,2.2)*1.5+.02+.3*exp(-length(q-m)*5.)*u_hover;
+    float s=hash(cell);if(s>.992)v=max(v,.6+.4*sin(u_time*3.+s*50.));return vec4(dpal(v,cell),1.);}`],
+  topo: ['paper', `vec4 effect(vec2 uv,vec2 cell){
+    vec2 q=aspect(uv),m=aspect(u_mouse);float h=fbm(q*2.+vec2(0.,u_time*.06))+.35*exp(-length(q-m)*3.)*u_hover;
+    float l=abs(fract(h*7.)-.5),major=abs(fract(h*1.75)-.5);
+    float v=.04+h*.1+smoothstep(.13,.02,l)*.55+smoothstep(.06,.0,major)*.4;return vec4(dpal(v,cell),1.);}`],
+  dots: ['lime', `vec4 effect(vec2 uv,vec2 cell){
+    vec2 g=floor(cell/4.),c=(g*4.+2.)/u_res,cq=aspect(c),m=aspect(u_mouse);float d=length(cq-m);
+    float v=.1+.32*fbm(g*.12+u_time*.15)+u_hover*(.5+.5*sin(d*28.-u_time*5.))*exp(-d*2.5)*.75;
+    vec2 f=mod(cell,4.);float on=step(f.x,2.)*step(f.y,2.)*step(.5,f.x)*step(.5,f.y);
+    return vec4(dpal(v*on,cell),1.);}`],
+  fire: ['fire', `vec4 effect(vec2 uv,vec2 cell){
+    vec2 q=aspect(uv),m=aspect(u_mouse),p=vec2(q.x*3.,uv.y*2.2-u_time*1.1);
+    float v=(1.-uv.y)*1.3-fbm(p)*.65+.2*fbm(p*2.3)+.4*exp(-length(q-m)*5.)*u_hover;
+    return vec4(dpal(pow(clamp(v,0.,1.),1.5),cell),1.);}`]
+};
+class PiixShaderElement extends GLStage {
+  get kind() { const k = this.getAttribute('kind'); return SH_KINDS[k] ? k : 'mesh'; }
+  get _defPal() { return SH_KINDS[this.kind][0]; }
+  _hostCss() { return this.hasAttribute('fill') || this.getAttribute('height') ? '' : 'height:360px;'; }
+  _setup() { if (!this.hasAttribute('aria-label') && !this.hasAttribute('fill')) { this.setAttribute('role', 'img'); this.setAttribute('aria-label', `An animated ${this.kind} background`); } if (this.hasAttribute('fill')) this.setAttribute('aria-hidden', 'true'); }
+  _shader() { return SH_KINDS[this.kind][1]; }
+}
+define('piix-shader', PiixShaderElement);
+ELEMENTS.shader = 'piix-shader';
 
 K.start(document.currentScript);
 })();
