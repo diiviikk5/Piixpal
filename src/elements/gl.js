@@ -51,3 +51,23 @@ void main(){vec2 cell=floor(gl_FragCoord.xy);vec2 uv=(cell+.5)/u_res;vec4 c=effe
 if(u_intro<1.){float th=bayer8(cell)*.75+(1.-uv.y)*.25;if(th>u_intro)c.a=0.;}
 gl_FragColor=vec4(c.rgb*c.a,c.a);}`;
 
+const glInit = () => {
+  if (GL.ok !== null) return GL.ok && !GL.lost;
+  try {
+    const cv = document.createElement('canvas');
+    const gl = cv.getContext('webgl', { alpha: true, premultipliedAlpha: true, antialias: false, depth: false, stencil: false, preserveDrawingBuffer: false, powerPreference: 'low-power' });
+    if (!gl) return (GL.ok = false);
+    GL.cv = cv; GL.gl = gl;
+    const setup = () => {
+      GL.buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, GL.buf);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true); gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
+    };
+    setup();
+    /* if the GPU resets, drop everything and rebuild when it comes back */
+    cv.addEventListener('webglcontextlost', e => { e.preventDefault(); GL.lost = true; GL.progs = {}; GL.tex = new WeakMap(); });
+    cv.addEventListener('webglcontextrestored', () => { GL.lost = false; setup(); });
+    return (GL.ok = true);
+  } catch (_) { return (GL.ok = false); }
+};
+
