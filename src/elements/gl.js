@@ -85,3 +85,43 @@ const glProgram = body => {
   return { prog: p, pos: gl.getAttribLocation(p, 'p'), u: {} };
 };
 
+/* draw a shader at w x h into the shared canvas; returns where to copy it from.
+ * u: uniforms by name. tex: { owner, src, dirty } to bind an image or canvas as u_tex */
+const glDraw = (body, w, h, u, tex) => {
+  if (!glInit()) return null;
+  const gl = GL.gl, cv = GL.cv;
+  if (cv.width < w || cv.height < h) { cv.width = Math.max(cv.width, w); cv.height = Math.max(cv.height, h); }
+  const P = GL.progs[body] || (GL.progs[body] = glProgram(body));
+  if (!P) return null;
+  gl.useProgram(P.prog);
+  gl.viewport(0, 0, w, h);
+  gl.disable(gl.SCISSOR_TEST); gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.bindBuffer(gl.ARRAY_BUFFER, GL.buf); gl.enableVertexAttribArray(P.pos); gl.vertexAttribPointer(P.pos, 2, gl.FLOAT, false, 0, 0);
+  for (const k in u) {
+    let loc = P.u[k];
+    if (loc === undefined) loc = P.u[k] = gl.getUniformLocation(P.prog, k === 'u_pal' ? 'u_pal[0]' : k);
+    if (!loc) continue;
+    const v = u[k];
+    if (k === 'u_pal') gl.uniform3fv(loc, v);
+    else if (typeof v === 'number') gl.uniform1f(loc, v);
+    else if (v.length === 2) gl.uniform2f(loc, v[0], v[1]);
+    else if (v.length === 3) gl.uniform3f(loc, v[0], v[1], v[2]);
+    else gl.uniform4f(loc, v[0], v[1], v[2], v[3]);
+  }
+  if (tex && tex.src) {
+    let t = GL.tex.get(tex.owner);
+    const fresh = !t;
+    if (!t) { t = gl.createTexture(); GL.tex.set(tex.owner, t); }
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, t);
+    if (fresh || tex.dirty) {
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+      try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, tex.src); } catch (_) { return null; }
+    }
+    if (P.u.u_tex === undefined) P.u.u_tex = gl.getUniformLocation(P.prog, 'u_tex');
+    if (P.u.u_tex) gl.uniform1i(P.u.u_tex, 0);
+  }
+  gl.drawArrays(gl.TRIANGLES, 0, 3);
+  return { cv, sy: cv.height - h };
+};
+
