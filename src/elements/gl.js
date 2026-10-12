@@ -29,3 +29,25 @@ const glPalette = name => {
   return { arr, n: Math.min(6, list.length), list };
 };
 
+const GL_VERT = 'attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}';
+/* what every fragment shader starts with */
+const GL_PRELUDE = `precision highp float;
+uniform vec2 u_res;uniform float u_time;uniform vec2 u_mouse;uniform float u_hover;uniform float u_intro;
+uniform vec3 u_pal[6];uniform float u_n;uniform float u_dither;uniform float u_seed;uniform vec4 u_k;uniform vec4 u_j;
+uniform sampler2D u_tex;
+float hash(vec2 p){p=fract(p*vec2(123.34,456.21)+u_seed*.013);p+=dot(p,p+45.32);return fract(p.x*p.y);}
+float noise(vec2 p){vec2 i=floor(p),f=fract(p),u=f*f*(3.-2.*f);return mix(mix(hash(i),hash(i+vec2(1,0)),u.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1,1)),u.x),u.y);}
+float fbm(vec2 p){float v=0.,a=.5;mat2 m=mat2(1.6,1.2,-1.2,1.6);for(int i=0;i<5;i++){v+=a*noise(p);p=m*p;a*=.5;}return v;}
+float bayer2(vec2 a){a=floor(a);return fract(dot(a,vec2(.5,a.y*.75)));}
+float bayer4(vec2 a){return bayer2(.5*a)*.25+bayer2(a);}
+float bayer8(vec2 a){return bayer4(.5*a)*.25+bayer2(a);}
+vec3 pal(float v){v=clamp(v,0.,1.)*(u_n-1.);vec3 c=u_pal[0];for(int i=1;i<6;i++){if(float(i)<u_n)c=mix(c,u_pal[i],clamp(v-float(i-1),0.,1.));}return c;}
+vec3 dpal(float v,vec2 cell){float n=u_n-1.;float q=clamp(v,0.,1.)*n+(bayer8(cell)-.5)*u_dither;return pal(floor(q+.5)/n);}
+vec2 aspect(vec2 uv){return (uv-.5)*vec2(u_res.x/u_res.y,1.);}
+`;
+/* and ends with: one pixel per fragment, plus the pixel-dissolve intro every component can use */
+const GL_MAIN = `
+void main(){vec2 cell=floor(gl_FragCoord.xy);vec2 uv=(cell+.5)/u_res;vec4 c=effect(uv,cell);
+if(u_intro<1.){float th=bayer8(cell)*.75+(1.-uv.y)*.25;if(th>u_intro)c.a=0.;}
+gl_FragColor=vec4(c.rgb*c.a,c.a);}`;
+
