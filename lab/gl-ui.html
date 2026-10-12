@@ -1,0 +1,33 @@
+<!doctype html><meta charset="utf-8"><title>Pixel UI (GPU) lab</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Silkscreen&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#0b0a10;color:#f2eef8;font-family:"Bricolage Grotesque",system-ui}
+  .wrap{max-width:1100px;margin:0 auto;padding:48px 24px;display:grid;gap:40px}
+  .row{display:flex;gap:16px;flex-wrap:wrap;align-items:center}
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  h2.t{font-size:64px;margin:0;font-weight:800;letter-spacing:-.03em}
+</style>
+<body>
+<piix-hero kind="horizon" height="560px">
+  <p class="eyebrow">New · Pixel UI</p>
+  <h1>Build something <piix-text effect="shine" palette="sunset">loud</piix-text></h1>
+  <p>Shader backgrounds, glowing buttons and cards, and headlines with GPU pixel effects, in one line of HTML.</p>
+  <div class="row" style="justify-content:center"><piix-glow-button>Get started</piix-glow-button><piix-glow-button palette="sunset">See the docs</piix-glow-button></div>
+</piix-hero>
+<div class="wrap">
+  <h2 class="t"><piix-text effect="glitch" palette="candy">Glitch headline</piix-text></h2>
+  <h2 class="t"><piix-text effect="wave" palette="ocean">Waves of pixels</piix-text></h2>
+  <h2 class="t"><piix-text effect="melt" palette="fire">Melting point</piix-text></h2>
+  <h2 class="t"><piix-text effect="scan" palette="aurora">Scanline</piix-text></h2>
+  <div class="cards">
+    <piix-glow-card><h3>Realtime</h3><p>Everything updates the moment it changes, on every device.</p></piix-glow-card>
+    <piix-glow-card palette="lime"><h3>Zero deps</h3><p>One script tag. No build step, no framework required.</p></piix-glow-card>
+    <piix-glow-card palette="sunset"><h3>On the GPU</h3><p>Shaders on a pixel grid, dithered into your palette.</p></piix-glow-card>
+  </div>
+  <div class="cards">
+    <piix-pixel-image src="../site/readme/hero.png" alt="The Piixpal hero"></piix-pixel-image>
+    <piix-pixel-image src="../site/readme/hero.png" effect="mosaic" alt="The Piixpal hero, as a mosaic"></piix-pixel-image>
+    <piix-pixel-image src="../site/readme/hero.png" effect="halftone" palette="paper" alt="The Piixpal hero, in halftone"></piix-pixel-image>
+  </div>
+</div>
+<script src="../piixpal.js"></script>
