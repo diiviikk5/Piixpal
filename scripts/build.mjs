@@ -114,6 +114,11 @@ export function components() {
     /* elements that aren't pals declare themselves with a "@component name" line */
     for (const m of text.matchAll(/@component ([\w-]+)/g)) out[m[1]] = { kind: studio ? '3d' : kit || glc ? 'kit' : 'power', files: [...needs, f] };
   }
+  /* a component can lean on another one with an "@needs name" line: it ships with it */
+  for (const [name, c] of Object.entries(out)) {
+    const text = readFileSync(join(src, c.files[c.files.length - 1]), 'utf8');
+    for (const m of text.matchAll(/@needs ([\w-]+)/g)) if (out[m[1]]) c.files = [...new Set([...out[m[1]].files, ...c.files])];
+  }
   return out;
 }
 
