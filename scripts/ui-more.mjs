@@ -82,7 +82,7 @@ Piixpal.toast('Your changes are live.', {
       { name: 'Bars', demo: `<piix-chart kind="bars" values="4,7,5,9,12,8,14" labels="Mon,Tue,Wed,Thu,Fri,Sat,Sun" palette="sunset"></piix-chart>` },
       { name: 'In a stat card', demo: `<div class="ex-stat">\n  <small>Revenue</small>\n  <strong>$48.2k</strong>\n  <piix-chart kind="line" values="3,4,4,6,5,8,9,8,11,13" height="70px" palette="ocean"></piix-chart>\n</div>` }
     ],
-    props: [['values', 'the numbers, comma separated (up to 256)', ''], ['labels', 'a label for each', ''], ['kind', '<code>area</code> <code>line</code> <code>bars</code>', 'area'], ['suffix', 'after each value, like % or ms', ''], ['palette', 'its colours', 'lime'], ['height', 'px or any CSS length', '220px'], PX(3)],
+    props: [['values', 'the numbers, comma separated (up to 256)', ''], ['labels', 'a label for each', ''], ['kind', '<code>area</code> <code>line</code> <code>bars</code>', 'area'], ['suffix', 'after each value, like % or ms', ''], ['min', 'where the axis starts', '0'], ['palette', 'its colours', 'lime'], ['height', 'px or any CSS length', '220px'], PX(3)],
     a11y: ['Screen readers get the numbers as a table, plus a one-line summary.', 'With reduced motion it is drawn at full height straight away.'] },
 
   { slug: 'flap-board', name: 'Flap board', section: 'Data', tag: 'piix-flap', file: 'flap',
