@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Night Roads · a Pixel UI showcase</title>
+<link rel="icon" href="../../site/favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Silkscreen&family=Space+Grotesk:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  /* Night Roads: a magazine printed in two inks. Everything, scenes included, is blue on paper. */
+  :root { --ink: #1c38d4; --paper: #eadcc4 }
+  * { box-sizing: border-box }
+  body { margin: 0; background: var(--paper); color: var(--ink); font: 400 17px/1.55 "Space Grotesk", system-ui, sans-serif }
+  /* a little paper grain over everything */
+  body::after { content: ""; position: fixed; inset: 0; pointer-events: none; opacity: .18; mix-blend-mode: multiply;
+    background-image: radial-gradient(#1c38d4 .6px, transparent .7px); background-size: 5px 5px }
+  .wrap { width: min(1180px, 100% - 40px); margin: 0 auto }
+  header { display: flex; justify-content: space-between; align-items: baseline; padding: 18px 0; border-bottom: 2px solid var(--ink) }
+  .mast { font: italic 400 34px/1 "Instrument Serif", serif; letter-spacing: -.01em }
+  .meta { font: 400 11px/1 "Silkscreen", monospace; text-transform: uppercase; letter-spacing: .06em }
+  .cover { display: grid; grid-template-columns: 1.35fr 1fr; border-bottom: 2px solid var(--ink) }
+  @media (max-width: 860px) { .cover { grid-template-columns: 1fr } }
+  .cover piix-scene { border-right: 2px solid var(--ink) }
+  .cover .txt { padding: 40px; display: grid; align-content: end; gap: 18px }
+  h1 { margin: 0; font: 400 clamp(56px, 8vw, 118px)/.86 "Instrument Serif", serif; letter-spacing: -.03em }
+  h1 em { display: block }
+  .deck { margin: 0; max-width: 34ch; font-size: 19px }
+  .byline { font: 400 11px/1.4 "Silkscreen", monospace; text-transform: uppercase }
+  .list { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 2px solid var(--ink) }
+  @media (max-width: 860px) { .list { grid-template-columns: 1fr } }
+  .list article { padding: 28px 28px 34px; border-right: 2px solid var(--ink) }
+  .list article:last-child { border-right: 0 }
+  .no { font: 400 54px/1 "Instrument Serif", serif }
+  .list h2 { margin: 10px 0 8px; font: italic 400 32px/1 "Instrument Serif", serif }
+  .list p { margin: 0 }
+  .feature { display: grid; grid-template-columns: 1fr 1.25fr; border-bottom: 2px solid var(--ink) }
+  @media (max-width: 860px) { .feature { grid-template-columns: 1fr } }
+  .feature .txt { padding: 40px; columns: 2 220px; column-gap: 28px; column-rule: 1px solid var(--ink) }
+  .feature .txt p:first-child::first-letter { float: left; font: 400 84px/.8 "Instrument Serif", serif; margin: 6px 8px 0 0 }
+  .feature piix-scene { border-left: 2px solid var(--ink) }
+  .sub { display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap; padding: 36px 0 60px }
+  .sub h3 { margin: 0; font: 400 clamp(36px, 5vw, 64px)/1 "Instrument Serif", serif }
+  .btn { font: 400 13px/1 "Silkscreen", monospace; text-transform: uppercase; padding: 16px 22px; background: var(--ink); color: var(--paper); border: 0; box-shadow: 5px 5px 0 #f0603c; cursor: pointer }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header><span class="mast">Night Roads</span><span class="meta">Issue 07 · Autumn · two inks</span></header>
+
+  <section class="cover">
+    <piix-scene kind="rays" height="560px" pixel="4" aria-label="Light bursting from the horizon over an empty desert road"></piix-scene>
+    <div class="txt">
+      <span class="byline">Cover story · 14 min read</span>
+      <h1>The long <em>way home</em></h1>
+      <p class="deck">Five drivers on the empty hours between midnight and dawn, and why the road looks different when nobody is watching.</p>
+    </div>
+  </section>
+
+  <section class="list">
+    <article><span class="no">01</span><h2>Lamplight</h2><p>A field guide to the last street lamp before the motorway.</p></article>
+    <article><span class="no">02</span><h2>Static</h2><p>Late radio, and the voices that keep long-haul drivers awake.</p></article>
+    <article><span class="no">03</span><h2>Moonroof</h2><p>What you see when you finally look up at a red light.</p></article>
+  </section>
+
+  <section class="feature">
+    <div class="txt">
+      <p>There is a lamp at the edge of town that nobody remembers putting up. It stands in a field, wired to nothing anyone can find, and every night at a quarter past eleven it comes on.</p>
+      <p>The drivers who pass it say the sky bends round it. They say it the way you say something you know sounds silly, and then they say it again.</p>
+      <p>We went to look. We stood in the field until the light came on, and then we stopped talking for a while.</p>
+    </div>
+    <piix-scene kind="vortex" height="440px" aria-label="The night sky swirling round a lone street lamp"></piix-scene>
+  </section>
+
+  <section class="sub"><h3>Subscribe to the print edition.</h3><button class="btn" type="button">Four issues · £28</button></section>
+</div>
+<script src="../../piixpal.js"></script>
+</body>
+</html>
