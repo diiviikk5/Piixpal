@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Summit · a Pixel UI showcase</title>
+<link rel="icon" href="../../site/favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Silkscreen&display=swap" rel="stylesheet">
+<style>
+  /* Summit: a calm, ordinary product page. Only the landscapes are pixels. */
+  :root { --bg: #f6f2ea; --ink: #18211b; --muted: #5d6a60; --green: #5f8f3a; --line: #18211b1f }
+  * { box-sizing: border-box }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 400 17px/1.55 "Bricolage Grotesque", system-ui, sans-serif }
+  a { color: inherit }
+  .wrap { width: min(1120px, 100% - 48px); margin: 0 auto }
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 22px 0 }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; letter-spacing: -.02em; text-decoration: none }
+  .brand i { width: 22px; height: 18px; background: var(--ink); clip-path: polygon(0 100%, 35% 20%, 55% 55%, 72% 30%, 100% 100%) }
+  nav ul { display: flex; gap: 28px; margin: 0; padding: 0; list-style: none; font-weight: 550; color: var(--muted) }
+  nav ul a { text-decoration: none }
+  @media (max-width: 720px) { nav ul { display: none } }
+  .hero { text-align: center; padding: 72px 0 0 }
+  .pill { display: inline-flex; gap: 8px; align-items: center; padding: 6px 12px; border: 1.5px solid var(--line); border-radius: 999px; font: 400 11px/1 "Silkscreen", monospace; text-transform: uppercase; letter-spacing: .05em; color: var(--muted) }
+  .pill b { width: 8px; height: 8px; background: var(--green) }
+  h1 { margin: 22px auto 16px; max-width: 14ch; font-size: clamp(44px, 7.4vw, 96px); line-height: .94; letter-spacing: -.055em; font-weight: 800 }
+  .lede { margin: 0 auto 30px; max-width: 46ch; color: var(--muted); font-size: 19px }
+  .ctas { display: flex; gap: 18px; justify-content: center; align-items: center; flex-wrap: wrap }
+  .ghost { font-weight: 650; text-decoration: none; border-bottom: 2px solid currentColor }
+  .band { margin-top: -10px }
+  .ground { background: #5c8a3a; height: 32px; margin-top: -4px }
+  section { padding: 96px 0 }
+  h2 { margin: 0 0 14px; font-size: clamp(32px, 4.6vw, 54px); line-height: 1; letter-spacing: -.045em; font-weight: 800 }
+  .sub { margin: 0 0 44px; color: var(--muted); max-width: 52ch }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr } }
+  .card { border: 1.5px solid var(--line); border-radius: 18px; background: #fffdf8; overflow: hidden }
+  .card piix-scene { border-bottom: 1.5px solid var(--line) }
+  .card div { padding: 20px 22px 24px }
+  .card h3 { margin: 0 0 6px; font-size: 21px; letter-spacing: -.02em }
+  .card p { margin: 0; color: var(--muted); font-size: 16px }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 40px; background: var(--ink); color: #eef2e8; border-radius: 24px }
+  @media (max-width: 860px) { .stats { grid-template-columns: 1fr } }
+  .quote { display: grid; grid-template-columns: 1fr 1.1fr; gap: 48px; align-items: center }
+  @media (max-width: 860px) { .quote { grid-template-columns: 1fr } }
+  blockquote { margin: 0; font-size: clamp(24px, 3vw, 34px); line-height: 1.2; letter-spacing: -.03em; font-weight: 650 }
+  cite { display: block; margin-top: 16px; font: 400 12px/1 "Silkscreen", monospace; font-style: normal; text-transform: uppercase; color: var(--muted) }
+  .frame { border-radius: 18px; overflow: hidden; border: 1.5px solid var(--line) }
+  footer { position: relative; color: #fff; background: #3c6a2c }
+  footer .in { position: relative; padding: 40px 0 48px; display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap }
+  footer h2 { color: #fff }
+</style>
+</head>
+<body>
+<header class="wrap">
+  <nav><a class="brand" href="#"><i></i>Summit</a><ul><li><a href="#">Routes</a></li><li><a href="#">Weather</a></li><li><a href="#">Pricing</a></li></ul><piix-button tone="ink" size="sm">Sign in</piix-button></nav>
+</header>
+
+<main>
+  <div class="hero wrap">
+    <span class="pill"><b></b>New · offline maps</span>
+    <h1>Plan the climb. Enjoy the view.</h1>
+    <p class="lede">Routes, weather windows and elevation in one calm place, so the only thing left to think about is the next step.</p>
+    <div class="ctas"><piix-button tone="ink" pal="pip">Start planning, free</piix-button><a class="ghost" href="#">See a sample route</a></div>
+  </div>
+  <!-- the only pixels on the hero: mountains rising out of the page itself -->
+  <piix-scene class="band" kind="alps" sky="none" height="340px" pixel="4"></piix-scene>
+  <div class="ground"></div>
+
+  <section class="wrap">
+    <h2>Everything above the treeline</h2>
+    <p class="sub">Three things Summit does better than a paper map and a weather app glued together.</p>
+    <div class="grid">
+      <article class="card"><piix-scene kind="vista" height="170px"></piix-scene><div><h3>Weather windows</h3><p>Hour by hour, ridge by ridge. We tell you when the clouds will clear.</p></div></article>
+      <article class="card"><piix-scene kind="lake" height="170px"></piix-scene><div><h3>Water on the way</h3><p>Every lake, stream and spring on your route, with how fresh it was last week.</p></div></article>
+      <article class="card"><piix-scene kind="castle" height="170px"></piix-scene><div><h3>Huts and shelters</h3><p>Book a bunk in a mountain hut, or find the bivvy before the dark does.</p></div></article>
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="stats">
+      <piix-stat value="18240" suffix="+" tone="mint">routes mapped</piix-stat>
+      <piix-stat value="4810" suffix=" m" tone="sun">highest summit</piix-stat>
+      <piix-stat value="99.2" decimals="1" suffix="%" tone="sky">forecast accuracy</piix-stat>
+    </div>
+  </section>
+
+  <section class="wrap quote">
+    <div><blockquote>“I stopped checking four apps before every hike. Summit just tells me when to go.”</blockquote><cite>Maya, walked the Haute Route in June</cite></div>
+    <div class="frame"><piix-scene kind="poppies" height="320px"></piix-scene></div>
+  </section>
+</main>
+
+<footer>
+  <piix-scene kind="vista" fade="top" height="260px"></piix-scene>
+  <div class="wrap in"><h2>See you up there.</h2><piix-button tone="paper" pal="frog">Get Summit</piix-button></div>
+</footer>
+<script src="../../piixpal.js"></script>
+</body>
+</html>
