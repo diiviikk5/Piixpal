@@ -124,3 +124,11 @@
 .ui-stage piix-glow-card{width:min(100%,340px)}
 .ui-stage .ex-grid piix-glow-card{width:auto}
 .ui-stage piix-tabs p{margin:0;opacity:.85}
+
+/* scenes and layouts */
+.ui-stage.block{display:block;padding:0}
+.ui-stage.block .stage-in{display:block}
+.ui-thumb > piix-scene{position:absolute;inset:0;width:100%}
+.ui-thumb .scaled{position:absolute;top:0;left:0;width:250%;transform:scale(.4);transform-origin:top left}
+.ctl .swatches .own{width:auto;padding:0 8px;font:600 11.5px/1 var(--f-sans);text-transform:none;background:var(--card);color:var(--ink)}
+.ctl .swatches .own[aria-pressed=true]{background:var(--ink);color:var(--paper)}

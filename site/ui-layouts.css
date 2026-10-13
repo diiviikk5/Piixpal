@@ -1,0 +1,30 @@
+/* Pixel UI layouts: scenes mixed into ordinary pages. Copy what you need. */
+.lay-copy{display:grid;gap:12px;justify-items:start;font-family:"Bricolage Grotesque",system-ui,sans-serif}
+.lay-copy.center{justify-items:center;text-align:center}
+.lay-copy h2{margin:0;font-size:clamp(30px,4.4vw,52px);font-weight:800;line-height:1;letter-spacing:-.04em}
+.lay-copy p{margin:0;max-width:42ch;font-size:17px;line-height:1.5;opacity:.75}
+.lay-kicker{font:400 12px/1 "Silkscreen",monospace!important;text-transform:uppercase;letter-spacing:.06em;opacity:.6!important}
+
+.lay-band{position:relative;display:grid;background:#f6f2ea;color:#17121f;overflow:hidden}
+.lay-band .lay-copy{padding:56px 40px 0;justify-items:center;text-align:center}
+.lay-band piix-scene{margin-top:-40px}
+
+.lay-split{display:grid;grid-template-columns:1fr 1.1fr;gap:40px;align-items:center;padding:48px 40px;background:#f6f2ea;color:#17121f}
+.lay-split.dark{background:#0d0c18;color:#f2eef8}
+@media (max-width:760px){.lay-split{grid-template-columns:1fr}}
+.lay-frame{padding:8px;background:#17121f;box-shadow:0 0 0 4px #f2eef8,8px 8px 0 4px #ff6b4a;clip-path:polygon(0 8px,8px 8px,8px 0,calc(100% - 8px) 0,calc(100% - 8px) 8px,100% 8px,100% calc(100% - 8px),calc(100% - 8px) calc(100% - 8px),calc(100% - 8px) 100%,8px 100%,8px calc(100% - 8px),0 calc(100% - 8px))}
+
+.lay-fade{display:grid;background:#0b0a10;color:#f2eef8;padding-bottom:56px}
+.lay-fade .lay-copy{margin-top:-60px;position:relative}
+
+.lay-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;padding:32px;background:#f6f2ea;color:#17121f}
+.lay-cards article{border:3px solid #17121f;background:#fff;box-shadow:6px 6px 0 #17121f;font-family:"Bricolage Grotesque",system-ui,sans-serif}
+.lay-cards piix-scene{border-bottom:3px solid #17121f}
+.lay-cards h3{margin:14px 16px 4px;font-size:20px;font-weight:800;letter-spacing:-.02em}
+.lay-cards p{margin:0 16px 16px;opacity:.7}
+
+.lay-riso{display:grid;grid-template-columns:1.2fr 1fr;background:#eadcc4;color:#1c38d4}
+.lay-riso .lay-copy{padding:40px;align-content:center}
+.lay-riso h2{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-style:italic;letter-spacing:-.02em}
+.lay-riso p{opacity:1}
+@media (max-width:760px){.lay-riso{grid-template-columns:1fr}}
