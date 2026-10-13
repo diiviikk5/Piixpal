@@ -3,8 +3,8 @@
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
-  /* set one attribute on the first <tag …> in a snippet of markup, keeping the others in order */
-  const setAttr = (code, tag, name, val) => code.replace(new RegExp('<' + tag + '\\b([^>]*)>'), (m, rest) => {
+  /* set one attribute on every <tag …> in a snippet of markup, keeping the others in order */
+  const setAttr = (code, tag, name, val) => code.replace(new RegExp('<' + tag + '\\b([^>]*)>', 'g'), (m, rest) => {
     const attrs = [];
     rest.replace(/\s([\w-]+)(?:="([^"]*)")?/g, (_, k, v) => { attrs.push([k, v]); });
     const i = attrs.findIndex(([k]) => k === name);
@@ -33,8 +33,7 @@
     const tag = box.dataset.target;
     const apply = (name, val, def) => {
       const v = val === '' || String(val) === String(def) ? null : String(val);
-      const el = stage.querySelector(tag);
-      if (el) v == null ? el.removeAttribute(name) : el.setAttribute(name, v);
+      stage.querySelectorAll(tag).forEach(el => { v == null ? el.removeAttribute(name) : el.setAttribute(name, v); });
       code = setAttr(code, tag, name, v);
       show();
     };

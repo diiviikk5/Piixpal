@@ -19,7 +19,7 @@ const PAL = Object.fromEntries(PALETTES.map(p => [p, glSrc.match(new RegExp(`\\b
 
 const VERSION = '0.6';
 const CDN = `https://cdn.jsdelivr.net/npm/piixpal@${VERSION}`;
-const START = [['index', 'Introduction'], ['showcase', 'Showcase'], ['installation', 'Installation'], ['palettes', 'Palettes']];
+const START = [['index', 'Introduction'], ['showcase', 'Showcase'], ['installation', 'Installation'], ['looks', 'Looks'], ['palettes', 'Palettes']];
 const bySection = SECTIONS.map(s => [s, UI.filter(u => u.section === s)]);
 const ORDER = [...START.map(([s]) => s), ...bySection.flatMap(([, l]) => l.map(u => u.slug))];
 const nameOf = s => (START.find(x => x[0] === s) || [])[1] || UI.find(u => u.slug === s).name;
@@ -196,7 +196,14 @@ const THUMB = {
   'loader': '<piix-loader size="56"></piix-loader><piix-loader kind="snake" palette="sunset" size="56"></piix-loader>',
   'progress': '<piix-progress value="60" style="width:80%"></piix-progress>',
   'reveal': '<piix-reveal pattern="rain" style="width:70%"><div class="shot s">Reveal</div></piix-reveal>',
-  'cursor': '<span class="t-cur">Move your pointer</span>'
+  'cursor': '<span class="t-cur">Move your pointer</span>',
+  'chart': '<piix-chart values="12,18,14,24,30,26,38,34,42,48,44,56" height="110px" style="width:86%"></piix-chart>',
+  'flap-board': '<piix-flap text="BOARDING" style="font-size:22px"></piix-flap>',
+  'slider': '<piix-slider value="62" style="width:80%">Volume</piix-slider>',
+  'keycap': '<span><piix-kbd>⌘</piix-kbd> <piix-kbd>K</piix-kbd></span>',
+  'dialog': '<piix-glow-card style="width:72%"><h3 style="margin:0;font-size:17px">Deploy to production?</h3></piix-glow-card>',
+  'toast': '<span class="t-toast"><i></i>Your changes are live.</span>',
+  'tooltip': '<span class="t-tip">Copy link</span>'
 };
 const thumb = u => u.section === 'Scenes' ? u.demo.replace('height="460px"', 'height="100%" pixel="3"')
   : u.section === 'Layouts' ? `<div class="scaled">${u.demo}</div>`
@@ -260,6 +267,21 @@ ${demoBox({ demo: '<piix-shader kind="warp" palette="#0b0a10,#3a2a6b,#ff6b4a,#ff
 ${demoBox({ demo: '<div class="ex-row">\n  <piix-shader kind="mesh" dither="1" height="160px"></piix-shader>\n  <piix-shader kind="mesh" dither=".5" height="160px"></piix-shader>\n  <piix-shader kind="mesh" dither="0" height="160px"></piix-shader>\n</div>', stage: { pad: 0 } })}
 ${pager('palettes')}`;
 
+/* ---------- looks: one component, five design languages ---------- */
+const LOOK_GUIDE = [
+  ['glow', 'Glow', 'The default. A dark pixel face, a band of light running round the border and a spotlight under the pointer. At home on dark product pages.', 'lime', 'galaxy'],
+  ['chrome', 'Chrome', 'Y2K liquid metal: a bright sky reflected above a dark horizon line that ripples, and a hot spot that follows the pointer. Pairs with bold sans type and big gradients.', '', 'vista'],
+  ['glass', 'Glass', 'Frosted glass: the page behind is blurred through it, with a lit rim and a glare that sweeps across under the pointer. Put it over a scene, a photo or a gradient.', '', 'sakura'],
+  ['riso', 'Riso', 'A two-ink risograph print: a solid ink face, a halftone shadow on two edges and a second ink laid down slightly off-register. It drifts when you hover. Give it any two inks and a paper as its palette.', '', ''],
+  ['crt', 'Terminal', 'Green phosphor on black: scanlines, a double rule, a faint flicker and a burst of static when you click. Try <code>palette="fire"</code> for amber.', '', 'castle']
+];
+const looksBody = `${head(['Get started'], 'Looks', 'The glow button, glow card, input and dialog all take a <code>look</code>. It swaps the whole style, from the shader to the type, so one set of components can live on very different pages.')}
+${LOOK_GUIDE.map(([id, name, about, , scene]) => `<h2 class="ui-h" id="look-${id}">${name}</h2>
+<p class="ui-note">${about}</p>
+${demoBox({ demo: `<piix-glow-button look="${id}">Get started</piix-glow-button>\n<piix-glow-card look="${id}">\n  <h3>Realtime</h3>\n  <p>Live on every device.</p>\n</piix-glow-card>\n<piix-input look="${id}" placeholder="you@site.com">Email</piix-input>`,
+  show: `<div class="ex-scene"${scene ? '' : ' style="background:#eadcc4"'}>${scene ? `<piix-scene kind="${scene}" fill></piix-scene>` : ''}<piix-glow-button look="${id}">Get started</piix-glow-button><piix-glow-card look="${id}"><h3>Realtime</h3><p>Live on every device.</p></piix-glow-card><piix-input look="${id}" placeholder="you@site.com">Email</piix-input></div>`, stage: { pad: 0, block: true } })}`).join('\n')}
+${pager('looks')}`;
+
 /* ---------- showcase: whole pages built with Pixel UI ---------- */
 const SHOWCASE = [
   ['summit', 'Summit', 'Clean product page', 'An ordinary, calm SaaS page. The only pixels are landscapes: alps rising out of the hero with the sky cut out, scene cards instead of stock photos, and a vista dissolving into the footer.', ['alps', 'vista', 'lake', 'castle', 'poppies', 'counter', 'button']],
@@ -281,6 +303,7 @@ const pages = [
   ['showcase.html', { key: 'showcase', title: 'Showcase', desc: 'Whole pages built with Pixel UI: a clean product page, a riso magazine, a lo-fi music app and a game launch.', body: showcaseBody }],
   ['index.html', { key: 'index', title: 'Pixel UI', desc: 'A GPU pixel component library: shader backgrounds, heroes, glow buttons, cards, text effects and form controls.', body: indexBody }],
   ['installation.html', { key: 'installation', title: 'Installation', desc: 'Add Pixel UI with one script tag, single files or npm.', body: installBody, toc: [['script', 'Script tag'], ['single', 'Only what you use'], ['npm', 'npm'], ['frameworks', 'Frameworks'], ['support', 'Browser support']] }],
+  ['looks.html', { key: 'looks', title: 'Looks', desc: 'One component, five design languages: glow, liquid chrome, frosted glass, two-ink riso and green terminal.', body: looksBody, toc: LOOK_GUIDE.map(([id, n]) => ['look-' + id, n]) }],
   ['palettes.html', { key: 'palettes', title: 'Palettes', desc: 'The ten Pixel UI palettes, and how to use your own colours.', body: palettesBody, toc: [['custom', 'Your own colours'], ['dither', 'Dither']] }],
   ...UI.map(u => [u.slug + '.html', null, u])
 ];

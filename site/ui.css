@@ -146,3 +146,15 @@
 .ui-show p{margin:0 0 14px;color:var(--ink-2);line-height:1.5}
 .ui-show .uses{display:flex;flex-wrap:wrap;gap:6px}
 .ui-show .uses a{font:600 12.5px/1 var(--f-sans);padding:6px 9px;border-radius:999px;border:1.5px solid var(--ink);text-decoration:none;background:var(--card)}
+
+/* demos: components over a scene, a stat card */
+.ex-scene{position:relative;display:flex;flex-wrap:wrap;gap:18px;align-items:center;justify-content:center;min-height:240px;padding:36px 28px;box-sizing:border-box}
+.ex-scene piix-glow-card{width:210px}
+.ex-scene piix-input{width:230px}
+.ex-stat{display:grid;gap:4px;width:min(100%,320px);padding:18px 18px 12px;background:#17121f;box-shadow:inset 0 0 0 2px #2a2236}
+.ex-stat small{font:400 11px/1 var(--f-pix);text-transform:uppercase;opacity:.6}
+.ex-stat strong{font:800 34px/1 "Bricolage Grotesque";letter-spacing:-.03em}
+.ui-stage p{margin:0}
+.ui-thumb .t-toast{display:flex;gap:10px;align-items:center;padding:12px 14px;background:#17121f;box-shadow:inset 0 0 0 2px #2c2438;font:500 13px/1 "Bricolage Grotesque";border-bottom:3px solid #9be15d}
+.ui-thumb .t-toast i{width:14px;height:14px;background:#9be15d}
+.ui-thumb .t-tip{padding:8px 11px;background:#f2eef8;color:#17121f;font:500 13px/1 "Bricolage Grotesque"}
