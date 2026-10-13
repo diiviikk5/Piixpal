@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="../site/site.css">
 <link rel="stylesheet" href="../site/docs.css">
 <link rel="stylesheet" href="../site/ui.css">
+<link rel="stylesheet" href="../site/ui-layouts.css">
 <!-- Vercel Web Analytics: cookieless page views -->
 <script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};</script>
 <script defer src="/_vercel/insights/script.js"></script>
@@ -44,6 +45,14 @@
     <input class="side-find" type="search" placeholder="Find a component…" aria-label="Find a component">
     <h4>Get started</h4>
     <nav class="side-start"><a href="./" aria-current="page">Introduction</a><a href="installation.html">Installation</a><a href="palettes.html">Palettes</a></nav>
+    <details class="sg" open>
+      <summary><a href="./#scenes">Scenes</a><span class="n">10</span></summary>
+      <a href="sakura.html">Sakura grove</a><a href="alps.html">Alpine hills</a><a href="lake.html">Sunset lake</a><a href="galaxy.html">Galaxy</a><a href="riso-rays.html">Riso rays</a><a href="riso-vortex.html">Riso vortex</a><a href="porthole.html">Porthole</a><a href="poppies.html">Poppy field</a><a href="castle.html">Castle</a><a href="vista.html">Anime vista</a>
+    </details>
+    <details class="sg" open>
+      <summary><a href="./#layouts">Layouts</a><span class="n">6</span></summary>
+      <a href="horizon-band.html">Horizon band</a><a href="window.html">Window</a><a href="split-hero.html">Split hero</a><a href="fade-into-page.html">Fade into page</a><a href="scene-cards.html">Scene cards</a><a href="riso-editorial.html">Riso editorial</a>
+    </details>
     <details class="sg" open>
       <summary><a href="./#backgrounds">Backgrounds</a><span class="n">10</span></summary>
       <a href="mesh-gradient.html">Mesh gradient</a><a href="warp.html">Marble warp</a><a href="aurora.html">Aurora</a><a href="crystal.html">Crystal cells</a><a href="liquid-metal.html">Liquid metal</a><a href="horizon.html">Synthwave horizon</a><a href="nebula.html">Nebula</a><a href="topographic.html">Topographic</a><a href="dot-matrix.html">Dot matrix</a><a href="fire.html">Fire</a>
@@ -90,12 +99,125 @@
 <header class="doc-head ui-head">
   <div class="crumbs"><a href="./">Pixel UI</a></div>
   <h1>Pixel UI</h1>
-  <p>A component library drawn on the GPU. Backgrounds, heroes, buttons, cards, text effects and form controls, all rendered on a pixel grid and dithered into a palette. 32 components, each one a plain web component: one script tag, then copy a tag.</p><div class="pills"><a class="pill" href="#backgrounds">Backgrounds · 10</a><a class="pill" href="#sections">Sections · 3</a><a class="pill" href="#buttons">Buttons · 2</a><a class="pill" href="#cards">Cards · 1</a><a class="pill" href="#text">Text · 7</a><a class="pill" href="#media">Media · 1</a><a class="pill" href="#forms">Forms · 3</a><a class="pill" href="#navigation">Navigation · 1</a><a class="pill" href="#feedback">Feedback · 2</a><a class="pill" href="#motion">Motion · 2</a></div>
+  <p>A component library drawn on the GPU. Backgrounds, heroes, buttons, cards, text effects and form controls, all rendered on a pixel grid and dithered into a palette. 48 components, each one a plain web component: one script tag, then copy a tag.</p><div class="pills"><a class="pill" href="#scenes">Scenes · 10</a><a class="pill" href="#layouts">Layouts · 6</a><a class="pill" href="#backgrounds">Backgrounds · 10</a><a class="pill" href="#sections">Sections · 3</a><a class="pill" href="#buttons">Buttons · 2</a><a class="pill" href="#cards">Cards · 1</a><a class="pill" href="#text">Text · 7</a><a class="pill" href="#media">Media · 1</a><a class="pill" href="#forms">Forms · 3</a><a class="pill" href="#navigation">Navigation · 1</a><a class="pill" href="#feedback">Feedback · 2</a><a class="pill" href="#motion">Motion · 2</a></div>
 </header>
 <div class="ui-why">
   <div><h3>On the GPU</h3><p>Shaders run on one shared WebGL context, drawn at pixel resolution and scaled up crisp.</p></div>
   <div><h3>Real elements</h3><p>Buttons are buttons, inputs submit with forms, tabs are tabs. Keyboard and screen readers just work.</p></div>
   <div><h3>Polite</h3><p>Only what's on screen draws, finished effects rest the GPU, and reduced motion is respected everywhere.</p></div>
+</div>
+
+<h2 class="fam-h" id="scenes">Scenes <span class="n">10</span></h2>
+<div class="ui-grid">
+  <a class="ui-card" href="sakura.html">
+    <div class="ui-thumb" aria-hidden="true" inert><piix-scene kind="sakura" height="100%" pixel="3"></piix-scene></div>
+    <h3>Sakura grove</h3><p>A cherry tree in full bloom over a misty forest, with a lantern and a bench.</p>
+  </a>
+  <a class="ui-card" href="alps.html">
+    <div class="ui-thumb" aria-hidden="true" inert><piix-scene kind="alps" height="100%" pixel="3"></piix-scene></div>
+    <h3>Alpine hills</h3><p>Snow peaks behind rolling green hills, pines and valley mist.</p>
+  </a>
+  <a class="ui-card" href="lake.html">
+    <div class="ui-thumb" aria-hidden="true" inert><piix-scene kind="lake" height="100%" pixel="3"></piix-scene></div>
+    <h3>Sunset lake</h3><p>A flat-colour sunset over a lake, with a boat drifting across.</p>
+  </a>
+  <a class="ui-card" href="galaxy.html">
+    <div class="ui-thumb" aria-hidden="true" inert><piix-scene kind="galaxy" height="100%" pixel="3"></piix-scene></div>
+    <h3>Galaxy</h3><p>A spiral galaxy with planets in orbit; the pointer tilts it.</p>
+  </a>
+  <a class="ui-card" href="riso-rays.html">
+    <div class="ui-thumb" aria-hidden="true" inert><piix-scene kind="rays" height="100%" pixel="3"></piix-scene></div>
+    <h3>Riso rays</h3><p>A two-ink riso print: light bursting from the horizon under a crescent moon.</p>
+  </a>
+  <a class="ui-card" href="riso-vortex.html">
+    <div class="ui-thumb" aria-hidden="true" inert><piix-scene kind="vortex" height="100%" pixel="3"></piix-scene></div>
+    <h3>Riso vortex</h3><p>A two-ink riso print of the sky swirling round a lone street lamp.</p>
+  </a>
+  <a class="ui-card" href="porthole.html">
+    <div class="ui-thumb" aria-hidden="true" inert><piix-scene kind="porthole" height="100%" pixel="3"></piix-scene></div>
+    <h3>Porthole</h3><p>A ship's window onto a calm sea that rocks gently.</p>
+  </a>
+  <a class="ui-card" href="poppies.html">
+    <div class="ui-thumb" aria-hidden="true" inert><piix-scene kind="poppies" height="100%" pixel="3"></piix-scene></div>
+    <h3>Poppy field</h3><p>A stormy sky over a field of red poppies blowing in the wind.</p>
+  </a>
+  <a class="ui-card" href="castle.html">
+    <div class="ui-thumb" aria-hidden="true" inert><piix-scene kind="castle" height="100%" pixel="3"></piix-scene></div>
+    <h3>Castle</h3><p>A pixel castle on a hill at night, windows flickering and a flag waving.</p>
+  </a>
+  <a class="ui-card" href="vista.html">
+    <div class="ui-thumb" aria-hidden="true" inert><piix-scene kind="vista" height="100%" pixel="3"></piix-scene></div>
+    <h3>Anime vista</h3><p>A summer sky with towering clouds, a snowy peak and grass in the breeze.</p>
+  </a>
+</div>
+
+<h2 class="fam-h" id="layouts">Layouts <span class="n">6</span></h2>
+<div class="ui-grid">
+  <a class="ui-card" href="horizon-band.html">
+    <div class="ui-thumb" aria-hidden="true" inert><div class="scaled"><section class="lay-band">
+  <div class="lay-copy">
+    <p class="lay-kicker">Summit · Trail planner</p>
+    <h2>Plan the climb. Enjoy the view.</h2>
+    <p>Routes, weather and elevation in one calm place.</p>
+    <piix-button tone="ink">Start planning</piix-button>
+  </div>
+  <piix-scene kind="alps" sky="none" height="260px"></piix-scene>
+</section></div></div>
+    <h3>Horizon band</h3><p>A clean page with a landscape rising along the bottom of the hero.</p>
+  </a>
+  <a class="ui-card" href="window.html">
+    <div class="ui-thumb" aria-hidden="true" inert><div class="scaled"><section class="lay-split">
+  <div class="lay-copy">
+    <p class="lay-kicker">Voyage</p>
+    <h2>Seven days, no signal.</h2>
+    <p>A slow crossing for people who need one.</p>
+    <piix-button tone="sky">Book a cabin</piix-button>
+  </div>
+  <piix-scene kind="porthole" sky="none" height="340px"></piix-scene>
+</section></div></div>
+    <h3>Window</h3><p>A pixel window onto another world, set into a normal page.</p>
+  </a>
+  <a class="ui-card" href="split-hero.html">
+    <div class="ui-thumb" aria-hidden="true" inert><div class="scaled"><section class="lay-split dark">
+  <div class="lay-copy">
+    <p class="lay-kicker">Out now on every platform</p>
+    <h2>Keep the castle lit.</h2>
+    <p>A cosy night-watch game about lanterns, ghosts and good neighbours.</p>
+    <piix-glow-button palette="sunset">Play free</piix-glow-button>
+  </div>
+  <div class="lay-frame"><piix-scene kind="castle" height="340px"></piix-scene></div>
+</section></div></div>
+    <h3>Split hero</h3><p>Copy on one side, a framed scene on the other.</p>
+  </a>
+  <a class="ui-card" href="fade-into-page.html">
+    <div class="ui-thumb" aria-hidden="true" inert><div class="scaled"><section class="lay-fade">
+  <piix-scene kind="galaxy" fade="bottom" height="300px"></piix-scene>
+  <div class="lay-copy center">
+    <h2>Orbit</h2>
+    <p>Satellite data for the rest of us.</p>
+  </div>
+</section></div></div>
+    <h3>Fade into page</h3><p>A scene that dissolves into the content below it.</p>
+  </a>
+  <a class="ui-card" href="scene-cards.html">
+    <div class="ui-thumb" aria-hidden="true" inert><div class="scaled"><div class="lay-cards">
+  <article><piix-scene kind="lake" height="140px"></piix-scene><h3>Still water</h3><p>Lo-fi for slow mornings.</p></article>
+  <article><piix-scene kind="sakura" height="140px"></piix-scene><h3>Petal season</h3><p>Soft piano and rain.</p></article>
+  <article><piix-scene kind="poppies" height="140px"></piix-scene><h3>Storm front</h3><p>Big drums, bigger skies.</p></article>
+</div></div></div>
+    <h3>Scene cards</h3><p>Cards with a little living scene as their header.</p>
+  </a>
+  <a class="ui-card" href="riso-editorial.html">
+    <div class="ui-thumb" aria-hidden="true" inert><div class="scaled"><section class="lay-riso">
+  <piix-scene kind="rays" height="300px"></piix-scene>
+  <div class="lay-copy">
+    <p class="lay-kicker">Issue 07 · Night roads</p>
+    <h2>The long way home</h2>
+    <p>Essays on driving after dark, printed in two inks.</p>
+  </div>
+</section></div></div>
+    <h3>Riso editorial</h3><p>A two-ink print look for a magazine or a portfolio.</p>
+  </a>
 </div>
 
 <h2 class="fam-h" id="backgrounds">Backgrounds <span class="n">10</span></h2>
