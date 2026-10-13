@@ -46,7 +46,7 @@ class PiixChartElement extends GLStage {
   constructor() { super(); this._defPx = 3; this._defPal = 'lime'; this._hi = -1; this._tex = { owner: {}, src: null, dirty: true }; }
   attributeChangedCallback(n, a, b) { if (n === 'values' || n === 'labels' || n === 'suffix') { if (this._cv) this._data(); return; } super.attributeChangedCallback(n, a, b); }
   get kind() { return { line: 1, bars: 2 }[this.getAttribute('kind')] || 0; }
-  _hostCss() { return this.getAttribute('height') ? '' : 'height:220px;'; }
+  _hostCss() { return 'width:100%;' + (this.getAttribute('height') ? '' : 'height:220px;'); }
   _css() {
     const l = this._pal.list;
     return `.tip{position:absolute;z-index:2;padding:6px 9px 7px;background:${l[l.length - 1]};color:${l[0]};font:600 12.5px/1.2 "Bricolage Grotesque",system-ui,sans-serif;clip-path:${kitCorners(2)};transform:translate(-50%,-100%);pointer-events:none;white-space:nowrap;opacity:0;transition:opacity .12s}

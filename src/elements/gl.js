@@ -267,8 +267,8 @@ const GL_LOOKS = {
   riso: ['#1c38d4,#ff4f9a,#eadcc4', GL_LOOK_HEAD + `
   vec3 A=u_pal[0],B=u_pal[1],P=u_pal[2];
   vec2 mis=vec2(3.,-2.)+(u_mouse-.5)*vec2(8.,6.)*u_hover+vec2(sin(u_time*1.1),cos(u_time*.9))*.7;
-  float sh=min(cell.y,sz.x-1.-cell.x),hdot=step(length(mod(cell,4.)-1.5),mix(1.9,.5,smoothstep(b,b+6.,sh)));
-  float a=e<b?1.:(sh<b+6.?hdot:1.);
+  float hw=min(6.,sz.y*.18),sh=min(cell.y,sz.x-1.-cell.x),hdot=step(length(mod(cell,4.)-1.5),mix(1.9,.5,smoothstep(b,b+hw,sh)));
+  float a=e<b?1.:(sh<b+hw?hdot:1.);
   vec2 cb=cell-floor(mis),db=min(cb,sz-1.-cb);float eb=min(db.x,db.y);
   float bb=step(0.,eb)*step(eb,b+1.)+ring;
   vec3 col=mix(P,A,a);
@@ -291,7 +291,7 @@ const GL_LOOK_TEXT = {
   glow: list => `color:${list[list.length - 1]};text-shadow:0 1px 0 rgba(0,0,0,.5)`,
   chrome: () => 'color:#0e0c14;text-shadow:0 1px 0 rgba(255,255,255,.85),0 -1px 0 rgba(0,0,0,.25)',
   glass: () => 'color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.45)',
-  riso: list => `color:${list[2] || '#eadcc4'};text-shadow:1px 1px 0 ${list[1] || '#ff4f9a'}`,
+  riso: list => `color:${list[2] || '#eadcc4'}`,
   crt: list => `color:${list[3] || '#46ff7e'};text-shadow:0 0 8px ${list[3] || '#46ff7e'}88;font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace!important;letter-spacing:0`
 };
 /* glass needs the page behind it blurred; everything else is opaque */
