@@ -1226,8 +1226,8 @@ const GL_LOOK_TEXT = {
   glow: list => `color:${list[list.length - 1]};text-shadow:0 1px 0 rgba(0,0,0,.5)`,
   chrome: () => 'color:#0e0c14;text-shadow:0 1px 0 rgba(255,255,255,.85),0 -1px 0 rgba(0,0,0,.25)',
   glass: () => 'color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.45)',
-  riso: list => `color:${list[2] || '#eadcc4'};text-shadow:2px 2px 0 ${list[1] || '#ff4f9a'};font-family:"Silkscreen",ui-monospace,monospace!important;font-weight:400!important;text-transform:uppercase;letter-spacing:.06em`,
-  crt: list => `color:${list[3] || '#46ff7e'};text-shadow:0 0 6px ${list[3] || '#46ff7e'},0 0 1px ${list[4] || '#fff'};font-family:"Silkscreen",ui-monospace,monospace!important;font-weight:400!important;text-transform:uppercase;letter-spacing:.06em`
+  riso: list => `color:${list[2] || '#eadcc4'};text-shadow:1px 1px 0 ${list[1] || '#ff4f9a'}`,
+  crt: list => `color:${list[3] || '#46ff7e'};text-shadow:0 0 8px ${list[3] || '#46ff7e'}88;font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace!important;letter-spacing:0`
 };
 /* glass needs the page behind it blurred; everything else is opaque */
 const glLookHost = look => look === 'glass' ? `-webkit-backdrop-filter:blur(14px) saturate(1.5);backdrop-filter:blur(14px) saturate(1.5);background:rgba(255,255,255,.07);clip-path:${kitCorners(3)};` : '';
@@ -11586,6 +11586,109 @@ canvas{position:absolute;bottom:${KIT_U + 2}px;left:0;image-rendering:pixelated;
 define('piix-toggle', PiixToggleElement);
 ELEMENTS.toggle = 'piix-toggle';
 
+/* ---- gl/chart.js ---- */
+/* CHART: small dithered charts, drawn on the GPU.   @component chart
+ *
+ *   <piix-chart values="12,18,9,24,30,28,35" labels="Mon,Tue,Wed,Thu,Fri,Sat,Sun"></piix-chart>
+ *   <piix-chart kind="bars" values="4,7,5,9,12" palette="sunset"></piix-chart>
+ *
+ * An area chart's fill fades out in a dither instead of a gradient, the line sits on top in the
+ * brightest colour, and bars are stepped columns shaded from the top. It sweeps in from the left
+ * the first time it's on screen. Hover it and a crosshair snaps to the nearest point and shows
+ * its label and value. Screen readers get the numbers as a table.
+ *
+ *   values    the numbers, comma separated (up to 256)
+ *   labels    a label for each, comma separated
+ *   kind      area | line | bars                            default: area
+ *   suffix    after each value, like % or ms
+ *   palette   its colours                                   default: lime
+ *   height    px or any CSS length                          default: 220px
+ *   pixel     size of one pixel, px                         default: 3 */
+const CH_SHADER = `vec4 effect(vec2 uv,vec2 cell){
+  float n=u_k.x,g=u_k.y,hov=u_k.z,kind=u_k.w,pad=6./u_res.y;
+  float y=(uv.y-pad)/(1.-pad*2.),grow=clamp(g*1.7-uv.x*.7,0.,1.);
+  grow=1.-pow(1.-grow,3.);
+  vec4 c=vec4(0.);
+  for(int k=1;k<4;k++){if(abs(y-float(k)*.25)*u_res.y<.6&&mod(cell.x,4.)<1.)c=vec4(dpal(.18,cell),1.);}
+  if(kind>1.5){
+    float i=floor(uv.x*n),fx=fract(uv.x*n),v=texture2D(u_tex,vec2((i+.5)/n,.5)).r*grow;
+    float gap=clamp(1.5/(u_res.x/n),.08,.3);
+    if(fx>gap&&fx<1.-gap&&y<v&&y>0.){float top=(v-y)*u_res.y;
+      float lit=i==hov?1.:.0;
+      c=vec4(dpal(top<2.?1.:mix(.75,.35,clamp((v-y)/max(v,.01),0.,1.))+lit*.2,cell),1.);}
+  }else{
+    float tx=(uv.x*(n-1.)+.5)/n,v=texture2D(u_tex,vec2(tx,.5)).r*grow;
+    float e=1./u_res.x,v1=texture2D(u_tex,vec2(((uv.x+e)*(n-1.)+.5)/n,.5)).r*grow;
+    float slope=abs(v1-v)*u_res.y,th=(1.1+slope*.5)/u_res.y;
+    if(kind<.5&&y<v&&y>0.){float k=(v-y)/max(v,.01);if(1.-k*1.15>bayer8(cell))c=vec4(dpal(.25+.45*(1.-k),cell),1.);}
+    if(abs(y-v)<th*1.)c=vec4(dpal(1.,cell),1.);
+    if(hov>=0.){float hxp=hov/(n-1.),hv=texture2D(u_tex,vec2((hov+.5)/n,.5)).r*grow;
+      if(abs(uv.x-hxp)*u_res.x<.6&&mod(cell.y,3.)<1.&&y>0.)c=vec4(dpal(.6,cell),1.);
+      vec2 dp=vec2((uv.x-hxp)*u_res.x,(y-hv)*u_res.y*(1.-pad*2.));
+      if(max(abs(dp.x),abs(dp.y))<2.5)c=vec4(dpal(1.,cell),1.);
+      if(max(abs(dp.x),abs(dp.y))<1.5)c=vec4(dpal(0.,cell),1.);}
+  }
+  if(y<=0.&&y>-1./u_res.y)c=vec4(dpal(.4,cell),1.);
+  return c;}`;
+class PiixChartElement extends GLStage {
+  static get observedAttributes() { return [...GLStage.observedAttributes, 'values', 'labels', 'suffix']; }
+  constructor() { super(); this._defPx = 3; this._defPal = 'lime'; this._hi = -1; this._tex = { owner: {}, src: null, dirty: true }; }
+  attributeChangedCallback(n, a, b) { if (n === 'values' || n === 'labels' || n === 'suffix') { if (this._cv) this._data(); return; } super.attributeChangedCallback(n, a, b); }
+  get kind() { return { line: 1, bars: 2 }[this.getAttribute('kind')] || 0; }
+  _hostCss() { return this.getAttribute('height') ? '' : 'height:220px;'; }
+  _css() {
+    const l = this._pal.list;
+    return `.tip{position:absolute;z-index:2;padding:6px 9px 7px;background:${l[l.length - 1]};color:${l[0]};font:600 12.5px/1.2 "Bricolage Grotesque",system-ui,sans-serif;clip-path:${kitCorners(2)};transform:translate(-50%,-100%);pointer-events:none;white-space:nowrap;opacity:0;transition:opacity .12s}
+.tip small{display:block;font:400 10px/1 ${KIT_FONT};text-transform:uppercase;opacity:.7;margin-bottom:3px}
+.ax{position:absolute;right:0;font:400 10px/1 ${KIT_FONT};opacity:.5;pointer-events:none}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}`;
+  }
+  _html() { return '<canvas aria-hidden="true"></canvas><span class="ax" style="top:0"></span><span class="tip" aria-hidden="true"></span><table class="sr"></table>'; }
+  _setup() {
+    this.setAttribute('role', 'figure');
+    this._data();
+    this.addEventListener('pointermove', e => {
+      const r = this.getBoundingClientRect(), x = clamp((e.clientX - r.left) / r.width, 0, 1), n = this._vals.length;
+      this._hi = !n ? -1 : this.kind === 2 ? Math.min(n - 1, Math.floor(x * n)) : Math.round(x * (n - 1));
+      this._tipAt();
+    });
+    this.addEventListener('pointerleave', () => { this._hi = -1; this.shadowRoot.querySelector('.tip').style.opacity = 0; });
+  }
+  /* read the numbers into a one-row texture the shader samples */
+  _data() {
+    const vals = (this.getAttribute('values') || '').split(',').map(Number).filter(v => !isNaN(v)).slice(0, 256);
+    const labs = (this.getAttribute('labels') || '').split(',').map(s => s.trim());
+    this._vals = vals.length ? vals : [0, 0]; this._labs = labs;
+    const max = this._max = Math.max(...this._vals, 0) || 1, n = this._vals.length;
+    const c = this._tex.src || (this._tex.src = document.createElement('canvas'));
+    c.width = n; c.height = 1;
+    const g = c.getContext('2d'), d = g.createImageData(n, 1);
+    this._vals.forEach((v, i) => { const k = Math.round(clamp(v / max, 0, 1) * 255); d.data.set([k, k, k, 255], i * 4); });
+    g.putImageData(d, 0, 0);
+    this._tex.dirty = true;
+    const sfx = this.getAttribute('suffix') || '';
+    this.shadowRoot.querySelector('.ax').textContent = (+max.toFixed(2)) + sfx;
+    this.shadowRoot.querySelector('.sr').innerHTML = `<tr><th>Label</th><th>Value</th></tr>` + this._vals.map((v, i) => `<tr><td>${(labs[i] || i + 1).toString().replace(/[<>&]/g, '')}</td><td>${v}${sfx.replace(/[<>&]/g, '')}</td></tr>`).join('');
+    this.setAttribute('aria-label', `Chart of ${n} values, from ${Math.min(...this._vals)} to ${max}`);
+  }
+  _tipAt() {
+    const tip = this.shadowRoot.querySelector('.tip'), i = this._hi, n = this._vals.length;
+    if (i < 0) { tip.style.opacity = 0; return; }
+    const r = this.getBoundingClientRect(), x = this.kind === 2 ? (i + .5) / n : i / Math.max(1, n - 1), pad = 6 * this._px / (r.height * Math.min(devicePixelRatio || 1, 2));
+    const y = 1 - (pad + (1 - pad * 2) * this._vals[i] / this._max);
+    tip.innerHTML = `${this._labs[i] ? `<small>${this._labs[i].replace(/[<>&]/g, '')}</small>` : ''}${this._vals[i]}${(this.getAttribute('suffix') || '').replace(/[<>&]/g, '')}`;
+    tip.style.left = clamp(x * r.width, 30, r.width - 30) + 'px'; tip.style.top = Math.max(26, y * r.height - 10) + 'px'; tip.style.opacity = 1;
+  }
+  _texture() { const t = this._tex; const out = { owner: t.owner, src: t.src, dirty: t.dirty }; t.dirty = false; return out; }
+  _shader() { return CH_SHADER; }
+  _uniforms() {
+    const g = reduced() ? 1 : clamp((now() - (this._seen || now())) / 1100, 0, 1);
+    return { u_k: [this._vals.length, g, this._hi, this.kind] };
+  }
+}
+define('piix-chart', PiixChartElement);
+ELEMENTS.chart = 'piix-chart';
+
 /* ---- gl/cursor.js ---- */
 /* CURSOR: a pixel trail, or a glow, that follows the pointer across the whole page.   @component cursor
  *
@@ -11641,6 +11744,116 @@ class PiixCursorElement extends GLStage {
 define('piix-cursor', PiixCursorElement);
 ELEMENTS.cursor = 'piix-cursor';
 
+/* ---- gl/dialog.js ---- */
+/* DIALOG: a modal that dissolves in, pixel by pixel, in any look.   @component dialog
+ *
+ *   <piix-glow-button data-piix-open="hello">Open</piix-glow-button>
+ *   <piix-dialog id="hello">
+ *     <h2>Ship it?</h2>
+ *     <p>This will deploy to production.</p>
+ *     <piix-glow-button data-close>Deploy</piix-glow-button>
+ *   </piix-dialog>
+ *
+ * A real modal (the browser's own <dialog>): it traps focus, Escape closes it, and focus goes
+ * back where it came from. The panel is drawn on the GPU and dissolves in when it opens, over
+ * a dithered backdrop. Anything with data-piix-open="its id" opens it; anything inside with
+ * data-close closes it; so does clicking the backdrop.
+ *
+ *   open      open it (or call .show() / .close())
+ *   look      glow | chrome | glass | riso | crt              default: glow
+ *   palette   the colours of the light                    default: violet (or the look's own)
+ *   pixel     size of one pixel, px                       default: 3
+ *   width     any CSS length                              default: 520px
+ *
+ *   events: open, close */
+/* a 2 x 2 checker for the backdrop: it dims the page in pixels, not a flat sheet */
+let DLG_DITHER = '';
+const dlgDither = () => {
+  if (DLG_DITHER) return DLG_DITHER;
+  const c = document.createElement('canvas'); c.width = c.height = 2;
+  const g = c.getContext('2d'); g.fillStyle = 'rgba(6,4,12,.62)'; g.fillRect(0, 0, 1, 1); g.fillRect(1, 1, 1, 1);
+  return (DLG_DITHER = c.toDataURL());
+};
+/* focus an element, or the real control inside a Pixel UI one */
+const dlgFocus = el => { const inner = el.shadowRoot && el.shadowRoot.querySelector('button,input,[tabindex]'); (inner || el).focus(); };
+class PiixDialogElement extends GLStage {
+  static get observedAttributes() { return [...GLStage.observedAttributes, 'open', 'width']; }
+  get _defPal() { const l = glLook(this); return l === 'glow' ? 'violet' : GL_LOOKS[l][0]; }
+  constructor() { super(); this._defPx = 3; this._introLen = .4; this._click = [.5, .5, -9]; this._open = false; }
+  connectedCallback() {
+    super.connectedCallback();
+    /* anything on the page with data-piix-open="my id" opens me */
+    document.addEventListener('click', this._opener = e => {
+      const t = e.target.closest && e.target.closest('[data-piix-open]');
+      if (t && this.id && t.getAttribute('data-piix-open') === this.id) { this._from = t; this.show(); }
+    });
+    if (this.hasAttribute('open')) requestAnimationFrame(() => this.show());
+  }
+  disconnectedCallback() { super.disconnectedCallback(); document.removeEventListener('click', this._opener); }
+  attributeChangedCallback(n, a, b) {
+    if (n === 'open') { if (this._dlg) b === null ? this.close() : this.show(); return; }
+    super.attributeChangedCallback(n, a, b);
+  }
+  _hostCss() { return 'display:contents'; }
+  _css() {
+    const l = glLook(this), txt = l === 'glow' ? 'color:#f2eef8' : GL_LOOK_TEXT[l](this._pal.list);
+    return `dialog{position:fixed;inset:0;margin:auto;padding:0;border:0;background:transparent;color:inherit;width:min(${this.getAttribute('width') || '520px'},calc(100vw - 32px));max-height:calc(100vh - 48px);overflow:visible;${glLookHost(l)}}
+dialog::backdrop{background:url(${dlgDither()}) 0 0/4px 4px;image-rendering:pixelated;animation:piixbd .24s steps(3)}
+dialog[open]{animation:piixpop .22s steps(3)}
+@keyframes piixbd{from{opacity:0}}
+@keyframes piixpop{from{transform:translateY(10px) scale(.96)}}
+.in{position:relative;padding:34px 30px 28px;max-height:calc(100vh - 48px);overflow:auto;box-sizing:border-box;font:400 16px/1.5 "Bricolage Grotesque",system-ui,sans-serif;${txt}}
+::slotted(h2),::slotted(h3){margin:0 0 .35em!important;font-size:26px!important;font-weight:800!important;letter-spacing:-.03em;line-height:1.05;color:inherit}
+::slotted(p){margin:0 0 1.1em!important;opacity:.85}
+.x{all:unset;position:absolute;z-index:2;top:12px;right:14px;width:30px;height:30px;display:grid;place-items:center;font:400 14px/1 ${KIT_FONT};color:inherit;cursor:pointer;opacity:.7}
+.x:hover{opacity:1}
+.x:focus-visible{outline:2px dashed currentColor;outline-offset:2px}
+@media (prefers-reduced-motion:reduce){dialog[open],dialog::backdrop{animation:none}}`;
+  }
+  _html() { return '<dialog part="dialog"><canvas aria-hidden="true"></canvas><div class="in" part="content"><slot></slot></div><button class="x" type="button" part="close" aria-label="Close">X</button></dialog>'; }
+  _box() { return this._dlg || this; }
+  _setup() {
+    const d = this._dlg = this.shadowRoot.querySelector('dialog');
+    const h = this.querySelector('h1,h2,h3');
+    if (h) { if (!h.id) h.id = 'piix-dlg-' + Math.random().toString(36).slice(2, 8); d.setAttribute('aria-label', h.textContent.trim()); }
+    d.addEventListener('close', () => {
+      this._open = false; this.removeAttribute('open');
+      if (this._from && this._from.isConnected) dlgFocus(this._from);
+      this._from = null;
+      this.dispatchEvent(new Event('close'));
+    });
+    /* the backdrop is the dialog itself, outside its box */
+    d.addEventListener('click', e => {
+      const r = d.getBoundingClientRect();
+      if (e.target === d && (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom)) this.close();
+    });
+    d.addEventListener('pointerdown', e => { const r = d.getBoundingClientRect(); this._click = [(e.clientX - r.left) / r.width, 1 - (e.clientY - r.top) / r.height, now()]; });
+    this.shadowRoot.querySelector('.x').addEventListener('click', () => this.close());
+    this.addEventListener('click', e => { if (e.target.closest('[data-close]')) this.close(); });
+    new ResizeObserver(() => this._fit()).observe(d);
+    if (this._open) { this._open = false; this.show(); }
+  }
+  show() {
+    const d = this._dlg;
+    if (!d || d.open) return;
+    if (!this._from) this._from = document.activeElement;
+    d.showModal();
+    this._open = true; this._seen = now(); this._fit();
+    if (!this.hasAttribute('open')) this.setAttribute('open', '');
+    /* focus the first thing inside you can use, else the close button */
+    const f = this.querySelector('[autofocus],input,select,textarea,button,a[href],[tabindex]:not([tabindex="-1"]),piix-glow-button,piix-button');
+    dlgFocus(f || this.shadowRoot.querySelector('.x'));
+    this.dispatchEvent(new Event('open'));
+  }
+  close() { const d = this._dlg; if (d && d.open) d.close(); }
+  _tick(dt) { if (this._open) this._vis = true; super._tick(dt); }
+  _skip() { return !this._open; }
+  _shader() { return GL_LOOKS[glLook(this)][1]; }
+  _uniforms() { return { u_k: [this._click[0], this._click[1], (now() - this._click[2]) / 1000, 1], u_j: [.03, 0, 0, 0] }; }
+}
+define('piix-dialog', PiixDialogElement);
+ELEMENTS.dialog = 'piix-dialog';
+
 /* ---- gl/divider.js ---- */
 /* DIVIDER: a moving pixel edge between two sections.   @component divider
  *
@@ -11682,6 +11895,118 @@ class PiixDividerElement extends GLStage {
 }
 define('piix-divider', PiixDividerElement);
 ELEMENTS.divider = 'piix-divider';
+
+/* ---- gl/flap.js ---- */
+/* FLAP: a split-flap board, like a station departures sign.   @component flap
+ *
+ *   <piix-flap text="NOW BOARDING"></piix-flap>
+ *   <piix-flap countdown="2026-12-31T00:00:00"></piix-flap>
+ *
+ * Every tile riffles through the alphabet, flap by flap, until it lands on its letter, each a
+ * beat after the one before, with that clatter of little cards. Change the text and it flips
+ * again. With a countdown it shows days, hours, minutes and seconds and keeps ticking.
+ * It sizes from the font size you give it; screen readers just get the words.
+ *
+ *   text      what it says (letters, digits, spaces and : . - / ! ? ' & +)
+ *   length    pad it to this many tiles
+ *   countdown a date and time to count down to
+ *   theme     dark | light | amber                          default: dark */
+const FLAP_SET = " ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:.-/!?'&+";
+const FLAP_THEMES = { dark: ['#17121f', '#211a2c', '#f4efe2', '#000'], light: ['#f4efe2', '#e7e0d0', '#17121f', '#b8ae9a'], amber: ['#1a1208', '#24190a', '#ffb43a', '#000'] };
+class PiixFlapElement extends HTMLElement {
+  static get observedAttributes() { return ['text', 'length', 'countdown', 'theme']; }
+  constructor() { super(); this.attachShadow({ mode: 'open' }); this._cur = []; }
+  connectedCallback() { this._build(); }
+  disconnectedCallback() { clearInterval(this._cd); this._timers && this._timers.forEach(clearTimeout); }
+  attributeChangedCallback(n) { if (!this.shadowRoot.firstChild) return; if (n === 'theme') this._build(); else this._run(); }
+  _build() {
+    const [bg, bg2, fg, line] = FLAP_THEMES[this.getAttribute('theme')] || FLAP_THEMES.dark;
+    this.shadowRoot.innerHTML = `<style>
+:host{display:inline-block;font-size:clamp(22px,5vw,56px);line-height:1}
+.row{display:flex;gap:.12em;flex-wrap:wrap}
+.g{display:inline-flex;flex-direction:column;align-items:center;gap:.25em}
+.g small{font:400 max(10px,.2em)/1 "Silkscreen",ui-monospace,monospace;letter-spacing:.08em;opacity:.6}
+.gs{display:flex;gap:.08em}
+.sep{align-self:flex-start;padding:.18em .02em 0;font:400 1em/1 "Silkscreen",ui-monospace,monospace;color:${fg};opacity:.6}
+.t{position:relative;width:.78em;height:1.16em;font:400 1em/1.16 "Silkscreen",ui-monospace,monospace;color:${fg};text-align:center;perspective:3em}
+.t span{position:absolute;left:0;right:0;height:50%;overflow:hidden;background:${bg};clip-path:polygon(0 3px,3px 3px,3px 0,calc(100% - 3px) 0,calc(100% - 3px) 3px,100% 3px,100% 100%,0 100%)}
+.t span i{display:block;font-style:normal;height:200%}
+.t .up,.t .fu{top:0}
+.t .dn,.t .fd{bottom:0;background:${bg2};clip-path:polygon(0 0,100% 0,100% calc(100% - 3px),calc(100% - 3px) calc(100% - 3px),calc(100% - 3px) 100%,3px 100%,3px calc(100% - 3px),0 calc(100% - 3px))}
+.t .dn i,.t .fd i{transform:translateY(-50%)}
+.t .fu{transform-origin:50% 100%;z-index:2;backface-visibility:hidden}
+.t .fd{transform-origin:50% 0;z-index:2;transform:rotateX(90deg);backface-visibility:hidden}
+.t.go .fu{animation:fu var(--s) steps(3) forwards}
+.t.go .fd{animation:fd var(--s) steps(3) var(--s) forwards}
+@keyframes fu{to{transform:rotateX(-90deg)}}
+@keyframes fd{to{transform:rotateX(0)}}
+.t::after{content:"";position:absolute;left:0;right:0;top:50%;height:2px;margin-top:-1px;background:${line};z-index:3;opacity:.7}
+</style><div class="row" part="board" aria-hidden="true"></div>`;
+    this._row = this.shadowRoot.querySelector('.row');
+    this._cur = [];
+    this._run();
+  }
+  /* the words to show, as tile groups */
+  _target() {
+    const cd = this.getAttribute('countdown');
+    if (cd) {
+      const ms = Math.max(0, new Date(cd).getTime() - Date.now()), s = Math.floor(ms / 1000);
+      const p = n => String(n).padStart(2, '0');
+      return { groups: [[p(Math.min(99, Math.floor(s / 86400))), 'DAYS'], [p(Math.floor(s / 3600) % 24), 'HRS'], [p(Math.floor(s / 60) % 60), 'MIN'], [p(s % 60), 'SEC']], label: `${Math.floor(s / 86400)} days ${Math.floor(s / 3600) % 24} hours ${Math.floor(s / 60) % 60} minutes left` };
+    }
+    let t = (this.getAttribute('text') || '').toUpperCase().split('').map(c => FLAP_SET.includes(c) ? c : ' ').join('');
+    const n = +this.getAttribute('length') || 0;
+    if (n > t.length) t = t.padEnd(n, ' ');
+    return { groups: [[t, '']], label: this.getAttribute('text') || '' };
+  }
+  _run() {
+    const { groups, label } = this._target(), cd = this.hasAttribute('countdown');
+    this.setAttribute('role', cd ? 'timer' : 'img');
+    this.setAttribute('aria-label', label);
+    const chars = groups.map(g => g[0]).join('');
+    /* rebuild the tiles if the shape changed */
+    if (this._shape !== groups.map(g => g[0].length + g[1]).join('|')) {
+      this._shape = groups.map(g => g[0].length + g[1]).join('|');
+      this._row.innerHTML = groups.map(([s, lab], gi) => `${gi && cd ? '<span class="sep">:</span>' : ''}<span class="g"><span class="gs">${[...s].map(() => '<span class="t"><span class="up"><i> </i></span><span class="dn"><i> </i></span><span class="fu"><i> </i></span><span class="fd"><i> </i></span></span>').join('')}</span>${lab ? `<small>${lab}</small>` : ''}</span>`).join('');
+      this._tiles = [...this._row.querySelectorAll('.t')];
+      this._cur = this._tiles.map(() => ' ');
+    }
+    (this._timers || []).forEach(clearTimeout); this._timers = [];
+    [...chars].forEach((ch, i) => this._flipTo(i, ch, cd ? 0 : i * 70));
+    clearInterval(this._cd);
+    if (cd) this._cd = setInterval(() => this._run(), 1000);
+  }
+  /* step one tile through the set until it reaches ch */
+  _flipTo(i, ch, delay) {
+    const tile = this._tiles[i];
+    if (!tile) return;
+    if (reduced()) { this._paint(tile, ch, ch); this._cur[i] = ch; return; }
+    const step = () => {
+      const cur = this._cur[i];
+      if (cur === ch) return;
+      /* a countdown flips straight to the next digit; words riffle, but never more than a dozen flaps */
+      const ci = FLAP_SET.indexOf(cur), ti = FLAP_SET.indexOf(ch), dist = (ti - ci + FLAP_SET.length) % FLAP_SET.length;
+      const next = this.hasAttribute('countdown') ? ch : FLAP_SET[dist > 12 ? (ti - 12 + FLAP_SET.length) % FLAP_SET.length : (ci + 1) % FLAP_SET.length];
+      const fast = this.hasAttribute('countdown') ? 90 : 46;
+      this._paint(tile, cur, next, fast);
+      this._cur[i] = next;
+      this._timers.push(setTimeout(step, fast * 2));
+    };
+    this._timers.push(setTimeout(step, delay));
+  }
+  /* show one flip from a to b */
+  _paint(tile, a, b, ms = 46) {
+    const [up, dn, fu, fd] = tile.children;
+    up.firstChild.textContent = b; dn.firstChild.textContent = a;
+    fu.firstChild.textContent = a; fd.firstChild.textContent = b;
+    tile.style.setProperty('--s', ms + 'ms');
+    tile.classList.remove('go'); void tile.offsetWidth; tile.classList.add('go');
+    clearTimeout(tile._done);
+    tile._done = setTimeout(() => { dn.firstChild.textContent = b; fu.firstChild.textContent = b; tile.classList.remove('go'); }, ms * 2);
+  }
+}
+define('piix-flap', PiixFlapElement);
+ELEMENTS.flap = 'piix-flap';
 
 /* ---- gl/glowbutton.js ---- */
 /* GLOW BUTTON: a button with light running round its pixel border.   @component glow-button
@@ -11857,7 +12182,7 @@ class PiixInputElement extends GLStage {
     const l = this._pal.list;
     return `label{display:block;margin-bottom:8px;font:400 12px/1 ${KIT_FONT};text-transform:uppercase;letter-spacing:.06em;color:inherit;opacity:.8}
 .box{position:relative;${glLookHost(glLook(this))}}
-input{all:unset;position:relative;z-index:1;box-sizing:border-box;width:100%;padding:15px 18px;font:500 16px/1.2 "Bricolage Grotesque",system-ui,sans-serif;${glLook(this) === 'glow' ? 'color:#f2eef8' : GL_LOOK_TEXT[glLook(this)](l).replace(/text-transform:uppercase;?/, '')};caret-color:${l[l.length - 2]}}
+input{all:unset;position:relative;z-index:1;box-sizing:border-box;width:100%;padding:15px 18px;font:500 16px/1.2 "Bricolage Grotesque",system-ui,sans-serif;${glLook(this) === 'glow' ? 'color:#f2eef8' : GL_LOOK_TEXT[glLook(this)](l)};caret-color:${l[l.length - 2]}}
 input::placeholder{color:#8e869c}
 :host([disabled]){opacity:.5}`;
   }
@@ -11893,6 +12218,48 @@ input::placeholder{color:#8e869c}
 }
 define('piix-input', PiixInputElement);
 ELEMENTS.input = 'piix-input';
+
+/* ---- gl/kbd.js ---- */
+/* KBD: a pixel keycap that presses down when you press the real key.   @component kbd
+ *
+ *   Press <piix-kbd>⌘</piix-kbd> <piix-kbd>K</piix-kbd> to search
+ *
+ * A chunky keycap with a lit top face and a skirt underneath. Press that key on your keyboard
+ * and it goes down with you, and comes back up when you let go. Great for shortcut hints,
+ * onboarding and docs. It reads as normal keyboard text for screen readers.
+ *
+ *   key       the key to listen for, if the label isn't it (Enter, Escape, ArrowUp, " "…)
+ *   theme     light | dark | lime                              default: light
+ *   size      sm | md | lg                                     default: md */
+const KBD_KEYS = { '⌘': 'Meta', '⌃': 'Control', '⇧': 'Shift', '⌥': 'Alt', '↵': 'Enter', '⏎': 'Enter', '⎋': 'Escape', '⇥': 'Tab', '⌫': 'Backspace', '↑': 'ArrowUp', '↓': 'ArrowDown', '←': 'ArrowLeft', '→': 'ArrowRight', space: ' ', esc: 'Escape', ctrl: 'Control', cmd: 'Meta', alt: 'Alt', opt: 'Alt', shift: 'Shift', enter: 'Enter', return: 'Enter', tab: 'Tab' };
+const KBD_THEMES = { light: ['#fbf8f2', '#d9d0bf', '#17121f'], dark: ['#2a2236', '#120e18', '#f2eef8'], lime: ['#c6f432', '#6f8f12', '#17121f'] };
+class PiixKbdElement extends HTMLElement {
+  static get observedAttributes() { return ['theme', 'size']; }
+  constructor() { super(); this.attachShadow({ mode: 'open' }); }
+  connectedCallback() {
+    this._build();
+    const want = () => { const k = this.getAttribute('key') || this.textContent.trim(); return KBD_KEYS[k] || KBD_KEYS[k.toLowerCase()] || k; };
+    const match = e => { const w = want(); return e.key === w || (w.length === 1 && e.key.toLowerCase() === w.toLowerCase()); };
+    addEventListener('keydown', this._kd = e => { if (match(e)) this.toggleAttribute('data-down', true); });
+    addEventListener('keyup', this._ku = e => { if (match(e) || e.key === 'Meta') this.removeAttribute('data-down'); });
+    addEventListener('blur', this._bl = () => this.removeAttribute('data-down'));
+  }
+  disconnectedCallback() { removeEventListener('keydown', this._kd); removeEventListener('keyup', this._ku); removeEventListener('blur', this._bl); }
+  attributeChangedCallback() { if (this.shadowRoot.firstChild) this._build(); }
+  _build() {
+    const [top, skirt, ink] = KBD_THEMES[this.getAttribute('theme')] || KBD_THEMES.light;
+    const [fs, h, pad] = { sm: [11, 3, '4px 7px 5px'], lg: [17, 5, '8px 13px 9px'] }[this.getAttribute('size')] || [13, 4, '6px 10px 7px'];
+    this.shadowRoot.innerHTML = `<style>
+:host{display:inline-block;vertical-align:middle;margin:0 1px;padding-bottom:${h}px}
+kbd{display:inline-block;min-width:1.1em;padding:${pad};text-align:center;font:400 ${fs}px/1 "Silkscreen","Segoe UI Symbol","Apple Symbols",ui-monospace,monospace;color:${ink};background:${top};
+  box-shadow:inset 0 0 0 2px ${ink},inset 0 -${h}px 0 ${skirt},0 ${h}px 0 0 ${ink};clip-path:polygon(0 2px,2px 2px,2px 0,calc(100% - 2px) 0,calc(100% - 2px) 2px,100% 2px,100% calc(100% + ${h}px),0 calc(100% + ${h}px));
+  transform:translateY(0);transition:transform 40ms steps(1),box-shadow 40ms steps(1)}
+:host([data-down]) kbd{transform:translateY(${h - 1}px);box-shadow:inset 0 0 0 2px ${ink},inset 0 -1px 0 ${skirt},0 1px 0 0 ${ink}}
+</style><kbd part="key"><slot></slot></kbd>`;
+  }
+}
+define('piix-kbd', PiixKbdElement);
+ELEMENTS.kbd = 'piix-kbd';
 
 /* ---- gl/loader.js ---- */
 /* LOADER: little pixel loaders drawn on the GPU.   @component loader
@@ -12575,6 +12942,103 @@ class PiixShaderElement extends GLStage {
 define('piix-shader', PiixShaderElement);
 ELEMENTS.shader = 'piix-shader';
 
+/* ---- gl/slider.js ---- */
+/* SLIDER: a range input whose track is lit on the GPU.   @component slider
+ *
+ *   <piix-slider name="volume" value="40">Volume</piix-slider>
+ *
+ * The filled part of the track glows through the palette with a slow shimmer; the head is a
+ * bright pixel block with a halo, and dragging it fast throws sparks behind it. While you drag
+ * (or have it focused) its value floats above the head. Whatever you put inside is its label.
+ * A real slider: arrow keys, Page Up/Down, Home and End move it, screen readers hear it, and it
+ * sends its value with the form it's in.
+ *
+ *   value, min, max, step                                  default: 50, 0, 100, 1
+ *   name      the form field name
+ *   suffix    shown after the value, like % or px
+ *   palette   the colours of the light                    default: lime
+ *   pixel     size of one pixel, px                       default: 3
+ *   disabled
+ *
+ *   events: input, change */
+const SL_SHADER = `vec4 effect(vec2 uv,vec2 cell){
+  float f=u_k.x,sp=u_k.y,mid=abs(uv.y-.5)*2.,hx=(uv.x-f)*u_res.x;
+  vec4 c=vec4(0.);
+  if(mid<.45){
+    if(uv.x<f){float v=.35+.45*uv.x/max(f,.01)+.12*sin(cell.x*.5-u_time*6.);c=vec4(dpal(v,cell),1.);}
+    else c=vec4(dpal(.07+.07*step(mod(cell.x,6.),.5)*step(mid,.2),cell),1.);}
+  float g=exp(-abs(hx)*.22)*(1.-mid*.8)*(.35+.65*u_hover);
+  if(c.a==0.&&g>bayer8(cell)*.8+.03)c=vec4(dpal(.75,cell),1.);
+  if(hx<0.&&sp>.02&&hash(floor(cell/1.)+floor(u_time*24.))>1.-sp*.5*exp(hx*.08)&&mid<.95)c=vec4(dpal(1.,cell),1.);
+  if(abs(hx)<2.5&&mid<.95)c=vec4(dpal(.92+.08*u_hover,cell),1.);
+  return c;}`;
+class PiixSliderElement extends GLStage {
+  static get formAssociated() { return true; }
+  static get observedAttributes() { return [...GLStage.observedAttributes, 'value', 'min', 'max', 'step', 'disabled', 'suffix']; }
+  constructor() { super(); this._defPx = 3; this._defPal = 'lime'; this._int = this.attachInternals ? this.attachInternals() : null; this._f = -1; this._sp = 0; }
+  attributeChangedCallback(n, a, b) {
+    if (n === 'value' || n === 'min' || n === 'max' || n === 'step' || n === 'suffix') { if (this._track) this._sync(); return; }
+    super.attributeChangedCallback(n, a, b);
+  }
+  get min() { return +this.getAttribute('min') || 0; }
+  get max() { return this.hasAttribute('max') ? +this.getAttribute('max') : 100; }
+  get step() { return +this.getAttribute('step') || 1; }
+  get value() { const v = this.hasAttribute('value') ? +this.getAttribute('value') : (this.min + this.max) / 2; return clamp(v, this.min, this.max); }
+  set value(v) { this.setAttribute('value', this._snap(v)); }
+  _snap(v) { const s = this.step, d = (String(s).split('.')[1] || '').length; return +clamp(Math.round((v - this.min) / s) * s + this.min, this.min, this.max).toFixed(d); }
+  _hostCss() { return 'display:block'; }
+  _css() {
+    const l = this._pal.list;
+    return `label{display:flex;justify-content:space-between;margin-bottom:10px;font:400 12px/1 ${KIT_FONT};text-transform:uppercase;letter-spacing:.06em;opacity:.8}
+.track{position:relative;height:30px;cursor:pointer;touch-action:none;outline:none}
+.track:focus-visible{outline:2px dashed ${l[l.length - 2]};outline-offset:6px}
+.val{position:absolute;bottom:calc(100% + 8px);transform:translateX(-50%);padding:5px 7px 6px;background:${l[l.length - 1]};color:${l[0]};font:400 11px/1 ${KIT_FONT};clip-path:${kitCorners(2)};opacity:0;transition:opacity .15s;pointer-events:none;white-space:nowrap}
+.track.live .val{opacity:1}
+:host([disabled]){opacity:.45;pointer-events:none}`;
+  }
+  _html() { return '<label part="label"><span><slot></slot></span><output part="output"></output></label><div class="track" role="slider" tabindex="0" part="track"><canvas aria-hidden="true"></canvas><span class="val" aria-hidden="true"></span></div>'; }
+  _box() { return this.shadowRoot.querySelector('.track'); }
+  _setup() {
+    const t = this._track = this._box();
+    if (this._initial === undefined) this._initial = this.getAttribute('value');
+    t.setAttribute('aria-label', this.textContent.trim() || this.getAttribute('name') || 'Value');
+    const at = e => { const r = t.getBoundingClientRect(); return this.min + clamp((e.clientX - r.left) / r.width, 0, 1) * (this.max - this.min); };
+    const set = (v, fire) => { const was = this.value; this.value = v; if (this.value !== was) this.dispatchEvent(new Event('input', { bubbles: true, composed: true })); if (fire) this.dispatchEvent(new Event('change', { bubbles: true })); };
+    t.addEventListener('pointerdown', e => { if (this.hasAttribute('disabled')) return; t.setPointerCapture(e.pointerId); this._drag = true; t.classList.add('live'); set(at(e)); t.focus(); });
+    t.addEventListener('pointermove', e => { if (this._drag) set(at(e)); });
+    const up = () => { if (!this._drag) return; this._drag = false; if (document.activeElement !== this) t.classList.remove('live'); this.dispatchEvent(new Event('change', { bubbles: true })); };
+    t.addEventListener('pointerup', up); t.addEventListener('pointercancel', up);
+    t.addEventListener('focus', () => t.classList.add('live'));
+    t.addEventListener('blur', () => { if (!this._drag) t.classList.remove('live'); });
+    t.addEventListener('keydown', e => {
+      const s = this.step, big = Math.max(s, (this.max - this.min) / 10);
+      const v = { ArrowRight: this.value + s, ArrowUp: this.value + s, ArrowLeft: this.value - s, ArrowDown: this.value - s, PageUp: this.value + big, PageDown: this.value - big, Home: this.min, End: this.max }[e.key];
+      if (v == null) return;
+      e.preventDefault(); set(v, true);
+    });
+    this._sync();
+  }
+  _sync() {
+    const t = this._track, v = this.value, sfx = this.getAttribute('suffix') || '', k = (v - this.min) / ((this.max - this.min) || 1);
+    t.setAttribute('aria-valuemin', this.min); t.setAttribute('aria-valuemax', this.max); t.setAttribute('aria-valuenow', v); t.setAttribute('aria-valuetext', v + sfx);
+    this.shadowRoot.querySelector('output').textContent = v + sfx;
+    const val = this.shadowRoot.querySelector('.val'); val.textContent = v + sfx; val.style.left = (k * 100) + '%';
+    if (this._int) this._int.setFormValue(String(v));
+  }
+  formResetCallback() { this._initial == null ? this.removeAttribute('value') : this.setAttribute('value', this._initial); }
+  _shader() { return SL_SHADER; }
+  _uniforms(T, dt) {
+    /* the head eases to the value; how fast it moved makes the sparks */
+    const k = (this.value - this.min) / ((this.max - this.min) || 1);
+    if (this._f < 0 || reduced()) this._f = k;
+    const was = this._f; this._f = lerp(this._f, k, Math.min(1, dt * 14));
+    this._sp = lerp(this._sp, Math.min(1, Math.abs(this._f - was) / Math.max(dt, .001) * .6), .3);
+    return { u_k: [this._f, this._sp, 0, 0], u_hover: Math.max(this._hov, this._drag ? 1 : 0) };
+  }
+}
+define('piix-slider', PiixSliderElement);
+ELEMENTS.slider = 'piix-slider';
+
 /* ---- gl/stat.js ---- */
 /* STAT: a big number that counts up in pixel type when it scrolls into view.   @component stat
  *
@@ -12776,6 +13240,189 @@ class PiixTextElement extends GLStage {
 }
 define('piix-text', PiixTextElement);
 ELEMENTS.text = 'piix-text';
+
+/* ---- gl/toast.js ---- */
+/* TOAST: notifications with a pixel fuse that burns down while they're up.   @component toast
+ *
+ *   Piixpal.toast('Saved');
+ *   Piixpal.toast('Deploy finished', { tone: 'ok', title: 'Production', action: { label: 'Open', onClick } });
+ *   Piixpal.toast('Card declined', { tone: 'error' });
+ *
+ * Toasts slide in from the corner in a few chunky steps. Along the bottom, a thin pixel fuse
+ * burns down with a flickering spark at its tip; when it runs out the toast wipes away. Hover
+ * (or focus) one and the fuse stops. They stack, newest nearest the corner, and screen readers
+ * hear them (errors straight away, the rest politely).
+ *
+ * Put a <piix-toaster> on the page to choose where and how they appear; one is added for you
+ * otherwise.
+ *
+ *   options   tone: info | ok | warn | error      title      duration (seconds, 0 = stay)
+ *             action: { label, onClick }
+ *   toaster   position: bottom-right | bottom-left | top-right | top-left | bottom | top
+ *             theme: dark | light
+ *
+ *   returns   { close() } */
+const TOAST_TONES = {
+  info: ['#58c8ff', '<path d="M3 1h2v1H3zM3 3h2v4H3z"/>'],
+  ok: ['#9be15d', '<path d="M6 1h1v2H6zM5 3h1v1H5zM4 4h1v1H4zM1 4h1v1H1zM2 5h1v1H2zM3 6h1v1H3z"/>'],
+  warn: ['#ffcc55', '<path d="M3 1h2v4H3zM3 6h2v1H3z"/>'],
+  error: ['#ff6b5e', '<path d="M1 1h2v1H1zM5 1h2v1H5zM2 2h1v1H2zM5 2h1v1H5zM3 3h2v2H3zM2 5h1v1H2zM5 5h1v1H5zM1 6h2v1H1zM5 6h2v1H5z"/>']
+};
+class PiixToasterElement extends HTMLElement {
+  static get observedAttributes() { return ['position', 'theme']; }
+  constructor() { super(); this.attachShadow({ mode: 'open' }); }
+  connectedCallback() { this._build(); }
+  attributeChangedCallback() { if (this.shadowRoot.firstChild) this._build(); }
+  _build() {
+    const pos = this.getAttribute('position') || 'bottom-right', top = pos.startsWith('top'), light = this.getAttribute('theme') === 'light';
+    const x = pos.endsWith('left') ? 'left:16px' : pos === 'top' || pos === 'bottom' ? 'left:50%;transform:translateX(-50%)' : 'right:16px';
+    const keep = this._list ? [...this._list.children] : [];
+    this.shadowRoot.innerHTML = `<style>
+:host{position:fixed;z-index:2147483000;${top ? 'top' : 'bottom'}:16px;${x};pointer-events:none}
+ol{display:flex;flex-direction:${top ? 'column' : 'column-reverse'};gap:10px;margin:0;padding:0;list-style:none;width:min(380px,calc(100vw - 32px));filter:drop-shadow(0 10px 22px rgba(0,0,0,.3))}
+li{--tone:#58c8ff;position:relative;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:start;padding:14px 14px 18px;pointer-events:auto;
+  background:${light ? '#fbf8f2' : '#17121f'};color:${light ? '#17121f' : '#f2eef8'};box-shadow:inset 0 0 0 2px ${light ? '#17121f' : '#2c2438'};
+  clip-path:${kitCorners(3)};font:400 14.5px/1.45 "Bricolage Grotesque",system-ui,sans-serif;animation:tin .28s steps(4) both}
+li.out{animation:tout .3s steps(4) forwards}
+@keyframes tin{from{transform:translateX(${pos.endsWith('left') ? '-' : ''}40px);opacity:0}}
+@keyframes tout{to{clip-path:inset(0 0 0 100%);opacity:.3}}
+.ico{width:22px;height:22px;display:grid;place-items:center;background:var(--tone);color:#17121f;clip-path:${kitCorners(2)}}
+.ico svg{width:12px;height:12px;shape-rendering:crispEdges}
+b{display:block;font-weight:650;font-size:15px;line-height:1.3}
+.msg{opacity:${light ? '.75' : '.8'}}
+.act{all:unset;margin-top:8px;display:inline-block;font-weight:650;font-size:13.5px;color:var(--tone);cursor:pointer;border-bottom:2px solid currentColor}
+.act:focus-visible,.x:focus-visible{outline:2px dashed var(--tone);outline-offset:3px}
+.x{all:unset;width:22px;height:22px;display:grid;place-items:center;font:400 11px/1 ${KIT_FONT};opacity:.5;cursor:pointer}
+.x:hover{opacity:1}
+.fuse{position:absolute;left:14px;right:14px;bottom:8px;height:3px;background:repeating-linear-gradient(90deg,${light ? '#17121f22' : '#ffffff1f'} 0 3px,transparent 3px 6px)}
+.fuse i{position:absolute;inset:0 auto 0 0;width:100%;background:var(--tone);animation:burn var(--d) linear forwards}
+.fuse i::after{content:"";position:absolute;right:-3px;top:-3px;width:6px;height:6px;background:#fff6c8;box-shadow:0 0 0 1px #ffb03a;animation:spark .12s steps(2) infinite}
+li:hover .fuse i,li:focus-within .fuse i,li:hover .fuse i::after,li:focus-within .fuse i::after{animation-play-state:paused}
+@keyframes burn{to{width:0}}
+@keyframes spark{50%{transform:translate(1px,-2px) scale(.6);background:#ffb03a}}
+@media (prefers-reduced-motion:reduce){li,li.out{animation:none}.fuse i::after{animation:none}}
+</style><ol part="list" role="region" aria-label="Notifications"></ol>`;
+    this._list = this.shadowRoot.querySelector('ol');
+    keep.forEach(k => this._list.appendChild(k));
+  }
+  /* add one; returns { close } */
+  push(message, o = {}) {
+    const [tone, glyph] = TOAST_TONES[o.tone] || TOAST_TONES.info, dur = o.duration == null ? 4.5 : +o.duration;
+    const li = document.createElement('li');
+    li.style.setProperty('--tone', tone); li.style.setProperty('--d', dur + 's');
+    li.setAttribute('role', o.tone === 'error' ? 'alert' : 'status');
+    const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    li.innerHTML = `<span class="ico" aria-hidden="true"><svg viewBox="0 0 8 8" fill="currentColor">${glyph}</svg></span>
+<div>${o.title ? `<b>${esc(o.title)}</b>` : ''}<div class="msg">${esc(message)}</div>${o.action ? `<button class="act" type="button">${esc(o.action.label)}</button>` : ''}</div>
+<button class="x" type="button" aria-label="Dismiss">X</button>${dur > 0 ? '<span class="fuse" aria-hidden="true"><i></i></span>' : ''}`;
+    let gone = false;
+    const close = () => {
+      if (gone) return; gone = true;
+      if (reduced()) { li.remove(); return; }
+      li.classList.add('out'); setTimeout(() => li.remove(), 320);
+    };
+    li.querySelector('.x').addEventListener('click', close);
+    if (o.action) li.querySelector('.act').addEventListener('click', () => { if (o.action.onClick) o.action.onClick(); close(); });
+    const fuse = li.querySelector('.fuse i');
+    if (fuse) fuse.addEventListener('animationend', e => { if (e.animationName === 'burn') close(); });
+    this._list.appendChild(li);
+    /* never more than five at once */
+    while (this._list.children.length > 5) this._list.firstElementChild.remove();
+    return { close };
+  }
+}
+define('piix-toaster', PiixToasterElement);
+Piixpal.toast = (message, o) => {
+  let t = document.querySelector('piix-toaster');
+  if (!t) { t = document.createElement('piix-toaster'); document.body.appendChild(t); }
+  return t.push(message, o);
+};
+ELEMENTS.toast = 'piix-toaster';
+
+/* ---- gl/tooltip.js ---- */
+/* TOOLTIP: a little pixel speech bubble that types its words out.   @component tooltip
+ *
+ *   <piix-tooltip tip="Copy link"><button>…</button></piix-tooltip>
+ *
+ * Hover or focus what's inside and a bubble pops up next to it, with a stepped pixel tail, and
+ * the text types itself in behind a blinking block cursor. It flips to the other side when
+ * there isn't room, sits above everything (no clipping by overflow), and Escape hides it.
+ * Screen readers get the tip as a description of the thing inside.
+ *
+ *   tip       the words
+ *   side      top | bottom                                 default: top
+ *   theme     dark | light                                 default: dark
+ *   delay     ms before it shows                           default: 150 */
+let TIP_N = 0;
+class PiixTooltipElement extends HTMLElement {
+  static get observedAttributes() { return ['tip', 'theme']; }
+  constructor() { super(); this.attachShadow({ mode: 'open' }); }
+  connectedCallback() {
+    const light = this.getAttribute('theme') === 'light', bg = light ? '#fbf8f2' : '#17121f', fg = light ? '#17121f' : '#f2eef8', ring = light ? '#17121f' : '#3a3049';
+    this.shadowRoot.innerHTML = `<style>
+:host{display:inline-block;position:relative}
+.tip{position:fixed;z-index:2147483001;left:0;top:0;box-sizing:border-box;width:max-content;padding:7px 11px 8px;max-width:260px;background:${bg};color:${fg};font:500 13px/1.35 "Bricolage Grotesque",system-ui,sans-serif;
+  box-shadow:inset 0 0 0 2px ${ring};clip-path:${kitCorners(2)};pointer-events:none;visibility:hidden;white-space:pre-wrap}
+.wrap{position:fixed;z-index:2147483001;left:0;top:0;pointer-events:none;filter:drop-shadow(0 6px 12px rgba(0,0,0,.25))}
+.wrap.on .tip{visibility:visible;animation:tpop .16s steps(2)}
+@keyframes tpop{from{transform:translateY(4px) scale(.94)}}
+.tail{position:fixed;width:12px;height:6px;visibility:hidden;display:block}
+.tail svg{display:block;width:12px;height:6px}
+.wrap.on .tail{visibility:visible}
+.wrap.below .tail{transform:scaleY(-1)}
+.cur{display:inline-block;width:.5em;height:1em;margin-left:1px;vertical-align:-2px;background:currentColor;animation:blink .8s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.wrap.on .tip{animation:none}.cur{display:none}}
+</style><slot></slot><div class="wrap" aria-hidden="true"><div class="tip" part="tip"></div><i class="tail"><svg viewBox="0 0 6 3" shape-rendering="crispEdges"><path fill="${ring}" d="M0 0h6v1H5v1H4v1H2V2H1V1H0z"/><path fill="${bg}" d="M1 0h4v1H4v1H2V1H1z"/></svg></i></div>`;
+    this._wrap = this.shadowRoot.querySelector('.wrap'); this._tip = this.shadowRoot.querySelector('.tip'); this._tail = this.shadowRoot.querySelector('.tail');
+    /* screen readers: describe the thing inside with a hidden copy of the tip */
+    this._desc = document.createElement('span');
+    this._desc.id = 'piix-tip-' + (++TIP_N);
+    this._desc.hidden = true;
+    this.appendChild(this._desc);
+    this._label();
+    const show = () => { clearTimeout(this._t); this._t = setTimeout(() => this.show(), +this.getAttribute('delay') || 150); };
+    const hide = () => { clearTimeout(this._t); this.hide(); };
+    this.addEventListener('pointerenter', show); this.addEventListener('pointerleave', hide);
+    this.addEventListener('focusin', show); this.addEventListener('focusout', hide);
+    this.addEventListener('keydown', e => { if (e.key === 'Escape') hide(); });
+    addEventListener('scroll', this._sh = () => this.hide(), { passive: true, capture: true });
+  }
+  disconnectedCallback() { removeEventListener('scroll', this._sh, { capture: true }); clearInterval(this._ty); }
+  attributeChangedCallback() { if (this._desc) { this._label(); if (this._wrap.classList.contains('on')) this.show(); } }
+  _label() {
+    this._desc.textContent = this.getAttribute('tip') || '';
+    const t = [...this.children].find(c => c !== this._desc);
+    if (t) t.setAttribute('aria-describedby', this._desc.id);
+  }
+  show() {
+    const text = this.getAttribute('tip') || '';
+    if (!text) return;
+    const tip = this._tip, w = this._wrap, r = this.getBoundingClientRect();
+    tip.style.width = ''; tip.textContent = text;
+    w.classList.add('on');
+    /* place it, flipping below if there's no room above */
+    const tr0 = tip.getBoundingClientRect(), tr = { width: tr0.width + 12, height: tr0.height }, gap = 10;
+    let below = this.getAttribute('side') === 'bottom' || r.top - tr.height - gap < 4;
+    if (below && r.bottom + tr.height + gap > innerHeight - 4) below = false;
+    const x = Math.round(Math.min(innerWidth - tr.width - 6, Math.max(6, r.left + r.width / 2 - tr.width / 2)));
+    const y = Math.round(below ? r.bottom + gap : r.top - tr.height - gap);
+    tip.style.width = Math.ceil(tr.width + 12) + 'px'; tip.style.left = x + 'px'; tip.style.top = y + 'px';
+    const tx = Math.round(r.left + r.width / 2 - 6);
+    this._tail.style.left = tx + 'px'; this._tail.style.top = (below ? y - 4 : y + tr.height - 2) + 'px';
+    w.classList.toggle('below', below);
+    /* type it in */
+    clearInterval(this._ty);
+    if (reduced()) return;
+    let i = 0;
+    tip.innerHTML = '<span></span><i class="cur"></i>';
+    const out = tip.firstChild;
+    this._ty = setInterval(() => { out.textContent = text.slice(0, ++i); if (i >= text.length) { clearInterval(this._ty); setTimeout(() => { const c = tip.querySelector('.cur'); if (c) c.remove(); }, 900); } }, 22);
+  }
+  hide() { clearInterval(this._ty); this._wrap.classList.remove('on'); }
+}
+define('piix-tooltip', PiixTooltipElement);
+ELEMENTS.tooltip = 'piix-tooltip';
 
 K.start(document.currentScript);
 })();
