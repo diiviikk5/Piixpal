@@ -13,7 +13,7 @@
  * paragraphs and buttons get hero-sized type.
  *
  *   kind      mesh | warp | aurora | crystal | liquid | horizon | nebula | topo | dots | fire   default: mesh
- *   scene     use an illustrated scene instead: sakura | alps | lake | galaxy | rays | vortex | porthole | poppies | castle | vista
+ *   scene     use an illustrated scene instead: sakura | alps | lake | galaxy | rays | vortex | train | poppies | castle | vista
  *   palette   any palette name or your own colours        default: the kind's own
  *   pixel     size of one background pixel, px             default: 5
  *   align     center | left                                default: center
