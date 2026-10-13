@@ -13,7 +13,7 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "dev": "node scripts/serve.mjs",
-    "docs": "node scripts/docs.mjs",
+    "docs": "node scripts/docs.mjs && node scripts/ui-docs.mjs",
     "registry": "node scripts/registry.mjs"
   },
   "keywords": [
