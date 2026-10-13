@@ -78,7 +78,7 @@ const SH_KINDS = {
 class PiixShaderElement extends GLStage {
   get kind() { const k = this.getAttribute('kind'); return SH_KINDS[k] ? k : 'mesh'; }
   get _defPal() { return SH_KINDS[this.kind][0]; }
-  _hostCss() { return this.hasAttribute('fill') || this.getAttribute('height') ? '' : 'height:360px;'; }
+  _hostCss() { return (this.hasAttribute('fill') ? '' : 'width:100%;') + (this.hasAttribute('fill') || this.getAttribute('height') ? '' : 'height:360px;'); }
   _setup() { if (!this.hasAttribute('aria-label') && !this.hasAttribute('fill')) { this.setAttribute('role', 'img'); this.setAttribute('aria-label', `An animated ${this.kind} background`); } if (this.hasAttribute('fill')) this.setAttribute('aria-hidden', 'true'); }
   _shader() { return SH_KINDS[this.kind][1]; }
 }
