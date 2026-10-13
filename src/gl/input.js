@@ -24,7 +24,7 @@ class PiixInputElement extends GLStage {
     const l = this._pal.list;
     return `label{display:block;margin-bottom:8px;font:400 12px/1 ${KIT_FONT};text-transform:uppercase;letter-spacing:.06em;color:inherit;opacity:.8}
 .box{position:relative;${glLookHost(glLook(this))}}
-input{all:unset;position:relative;z-index:1;box-sizing:border-box;width:100%;padding:15px 18px;font:500 16px/1.2 "Bricolage Grotesque",system-ui,sans-serif;${glLook(this) === 'glow' ? 'color:#f2eef8' : GL_LOOK_TEXT[glLook(this)](l).replace(/text-transform:uppercase;?/, '')};caret-color:${l[l.length - 2]}}
+input{all:unset;position:relative;z-index:1;box-sizing:border-box;width:100%;padding:15px 18px;font:500 16px/1.2 "Bricolage Grotesque",system-ui,sans-serif;${glLook(this) === 'glow' ? 'color:#f2eef8' : GL_LOOK_TEXT[glLook(this)](l)};caret-color:${l[l.length - 2]}}
 input::placeholder{color:#8e869c}
 :host([disabled]){opacity:.5}`;
   }

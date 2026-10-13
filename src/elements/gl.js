@@ -291,8 +291,8 @@ const GL_LOOK_TEXT = {
   glow: list => `color:${list[list.length - 1]};text-shadow:0 1px 0 rgba(0,0,0,.5)`,
   chrome: () => 'color:#0e0c14;text-shadow:0 1px 0 rgba(255,255,255,.85),0 -1px 0 rgba(0,0,0,.25)',
   glass: () => 'color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.45)',
-  riso: list => `color:${list[2] || '#eadcc4'};text-shadow:2px 2px 0 ${list[1] || '#ff4f9a'};font-family:"Silkscreen",ui-monospace,monospace!important;font-weight:400!important;text-transform:uppercase;letter-spacing:.06em`,
-  crt: list => `color:${list[3] || '#46ff7e'};text-shadow:0 0 6px ${list[3] || '#46ff7e'},0 0 1px ${list[4] || '#fff'};font-family:"Silkscreen",ui-monospace,monospace!important;font-weight:400!important;text-transform:uppercase;letter-spacing:.06em`
+  riso: list => `color:${list[2] || '#eadcc4'};text-shadow:1px 1px 0 ${list[1] || '#ff4f9a'}`,
+  crt: list => `color:${list[3] || '#46ff7e'};text-shadow:0 0 8px ${list[3] || '#46ff7e'}88;font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace!important;letter-spacing:0`
 };
 /* glass needs the page behind it blurred; everything else is opaque */
 const glLookHost = look => look === 'glass' ? `-webkit-backdrop-filter:blur(14px) saturate(1.5);backdrop-filter:blur(14px) saturate(1.5);background:rgba(255,255,255,.07);clip-path:${kitCorners(3)};` : '';
