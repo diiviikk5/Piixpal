@@ -1,0 +1,23 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Pixel UI: looks</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Silkscreen&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #0b0a10; color: #f2eef8; font-family: "Bricolage Grotesque", system-ui }
+  .row { display: grid; grid-template-columns: 110px 220px 1fr 280px; gap: 24px; align-items: center; padding: 22px 32px; border-bottom: 1px solid #ffffff14 }
+  .row > b { font: 400 12px/1 "Silkscreen"; text-transform: uppercase; opacity: .6 }
+  .over { position: relative; padding: 40px 32px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; align-items: center }
+  piix-glow-card { max-width: 340px }
+</style>
+<div class="row"><b>glow</b><piix-glow-button>Get started</piix-glow-button><piix-glow-card><h3>Realtime</h3><p>Updates the moment it changes.</p></piix-glow-card><piix-input placeholder="you@site.com">Email</piix-input></div>
+<div class="row"><b>chrome</b><piix-glow-button look="chrome">Get started</piix-glow-button><piix-glow-card look="chrome"><h3>Realtime</h3><p>Updates the moment it changes.</p></piix-glow-card><piix-input look="chrome" placeholder="you@site.com">Email</piix-input></div>
+<div class="row"><b>glass</b><piix-glow-button look="glass">Get started</piix-glow-button><piix-glow-card look="glass"><h3>Realtime</h3><p>Updates the moment it changes.</p></piix-glow-card><piix-input look="glass" placeholder="you@site.com">Email</piix-input></div>
+<div class="row"><b>riso</b><piix-glow-button look="riso">Get started</piix-glow-button><piix-glow-card look="riso"><h3>Realtime</h3><p>Updates the moment it changes.</p></piix-glow-card><piix-input look="riso" placeholder="you@site.com">Email</piix-input></div>
+<div class="row"><b>crt</b><piix-glow-button look="crt">Get started</piix-glow-button><piix-glow-card look="crt"><h3>Realtime</h3><p>Updates the moment it changes.</p></piix-glow-card><piix-input look="crt" placeholder="you@site.com">Email</piix-input></div>
+<div class="over">
+  <piix-scene kind="vista" fill></piix-scene>
+  <piix-glow-card look="glass"><h3>Glass over a scene</h3><p>The page behind is blurred, the rim and glare are pixels.</p></piix-glow-card>
+  <piix-glow-button look="glass" size="lg">Explore</piix-glow-button>
+  <piix-input look="glass" placeholder="where to?">Destination</piix-input>
+</div>
+<script src="../piixpal.js"></script>
