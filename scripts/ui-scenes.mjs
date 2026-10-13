@@ -15,8 +15,8 @@ const SCENES = [
     'Only two colours, blue ink on warm paper, like a risograph print. Rays of light burst up from a vanishing point on the horizon while the ground streams toward you. The vanishing point follows the pointer.'],
   ['vortex', 'riso-vortex', 'Riso vortex', 'A two-ink riso print of the sky swirling round a lone street lamp.',
     'The same two inks: the night sky spirals round a single street lamp, and the ground fans out beneath it. The swirl drifts toward the pointer.'],
-  ['porthole', 'porthole', 'Porthole', "A ship's window onto a calm sea that rocks gently.",
-    'A rounded ship window set into a pale wall, a calm sea outside, the horizon rocking slowly as the ship rolls. Move the pointer to look around. With <code>sky="none"</code> the wall disappears and you get a window into the sea, floating on your own page.'],
+  ['train', 'train-window', 'Train window', 'A train window with the countryside rushing past.',
+    'Look out of a train: clouds and far mountains crawl, the hills roll by faster, a fence whips past and telegraph poles flash through the frame with their wires sagging between them. The carriage sways and bumps over every rail joint. Move the pointer to look around. With <code>sky="none"</code> the carriage wall disappears and the window floats on your own page.'],
   ['poppies', 'poppies', 'Poppy field', 'A stormy sky over a field of red poppies blowing in the wind.',
     'A painterly storm, a bright band of light on the horizon and a field of poppies that sway and shed petals across the sky. The pointer sets the wind.'],
   ['castle', 'castle', 'Castle', 'A pixel castle on a hill at night, windows flickering and a flag waving.',
@@ -40,7 +40,7 @@ const scenePage = ([kind, slug, name, brief, about]) => ({
       demo: `<piix-scene kind="${kind}" levels="3" pixel="5" height="240px"></piix-scene>`, stage: { pad: 0 } }
   ],
   props: [
-    ['kind', '<code>sakura</code> <code>alps</code> <code>lake</code> <code>galaxy</code> <code>rays</code> <code>vortex</code> <code>porthole</code> <code>poppies</code> <code>castle</code> <code>vista</code>', 'sakura'],
+    ['kind', '<code>sakura</code> <code>alps</code> <code>lake</code> <code>galaxy</code> <code>rays</code> <code>vortex</code> <code>train</code> <code>poppies</code> <code>castle</code> <code>vista</code>', 'sakura'],
     ['sky', '<code>none</code> makes the sky see-through', ''],
     ['fade', '<code>top</code> <code>bottom</code> <code>both</code>: dissolve that edge in dithered pixels', ''],
     ['palette', 'repaint it in a palette instead of its own colours', ''],
@@ -64,16 +64,16 @@ const LAYOUTS = [
   </div>
   <piix-scene kind="alps" sky="none" height="260px"></piix-scene>
 </section>` },
-  { slug: 'window', name: 'Window', brief: 'A pixel window onto another world, set into a normal page.',
-    about: 'The porthole with its wall cut out becomes a window you can drop next to your copy. The rest of the page stays ordinary, so the window is the one thing that moves.',
+  { slug: 'window', name: 'Window', brief: 'A train window onto the countryside, set into a normal page.',
+    about: 'The train window with its wall cut out becomes a window you can drop next to your copy. The rest of the page stays ordinary, so the window is the one thing that moves.',
     demo: `<section class="lay-split">
   <div class="lay-copy">
-    <p class="lay-kicker">Voyage</p>
-    <h2>Seven days, no signal.</h2>
-    <p>A slow crossing for people who need one.</p>
-    <piix-button tone="sky">Book a cabin</piix-button>
+    <p class="lay-kicker">Slow rail</p>
+    <h2>Six hours, no signal.</h2>
+    <p>The long way through the hills, for people who need it.</p>
+    <piix-button tone="sky">Book a seat</piix-button>
   </div>
-  <piix-scene kind="porthole" sky="none" height="340px"></piix-scene>
+  <piix-scene kind="train" sky="none" height="340px"></piix-scene>
 </section>` },
   { slug: 'split-hero', name: 'Split hero', brief: 'Copy on one side, a framed scene on the other.',
     about: 'Classic SaaS layout, but the product shot is a living scene in a chunky pixel frame. Works with any scene; here, the castle for a game launch.',

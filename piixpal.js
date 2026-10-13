@@ -11722,7 +11722,7 @@ ELEMENTS['glow-card'] = 'piix-glow-card';
  * paragraphs and buttons get hero-sized type.
  *
  *   kind      mesh | warp | aurora | crystal | liquid | horizon | nebula | topo | dots | fire   default: mesh
- *   scene     use an illustrated scene instead: sakura | alps | lake | galaxy | rays | vortex | porthole | poppies | castle | vista
+ *   scene     use an illustrated scene instead: sakura | alps | lake | galaxy | rays | vortex | train | poppies | castle | vista
  *   palette   any palette name or your own colours        default: the kind's own
  *   pixel     size of one background pixel, px             default: 5
  *   align     center | left                                default: center
@@ -12057,7 +12057,7 @@ ELEMENTS.reveal = 'piix-reveal';
  * Not a texture or a photo: every scene is drawn from nothing in a shader, on a pixel grid,
  * and dithered down to a handful of colours like a pixel-art painting. They move, and they
  * answer the pointer: wind in the blossom, the sun follows you over the lake, the galaxy tilts,
- * the riso rays swing toward you, the porthole lets you look around.
+ * the riso rays swing toward you, the train window lets you look around.
  *
  *   sakura    a cherry tree over a misty forest, a lantern, a bench and falling petals
  *   alps      snow peaks behind layers of green hills, pines and valley mist
@@ -12065,7 +12065,7 @@ ELEMENTS.reveal = 'piix-reveal';
  *   galaxy    a spiral galaxy with planets in orbit; the pointer tilts it
  *   rays      two-ink riso print: light rays bursting from the horizon, a crescent moon
  *   vortex    two-ink riso print: the sky swirling round a lone street lamp
- *   porthole  a ship's window onto a calm sea that rocks gently
+ *   train     a train window, the countryside rushing past, poles flashing by
  *   poppies   a stormy sky over a field of red poppies blowing in the wind
  *   castle    a pixel castle on a hill at night, windows flickering, a flag waving
  *   vista     an anime summer sky, big clouds, a snowy peak and grass in the breeze
@@ -12146,10 +12146,12 @@ vec4 scene(vec2 uv,vec2 p,vec2 cell,vec2 m){
   if(d>.14){sky=0.;float l=fbm(p*9.+3.)*.7+(y-.5)*.6+p.x/w*.25+.12*m.y;
     c=l<.3?rgb(104.,28.,60.):l<.44?rgb(168.,50.,94.):l<.58?rgb(214.,98.,140.):rgb(248.,172.,198.);
     c=mix(c,rgb(20.,62.,56.),.3*step(fbm(p*16.),.3));}
+  vec2 mp=u_mouse*u_res;
   for(int i=0;i<3;i++){float fi=float(i),s=8.+fi*5.;
-    vec2 q=cell/s;q.y+=t*(1.3+fi*.6);q.x+=t*(.45+fi*.2)+sin(q.y*.5+fi)*.5+(u_mouse.x-.5)*q.y*.6*u_hover;
+    vec2 dm=cell-mp,push=dm/(length(dm)+.001)*exp(-length(dm)/(14.+fi*4.))*(6.+fi*3.)*u_hover;
+    vec2 q=(cell-push)/s;q.y+=t*(.7+fi*.3);q.x+=t*.06+sin(q.y*.35+t*.5+fi*2.)*.18;
     vec2 id=floor(q),f=fract(q);float h=h2(id+fi*17.);
-    if(h>.6){vec2 o=vec2(h2(id+3.),h2(id+5.))*.6+.2,dd=abs(f-o)*s;
+    if(h>.78){vec2 o=vec2(h2(id+3.),h2(id+5.))*.6+.2,dd=abs(f-o)*s;
       if(dd.x<1.+fi*.6&&dd.y<.7+fi*.4){c=mix(rgb(255.,186.,208.),rgb(255.,236.,242.),h2(id));sky=0.;}}}
   return vec4(c,sky);}`],
 
@@ -12266,26 +12268,42 @@ vec4 scene(vec2 uv,vec2 p,vec2 cell,vec2 m){
   if(abs(uv.y-.3)<.004&&abs(p.x-C.x)<.07)c=blk;
   return vec4(c,sky);}`],
 
-  porthole: ["A ship's porthole looking out onto a calm sea that rocks gently", `
+  train: ['The view from a train window, the countryside rushing past', `
+float ridge(float x,float a,float f,float o){return a*(.55*sin(x*f+o)+.3*sin(x*f*2.3+o*1.7)+.15*sin(x*f*5.1+o*.3));}
 vec4 scene(vec2 uv,vec2 p,vec2 cell,vec2 m){
   float t=u_time,w=W(),sky=1.;
-  vec2 hs=vec2(min(w*.34,.64),.3),ce=vec2(0.,.55);
-  float sd=rbox(p,ce,hs,.1);
-  vec3 c=mix(rgb(140.,172.,194.),rgb(214.,230.,240.),uv.y*.7+.15);
-  if(sd<0.){sky=0.;vec2 v=p-ce-m*vec2(.1,.08);
-    float hy=v.y+.02-sin(t*.5)*.014-v.x*sin(t*.35)*.03;
-    if(hy>0.)c=mix(rgb(206.,226.,246.),rgb(118.,170.,232.),smoothstep(0.,.35,hy));
-    else{float dep=-hy;c=mix(rgb(118.,164.,220.),rgb(36.,92.,168.),smoothstep(0.,.3,dep));
-      float wv=noise(vec2(v.x*26./(dep*8.+.2)+t*.3,dep*70.-t*1.4));
-      c=mix(c,rgb(176.,210.,242.),smoothstep(.64,.82,wv)*.6);}
-    c=mix(c,rgb(236.,246.,252.),smoothstep(-.05,0.,sd)*.3);
-    c+=vec3(.07)*step(abs(v.x+v.y*.6-.25+m.x*.1),.02);
-  }else if(sd<.032){sky=0.;c=mix(rgb(240.,246.,250.),rgb(186.,206.,222.),smoothstep(0.,.032,sd));}
-  else c-=vec3(.1)*smoothstep(.12,.032,sd);
-  if(abs(uv.y-.15)<.012){c=mix(rgb(232.,238.,242.),rgb(168.,184.,200.),step(.15,uv.y));sky=0.;}
-  if(abs(uv.y-.132)<.004)c*=.82;
+  vec2 hs=vec2(min(w*.4,.78),.27),ce=vec2(0.,.56);
+  float sd=rbox(p,ce,hs,.07);
+  vec3 c=mix(rgb(96.,112.,104.),rgb(150.,166.,150.),uv.y*.8+.1);
+  if(sd<0.){sky=0.;
+    /* the carriage rattles: a soft sway plus a bump at every rail joint */
+    float bump=exp(-fract(t*1.4)*18.)*.006;
+    vec2 v=p-ce-m*vec2(.06,.05)+vec2(0.,sin(t*9.)*.0015+bump);
+    float y=v.y+.27,x=v.x;
+    c=mix(rgb(214.,232.,244.),rgb(122.,176.,228.),smoothstep(.15,.55,y));
+    float cl=fbm(vec2((x+t*.01)*2.5,y*6.));
+    if(cl>.62&&y>.32)c=mix(c,rgb(250.,252.,255.),smoothstep(.62,.75,cl));
+    float hm=.22+ridge(x+t*.02,.06,3.,1.);
+    if(y<hm){c=mix(rgb(150.,170.,196.),rgb(196.,210.,226.),smoothstep(hm-.1,hm,y));}
+    float hh=.15+ridge(x+t*.09,.035,5.,4.);
+    if(y<hh){c=mix(rgb(84.,130.,72.),rgb(120.,164.,92.),smoothstep(hh-.08,hh,y));
+      float tx=(x+t*.09)*30.,th=h2(vec2(floor(tx),2.));
+      if(th>.6&&tri(vec2(fract(tx),y),vec2(.5,hh-.01),.35,.03+.02*th)>0.)c=rgb(46.,86.,52.);}
+    if(y<.07){float g=noise(vec2((x+t*.6)*40.,y*30.));c=mix(rgb(96.,140.,60.),rgb(140.,176.,80.),g);
+      float fx=fract((x+t*.6)*9.);if(fx<.06&&y>.03)c=rgb(96.,76.,56.);
+      if(abs(y-.055)<.004)c=rgb(120.,96.,70.);}
+    /* telegraph poles flashing past, wires sagging between them */
+    float px=(x+t*1.6)*1.1,pf=fract(px);
+    float sag=.24-.05*4.*pf*(1.-pf);
+    if(pf<.035&&y<.27)c=rgb(40.,34.,30.);
+    if(abs(y-sag)<.0055||abs(y-sag+.03)<.0055)c=rgb(54.,48.,44.);
+    c=mix(c,rgb(240.,246.,250.),smoothstep(-.04,0.,sd)*.25);
+    c+=vec3(.06)*step(abs(v.x*.8+v.y-.18+m.x*.1),.025);
+  }else if(sd<.03){sky=0.;c=mix(rgb(230.,226.,214.),rgb(170.,164.,150.),smoothstep(0.,.03,sd));}
+  else c-=vec3(.08)*smoothstep(.1,.03,sd);
+  if(uv.y<.17){c=mix(rgb(120.,62.,48.),rgb(150.,82.,62.),step(.5,fract(p.x*14.)))*.9;sky=0.;}
+  if(abs(uv.y-.17)<.01){c=rgb(196.,178.,140.);sky=0.;}
   return vec4(c,sky);}`],
-
   poppies: ['A stormy sky over a field of red poppies blowing in the wind', `
 vec4 scene(vec2 uv,vec2 p,vec2 cell,vec2 m){
   float t=u_time,H=.42,y=uv.y,sky=1.,wind=.7+m.x*1.6*u_hover;
@@ -12381,8 +12399,8 @@ const scBody = k => (SC_HEAD + SC_KINDS[k][1]).replace(/\bfbm\(/g, 'tfbm(').repl
 class PiixSceneElement extends GLStage {
   static get observedAttributes() { return [...GLStage.observedAttributes, 'sky', 'fade', 'levels']; }
   constructor() { super(); this._defPx = 4; this._defPal = 'mono'; this._introLen = 1; }
-  get kind() { const k = this.getAttribute('kind'); return SC_KINDS[k] ? k : 'sakura'; }
-  _hostCss() { return this.hasAttribute('fill') || this.getAttribute('height') ? '' : 'height:480px;'; }
+  get kind() { const k = this.getAttribute('kind'); return k === 'porthole' ? 'train' : SC_KINDS[k] ? k : 'sakura'; }
+  _hostCss() { return (this.hasAttribute('fill') ? '' : 'width:100%;') + (this.hasAttribute('fill') || this.getAttribute('height') ? '' : 'height:480px;'); }
   _setup() {
     if (this.hasAttribute('fill')) this.setAttribute('aria-hidden', 'true');
     else if (!this.hasAttribute('aria-label')) { this.setAttribute('role', 'img'); this.setAttribute('aria-label', SC_KINDS[this.kind][0]); }
@@ -12478,7 +12496,7 @@ const SH_KINDS = {
 class PiixShaderElement extends GLStage {
   get kind() { const k = this.getAttribute('kind'); return SH_KINDS[k] ? k : 'mesh'; }
   get _defPal() { return SH_KINDS[this.kind][0]; }
-  _hostCss() { return this.hasAttribute('fill') || this.getAttribute('height') ? '' : 'height:360px;'; }
+  _hostCss() { return (this.hasAttribute('fill') ? '' : 'width:100%;') + (this.hasAttribute('fill') || this.getAttribute('height') ? '' : 'height:360px;'); }
   _setup() { if (!this.hasAttribute('aria-label') && !this.hasAttribute('fill')) { this.setAttribute('role', 'img'); this.setAttribute('aria-label', `An animated ${this.kind} background`); } if (this.hasAttribute('fill')) this.setAttribute('aria-hidden', 'true'); }
   _shader() { return SH_KINDS[this.kind][1]; }
 }
