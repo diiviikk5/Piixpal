@@ -141,7 +141,7 @@ const glDraw = (body, w, h, u, tex) => {
  * a small canvas in a shadow root, scaled up crisp; the pointer and hover are tracked; it only
  * draws while on screen; reduced motion gets one still frame; without WebGL it shows a gradient */
 class GLStage extends HTMLElement {
-  static get observedAttributes() { return ['kind', 'effect', 'palette', 'pixel', 'dither', 'speed', 'fill', 'height', 'src', 'tone']; }
+  static get observedAttributes() { return ['kind', 'effect', 'palette', 'pixel', 'dither', 'speed', 'fill', 'height', 'src', 'tone', 'look']; }
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
@@ -233,6 +233,69 @@ const GL_FRAME = `vec4 effect(vec2 uv,vec2 cell){
   float v=.05+u_j.x+.05*hash(cell)+.3*exp(-length(q-m)*2.8)*u_hover;
   if(u_k.z<1.2){vec2 c=aspect(u_k.xy);float r=u_k.z*1.5,ring=smoothstep(.07,0.,abs(length(q-c)-r))*(1.-u_k.z/1.2);v+=ring*.75;}
   return vec4(dpal(v,cell),1.);}`;
+
+/* ---------- looks: the same frame in other design languages ----------
+ * every look shares the frame's inputs: u_k = (click x, click y, seconds since click, border),
+ * u_j.x = face lift, u_mouse, u_hover. Corners are cut in steps the same way. */
+const GL_LOOK_HEAD = `vec4 effect(vec2 uv,vec2 cell){
+  vec2 sz=u_res,d=min(cell,sz-1.-cell);float b=u_k.w,e=min(d.x,d.y);
+  if(d.x+d.y<b*1.5)return vec4(0.);
+  vec2 q=aspect(uv),m=aspect(u_mouse);
+  float ring=0.;if(u_k.z<1.2){vec2 c=aspect(u_k.xy);ring=smoothstep(.07,0.,abs(length(q-c)-u_k.z*1.5))*(1.-u_k.z/1.2);}`;
+const GL_LOOKS = {
+  glow: ['lime', GL_FRAME],
+  /* Y2K liquid chrome: a bright sky above a dark horizon line, rippling, with a hot spot under the pointer */
+  chrome: ['#0e0c14,#353a4a,#6f7890,#aab3c6,#dde3ee,#ffffff', GL_LOOK_HEAD + `
+  float y=uv.y+.05*sin(uv.x*4.+u_time*.8)+.08*(fbm(q*1.6+u_time*.1)-.5)+(u_mouse.y-.5)*.18*u_hover;
+  float hz=clamp(6./sz.y,.1,.3);
+  float v=y>hz?mix(.68,1.,smoothstep(hz,1.,y)):mix(.62,.3,smoothstep(.0,hz-.02,y));
+  v*=1.-.7*smoothstep(.03,0.,abs(y-hz));
+  if(e<b)v=uv.y>.5?1.:.35;
+  v+=.35*exp(-length(q-m)*6.)*u_hover+ring*.5;
+  float n=u_n-1.,qv=clamp(v,0.,1.)*n+(bayer8(cell)-.5)*.45;
+  return vec4(pal(floor(qv+.5)/n),1.);}`],
+  /* frosted glass: mostly see-through (the host blurs what's behind), a lit rim, a glare that sweeps with the pointer */
+  glass: ['mono', GL_LOOK_HEAD + `
+  float bay=bayer8(cell);
+  if(e<b){float lit=mix(1.,.55,smoothstep(0.,1.,(1.-uv.y)*.7+uv.x*.3));return vec4(dpal(lit+.1*u_hover,cell),1.);}
+  float gx=uv.x+uv.y*.55-mix(-.2,1.6,u_hover>.05?u_mouse.x:fract(u_time*.08));
+  float glare=smoothstep(.07,0.,abs(gx))*.85+smoothstep(.2,0.,abs(gx-.12))*.2;
+  float top=smoothstep(b+2.,b,d.y)*step(sz.y*.5,cell.y)*.7;
+  float a=glare*.6+top+ring*.6+.2*exp(-length(q-m)*5.)*u_hover;
+  return vec4(dpal(.9+glare*.1,cell),step(bay+.02,a));}`],
+  /* two-ink risograph: solid ink face, a halftone edge, and a second ink laid down a little off-register */
+  riso: ['#1c38d4,#ff4f9a,#eadcc4', GL_LOOK_HEAD + `
+  vec3 A=u_pal[0],B=u_pal[1],P=u_pal[2];
+  vec2 mis=vec2(3.,-2.)+(u_mouse-.5)*vec2(8.,6.)*u_hover+vec2(sin(u_time*1.1),cos(u_time*.9))*.7;
+  float sh=min(cell.y,sz.x-1.-cell.x),hdot=step(length(mod(cell,4.)-1.5),mix(1.9,.5,smoothstep(b,b+6.,sh)));
+  float a=e<b?1.:(sh<b+6.?hdot:1.);
+  vec2 cb=cell-floor(mis),db=min(cb,sz-1.-cb);float eb=min(db.x,db.y);
+  float bb=step(0.,eb)*step(eb,b+1.)+ring;
+  vec3 col=mix(P,A,a);
+  if(bb>0.)col=a>0.?A*B*1.25:B;
+  return vec4(col,1.);}`],
+  /* green phosphor terminal: scanlines, a double rule, flicker, and a burst of static when clicked */
+  crt: ['#020805,#06301a,#138a3c,#46ff7e,#d2ffe0', GL_LOOK_HEAD + `
+  float fl=.94+.06*sin(u_time*53.)*sin(u_time*7.);
+  float v=.06+.05*hash(cell+floor(u_time*12.));
+  if(e<1.||(e>=2.&&e<3.))v=.75;
+  v+=.35*exp(-e*.25)*(.6+.4*u_hover);
+  v+=.25*exp(-length(q-m)*4.)*u_hover;
+  if(u_k.z<.35)v+=step(.6,hash(cell+floor(u_time*30.)))*(1.-u_k.z/.35)*.8;
+  v*=mod(cell.y,2.)<1.?1.:.55;
+  return vec4(dpal(v*fl,cell),1.);}`]
+};
+const glLook = el => { const l = el.getAttribute('look'); return GL_LOOKS[l] ? l : 'glow'; };
+/* text that sits on each look */
+const GL_LOOK_TEXT = {
+  glow: list => `color:${list[list.length - 1]};text-shadow:0 1px 0 rgba(0,0,0,.5)`,
+  chrome: () => 'color:#0e0c14;text-shadow:0 1px 0 rgba(255,255,255,.85),0 -1px 0 rgba(0,0,0,.25)',
+  glass: () => 'color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.45)',
+  riso: list => `color:${list[2] || '#eadcc4'};text-shadow:2px 2px 0 ${list[1] || '#ff4f9a'};font-family:"Silkscreen",ui-monospace,monospace!important;font-weight:400!important;text-transform:uppercase;letter-spacing:.06em`,
+  crt: list => `color:${list[3] || '#46ff7e'};text-shadow:0 0 6px ${list[3] || '#46ff7e'},0 0 1px ${list[4] || '#fff'};font-family:"Silkscreen",ui-monospace,monospace!important;font-weight:400!important;text-transform:uppercase;letter-spacing:.06em`
+};
+/* glass needs the page behind it blurred; everything else is opaque */
+const glLookHost = look => look === 'glass' ? `-webkit-backdrop-filter:blur(14px) saturate(1.5);backdrop-filter:blur(14px) saturate(1.5);background:rgba(255,255,255,.07);clip-path:${kitCorners(3)};` : '';
 
 /* any CSS colour, as 0..1 rgb for a shader */
 const glRGB = c => {
