@@ -338,3 +338,15 @@ export const UI = [
 ];
 
 export const SECTIONS = ['Scenes', 'Layouts', 'Backgrounds', 'Sections', 'Buttons', 'Cards', 'Text', 'Media', 'Forms', 'Navigation', 'Feedback', 'Motion'];
+
+/* ---------- the newer components, and looks on the frame components ---------- */
+import { MORE_PAGES, LOOK_PROP, LOOK_CONTROL, looksExample } from './ui-more.mjs';
+const LOOKED = { 'glow-button': ['Get started', ''], 'glow-card': ['<h3>Realtime</h3><p>Live on every device.</p>', ''], input: ['Email', ' placeholder="you@site.com"'] };
+for (const u of UI) if (LOOKED[u.slug]) {
+  u.controls = [LOOK_CONTROL, ...(u.controls || [])];
+  u.props = [LOOK_PROP, ...u.props];
+  u.examples = [looksExample(u.tag, ...LOOKED[u.slug]), ...(u.examples || [])];
+}
+UI.push(...MORE_PAGES);
+SECTIONS.splice(SECTIONS.indexOf('Navigation') + 1, 0, 'Overlays');
+SECTIONS.splice(SECTIONS.indexOf('Feedback') + 1, 0, 'Data');
