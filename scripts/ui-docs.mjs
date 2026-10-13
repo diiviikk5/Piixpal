@@ -19,7 +19,7 @@ const PAL = Object.fromEntries(PALETTES.map(p => [p, glSrc.match(new RegExp(`\\b
 
 const VERSION = '0.6';
 const CDN = `https://cdn.jsdelivr.net/npm/piixpal@${VERSION}`;
-const START = [['index', 'Introduction'], ['installation', 'Installation'], ['palettes', 'Palettes']];
+const START = [['index', 'Introduction'], ['showcase', 'Showcase'], ['installation', 'Installation'], ['palettes', 'Palettes']];
 const bySection = SECTIONS.map(s => [s, UI.filter(u => u.section === s)]);
 const ORDER = [...START.map(([s]) => s), ...bySection.flatMap(([, l]) => l.map(u => u.slug))];
 const nameOf = s => (START.find(x => x[0] === s) || [])[1] || UI.find(u => u.slug === s).name;
@@ -260,7 +260,25 @@ ${demoBox({ demo: '<piix-shader kind="warp" palette="#0b0a10,#3a2a6b,#ff6b4a,#ff
 ${demoBox({ demo: '<div class="ex-row">\n  <piix-shader kind="mesh" dither="1" height="160px"></piix-shader>\n  <piix-shader kind="mesh" dither=".5" height="160px"></piix-shader>\n  <piix-shader kind="mesh" dither="0" height="160px"></piix-shader>\n</div>', stage: { pad: 0 } })}
 ${pager('palettes')}`;
 
+/* ---------- showcase: whole pages built with Pixel UI ---------- */
+const SHOWCASE = [
+  ['summit', 'Summit', 'Clean product page', 'An ordinary, calm SaaS page. The only pixels are landscapes: alps rising out of the hero with the sky cut out, scene cards instead of stock photos, and a vista dissolving into the footer.', ['alps', 'vista', 'lake', 'castle', 'poppies', 'counter', 'button']],
+  ['riso', 'Night Roads', 'Two-ink riso magazine', 'Blue ink on warm paper, everywhere. The riso scenes are the cover art; a serif, hairline rules and a paper grain do the rest.', ['riso-rays', 'riso-vortex']],
+  ['bloom', 'Bloom', 'Lo-fi music app', 'A full sakura hero with shine text, then soft glassy cards over a dark page, a marquee, pal toggles and a sticky player with a running progress bar.', ['sakura', 'hero', 'shine-text', 'marquee', 'toggle', 'progress', 'loader', 'cursor']],
+  ['keep', 'Keep', 'Cosy game launch', 'Fully pixel: the castle hero with glitch type, stair dividers, glow cards, counters, tabs and a sign-up form, ending on the castle again, repainted in violet and fading in.', ['castle', 'hero', 'glitch-text', 'divider', 'glow-card', 'counter', 'tabs', 'input']]
+];
+const showcaseBody = `${head(['Get started'], 'Showcase', 'Whole pages built with Pixel UI, each in a different design language: some fully pixel, some ordinary pages with just a piece of pixel art woven in. Open one, view the source, take what you like.')}
+<div class="ui-show">
+${SHOWCASE.map(([id, name, kind, about, uses]) => `  <article>
+    <a class="shot" href="showcase/${id}.html" target="_blank" rel="noopener"><img src="showcase/${id}.jpg" alt="The ${name} page" loading="lazy" width="720" height="450"></a>
+    <div><p class="k">${kind}</p><h2><a href="showcase/${id}.html" target="_blank" rel="noopener">${name} ↗</a></h2><p>${about}</p>
+    <p class="uses">${uses.map(s => `<a href="${s}.html">${esc(nameOf(s))}</a>`).join('')}</p></div>
+  </article>`).join('\n')}
+</div>
+${pager('showcase')}`;
+
 const pages = [
+  ['showcase.html', { key: 'showcase', title: 'Showcase', desc: 'Whole pages built with Pixel UI: a clean product page, a riso magazine, a lo-fi music app and a game launch.', body: showcaseBody }],
   ['index.html', { key: 'index', title: 'Pixel UI', desc: 'A GPU pixel component library: shader backgrounds, heroes, glow buttons, cards, text effects and form controls.', body: indexBody }],
   ['installation.html', { key: 'installation', title: 'Installation', desc: 'Add Pixel UI with one script tag, single files or npm.', body: installBody, toc: [['script', 'Script tag'], ['single', 'Only what you use'], ['npm', 'npm'], ['frameworks', 'Frameworks'], ['support', 'Browser support']] }],
   ['palettes.html', { key: 'palettes', title: 'Palettes', desc: 'The ten Pixel UI palettes, and how to use your own colours.', body: palettesBody, toc: [['custom', 'Your own colours'], ['dither', 'Dither']] }],
