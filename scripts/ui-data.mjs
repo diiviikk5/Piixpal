@@ -22,19 +22,19 @@ const TONES = 'lime | coral | violet | sky | sun | mint | ink | paper';
 
 /* ---------- backgrounds: one page per shader kind ---------- */
 const BG = [
-  ['mesh', 'mesh-gradient', 'Mesh gradient', 'violet', 'Soft colour blobs that drift into each other, the classic SaaS gradient, rebuilt out of pixels.',
+  ['mesh', 'mesh-gradient', 'Mesh gradient', 'candy', 'Soft colour blobs that drift into each other, the classic SaaS gradient, rebuilt out of pixels.',
     'Four colour fields drift on slow noise and blend into each other, then get dithered down into the palette on a pixel grid. The pointer pulls the nearest blob toward it. Calm enough to sit behind body text.'],
-  ['warp', 'warp', 'Marble warp', 'candy', 'Domain-warped noise that folds over itself like marbled paper.',
+  ['warp', 'warp', 'Marble warp', 'aurora', 'Domain-warped noise that folds over itself like marbled paper.',
     'Noise feeding into noise feeding into noise: the classic domain-warp trick, so the colour bands fold and curl like ink on water. Busy, so it suits short sections and headers more than long reading.'],
   ['aurora', 'aurora', 'Aurora', 'aurora', 'Curtains of light rippling over a night sky.',
     'Long vertical curtains of colour sway and shimmer over a dark sky with a few stars in it. The pointer pushes the curtains aside.'],
-  ['crystal', 'crystal', 'Crystal cells', 'ocean', 'Glowing crystal cells whose edges catch the light.',
+  ['crystal', 'crystal', 'Crystal cells', 'violet', 'Glowing crystal cells whose edges catch the light.',
     'Voronoi cells that slowly shift, each lit from inside, with bright seams where they meet. Move the pointer and the nearest cell lights up.'],
   ['liquid', 'liquid-metal', 'Liquid metal', 'mono', 'A chrome surface that ripples like mercury.',
     'A height field shaded like polished metal, with sharp highlights sliding over it. In mono it is pure chrome; in a colour palette it turns into anodised metal.'],
   ['horizon', 'horizon', 'Synthwave horizon', 'sunset', 'A sun setting behind a grid that scrolls toward you forever.',
     'The retro horizon: a striped sun, a glowing perspective grid racing toward you, and haze where they meet. The pointer steers the grid.'],
-  ['nebula', 'nebula', 'Nebula', 'violet', 'Deep-space gas clouds with stars twinkling through.',
+  ['nebula', 'nebula', 'Nebula', 'candy', 'Deep-space gas clouds with stars twinkling through.',
     'Layered fractal noise as glowing gas, with a starfield behind it. Slow and dark, so it makes a great backdrop for white text.'],
   ['topo', 'topographic', 'Topographic', 'paper', 'Contour lines like a living map.',
     'Height lines from a slowly shifting landscape, drawn as a contour map. In paper it looks like an old survey sheet; in lime it looks like a radar screen.'],
