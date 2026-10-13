@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Keep · a Pixel UI showcase</title>
+<link rel="icon" href="../../site/favicon.svg" type="image/svg+xml">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Silkscreen&display=swap" rel="stylesheet">
+<style>
+  /* Keep: a cosy game launch. Fully pixel, dark and warm. */
+  :root { --bg: #0d0c1c; --ink: #f2eef8; --gold: #ffcc55; --muted: #a7a2c4 }
+  * { box-sizing: border-box }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 400 17px/1.55 "Bricolage Grotesque", system-ui, sans-serif }
+  .wrap { width: min(1120px, 100% - 48px); margin: 0 auto }
+  .pix { font-family: "Silkscreen", monospace; text-transform: uppercase; letter-spacing: .04em }
+  piix-hero h1 { font-family: "Silkscreen", monospace !important; font-weight: 400 !important; letter-spacing: 0 !important; text-shadow: 6px 6px 0 #000 !important }
+  .ctas { display: flex; gap: 18px; flex-wrap: wrap; justify-content: center }
+  section { padding: 84px 0 }
+  h2 { margin: 0 0 12px; font: 400 clamp(26px, 3.6vw, 40px)/1.1 "Silkscreen", monospace; text-transform: uppercase }
+  .lead { margin: 0 0 36px; color: var(--muted); max-width: 52ch }
+  .feat { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px }
+  @media (max-width: 860px) { .feat { grid-template-columns: 1fr } }
+  piix-glow-card h3 { margin: 0 0 8px; font: 400 18px/1.2 "Silkscreen", monospace; text-transform: uppercase; color: var(--gold) }
+  piix-glow-card p { margin: 0; color: var(--muted) }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; text-align: center }
+  @media (max-width: 860px) { .stats { grid-template-columns: 1fr } }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center }
+  @media (max-width: 860px) { .two { grid-template-columns: 1fr } }
+  .frame { border: 4px solid #f2eef8; box-shadow: 8px 8px 0 #ff6b4a }
+  piix-tabs p { color: var(--muted); margin: 0 }
+  form { display: grid; gap: 16px; max-width: 460px }
+  footer { padding: 24px 0 40px; color: var(--muted); font-size: 14px }
+</style>
+</head>
+<body>
+<piix-hero scene="castle" height="min(94vh, 800px)">
+  <p class="eyebrow">Out now · PC, Mac, Switch</p>
+  <h1>Keep the <piix-text effect="glitch" palette="fire">castle</piix-text> lit</h1>
+  <p>A cosy night-watch game about lanterns, ghosts and good neighbours.</p>
+  <div class="ctas"><piix-glow-button palette="sunset" size="lg">Play free</piix-glow-button><piix-button tone="paper" pal="kitty">Watch trailer</piix-button></div>
+</piix-hero>
+
+<piix-divider kind="stairs" from="#0d0c1c" to="#0d0c1c" palette="sunset" height="60px"></piix-divider>
+
+<section class="wrap">
+  <h2>Every night, a little different</h2>
+  <p class="lead">The castle is procedurally lit: no two nights have the same windows on.</p>
+  <div class="feat">
+    <piix-glow-card palette="sunset"><h3>Light the lanterns</h3><p>Walk the walls before midnight and keep every tower glowing.</p></piix-glow-card>
+    <piix-glow-card palette="violet"><h3>Talk to ghosts</h3><p>They're mostly lonely. Some of them have quests.</p></piix-glow-card>
+    <piix-glow-card palette="lime"><h3>Grow a garden</h3><p>Moonflowers on the battlements, if you can keep the crows off.</p></piix-glow-card>
+  </div>
+</section>
+
+<section class="wrap">
+  <div class="stats">
+    <piix-stat value="240000" suffix="+" tone="sun">keepers so far</piix-stat>
+    <piix-stat value="96" suffix="%" tone="mint">positive reviews</piix-stat>
+    <piix-stat value="31" tone="coral">ghosts to befriend</piix-stat>
+  </div>
+</section>
+
+<section class="wrap two">
+  <div>
+    <h2>Patch notes</h2>
+    <piix-tabs palette="sunset">
+      <div label="1.2"><p>Winter nights: snow on the battlements and a new ghost in the well.</p></div>
+      <div label="1.1"><p>Photo mode, and the cat now follows you up the stairs.</p></div>
+      <div label="1.0"><p>Launch. Thank you for keeping the lights on.</p></div>
+    </piix-tabs>
+  </div>
+  <div class="frame"><piix-scene kind="galaxy" height="300px" aria-label="The night sky over the castle: a spiral galaxy"></piix-scene></div>
+</section>
+
+<section class="wrap">
+  <h2>Get the night-watch letter</h2>
+  <p class="lead">One email a month. Dev diaries, ghost stories, no spam.</p>
+  <form onsubmit="event.preventDefault(); this.querySelector('output').value = 'You\'re on the watch list.'">
+    <piix-input name="email" type="email" required placeholder="you@castle.com" palette="sunset">Email</piix-input>
+    <piix-checkbox name="beta" tone="sun">Invite me to betas</piix-checkbox>
+    <piix-glow-button type="submit" palette="sunset">Sign up</piix-glow-button>
+    <output class="pix" style="color:var(--gold);font-size:12px"></output>
+  </form>
+</section>
+
+<piix-scene kind="castle" sky="none" fade="top" height="200px" palette="violet" aria-hidden="true"></piix-scene>
+<footer class="wrap">© Keep. A made-up game for a Pixel UI showcase.</footer>
+<script src="../../piixpal.js"></script>
+</body>
+</html>
