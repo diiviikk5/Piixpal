@@ -15,6 +15,8 @@
 //   events    [name, when]
 //   a11y      notes on keyboard, screen readers and reduced motion
 
+import { SCENE_PAGES } from './ui-scenes.mjs';
+
 export const PALETTES = ['lime', 'aurora', 'sunset', 'ocean', 'candy', 'violet', 'fire', 'gameboy', 'paper', 'mono'];
 const PAL_PROP = (def) => ['palette', `the colours: ${PALETTES.map(p => `<code>${p}</code>`).join(' ')}, or your own, dark to light: <code>"#000,#6b4cff,#fff"</code>`, def];
 const PX_PROP = (def) => ['pixel', 'size of one pixel, in px', String(def)];
@@ -95,6 +97,7 @@ const txPage = ([effect, slug, name, pal, brief, about]) => ({
 });
 
 export const UI = [
+  ...SCENE_PAGES,
   /* ---------- sections ---------- */
   { slug: 'hero', name: 'Hero', section: 'Sections', tag: 'piix-hero', file: 'hero', needs: ['shader'],
     brief: 'A whole hero section on a GPU pixel background that dissolves in.',
@@ -334,4 +337,4 @@ export const UI = [
   ...BG.map(bgPage)
 ];
 
-export const SECTIONS = ['Backgrounds', 'Sections', 'Buttons', 'Cards', 'Text', 'Media', 'Forms', 'Navigation', 'Feedback', 'Motion'];
+export const SECTIONS = ['Scenes', 'Layouts', 'Backgrounds', 'Sections', 'Buttons', 'Cards', 'Text', 'Media', 'Forms', 'Navigation', 'Feedback', 'Motion'];

@@ -53,6 +53,7 @@ const shell = ({ key, title, desc, body, toc = [] }) => `<!doctype html>
 <link rel="stylesheet" href="../site/site.css">
 <link rel="stylesheet" href="../site/docs.css">
 <link rel="stylesheet" href="../site/ui.css">
+<link rel="stylesheet" href="../site/ui-layouts.css">
 <!-- Vercel Web Analytics: cookieless page views -->
 <script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};</script>
 <script defer src="/_vercel/insights/script.js"></script>
@@ -97,7 +98,7 @@ const stageHtml = (demo, st = {}) => {
     const from = (demo.match(/from="([^"]+)"/) || [, '#17121f'])[1], to = (demo.match(/to="([^"]+)"/) || [, '#f3eee3'])[1];
     inner = `<div class="split" style="background:${from}"></div>${demo}<div class="split" style="background:${to}"></div>`;
   }
-  const cls = ['ui-stage', st.light ? 'light' : '', st.split ? 'is-split' : '', st.narrow ? 'narrow' : '', st.top ? 'top' : ''].filter(Boolean).join(' ');
+  const cls = ['ui-stage', st.light ? 'light' : '', st.block ? 'block' : '', st.split ? 'is-split' : '', st.narrow ? 'narrow' : '', st.top ? 'top' : ''].filter(Boolean).join(' ');
   const style = [st.h ? `min-height:${st.h}px` : '', st.pad != null ? `padding:${st.pad}px` : ''].filter(Boolean).join(';');
   return `<div class="${cls}"${style ? ` style="${style}"` : ''}>${st.hint ? `<p class="hint">${esc(st.hint)}</p>` : ''}<div class="stage-in">${inner}</div></div>`;
 };
@@ -106,7 +107,7 @@ const demoBox = ({ demo, code, show, stage = {}, controls, tag, id }) => {
   /* what the demo starts with: its own attribute, or the component's default */
   const cur = (attr, def) => { const m = shown.match(new RegExp('<' + tag + '\b[^>]*\s' + attr + '="([^"]*)"')); return m ? m[1] : def; };
   const ctl = controls && controls.length ? `<div class="ui-controls" data-target="${tag}">${controls.map(([attr, label, kind, opts, def]) => {
-    if (kind === 'palette') return `<div class="ctl"><span>${label}</span><div class="swatches" data-attr="${attr}" data-def="${opts}">${PALETTES.map(p => `<button type="button" data-val="${p}" title="${p}" aria-label="${p}" aria-pressed="${p === cur(attr, opts)}" style="--sw:linear-gradient(90deg,${PAL[p].join(',')})"></button>`).join('')}</div></div>`;
+    if (kind === 'palette') return `<div class="ctl"><span>${label}</span><div class="swatches" data-attr="${attr}" data-def="${opts}">${opts === '' ? `<button type="button" class="own" data-val="" aria-pressed="${!cur(attr, '')}">Scene</button>` : ''}${PALETTES.map(p => `<button type="button" data-val="${p}" title="${p}" aria-label="${p}" aria-pressed="${p === cur(attr, opts)}" style="--sw:linear-gradient(90deg,${PAL[p].join(',')})"></button>`).join('')}</div></div>`;
     if (kind === 'range') { const [min, max, step, d] = opts, v = cur(attr, d); return `<label class="ctl"><span>${label}</span><input type="range" data-attr="${attr}" data-def="${d}" min="${min}" max="${max}" step="${step}" value="${v}"><output>${v}</output></label>`; }
     return `<div class="ctl"><span>${label}</span><div class="seg" data-attr="${attr}" data-def="${def}">${opts.map(o => `<button type="button" data-val="${o}" aria-pressed="${o === cur(attr, def)}">${o || 'default'}</button>`).join('')}</div></div>`;
   }).join('')}</div>` : '';
@@ -131,11 +132,26 @@ const table = (cols, rows) => `<div class="table-wrap"><table><thead><tr>${cols.
 ${rows.map(r => `<tr>${r.map((c, i) => `<td>${i === 0 ? `<code>${esc(c)}</code>` : c === '' ? '<span class="muted">–</span>' : i === 2 ? `<code>${esc(c)}</code>` : c}</td>`).join('')}</tr>`).join('\n')}
 </tbody></table></div>`;
 
+/* ---------- layout CSS: the rules a layout's markup uses ---------- */
+const LAY_CSS = readFileSync(join(root, 'site/ui-layouts.css'), 'utf8').split('\n').filter(l => l.includes('{'));
+const layCss = html => {
+  const used = new Set([...html.matchAll(/class="([^"]+)"/g)].flatMap(m => m[1].split(/\s+/)));
+  return LAY_CSS.filter(l => {
+    const sel = l.startsWith('@') ? l.slice(l.indexOf('{') + 1, l.indexOf('{', l.indexOf('{') + 1)) : l.slice(0, l.indexOf('{'));
+    const t = [...sel.matchAll(/\.(lay-[\w-]+|dark|center)/g)].map(m => m[1]);
+    return t.length && t.every(c => used.has(c));
+  }).join('\n');
+};
 /* ---------- a component page ---------- */
-const compPage = u => {
+const compPage = u0 => {
+  const u = u0.section === 'Layouts' ? { ...u0, code: `${u0.demo}
+
+<style>
+${layCss(u0.demo)}
+</style>` } : u0;
   const toc = [['preview', 'Preview'], ['installation', 'Installation'], ['usage', 'Usage']];
   if (u.examples && u.examples.length) toc.push(['examples', 'Examples']);
-  toc.push(['api', 'API reference']);
+  if (u.props) toc.push(['api', 'API reference']);
   if (u.events) toc.push(['events', 'Events']);
   if (u.a11y) toc.push(['accessibility', 'Accessibility']);
   const gpu = !['piix-stat', 'piix-marquee', 'piix-button', 'piix-toggle', 'piix-checkbox', 'piix-progress'].includes(u.tag);
@@ -154,8 +170,8 @@ ${u.examples && u.examples.length ? `
 ${u.examples.map(e => `<h3 class="ui-h3" id="ex-${slug(e.name)}">${esc(e.name)}</h3>${e.note ? `\n<p class="ui-note">${e.note}</p>` : ''}
 ${demoBox({ demo: e.demo, code: e.code, show: e.show, stage: { ...e.stage } })}`).join('\n')}` : ''}
 
-<h2 class="ui-h" id="api">API reference</h2>
-${table(['Attribute', 'What it does', 'Default'], u.props)}
+${u.props ? `<h2 class="ui-h" id="api">API reference</h2>
+${table(['Attribute', 'What it does', 'Default'], u.props)}` : ''}
 ${u.events ? `
 <h2 class="ui-h" id="events">Events</h2>
 ${table(['Event', 'When'], u.events)}` : ''}
@@ -182,10 +198,12 @@ const THUMB = {
   'reveal': '<piix-reveal pattern="rain" style="width:70%"><div class="shot s">Reveal</div></piix-reveal>',
   'cursor': '<span class="t-cur">Move your pointer</span>'
 };
-const thumb = u => u.section === 'Backgrounds' ? u.demo.replace('height="420px"', 'height="100%"')
+const thumb = u => u.section === 'Scenes' ? u.demo.replace('height="460px"', 'height="100%" pixel="3"')
+  : u.section === 'Layouts' ? `<div class="scaled">${u.demo}</div>`
+  : u.section === 'Backgrounds' ? u.demo.replace('height="420px"', 'height="100%"')
   : u.section === 'Text' && u.tag === 'piix-text' ? u.demo.replace('ex-h1', 'ex-h3')
   : THUMB[u.slug] || u.demo;
-const lightThumb = u => u.stage && u.stage.light;
+const lightThumb = u => u.stage && u.stage.light && u.section !== 'Layouts';
 const indexBody = `${head([], 'Pixel UI', `A component library drawn on the GPU. Backgrounds, heroes, buttons, cards, text effects and form controls, all rendered on a pixel grid and dithered into a palette. ${UI.length} components, each one a plain web component: one script tag, then copy a tag.`,
   `<div class="pills">${bySection.map(([s, l]) => `<a class="pill" href="#${slug(s)}">${s} · ${l.length}</a>`).join('')}</div>`)}
 <div class="ui-why">
