@@ -58,6 +58,8 @@ const glInit = () => {
     const gl = cv.getContext('webgl', { alpha: true, premultipliedAlpha: true, antialias: false, depth: false, stencil: false, preserveDrawingBuffer: false, powerPreference: 'low-power' });
     if (!gl) return (GL.ok = false);
     GL.cv = cv; GL.gl = gl;
+    /* compile shaders in the background where the browser can, so a big one never freezes the page */
+    GL.par = gl.getExtension('KHR_parallel_shader_compile');
     const setup = () => {
       GL.buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, GL.buf);
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
@@ -73,16 +75,23 @@ const glInit = () => {
 
 const glProgram = body => {
   const gl = GL.gl;
-  const sh = (type, src) => {
-    const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s);
-    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) { console.warn('[piixpal] shader:', gl.getShaderInfoLog(s)); return null; }
-    return s;
-  };
+  const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; };
   const v = sh(gl.VERTEX_SHADER, GL_VERT), f = sh(gl.FRAGMENT_SHADER, GL_PRELUDE + body + GL_MAIN);
-  if (!v || !f) return null;
   const p = gl.createProgram(); gl.attachShader(p, v); gl.attachShader(p, f); gl.linkProgram(p);
-  if (!gl.getProgramParameter(p, gl.LINK_STATUS)) { console.warn('[piixpal] link:', gl.getProgramInfoLog(p)); return null; }
-  return { prog: p, pos: gl.getAttribLocation(p, 'p'), u: {} };
+  return { prog: p, v, f, pending: true, u: {} };
+};
+/* is it ready? false while it's still compiling in the background, null if it failed */
+const glReady = P => {
+  if (!P.pending) return P;
+  const gl = GL.gl;
+  if (GL.par && !gl.getProgramParameter(P.prog, GL.par.COMPLETION_STATUS_KHR)) return false;
+  P.pending = false;
+  if (!gl.getProgramParameter(P.prog, gl.LINK_STATUS)) {
+    console.warn('[piixpal] shader:', gl.getShaderInfoLog(P.f) || gl.getProgramInfoLog(P.prog));
+    return null;
+  }
+  P.pos = gl.getAttribLocation(P.prog, 'p');
+  return P;
 };
 
 /* draw a shader at w x h into the shared canvas; returns where to copy it from.
@@ -91,8 +100,9 @@ const glDraw = (body, w, h, u, tex) => {
   if (!glInit()) return null;
   const gl = GL.gl, cv = GL.cv;
   if (cv.width < w || cv.height < h) { cv.width = Math.max(cv.width, w); cv.height = Math.max(cv.height, h); }
-  const P = GL.progs[body] || (GL.progs[body] = glProgram(body));
-  if (!P) return null;
+  const P0 = GL.progs[body] || (GL.progs[body] = glProgram(body)), P = glReady(P0);
+  if (P === null) GL.progs[body] = { failed: true };
+  if (!P || P0.failed) return null;
   gl.useProgram(P.prog);
   gl.viewport(0, 0, w, h);
   gl.disable(gl.SCISSOR_TEST); gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
@@ -115,7 +125,8 @@ const glDraw = (body, w, h, u, tex) => {
     if (!t) { t = gl.createTexture(); GL.tex.set(tex.owner, t); }
     gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, t);
     if (fresh || tex.dirty) {
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+      const wrap = tex.repeat ? gl.REPEAT : gl.CLAMP_TO_EDGE;
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrap); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrap);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
       try { gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, tex.src); } catch (_) { return null; }
     }
