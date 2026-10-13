@@ -7,24 +7,28 @@
  *
  * A dark pixel card with a band of light chasing round its edge and a spotlight that follows your
  * pointer under the content. It tilts a little toward the pointer, and a click sends a ring out
- * across it. Put anything inside.
+ * across it. Put anything inside. Looks: liquid chrome, frosted glass (lovely over a scene),
+ * a two-ink riso print, or a green terminal.
  *
- *   palette   the colours of the light                    default: violet
+ *   look      glow | chrome | glass | riso | crt              default: glow
+ *   palette   the colours of the light                    default: violet (or the look's own)
  *   pixel     size of one pixel, px                       default: 3
  *   tilt      "none" keeps it flat */
 class PiixGlowCardElement extends GLStage {
-  constructor() { super(); this._defPx = 3; this._defPal = 'violet'; this._click = [.5, .5, -9]; this._tilt = [0, 0]; }
-  _hostCss() { return 'display:block;color:#f2eef8;transform-style:preserve-3d;transition:transform .2s cubic-bezier(.2,.8,.2,1)'; }
+  get _defPal() { const l = glLook(this); return l === 'glow' ? 'violet' : GL_LOOKS[l][0]; }
+  constructor() { super(); this._defPx = 3; this._click = [.5, .5, -9]; this._tilt = [0, 0]; }
+  _hostCss() { return 'display:block;color:#f2eef8;transform-style:preserve-3d;transition:transform .2s cubic-bezier(.2,.8,.2,1);' + glLookHost(glLook(this)); }
   _css() {
-    return `.in{position:relative;padding:28px 26px 26px;font:400 15px/1.5 "Bricolage Grotesque",system-ui,sans-serif}
-::slotted(h3),::slotted(h2){margin:0 0 .4em!important;font-weight:750!important;font-size:22px!important;letter-spacing:-.02em;color:#fff}
+    const l = glLook(this), txt = l === 'glow' ? 'color:#f2eef8' : GL_LOOK_TEXT[l](this._pal.list);
+    return `.in{position:relative;padding:28px 26px 26px;font:400 15px/1.5 "Bricolage Grotesque",system-ui,sans-serif;${txt}}
+::slotted(h3),::slotted(h2){margin:0 0 .4em!important;font-weight:750!important;font-size:22px!important;letter-spacing:-.02em;color:inherit}
 ::slotted(p){margin:0!important;opacity:.8}`;
   }
   _html() { return '<canvas aria-hidden="true"></canvas><div class="in" part="content"><slot></slot></div>'; }
   _setup() {
     this.addEventListener('pointerdown', e => { const r = this.getBoundingClientRect(); this._click = [(e.clientX - r.left) / r.width, 1 - (e.clientY - r.top) / r.height, now()]; });
   }
-  _shader() { return GL_FRAME; }
+  _shader() { return GL_LOOKS[glLook(this)][1]; }
   _uniforms(T, dt) {
     /* lean toward the pointer while it's over the card */
     if (this.getAttribute('tilt') !== 'none' && !reduced()) {

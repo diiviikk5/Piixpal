@@ -6,9 +6,11 @@
  * A band of light chases round the pixel border, drawn on the GPU and dithered into the palette.
  * Hover and a spotlight follows your pointer across the face; click and a ring ripples out from
  * where you clicked. It's a real button: it focuses, works with the keyboard, and submits or
- * resets the form it's in.
+ * resets the form it's in. Give it a look to change its whole style: liquid chrome, frosted
+ * glass, a two-ink riso print or a green terminal.
  *
- *   palette   the colours of the light                    default: lime
+ *   look      glow | chrome | glass | riso | crt              default: glow
+ *   palette   the colours of the light                    default: lime (or the look's own)
  *   pixel     size of one pixel, px                       default: 3
  *   type      button | submit | reset                     default: button
  *   size      sm | md | lg                                default: md
@@ -16,11 +18,12 @@
 class PiixGlowButtonElement extends GLStage {
   static get formAssociated() { return true; }
   static get observedAttributes() { return [...GLStage.observedAttributes, 'size', 'disabled']; }
-  constructor() { super(); this._defPx = 3; this._defPal = 'lime'; this._click = [.5, .5, -9]; this._int = this.attachInternals ? this.attachInternals() : null; }
-  _hostCss() { return 'display:inline-block;vertical-align:middle;cursor:pointer;-webkit-tap-highlight-color:transparent'; }
+  get _defPal() { const l = glLook(this); return l === 'glow' ? 'lime' : GL_LOOKS[l][0]; }
+  constructor() { super(); this._defPx = 3; this._click = [.5, .5, -9]; this._int = this.attachInternals ? this.attachInternals() : null; }
+  _hostCss() { return 'display:inline-block;vertical-align:middle;cursor:pointer;-webkit-tap-highlight-color:transparent;' + glLookHost(glLook(this)); }
   _css() {
     const [pad, fs] = { sm: ['11px 18px', 13], lg: ['20px 34px', 18] }[this.getAttribute('size')] || ['16px 26px', 15];
-    return `button{all:unset;position:relative;display:block;box-sizing:border-box;padding:${pad};color:${this._pal.list[this._pal.list.length - 1]};font:700 ${fs}px/1 "Bricolage Grotesque",system-ui,sans-serif;letter-spacing:.01em;text-shadow:0 1px 0 rgba(0,0,0,.5);transition:transform .08s}
+    return `button{all:unset;position:relative;display:block;box-sizing:border-box;padding:${pad};font:700 ${fs}px/1 "Bricolage Grotesque",system-ui,sans-serif;letter-spacing:.01em;${GL_LOOK_TEXT[glLook(this)](this._pal.list)};transition:transform .08s}
 button:focus-visible{outline:2px dashed ${this._pal.list[this._pal.list.length - 2]};outline-offset:4px}
 :host(:active) button{transform:translateY(1px)}
 :host([disabled]){opacity:.45;cursor:not-allowed;filter:grayscale(.7)}`;
@@ -36,7 +39,7 @@ button:focus-visible{outline:2px dashed ${this._pal.list[this._pal.list.length -
       if (form && t === 'reset') form.reset();
     });
   }
-  _shader() { return GL_FRAME; }
+  _shader() { return GL_LOOKS[glLook(this)][1]; }
   _uniforms() { return { u_k: [this._click[0], this._click[1], (now() - this._click[2]) / 1000, 2], u_j: [this._hov * .04, 0, 0, 0] }; }
 }
 define('piix-glow-button', PiixGlowButtonElement);

@@ -7,22 +7,24 @@
  * it has a value, it's labelled for screen readers, and it submits with the form it's in.
  *
  *   name, type, value, placeholder, required, disabled, autocomplete, maxlength
- *   palette   the colours of the light                    default: lime
+ *   look      glow | chrome | glass | riso | crt              default: glow
+ *   palette   the colours of the light                    default: lime (or the look's own)
  *   pixel     size of one pixel, px                       default: 3
  *
  *   events: input, change */
 class PiixInputElement extends GLStage {
   static get formAssociated() { return true; }
   static get observedAttributes() { return [...GLStage.observedAttributes, 'placeholder', 'type', 'disabled', 'required']; }
-  constructor() { super(); this._defPx = 3; this._defPal = 'lime'; this._defDither = .4; this._click = [.5, .5, -9]; this._int = this.attachInternals ? this.attachInternals() : null; this._focus = 0; }
+  get _defPal() { const l = glLook(this); return l === 'glow' ? 'lime' : GL_LOOKS[l][0]; }
+  constructor() { super(); this._defPx = 3; this._defDither = .4; this._click = [.5, .5, -9]; this._int = this.attachInternals ? this.attachInternals() : null; this._focus = 0; }
   get value() { return this._in ? this._in.value : this.getAttribute('value') || ''; }
   set value(v) { if (this._in) this._in.value = v; this._sync(); }
   _hostCss() { return 'display:block'; }
   _css() {
     const l = this._pal.list;
     return `label{display:block;margin-bottom:8px;font:400 12px/1 ${KIT_FONT};text-transform:uppercase;letter-spacing:.06em;color:inherit;opacity:.8}
-.box{position:relative}
-input{all:unset;position:relative;z-index:1;box-sizing:border-box;width:100%;padding:15px 18px;font:500 16px/1.2 "Bricolage Grotesque",system-ui,sans-serif;color:#f2eef8;caret-color:${l[l.length - 2]}}
+.box{position:relative;${glLookHost(glLook(this))}}
+input{all:unset;position:relative;z-index:1;box-sizing:border-box;width:100%;padding:15px 18px;font:500 16px/1.2 "Bricolage Grotesque",system-ui,sans-serif;${glLook(this) === 'glow' ? 'color:#f2eef8' : GL_LOOK_TEXT[glLook(this)](l).replace(/text-transform:uppercase;?/, '')};caret-color:${l[l.length - 2]}}
 input::placeholder{color:#8e869c}
 :host([disabled]){opacity:.5}`;
   }
@@ -50,7 +52,7 @@ input::placeholder{color:#8e869c}
     this._int.setFormValue(this._in.value);
     if (this._in.validity) this._int.setValidity(this._in.validity.valid ? {} : this._in.validity, this._in.validationMessage, this._in);
   }
-  _shader() { return GL_FRAME; }
+  _shader() { return GL_LOOKS[glLook(this)][1]; }
   _uniforms(T, dt) {
     this._focus = lerp(this._focus, this._focused ? 1 : 0, Math.min(1, dt * 6));
     return { u_hover: Math.max(this._hov * .5, this._focus), u_mouse: this._focused ? [this._click[0], .5] : this._m, u_k: [this._click[0], this._click[1], (now() - this._click[2]) / 1000, 1], u_j: [this._focus * .03, 0, 0, 0] };
