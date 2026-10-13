@@ -60,6 +60,11 @@
   </div>
 </section>
 
+<section class="wrap" style="text-align:center">
+  <h2>The winter update lands in</h2>
+  <piix-flap countdown="2026-12-21T18:00:00" theme="amber" style="font-size:clamp(28px,5vw,52px)"></piix-flap>
+</section>
+
 <section class="wrap two">
   <div>
     <h2>Patch notes</h2>
@@ -75,16 +80,16 @@
 <section class="wrap">
   <h2>Get the night-watch letter</h2>
   <p class="lead">One email a month. Dev diaries, ghost stories, no spam.</p>
-  <form onsubmit="event.preventDefault(); this.querySelector('output').value = 'You\'re on the watch list.'">
+  <form onsubmit="event.preventDefault(); Piixpal.toast('Check your inbox to confirm.', { tone: 'ok', title: 'You\'re on the watch list' }); this.reset()">
     <piix-input name="email" type="email" required placeholder="you@castle.com" palette="sunset">Email</piix-input>
     <piix-checkbox name="beta" tone="sun">Invite me to betas</piix-checkbox>
     <piix-glow-button type="submit" palette="sunset">Sign up</piix-glow-button>
-    <output class="pix" style="color:var(--gold);font-size:12px"></output>
   </form>
 </section>
 
 <piix-scene kind="castle" sky="none" fade="top" height="200px" palette="violet" aria-hidden="true"></piix-scene>
 <footer class="wrap">© Keep. A made-up game for a Pixel UI showcase.</footer>
+<piix-toaster position="bottom"></piix-toaster>
 <script src="../../piixpal.js"></script>
 </body>
 </html>

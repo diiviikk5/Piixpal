@@ -45,6 +45,7 @@
   blockquote { margin: 0; font-size: clamp(24px, 3vw, 34px); line-height: 1.2; letter-spacing: -.03em; font-weight: 650 }
   cite { display: block; margin-top: 16px; font: 400 12px/1 "Silkscreen", monospace; font-style: normal; text-transform: uppercase; color: var(--muted) }
   .frame { border-radius: 18px; overflow: hidden; border: 1.5px solid var(--line) }
+  .profile { padding: 24px; border: 1.5px solid var(--line); border-radius: 18px; background: #fffdf8; color: var(--ink) }
   footer { position: relative; color: #fff; background: #3c6a2c }
   footer .in { position: relative; padding: 40px 0 48px; display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap }
   footer h2 { color: #fff }
@@ -82,6 +83,12 @@
       <piix-stat value="4810" suffix=" m" tone="sun">highest summit</piix-stat>
       <piix-stat value="99.2" decimals="1" suffix="%" tone="sky">forecast accuracy</piix-stat>
     </div>
+  </section>
+
+  <section class="wrap">
+    <h2>Know the climb before you start</h2>
+    <p class="sub">Every route comes with its elevation profile. Hover to read the height at each kilometre.</p>
+    <div class="profile"><piix-chart values="1210,1260,1340,1480,1520,1610,1790,1950,1900,2080,2260,2410,2380,2550,2720,2810" labels="0 km,1 km,2 km,3 km,4 km,5 km,6 km,7 km,8 km,9 km,10 km,11 km,12 km,13 km,14 km,15 km" suffix=" m" min="1000" palette="#fffdf8,#a8c48c,#5f8f3a,#2f5a22,#18211b" height="240px"></piix-chart></div>
   </section>
 
   <section class="wrap quote">
