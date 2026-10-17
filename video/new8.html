@@ -1,6 +1,6 @@
 <!doctype html>
-<!-- Physics & time + Games & sound: a 30-second film of the eight newest Pixel UI components, cut to video/beat30.mjs.
-     Rendered frame by frame by: PAGE=new8.html NAME=pixelui-new8 WAV=pixelui30.wav node video/render.mjs -->
+<!-- Physics & time + Games & sound: a 21-second film of the eight newest Pixel UI components, cut to video/beat-new8.mjs.
+     Rendered frame by frame by: PAGE=new8.html NAME=pixelui-new8 WAV=new8.wav node video/render.mjs -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -63,10 +63,6 @@
   .card { padding: 22px 26px; background: #fbf8f1; box-shadow: inset 0 0 0 4px #17121f; font-size: 30px; line-height: 1.3 }
   .card b { display: block; font-size: 40px }
   /* intro */
-  #s-intro { display: grid; place-content: center; justify-items: center; gap: 34px }
-  #s-intro .big { font-size: 210px; font-weight: 800; letter-spacing: -.06em; line-height: .9 }
-  #s-intro .kick { font-size: 34px; color: #c6f432 }
-  #s-intro .sub { font-size: 46px; opacity: .8 }
   /* rpg */
   #s-rpg .zoom { position: absolute; left: 50%; top: 42%; width: 700px; transform: translate(-50%, -50%) scale(2.25); transform-origin: 50% 50% }
   /* chiptune */
@@ -86,17 +82,11 @@
 </style>
 <div id="stage">
 
-  <section class="shot dark" id="s-intro">
-    <div class="kick pix">New in Pixel UI</div>
-    <div class="big">8 new toys.</div>
-    <div class="sub">Physics &amp; time · Games &amp; sound</div>
-  </section>
 
   <section class="shot paper" id="s-rpg">
     <div class="zoom">
-      <piix-rpg-box id="rpg" pal="kitty" name="Kit" lines="2" speed="34" sound="off">
-        <p>Psst! Eight new components just landed.</p>
-        <p>They fall, splash, rewind… and play.</p>
+      <piix-rpg-box id="rpg" pal="kitty" name="Kit" lines="2" speed="45" sound="off">
+        <p>Psst! Eight new toys. Go play.</p>
       </piix-rpg-box>
     </div>
     <div class="label"><span class="kick pix">Games &amp; sound</span><span class="name">RPG dialogue</span><span class="tag mono">&lt;piix-rpg-box&gt;</span></div>
