@@ -1,0 +1,32 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Pixel UI: rewind</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono&family=Silkscreen&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #f3eee3; color: #17121f; font: 400 18px/1.6 "Bricolage Grotesque", system-ui }
+  main { max-width: 640px; margin: 0 auto; padding: 40px 28px 300px }
+  h2 { font-size: 40px; line-height: 1; letter-spacing: -.03em; margin: 0 0 14px; font-weight: 800 }
+  .app { padding: 20px; background: #fbf8f1; box-shadow: inset 0 0 0 2px #17121f }
+  ul { list-style: none; padding: 0; margin: 12px 0 }
+  li { display: flex; gap: 10px; align-items: center; padding: 6px 0; border-bottom: 1px dashed #d8d0c2 }
+  li.done span { text-decoration: line-through; opacity: .5 }
+  li button { margin-left: auto }
+  input[type=text] { font: inherit; padding: 6px 10px; width: 60% }
+  .note { min-height: 60px; padding: 10px; outline: 2px solid #17121f; background: #fff }
+</style>
+<main>
+  <piix-rewind id="rw">
+    <div class="app">
+      <h2>Tasks</h2>
+      <form id="add"><input type="text" id="task" placeholder="New task"> <button>Add</button></form>
+      <ul id="list"><li><input type="checkbox"><span>Ship the rewind component</span><button>×</button></li></ul>
+      <div class="note" contenteditable>Type here, then rewind.</div>
+    </div>
+  </piix-rewind>
+</main>
+<script>
+  add.addEventListener('submit', e => { e.preventDefault(); if (!task.value.trim()) return; const li = document.createElement('li'); li.innerHTML = '<input type="checkbox"><span></span><button>×</button>'; li.querySelector('span').textContent = task.value; list.append(li); task.value = ''; });
+  list.addEventListener('click', e => { if (e.target.tagName === 'BUTTON') e.target.closest('li').remove(); });
+  list.addEventListener('change', e => e.target.closest('li').classList.toggle('done', e.target.checked));
+</script>
+<script src="../piixpal.js"></script>
