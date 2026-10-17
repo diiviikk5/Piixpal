@@ -8,6 +8,8 @@ import { navBar } from './docs.mjs';
 import { GAME_THUMBS, PHYSICS_THUMBS } from './ui-games.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+/* the bundle's fingerprint goes on its URL: browsers cache piixpal.js for an hour, and a new version must not wait for that */
+const BUNDLE_V = (await import('node:crypto')).createHash('md5').update(readFileSync(join(root, 'piixpal.js'))).digest('hex').slice(0, 8);
 const out = join(root, 'ui');
 mkdirSync(out, { recursive: true });
 for (const f of readdirSync(out)) if (f.endsWith('.html')) unlinkSync(join(out, f));
@@ -70,7 +72,7 @@ ${body}
   </main>
   <nav class="ui-toc" aria-label="On this page">${toc.length ? `<h4>On this page</h4>${toc.map(([id, t]) => `<a href="#${id}">${t}</a>`).join('')}` : ''}</nav>
 </div>
-<script src="../piixpal.js"></script>
+<script src="../piixpal.js?v=${BUNDLE_V}"></script>
 <script src="../site/site.js" defer></script>
 <script src="../site/docs.js" defer></script>
 <script src="../site/ui.js" defer></script>
