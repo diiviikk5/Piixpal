@@ -9,6 +9,7 @@
 import { readFileSync, readdirSync, writeFileSync, existsSync, mkdirSync, rmSync } from 'node:fs';
 import { join, dirname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { createHash } from 'node:crypto';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const src = join(root, 'src');
@@ -125,6 +126,9 @@ export function components() {
 export function build() {
   const { code, files } = bundle();
   writeFileSync(join(root, 'piixpal.js'), code);
+  /* the home page loads the bundle by a fingerprinted URL, so browsers never keep an old one */
+  const v = createHash('md5').update(code).digest('hex').slice(0, 8), home = join(root, 'index.html');
+  if (existsSync(home)) writeFileSync(home, readFileSync(home, 'utf8').replace(/<script src="piixpal\.js(\?v=\w+)?"><\/script>/,`<script src="piixpal.js?v=${v}"></script>`));
   return { files, bytes: Buffer.byteLength(code) };
 }
 
