@@ -365,6 +365,6 @@ SECTIONS.splice(SECTIONS.indexOf('3D & Shaders'), 0, 'Hero sections');
 export { HERO_CSS };
 
 /* ---------- games and sound ---------- */
-import { GAME_PAGES } from './ui-games.mjs';
-UI.push(...GAME_PAGES);
-SECTIONS.splice(SECTIONS.indexOf('Motion') + 1, 0, 'Games & sound');
+import { GAME_PAGES, PHYSICS_PAGES } from './ui-games.mjs';
+UI.push(...GAME_PAGES, ...PHYSICS_PAGES);
+SECTIONS.splice(SECTIONS.indexOf('Motion') + 1, 0, 'Physics', 'Games & sound');
