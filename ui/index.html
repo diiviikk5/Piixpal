@@ -115,8 +115,8 @@
       <a href="reveal.html">Reveal</a><a href="cursor.html">Cursor trail</a>
     </details>
     <details class="sg" open>
-      <summary><a href="./#physics">Physics</a><span class="n">3</span></summary>
-      <a href="sand.html">Sand</a><a href="quake.html">Quake</a><a href="liquid.html">Liquid</a>
+      <summary><a href="./#physics-time">Physics & time</a><span class="n">4</span></summary>
+      <a href="sand.html">Sand</a><a href="quake.html">Quake</a><a href="liquid.html">Liquid</a><a href="rewind.html">Rewind</a>
     </details>
     <details class="sg" open>
       <summary><a href="./#games-sound">Games & sound</a><span class="n">4</span></summary>
@@ -128,7 +128,7 @@
 <header class="doc-head ui-head">
   <div class="crumbs"><a href="./">Pixel UI</a></div>
   <h1>Pixel UI</h1>
-  <p>A component library drawn on the GPU. Backgrounds, heroes, buttons, cards, text effects and form controls, all rendered on a pixel grid and dithered into a palette. 109 components, each one a plain web component: one script tag, then copy a tag.</p><div class="pills"><a class="pill" href="#scenes">Scenes · 10</a><a class="pill" href="#layouts">Layouts · 6</a><a class="pill" href="#hero-sections">Hero sections · 18</a><a class="pill" href="#3d-shaders">3D & Shaders · 19</a><a class="pill" href="#image-effects">Image effects · 10</a><a class="pill" href="#backgrounds">Backgrounds · 10</a><a class="pill" href="#sections">Sections · 3</a><a class="pill" href="#buttons">Buttons · 2</a><a class="pill" href="#cards">Cards · 1</a><a class="pill" href="#text">Text · 8</a><a class="pill" href="#media">Media · 1</a><a class="pill" href="#forms">Forms · 4</a><a class="pill" href="#navigation">Navigation · 1</a><a class="pill" href="#overlays">Overlays · 3</a><a class="pill" href="#feedback">Feedback · 2</a><a class="pill" href="#data">Data · 2</a><a class="pill" href="#motion">Motion · 2</a><a class="pill" href="#physics">Physics · 3</a><a class="pill" href="#games-sound">Games & sound · 4</a></div>
+  <p>A component library drawn on the GPU. Backgrounds, heroes, buttons, cards, text effects and form controls, all rendered on a pixel grid and dithered into a palette. 110 components, each one a plain web component: one script tag, then copy a tag.</p><div class="pills"><a class="pill" href="#scenes">Scenes · 10</a><a class="pill" href="#layouts">Layouts · 6</a><a class="pill" href="#hero-sections">Hero sections · 18</a><a class="pill" href="#3d-shaders">3D & Shaders · 19</a><a class="pill" href="#image-effects">Image effects · 10</a><a class="pill" href="#backgrounds">Backgrounds · 10</a><a class="pill" href="#sections">Sections · 3</a><a class="pill" href="#buttons">Buttons · 2</a><a class="pill" href="#cards">Cards · 1</a><a class="pill" href="#text">Text · 8</a><a class="pill" href="#media">Media · 1</a><a class="pill" href="#forms">Forms · 4</a><a class="pill" href="#navigation">Navigation · 1</a><a class="pill" href="#overlays">Overlays · 3</a><a class="pill" href="#feedback">Feedback · 2</a><a class="pill" href="#data">Data · 2</a><a class="pill" href="#motion">Motion · 2</a><a class="pill" href="#physics-time">Physics & time · 4</a><a class="pill" href="#games-sound">Games & sound · 4</a></div>
 </header>
 <div class="ui-why">
   <div><h3>On the GPU</h3><p>Shaders run on one shared WebGL context, drawn at pixel resolution and scaled up crisp.</p></div>
@@ -726,7 +726,7 @@
   </a>
 </div>
 
-<h2 class="fam-h" id="physics">Physics <span class="n">3</span></h2>
+<h2 class="fam-h" id="physics-time">Physics & time <span class="n">4</span></h2>
 <div class="ui-grid">
   <a class="ui-card" href="sand.html">
     <div class="ui-thumb light" aria-hidden="true" inert><piix-sand trigger="click" rest="never" grain="3" style="width:80%"><b style="font:800 30px/1 Bricolage Grotesque,system-ui">Crumble me</b></piix-sand></div>
@@ -739,6 +739,10 @@
   <a class="ui-card" href="liquid.html">
     <div class="ui-thumb light" aria-hidden="true" inert><piix-liquid level=".5" style="width:86%;height:110px"><span style="display:inline-block;margin:58px 0 0 30%;padding:6px 12px;background:#fbf8f1;box-shadow:inset 0 0 0 2px #17121f;font:700 13px Bricolage Grotesque,system-ui">float</span></piix-liquid></div>
     <h3>Liquid</h3><p>Your section half full of pixel water, and the things in it float.</p>
+  </a>
+  <a class="ui-card" href="rewind.html">
+    <div class="ui-thumb light" aria-hidden="true" inert><span style="display:inline-flex;gap:6px;align-items:center;padding:8px 12px;background:#17121f;color:#f2eef8;font:400 13px Silkscreen,monospace"><b style="padding:5px 8px;background:#c6f432;color:#17121f">&lt;&lt;</b><i style="width:110px;height:4px;background:linear-gradient(90deg,#c6f432 60%,#2a2236 60%)"></i>-00:12</span></div>
+    <h3>Rewind</h3><p>A VCR for any part of your page. Everything that changes in it can be rewound.</p>
   </a>
 </div>
 
