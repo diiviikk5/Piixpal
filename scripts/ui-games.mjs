@@ -109,3 +109,33 @@ export const GAME_THUMBS = {
   'handheld': '<piix-handheld width="84px" boot="off" style="pointer-events:none"><p>SAVE 1</p></piix-handheld>',
   'chiptune': '<piix-chiptune></piix-chiptune>'
 };
+
+/* ---------- physics: whole pages that fall apart and come back ---------- */
+export const PHYSICS_PAGES = [
+  { slug: 'sand', name: 'Sand', section: 'Physics', tag: 'piix-sand', file: 'sand',
+    brief: 'Your text crumbles into sand, piles up, and flows back into words.',
+    about: "Every letter inside is redrawn as pixels, and every pixel is a grain in a real falling-sand simulation. Brush over a word and its grains come loose: they pour down, slide off each other into piles, land on the words below and on buttons and images (those stay solid), and you can sweep the piles around with the pointer. Stop for a moment and every grain flies back to the exact pixel it came from, and the real text returns. Your markup is never changed: the words stay in the page the whole time, for selection, search and screen readers.",
+    demo: `<piix-sand>
+  <h2 class="ex-h2">Touch these words.</h2>
+  <p>Brush over a line and it falls apart, pours down and piles up on the words below. Stop, and every grain flies home.</p>
+  <piix-button tone="ink">Sand piles on me</piix-button>
+</piix-sand>`,
+    stage: { light: true, block: true, pad: 40, hint: 'Brush over the words' },
+    controls: [['trigger', 'Trigger', 'seg', ['brush', 'click'], 'brush'], ['grain', 'Grain', 'seg', ['1', '2', '3', '4'], '2'], ['rest', 'Flows back after', 'seg', ['1', '2', '4', 'never'], '2']],
+    examples: [
+      { name: 'Click to collapse', note: 'With <code>trigger="click"</code> one click brings it all down; with <code>rest="never"</code> it stays down until the next click.',
+        demo: `<piix-sand trigger="click" rest="never" grain="3">\n  <h2 class="ex-h2" style="color:#6b4cff">Click me.</h2>\n  <p>Once to bring it down, again to build it back.</p>\n</piix-sand>`, stage: { light: true, block: true, pad: 40 } },
+      { name: 'Around images', note: 'Images, buttons, inputs and anything with <code>data-solid</code> stay put, and the sand piles on them.',
+        demo: `<piix-sand brush="30">\n  <img src="../site/launch-poster.jpg" alt="" style="width:46%;float:right;margin:0 0 12px 20px">\n  <h3 class="ex-h3">Patch notes</h3>\n  <p>Brush the words to the right of the picture and watch them pour down its edge and heap on the button below.</p>\n  <p>Grains that land on letters rest on them, and fall again when those letters crumble too.</p>\n  <piix-button tone="coral" style="clear:both">Read more</piix-button>\n</piix-sand>`, stage: { light: true, block: true, pad: 40 } },
+      { name: 'From your own code', note: '<code>crumble()</code> brings everything down, <code>crumble(x, y, r)</code> just one spot, <code>rebuild()</code> calls it home.',
+        demo: `<piix-sand id="logo" trigger="none" rest="never" grain="3">\n  <h2 class="ex-h2">piixpal</h2>\n</piix-sand>\n<piix-button tone="ink" size="sm" onclick="logo.crumble()">Crumble</piix-button>\n<piix-button tone="lime" size="sm" onclick="logo.rebuild()">Rebuild</piix-button>`, stage: { light: true, block: true, pad: 40 } }
+    ],
+    props: [['trigger', '<code>brush</code>: the pointer crumbles what it touches. <code>click</code>: a click brings it all down. <code>none</code>: only from code', 'brush'], ['brush', "the brush's radius, in px", '22'], ['grain', 'the size of one grain, in px', '2'], ['rest', 'seconds of calm before it flows back, or <code>never</code>', '2'], SOUND,
+      ['data-solid', 'on any element inside: it stays solid and sand piles on it (images, buttons and inputs already do)', '']],
+    events: [['crumble', 'the first grains come loose'], ['rebuild', 'every grain is home and the real text is back']],
+    methods: [['crumble()', 'bring everything down'], ['crumble(x, y, r)', 'crumble one spot: x and y in px from its top-left, r the radius'], ['rebuild()', 'send every grain home now']],
+    a11y: ['Your text is never removed or rewritten: screen readers, selection and find-in-page see the real words the whole time.', 'Buttons, links and inputs keep working, and stay visible, while everything around them is sand.', 'With reduced motion the grains go home at once instead of flying.'] }
+];
+export const PHYSICS_THUMBS = {
+  'sand': '<piix-sand trigger="click" rest="never" grain="3" style="width:80%"><b style="font:800 30px/1 Bricolage Grotesque,system-ui">Crumble me</b></piix-sand>'
+};
