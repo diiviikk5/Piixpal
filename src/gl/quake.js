@@ -170,7 +170,7 @@ canvas{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none
       /* nothing wider than the room it falls in, or it would wedge between the walls forever */
       b.w = Math.min(b.w, host.width * .96); b.h = Math.min(b.h, host.height * .9);
       const m = b.w * b.h;
-      const keep = [el.style.transform, el.style.transformOrigin, el.style.willChange, el.style.position, el.style.zIndex];
+      const keep = [el.style.translate, el.style.rotate, el.style.transformOrigin, el.style.willChange, el.style.position, el.style.zIndex];
       el.style.transformOrigin = `${b.ox}px ${b.oy}px`; el.style.willChange = 'transform';
       if (getComputedStyle(el).position === 'static') el.style.position = 'relative';
       /* the colour its dust takes */
@@ -212,7 +212,7 @@ canvas{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none
     this.dispatchEvent(new Event('restore'));
   }
   _reset() {
-    for (const b of this._bodies) [b.el.style.transform, b.el.style.transformOrigin, b.el.style.willChange, b.el.style.position, b.el.style.zIndex] = b.keep;
+    for (const b of this._bodies) [b.el.style.translate, b.el.style.rotate, b.el.style.transformOrigin, b.el.style.willChange, b.el.style.position, b.el.style.zIndex] = b.keep;
     this._bodies = [];
   }
 
@@ -351,8 +351,9 @@ canvas{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none
     const s = Math.max(1, +this.getAttribute('snap') || 2);
     for (const b of this._bodies) {
       const tx = Math.round((b.x - b.x0) / s) * s, ty = Math.round((b.y - b.y0) / s) * s, a = Math.round(b.a * 1000) / 1000;
-      const t = `translate(${tx}px,${ty}px) rotate(${a}rad)`;
-      if (t !== b.t) { b.t = t; b.el.style.transform = t; }
+      /* translate and rotate, not transform: they stack with any transform the element sets for itself */
+      const t = tx + '|' + ty + '|' + a;
+      if (t !== b.t) { b.t = t; b.el.style.translate = `${tx}px ${ty}px`; b.el.style.rotate = `${a}rad`; }
     }
     const g = this._cv.getContext('2d');
     g.clearRect(0, 0, this._W, this._H);
