@@ -8,6 +8,8 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
+/* the bundle's fingerprint goes on its URL: browsers cache piixpal.js for an hour, and a new version must not wait for that */
+const BUNDLE_V = (await import('node:crypto')).createHash('md5').update(readFileSync(join(root, 'piixpal.js'))).digest('hex').slice(0, 8);
 const out = join(root, 'components');
 mkdirSync(out, { recursive: true });
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -278,7 +280,7 @@ ${body}
   </main>
 </div>
 ${extra}
-<script src="../piixpal.js"></script>
+<script src="../piixpal.js?v=${BUNDLE_V}"></script>
 <script src="../site/site.js" defer></script>
 <script src="../site/docs.js" defer></script>
 </body>
@@ -791,7 +793,7 @@ writeFileSync(join(out, 'nomad.html'), `<!doctype html>
 <body>
 <p>Nomad's other window.<small>Put it right next to the first one. When Nomad reaches the edge over there, it walks in here.</small></p>
 <piix-pal pal="nomad"></piix-pal>
-<script src="../piixpal.js"></script>
+<script src="../piixpal.js?v=${BUNDLE_V}"></script>
 </body>
 </html>
 `);
