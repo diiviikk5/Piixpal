@@ -1,0 +1,24 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Pixel UI: liquid</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono&family=Silkscreen&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #f3eee3; color: #17121f; font: 400 18px/1.6 "Bricolage Grotesque", system-ui }
+  main { max-width: 860px; margin: 0 auto; padding: 40px 28px 900px }
+  h2 { font-size: 56px; line-height: 1; letter-spacing: -.04em; margin: 0 0 10px; font-weight: 800 }
+  #tank { height: 520px; box-shadow: inset 0 0 0 3px #17121f; padding: 28px; box-sizing: border-box; display: flex; flex-direction: column; gap: 18px }
+  .row { display: flex; gap: 18px; align-items: flex-end; margin-top: auto }
+  .card { width: 200px; padding: 14px 16px; background: #fbf8f1; box-shadow: inset 0 0 0 2px #17121f }
+</style>
+<main>
+  <piix-liquid id="tank" level=".45">
+    <h2>Make a splash.</h2>
+    <p style="margin:0">Stir the water with your pointer, click to splash, scroll fast to slosh.</p>
+    <div class="row" style="align-items:flex-end">
+      <div class="card"><b>Floats</b><br>Rides the waves.</div>
+      <piix-button tone="coral">Still clickable</piix-button>
+      <div class="card"><b>Tilts</b><br>With the slope.</div>
+    </div>
+  </piix-liquid>
+</main>
+<script src="../piixpal.js"></script>
