@@ -1,0 +1,30 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Pixel UI: quake</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono&family=Silkscreen&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #f3eee3; color: #17121f; font: 400 18px/1.6 "Bricolage Grotesque", system-ui }
+  main { max-width: 820px; margin: 0 auto; padding: 40px 28px 200px }
+  h2 { font-size: 56px; line-height: 1; letter-spacing: -.04em; margin: 0 0 14px; font-weight: 800 }
+  p { margin: 0 0 14px; color: #3d3548 }
+  .row { display: flex; gap: 14px; margin: 18px 0 }
+  .card { flex: 1; padding: 16px; background: #fbf8f1; box-shadow: inset 0 0 0 2px #17121f }
+  .card b { display: block; font-size: 20px }
+  img { width: 220px; display: block }
+  #stage { height: 760px; box-shadow: inset 0 -3px 0 #17121f }
+</style>
+<main>
+  <piix-glow-button data-piix-quake="stage">Quake</piix-glow-button>
+  <piix-quake id="stage" trigger="click">
+    <h2>Everything here is a body.</h2>
+    <p>Headings, paragraphs, cards, images and buttons tumble, stack and rest on each other. Grab one and throw it.</p>
+    <div class="row">
+      <div class="card"><b>Fast</b>Boxes that collide at their corners.</div>
+      <div class="card"><b>Real</b>Buttons still work on the floor.</div>
+      <div class="card"><b>Back</b>Press again to rewind.</div>
+    </div>
+    <img src="../site/launch-poster.jpg" alt="Piixpal">
+    <p><piix-button tone="coral">Still clickable</piix-button></p>
+  </piix-quake>
+</main>
+<script src="../piixpal.js"></script>
