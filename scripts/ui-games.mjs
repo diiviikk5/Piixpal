@@ -112,7 +112,7 @@ export const GAME_THUMBS = {
 
 /* ---------- physics: whole pages that fall apart and come back ---------- */
 export const PHYSICS_PAGES = [
-  { slug: 'sand', name: 'Sand', section: 'Physics', tag: 'piix-sand', file: 'sand',
+  { slug: 'sand', name: 'Sand', section: 'Physics & time', tag: 'piix-sand', file: 'sand',
     brief: 'Your text crumbles into sand, piles up, and flows back into words.',
     about: "Every letter inside is redrawn as pixels, and every pixel is a grain in a real falling-sand simulation. Brush over a word and its grains come loose: they pour down, slide off each other into piles, land on the words below and on buttons and images (those stay solid), and you can sweep the piles around with the pointer. Stop for a moment and every grain flies back to the exact pixel it came from, and the real text returns. Your markup is never changed: the words stay in the page the whole time, for selection, search and screen readers.",
     demo: `<piix-sand>
@@ -136,7 +136,7 @@ export const PHYSICS_PAGES = [
     methods: [['crumble()', 'bring everything down'], ['crumble(x, y, r)', 'crumble one spot: x and y in px from its top-left, r the radius'], ['rebuild()', 'send every grain home now']],
     a11y: ['Your text is never removed or rewritten: screen readers, selection and find-in-page see the real words the whole time.', 'Buttons, links and inputs keep working, and stay visible, while everything around them is sand.', 'With reduced motion the grains go home at once instead of flying.'] },
 
-  { slug: 'quake', name: 'Quake', section: 'Physics', tag: 'piix-quake', file: 'quake',
+  { slug: 'quake', name: 'Quake', section: 'Physics & time', tag: 'piix-quake', file: 'quake',
     brief: 'One press and the page falls down. Throw the pieces, then put it all back.',
     about: 'A real rigid-body simulation running on your actual elements: boxes that collide at their corners, stack, slide with friction and come to rest. The ground shakes, every block inside falls, bounces and piles up; grab any piece and throw it. Text collides by the shape of its lines, not its full-width box. Pieces are only moved, never copied, so buttons and links still work while they lie on the floor. Press again and every piece flies back into place. Anything with <code>data-piix-quake="its id"</code> toggles it.',
     demo: `<piix-glow-button data-piix-quake="page">Quake</piix-glow-button>
@@ -161,7 +161,7 @@ export const PHYSICS_PAGES = [
     methods: [['quake()', 'bring it down'], ['restore()', 'put everything back'], ['toggle()', 'one or the other']],
     a11y: ['Pieces are moved with transforms only: the page order, reading order and tab order never change.', 'Buttons and links keep working wherever they land.', 'It announces when things fall and when they are back.', 'With reduced motion the ground only shakes; nothing falls.'] },
 
-  { slug: 'liquid', name: 'Liquid', section: 'Physics', tag: 'piix-liquid', file: 'liquid',
+  { slug: 'liquid', name: 'Liquid', section: 'Physics & time', tag: 'piix-liquid', file: 'liquid',
     brief: 'Your section half full of pixel water, and the things in it float.',
     about: 'A tank of water drawn in pixels across your section, at the level you choose. Anything whose bottom sits below the waterline rises and floats on the surface: it rides up and down on the wave beneath it, tilts with the slope, and pushes waves back as it bobs. Move the pointer through the water and it ripples; click and it splashes, throwing droplets that fall back in; scroll fast and the whole tank sloshes. Everything stays real: links and buttons work, even half under water.',
     demo: `<piix-liquid level=".45" style="height:420px;padding:28px 32px;box-sizing:border-box">
@@ -183,9 +183,33 @@ export const PHYSICS_PAGES = [
       ['data-anchored', 'on an element inside: it stays where it is, even under water', ''], ['data-float', 'on a box inside: it floats as one piece instead of each thing in it floating alone', '']],
     events: [['splash', 'a click or <code>splash()</code> drops something in: <code>detail.x</code>']],
     methods: [['splash(x, strength)', 'drop something in at x (px from the left); strength around 1']],
-    a11y: ['Floating only moves things with transforms: reading order, tab order and clicks are unchanged.', 'The water is a picture laid over the content and lets clicks through.', 'With reduced motion the water lies flat and nothing bobs.'] }
+    a11y: ['Floating only moves things with transforms: reading order, tab order and clicks are unchanged.', 'The water is a picture laid over the content and lets clicks through.', 'With reduced motion the water lies flat and nothing bobs.'] },
+
+  { slug: 'rewind', name: 'Rewind', section: 'Physics & time', tag: 'piix-rewind', file: 'rewind',
+    brief: 'A VCR for any part of your page. Everything that changes in it can be rewound.',
+    about: 'It records every change inside it as it happens: text typed into fields and editable areas, elements your code adds and removes, attributes, checkboxes and selects. Press ◀◀ and it rewinds like a tape, with scanlines, a rolling tracking band and the time counting back, every change undone in reverse, letter by letter. Drag the playhead to any moment, ►► to come back to now, or KEEP to carry on from that moment (everything after it is dropped, like undo). These are the real changes reversed, not screenshots: the past you see is live DOM, held still until you come back.',
+    demo: `<piix-rewind>
+  <div>
+    <h3 class="ex-h3">Edit anything, then rewind.</h3>
+    <p contenteditable style="padding:10px;outline:2px solid currentColor">Type here, delete things, then press ◀◀ below.</p>
+    <label><input type="checkbox"> Remember me</label>
+    <input type="text" placeholder="Your name">
+  </div>
+</piix-rewind>`,
+    stage: { light: true, block: true, pad: 36 },
+    examples: [
+      { name: 'Undo for a whole app', note: 'It records what your own code does too: here, tasks added, ticked and deleted.',
+        demo: `<piix-rewind>\n  <form id="rwAdd"><input id="rwTask" placeholder="New task"> <button>Add</button></form>\n  <ul id="rwList"></ul>\n</piix-rewind>\n\n<script>\n  rwAdd.onsubmit = e => {\n    e.preventDefault();\n    if (!rwTask.value) return;\n    const li = document.createElement('li');\n    li.innerHTML = '<label><input type="checkbox"> <span></span></label> <button>×</button>';\n    li.querySelector('span').textContent = rwTask.value;\n    li.querySelector('button').onclick = () => li.remove();\n    rwList.append(li);\n    rwTask.value = '';\n  };\n</script>`, stage: { light: true, block: true, pad: 36 } },
+      { name: 'From your own code', note: 'Hide the tape deck and build your own controls with <code>rewind()</code>, <code>seek()</code>, <code>play()</code> and <code>keep()</code>.',
+        demo: `<piix-rewind id="tape" controls="off">\n  <p contenteditable style="padding:10px;outline:2px solid currentColor">Write something…</p>\n</piix-rewind>\n<piix-button tone="ink" size="sm" onclick="tape.rewind()">Rewind</piix-button>\n<piix-button tone="lime" size="sm" onclick="tape.play()">Back to now</piix-button>\n<piix-button tone="coral" size="sm" onclick="tape.keep()">Keep</piix-button>`, stage: { light: true, block: true, pad: 36 } }
+    ],
+    props: [['max', 'how many changes to remember', '2000'], ['speed', 'how fast it rewinds, 0.5 to 4', '1'], ['controls', '<code>off</code>: no tape deck, drive it from code', ''], SOUND],
+    events: [['seek', 'it moved through time: <code>detail.at</code>, <code>detail.steps</code>'], ['keep', 'you carried on from the past']],
+    methods: [['rewind()', 'rewind, faster the longer it runs'], ['play()', 'come back to now, replaying every change'], ['seek(step)', 'jump to a step, 0 is the start'], ['keep()', 'carry on from here: everything after is dropped'], ['clear()', 'forget the history'], ['steps, at', 'how many changes are recorded, and which one you are on']],
+    a11y: ['While you look at the past, the content is inert, so nothing in it can be changed by accident.', 'The playhead is a slider: arrow keys, Page Up/Down, Home and End move through time.', 'It announces when you are in the past and when you are back.', 'With reduced motion the tape effects stay still.'] }
 ];
 export const PHYSICS_THUMBS = {
+  'rewind': '<span style="display:inline-flex;gap:6px;align-items:center;padding:8px 12px;background:#17121f;color:#f2eef8;font:400 13px Silkscreen,monospace"><b style="padding:5px 8px;background:#c6f432;color:#17121f">&lt;&lt;</b><i style="width:110px;height:4px;background:linear-gradient(90deg,#c6f432 60%,#2a2236 60%)"></i>-00:12</span>',
   'liquid': '<piix-liquid level=".5" style="width:86%;height:110px"><span style="display:inline-block;margin:58px 0 0 30%;padding:6px 12px;background:#fbf8f1;box-shadow:inset 0 0 0 2px #17121f;font:700 13px Bricolage Grotesque,system-ui">float</span></piix-liquid>',
   'quake': '<span style="display:flex;gap:6px;align-items:flex-end;height:80px"><i style="width:64px;height:22px;background:#c6f432;box-shadow:0 0 0 2px #17121f;transform:rotate(-9deg)"></i><i style="width:34px;height:34px;background:#ff6b4a;box-shadow:0 0 0 2px #17121f;transform:rotate(16deg)"></i><i style="width:84px;height:18px;background:#6b4cff;box-shadow:0 0 0 2px #17121f;transform:rotate(4deg)"></i></span>',
   'sand': '<piix-sand trigger="click" rest="never" grain="3" style="width:80%"><b style="font:800 30px/1 Bricolage Grotesque,system-ui">Crumble me</b></piix-sand>'
