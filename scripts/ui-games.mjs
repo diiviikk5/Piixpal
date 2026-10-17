@@ -134,8 +134,34 @@ export const PHYSICS_PAGES = [
       ['data-solid', 'on any element inside: it stays solid and sand piles on it (images, buttons and inputs already do)', '']],
     events: [['crumble', 'the first grains come loose'], ['rebuild', 'every grain is home and the real text is back']],
     methods: [['crumble()', 'bring everything down'], ['crumble(x, y, r)', 'crumble one spot: x and y in px from its top-left, r the radius'], ['rebuild()', 'send every grain home now']],
-    a11y: ['Your text is never removed or rewritten: screen readers, selection and find-in-page see the real words the whole time.', 'Buttons, links and inputs keep working, and stay visible, while everything around them is sand.', 'With reduced motion the grains go home at once instead of flying.'] }
+    a11y: ['Your text is never removed or rewritten: screen readers, selection and find-in-page see the real words the whole time.', 'Buttons, links and inputs keep working, and stay visible, while everything around them is sand.', 'With reduced motion the grains go home at once instead of flying.'] },
+
+  { slug: 'quake', name: 'Quake', section: 'Physics', tag: 'piix-quake', file: 'quake',
+    brief: 'One press and the page falls down. Throw the pieces, then put it all back.',
+    about: 'A real rigid-body simulation running on your actual elements: boxes that collide at their corners, stack, slide with friction and come to rest. The ground shakes, every block inside falls, bounces and piles up; grab any piece and throw it. Text collides by the shape of its lines, not its full-width box. Pieces are only moved, never copied, so buttons and links still work while they lie on the floor. Press again and every piece flies back into place. Anything with <code>data-piix-quake="its id"</code> toggles it.',
+    demo: `<piix-glow-button data-piix-quake="page">Quake</piix-glow-button>
+
+<piix-quake id="page" style="height:420px">
+  <h2 class="ex-h2">Everything here is a body.</h2>
+  <p>Grab a piece and throw it. Press Quake again to put it all back.</p>
+  <piix-glow-card style="width:220px"><h3>Cards</h3><p>They stack.</p></piix-glow-card>
+  <piix-button tone="coral">Still clickable</piix-button>
+</piix-quake>`,
+    stage: { light: true, block: true, pad: 32 },
+    controls: [['gravity', 'Gravity', 'seg', ['0.5', '1', '2'], '1'], ['bounce', 'Bounce', 'seg', ['0', '0.15', '0.5'], '0.15']],
+    examples: [
+      { name: 'Click anywhere', note: 'With <code>trigger="click"</code> a click on an empty spot brings it down, and another puts it back.',
+        demo: `<piix-quake trigger="click" style="height:360px">\n  <h3 class="ex-h3">Click an empty spot</h3>\n  <p>Then throw things around.</p>\n  <piix-kbd>Q</piix-kbd> <piix-kbd>U</piix-kbd> <piix-kbd>A</piix-kbd> <piix-kbd>K</piix-kbd> <piix-kbd>E</piix-kbd>\n</piix-quake>`, stage: { light: true, block: true, pad: 32 } },
+      { name: 'Keep some things standing', note: '<code>data-fixed</code> stays put and things land on it. <code>data-body</code> makes a whole group fall as one piece.',
+        demo: `<piix-quake id="shelf" style="height:380px">\n  <div data-fixed style="position:absolute;left:30%;top:230px;width:40%;height:14px;background:#17121f"></div>\n  <h3 class="ex-h3">A shelf catches me</h3>\n  <div data-body style="display:inline-block;padding:12px 16px;background:#c6f432"><b>One piece</b><br>with two lines</div>\n</piix-quake>\n<piix-button tone="ink" size="sm" onclick="shelf.toggle()">Quake</piix-button>`, stage: { light: true, block: true, pad: 32 } }
+    ],
+    props: [['trigger', '<code>click</code>: a click on an empty spot toggles it', 'none'], ['gravity', 'how hard things fall, 0.2 to 3', '1'], ['bounce', 'how much things bounce, 0 to 1', '0.15'], ['snap', 'pieces move on a grid this many px wide', '2'], ['rest', 'seconds before it puts itself back, or <code>never</code>', 'never'], SOUND,
+      ['data-piix-quake', 'on any element: clicking it toggles the quake with that id', ''], ['data-body', 'on an element inside: it and everything in it fall as one piece', ''], ['data-fixed', 'on an element inside: it stays standing, and things land on it', '']],
+    events: [['quake', 'it starts falling'], ['restore', 'every piece is back in place']],
+    methods: [['quake()', 'bring it down'], ['restore()', 'put everything back'], ['toggle()', 'one or the other']],
+    a11y: ['Pieces are moved with transforms only: the page order, reading order and tab order never change.', 'Buttons and links keep working wherever they land.', 'It announces when things fall and when they are back.', 'With reduced motion the ground only shakes; nothing falls.'] }
 ];
 export const PHYSICS_THUMBS = {
+  'quake': '<span style="display:flex;gap:6px;align-items:flex-end;height:80px"><i style="width:64px;height:22px;background:#c6f432;box-shadow:0 0 0 2px #17121f;transform:rotate(-9deg)"></i><i style="width:34px;height:34px;background:#ff6b4a;box-shadow:0 0 0 2px #17121f;transform:rotate(16deg)"></i><i style="width:84px;height:18px;background:#6b4cff;box-shadow:0 0 0 2px #17121f;transform:rotate(4deg)"></i></span>',
   'sand': '<piix-sand trigger="click" rest="never" grain="3" style="width:80%"><b style="font:800 30px/1 Bricolage Grotesque,system-ui">Crumble me</b></piix-sand>'
 };
