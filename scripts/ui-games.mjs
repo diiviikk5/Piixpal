@@ -159,9 +159,34 @@ export const PHYSICS_PAGES = [
       ['data-piix-quake', 'on any element: clicking it toggles the quake with that id', ''], ['data-body', 'on an element inside: it and everything in it fall as one piece', ''], ['data-fixed', 'on an element inside: it stays standing, and things land on it', '']],
     events: [['quake', 'it starts falling'], ['restore', 'every piece is back in place']],
     methods: [['quake()', 'bring it down'], ['restore()', 'put everything back'], ['toggle()', 'one or the other']],
-    a11y: ['Pieces are moved with transforms only: the page order, reading order and tab order never change.', 'Buttons and links keep working wherever they land.', 'It announces when things fall and when they are back.', 'With reduced motion the ground only shakes; nothing falls.'] }
+    a11y: ['Pieces are moved with transforms only: the page order, reading order and tab order never change.', 'Buttons and links keep working wherever they land.', 'It announces when things fall and when they are back.', 'With reduced motion the ground only shakes; nothing falls.'] },
+
+  { slug: 'liquid', name: 'Liquid', section: 'Physics', tag: 'piix-liquid', file: 'liquid',
+    brief: 'Your section half full of pixel water, and the things in it float.',
+    about: 'A tank of water drawn in pixels across your section, at the level you choose. Anything whose bottom sits below the waterline rises and floats on the surface: it rides up and down on the wave beneath it, tilts with the slope, and pushes waves back as it bobs. Move the pointer through the water and it ripples; click and it splashes, throwing droplets that fall back in; scroll fast and the whole tank sloshes. Everything stays real: links and buttons work, even half under water.',
+    demo: `<piix-liquid level=".45" style="height:420px;padding:28px 32px;box-sizing:border-box">
+  <h2 class="ex-h2">Make a splash.</h2>
+  <div style="display:flex;gap:16px;align-items:flex-end;margin-top:150px">
+    <piix-glow-card style="width:200px"><h3>Floats</h3><p>Rides the waves.</p></piix-glow-card>
+    <piix-button tone="coral">Still clickable</piix-button>
+  </div>
+</piix-liquid>`,
+    stage: { light: true, block: true, pad: 0 },
+    controls: [['palette', 'Water', 'seg', ['lagoon', 'ocean', 'slime', 'lava', 'ink'], 'lagoon'], ['level', 'Level', 'seg', ['0.3', '0.45', '0.6'], '0.45'], ['pixel', 'Pixel', 'seg', ['2', '3', '5'], '3']],
+    examples: [
+      { name: 'A lava lake', note: 'Same physics, different palette. <code>calm</code> sets how long the waves last.',
+        demo: `<piix-liquid palette="lava" level=".4" calm=".1" style="height:320px;background:#17121f;color:#f2eef8;padding:28px">\n  <h3 class="ex-h3">Don't touch the floor</h3>\n  <piix-button tone="sun" style="margin-top:150px">Raft</piix-button>\n</piix-liquid>`, stage: { block: true, pad: 0 } },
+      { name: 'Splash from code', note: '<code>splash(x, strength)</code> drops something in, x in px from the left.',
+        demo: `<piix-liquid id="pond" palette="ocean" level=".5" style="height:260px"></piix-liquid>\n<piix-button tone="sky" size="sm" onclick="pond.splash(Math.random() * pond.clientWidth, 1.5)">Drop a rock</piix-button>`, stage: { light: true, block: true, pad: 24 } }
+    ],
+    props: [['level', 'how full, from 0 (empty) to 1 (brim)', '.55'], ['palette', '<code>lagoon</code> <code>ocean</code> <code>slime</code> <code>lava</code> <code>ink</code>', 'lagoon'], ['pixel', 'size of one pixel of water, in px', '3'], ['calm', 'how fast waves die down, 0 (they last) to 1 (at once)', '.3'], SOUND,
+      ['data-anchored', 'on an element inside: it stays where it is, even under water', ''], ['data-float', 'on a box inside: it floats as one piece instead of each thing in it floating alone', '']],
+    events: [['splash', 'a click or <code>splash()</code> drops something in: <code>detail.x</code>']],
+    methods: [['splash(x, strength)', 'drop something in at x (px from the left); strength around 1']],
+    a11y: ['Floating only moves things with transforms: reading order, tab order and clicks are unchanged.', 'The water is a picture laid over the content and lets clicks through.', 'With reduced motion the water lies flat and nothing bobs.'] }
 ];
 export const PHYSICS_THUMBS = {
+  'liquid': '<piix-liquid level=".5" style="width:86%;height:110px"><span style="display:inline-block;margin:58px 0 0 30%;padding:6px 12px;background:#fbf8f1;box-shadow:inset 0 0 0 2px #17121f;font:700 13px Bricolage Grotesque,system-ui">float</span></piix-liquid>',
   'quake': '<span style="display:flex;gap:6px;align-items:flex-end;height:80px"><i style="width:64px;height:22px;background:#c6f432;box-shadow:0 0 0 2px #17121f;transform:rotate(-9deg)"></i><i style="width:34px;height:34px;background:#ff6b4a;box-shadow:0 0 0 2px #17121f;transform:rotate(16deg)"></i><i style="width:84px;height:18px;background:#6b4cff;box-shadow:0 0 0 2px #17121f;transform:rotate(4deg)"></i></span>',
   'sand': '<piix-sand trigger="click" rest="never" grain="3" style="width:80%"><b style="font:800 30px/1 Bricolage Grotesque,system-ui">Crumble me</b></piix-sand>'
 };
