@@ -157,7 +157,7 @@ ${layCss(u0.demo)}
   if (u.events) toc.push(['events', 'Events']);
   if (u.methods) toc.push(['methods', 'Methods']);
   if (u.a11y) toc.push(['accessibility', 'Accessibility']);
-  const gpu = !['piix-stat', 'piix-marquee', 'piix-button', 'piix-toggle', 'piix-checkbox', 'piix-progress', 'piix-breakout', 'piix-rpg-box', 'piix-handheld', 'piix-chiptune', 'piix-sand', 'piix-quake'].includes(u.tag);
+  const gpu = !['piix-stat', 'piix-marquee', 'piix-button', 'piix-toggle', 'piix-checkbox', 'piix-progress', 'piix-breakout', 'piix-rpg-box', 'piix-handheld', 'piix-chiptune', 'piix-sand', 'piix-quake', 'piix-liquid'].includes(u.tag);
   const badges = `<div class="ui-badges"><code>&lt;${u.tag}&gt;</code><span class="b">${gpu ? 'WebGL' : 'DOM + canvas'}</span>${u.tag === 'piix-glow-button' || u.tag === 'piix-input' || u.tag === 'piix-button' || u.tag === 'piix-toggle' || u.tag === 'piix-checkbox' ? '<span class="b">Form-ready</span>' : ''}</div>`;
   const body = `${head([u.section, esc(u.name)], esc(u.name), u.brief, badges)}
 ${demoBox({ demo: u.demo, code: u.code, stage: u.stage, controls: u.controls, tag: u.tag, id: 'preview' })}
