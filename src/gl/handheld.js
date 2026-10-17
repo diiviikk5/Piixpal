@@ -103,9 +103,9 @@ class PiixHandheldElement extends HTMLElement {
 ::slotted(*){max-width:100%}
 ::slotted(:first-child){margin-top:0!important}
 ::slotted(img){image-rendering:pixelated}
-.boot{position:absolute;inset:0;display:grid;place-items:center;background:${lcd};color:${dark};pointer-events:none;visibility:hidden}
+.boot{position:absolute;inset:0;display:none;place-items:center;background:${lcd};color:${dark};pointer-events:none}
 .boot b{font:400 1.25em/1 ${KIT_FONT};letter-spacing:.04em;transform:translateY(-4.5em)}
-:host([data-booting]) .boot{visibility:visible}
+:host([data-booting]) .boot{display:grid}
 :host([data-booting]) .boot b{animation:piixboot 1.5s steps(15) forwards}
 :host([data-booting][data-fade]) .boot{animation:piixfade .4s steps(4) forwards}
 @keyframes piixboot{to{transform:none}}
