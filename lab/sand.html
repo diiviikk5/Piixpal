@@ -1,0 +1,25 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Pixel UI: sand</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono&family=Silkscreen&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #f3eee3; color: #17121f; font: 400 18px/1.6 "Bricolage Grotesque", system-ui }
+  main { max-width: 760px; margin: 0 auto; padding: 60px 28px 400px }
+  h2 { font-size: 64px; line-height: .95; letter-spacing: -.04em; margin: 0 0 18px; font-weight: 800 }
+  p { margin: 0 0 16px; color: #3d3548 }
+  a { color: #6b4cff }
+  .pill { display: inline-block; margin-top: 10px; padding: 10px 16px; border: 0; background: #17121f; color: #c6f432; font: 600 15px "Bricolage Grotesque" }
+</style>
+<main>
+  <piix-sand id="sd">
+    <h2>Touch these words.</h2>
+    <p>Every letter here is made of grains. Brush over a line and it <b>falls apart</b>, pours down, and piles up on the words below. Sweep the piles around. Stop, and every grain flies back to the exact pixel it came from. <a href="#x">Links</a> crumble too.</p>
+    <button class="pill">Sand piles on me</button>
+  </piix-sand>
+  <br><br>
+  <piix-sand trigger="click" rest="never" id="sd2">
+    <h2 style="color:#6b4cff">Click me.</h2>
+    <p>Click once to bring it all down, click again to rebuild.</p>
+  </piix-sand>
+</main>
+<script src="../piixpal.js"></script>
