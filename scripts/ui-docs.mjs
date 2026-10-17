@@ -5,7 +5,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { UI, SECTIONS, PALETTES } from './ui-data.mjs';
 import { navBar } from './docs.mjs';
-import { GAME_THUMBS } from './ui-games.mjs';
+import { GAME_THUMBS, PHYSICS_THUMBS } from './ui-games.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const out = join(root, 'ui');
@@ -157,7 +157,7 @@ ${layCss(u0.demo)}
   if (u.events) toc.push(['events', 'Events']);
   if (u.methods) toc.push(['methods', 'Methods']);
   if (u.a11y) toc.push(['accessibility', 'Accessibility']);
-  const gpu = !['piix-stat', 'piix-marquee', 'piix-button', 'piix-toggle', 'piix-checkbox', 'piix-progress', 'piix-breakout', 'piix-rpg-box', 'piix-handheld', 'piix-chiptune'].includes(u.tag);
+  const gpu = !['piix-stat', 'piix-marquee', 'piix-button', 'piix-toggle', 'piix-checkbox', 'piix-progress', 'piix-breakout', 'piix-rpg-box', 'piix-handheld', 'piix-chiptune', 'piix-sand'].includes(u.tag);
   const badges = `<div class="ui-badges"><code>&lt;${u.tag}&gt;</code><span class="b">${gpu ? 'WebGL' : 'DOM + canvas'}</span>${u.tag === 'piix-glow-button' || u.tag === 'piix-input' || u.tag === 'piix-button' || u.tag === 'piix-toggle' || u.tag === 'piix-checkbox' ? '<span class="b">Form-ready</span>' : ''}</div>`;
   const body = `${head([u.section, esc(u.name)], esc(u.name), u.brief, badges)}
 ${demoBox({ demo: u.demo, code: u.code, stage: u.stage, controls: u.controls, tag: u.tag, id: 'preview' })}
@@ -192,6 +192,7 @@ ${pager(u.slug)}`;
 /* small live previews for the overview grid */
 const THUMB = {
   ...GAME_THUMBS,
+  ...PHYSICS_THUMBS,
   'hero': '<piix-shader kind="horizon" height="100%" pixel="4"></piix-shader><b class="t-over">Build something loud</b>',
   'divider': '<piix-divider kind="wave" from="#17121f" to="#f3eee3" height="100%"></piix-divider>',
   'marquee': '<piix-marquee speed="30" gap="28" fade="48"><span class="logo s">◆ Acme</span><span class="logo s">▲ Globex</span><span class="logo s">● Initech</span><span class="logo s">■ Umbrella</span></piix-marquee>',
