@@ -145,15 +145,18 @@
  "marquee": "kit",
  "pixel-image": "kit",
  "quake": "kit",
+ "receipt": "kit",
  "reveal": "kit",
  "rewind": "kit",
  "rpg-box": "kit",
  "sand": "kit",
  "scene": "kit",
+ "scratch": "kit",
  "shader": "kit",
  "slider": "kit",
  "stat": "kit",
  "tabs": "kit",
  "text": "kit",
- "tooltip": "kit"
+ "tooltip": "kit",
+ "zipper": "kit"
 }
