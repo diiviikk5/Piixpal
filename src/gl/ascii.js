@@ -1,0 +1,239 @@
+/* ASCII: whole worlds drawn in characters, on the GPU.   @component ascii
+ *
+ *   <section class="hero">
+ *     <piix-ascii scene="glow" fill></piix-ascii>
+ *     <h1>Your headline</h1>
+ *   </section>
+ *
+ * A living scene rendered as ASCII: every character cell asks the scene how bright it is there
+ * and what colour, picks a glyph from a pixel-font ramp ( . : - = + * x % # @ ), and draws it in
+ * that colour, over a soft haze of the same light, so the gradient glows through the text. It all
+ * runs in one shader on the GPU, so a full-screen hero stays smooth. Twelve scenes, from a gradient
+ * glow to whole worlds: fly over mountains, drift over a moonlit sea, spin a galaxy, orbit a planet.
+ * Every scene leans toward your pointer.
+ *
+ *   scene     glow | flow | aurora | ocean | terrain | galaxy | planet | city | tunnel | rain | storm | dunes
+ *   palette   any Pixel UI palette, or your colours dark to light: "#0a1a8c,#2b8cff,#ffffff"
+ *   chars     ascii | blocks | binary | dots                      default: ascii
+ *   pixel     size of one font pixel, px (a character is 6 x 9 of them)   default: 2
+ *   haze      how much soft glow behind the characters, 0 to 1     default: .45
+ *   speed     1 is normal, 0 holds still                          default: 1
+ *   height    when not filling: px or any CSS length              default: 420px
+ *   fill      sit behind the content of the parent element */
+
+/* ---------- the font: 5 x 7 glyphs, packed into two numbers each (rows 0-3, rows 4-6) ---------- */
+const ASC_GLYPHS = {
+  ' ': [0, 0, 0, 0, 0, 0, 0],
+  '.': [0, 0, 0, 0, 0, 0b01100, 0b01100],
+  ':': [0, 0b01100, 0b01100, 0, 0b01100, 0b01100, 0],
+  '-': [0, 0, 0, 0b11110, 0, 0, 0],
+  '=': [0, 0, 0b11111, 0, 0b11111, 0, 0],
+  '+': [0, 0b00100, 0b00100, 0b11111, 0b00100, 0b00100, 0],
+  '*': [0, 0b10101, 0b01110, 0b11111, 0b01110, 0b10101, 0],
+  'x': [0, 0, 0b10001, 0b01010, 0b00100, 0b01010, 0b10001],
+  'X': [0b10001, 0b10001, 0b01010, 0b00100, 0b01010, 0b10001, 0b10001],
+  '%': [0b11001, 0b11010, 0b00010, 0b00100, 0b01000, 0b01011, 0b10011],
+  '$': [0b00100, 0b01111, 0b10100, 0b01110, 0b00101, 0b11110, 0b00100],
+  '8': [0b01110, 0b10001, 0b10001, 0b01110, 0b10001, 0b10001, 0b01110],
+  '#': [0b01010, 0b11111, 0b01010, 0b01010, 0b01010, 0b11111, 0b01010],
+  '@': [0b01110, 0b10001, 0b10111, 0b10101, 0b10111, 0b10000, 0b01111],
+  '0': [0b01110, 0b10011, 0b10101, 0b10101, 0b10101, 0b11001, 0b01110],
+  '1': [0b00100, 0b01100, 0b00100, 0b00100, 0b00100, 0b00100, 0b01110],
+  'o': [0, 0, 0b01110, 0b10001, 0b10001, 0b10001, 0b01110],
+  'O': [0b01110, 0b10001, 0b10001, 0b10001, 0b10001, 0b10001, 0b01110],
+  '░': [0b10101, 0, 0b01010, 0, 0b10101, 0, 0b01010],
+  '▒': [0b10101, 0b01010, 0b10101, 0b01010, 0b10101, 0b01010, 0b10101],
+  '▓': [0b11111, 0b01010, 0b11111, 0b10101, 0b11111, 0b01010, 0b11111],
+  '█': [0b11111, 0b11111, 0b11111, 0b11111, 0b11111, 0b11111, 0b11111]
+};
+/* ramps, from empty to full */
+const ASC_RAMPS = {
+  ascii: ' .:-=+*x%$8#@',
+  blocks: ' .░░▒▒▓▓██',
+  binary: ' ..001101',
+  dots: ' .:oO8@'
+};
+const ascPack = g => [g[0] * 32768 + g[1] * 1024 + g[2] * 32 + g[3], g[4] * 1024 + g[5] * 32 + g[6]];
+/* a GLSL function that returns glyph i of a ramp as its two packed numbers */
+const ascGlyphFn = ramp => {
+  const cs = [...ramp].map(c => ascPack(ASC_GLYPHS[c] || ASC_GLYPHS[' ']));
+  return `float ascN(){return ${cs.length.toFixed(1)};}
+vec2 ascG(float i){${cs.map((p, k) => `if(i<${k}.5)return vec2(${p[0].toFixed(1)},${p[1].toFixed(1)});`).join('')}return vec2(${cs[cs.length - 1][0].toFixed(1)},${cs[cs.length - 1][1].toFixed(1)});}`;
+};
+/* the frame: a character cell is 6 x 9 font pixels (5 x 7 glyph, a one-pixel gutter) */
+const ASC_MAIN = `
+float ascBit(vec2 g,vec2 lp){
+  float x=lp.x,y=6.-lp.y;
+  if(x<0.||x>4.||y<0.||y>6.)return 0.;
+  float row=y<4.?mod(floor(g.x/exp2(5.*(3.-y))),32.):mod(floor(g.y/exp2(5.*(6.-y))),32.);
+  return mod(floor(row/exp2(4.-x)),2.);}
+vec4 effect(vec2 uv,vec2 cell){
+  vec2 cs=vec2(6.,9.),ci=floor(cell/cs),cuv=(ci*cs+cs*.5)/u_res;
+  vec2 s=scene(cuv,aspect(cuv),cell,ci);
+  float v=clamp(s.x,0.,1.);
+  /* a glyph from the ramp: brighter is denser; a little flicker so the field shimmers */
+  float n=ascN(),idx=floor(clamp(v+(hash(ci+floor(u_time*u_k.y))-.5)*u_k.z,0.,.999)*n);
+  float on=ascBit(ascG(idx),cell-ci*cs-vec2(0.,1.));
+  vec3 col=pal(clamp(s.y,0.,1.));
+  /* the haze: the same light, smooth, under the text */
+  vec2 h=scene(uv,aspect(uv),cell,ci);
+  float hv=clamp(h.x,0.,1.),ha=u_k.x*pow(hv,1.5);
+  vec3 hc=pal(clamp(h.y,0.,1.));
+  float ga=on*smoothstep(0.,.15,v);
+  vec3 c=mix(hc,col,ga);
+  return vec4(c,max(ga,ha));}`;
+
+/* ---------- the scenes: each returns (brightness, colour 0..1) for a point ---------- */
+const ASC_SCENES = {
+  /* a great arc of light from above, like a planet's rim at dawn: the hero background */
+  glow: ['#0a1a8c,#1b3fe0,#2b8cff,#56d4ff,#c8f4ff,#ffffff', `vec2 scene(vec2 uv,vec2 q,vec2 cell,vec2 ci){
+    vec2 m=aspect(u_mouse);float t=u_time*.08;
+    /* a pale world rising from below; its atmosphere burns blue at the rim and thins into noise above */
+    vec2 c=vec2(m.x*.14*u_hover,-1.3);float R=1.1,d=length(q-c)-R;
+    float n=fbm(q*vec2(2.4,3.2)+vec2(t,-t*.6)),n2=fbm(q*7.+vec2(-t*2.,t));
+    float atm=exp(-max(d,0.)*6.)*(.85+.3*n2);
+    float sky=smoothstep(.0,.55,d)*max(0.,.04+(n-.36)*1.3);
+    float v=(atm*1.05+sky)*smoothstep(-.015,.05,d);
+    float col=clamp(.04+d*1.15+(n-.5)*.35+n2*.08,0.,1.);
+    return vec2(v,col);}`],
+  /* domain-warped flow: a slow liquid gradient */
+  flow: ['#0c0718,#3b1ea8,#6b4cff,#ff6bb5,#ffd23f,#fffbe6', `vec2 scene(vec2 uv,vec2 q,vec2 cell,vec2 ci){
+    vec2 m=aspect(u_mouse),p=q*1.6;float t=u_time*.07;
+    p+=normalize(q-m+.0001)*.25*exp(-length(q-m)*3.)*u_hover;
+    vec2 a=vec2(fbm(p+vec2(0,t)),fbm(p+vec2(5.2,1.3)-t));
+    vec2 b=vec2(fbm(p+3.5*a+vec2(1.7,9.2)+t*.6),fbm(p+3.5*a+vec2(8.3,2.8)-t*.4));
+    float f=fbm(p+3.5*b);
+    return vec2(pow(f*1.25,1.6),f*1.2-.1+length(b)*.2);}`],
+  /* curtains of light over a dark sky */
+  aurora: ['#030a12,#0b3a4a,#127a74,#25d6a0,#9ef5cf,#e4dcff', `vec2 scene(vec2 uv,vec2 q,vec2 cell,vec2 ci){
+    vec2 m=aspect(u_mouse);float t=u_time*.25,v=0.,col=0.;
+    for(int i=0;i<3;i++){float fi=float(i),x=q.x*1.2+fi*.8;
+      float yc=.62-fi*.14+.09*sin(x*1.8+t+fi)+.07*fbm(vec2(x*2.,t*.4+fi))+.08*exp(-length(q-m)*3.5)*u_hover;
+      float d=uv.y-yc,band=exp(-d*d*(d>0.?14.:160.))*(.65+.35*sin(x*11.+t*1.4+fbm(vec2(x*4.,t))*5.));
+      v+=band*(.95-fi*.22);col=max(col,band*(1.-fi*.25));}
+    float st=step(.993,hash(ci*.37+3.))*(.5+.5*sin(u_time*2.+hash(ci)*30.));
+    return vec2(v+st*.7+.04,clamp(col*1.1+uv.y*.25,0.,1.));}`],
+  /* a moonlit sea: swells that roll toward you, and the moon's road across the water */
+  ocean: ['#020617,#0a2c55,#1d6fb0,#58c8ff,#bfeaff,#ffffff', `vec2 scene(vec2 uv,vec2 q,vec2 cell,vec2 ci){
+    vec2 m=aspect(u_mouse);float hz=.56,mx=.28+m.x*.1*u_hover;
+    vec2 mc=vec2(mx,.27);
+    if(uv.y>hz){float d=length(q-mc),moon=smoothstep(.085,.075,d),halo=exp(-d*5.)*.55;
+      float st=step(.99,hash(ci*.71))*step(.13,d)*(.4+.4*sin(u_time*1.7+hash(ci)*20.));
+      return vec2(moon+halo+st+.06*(uv.y-hz),moon>0.?1.:.35+halo*.6+(uv.y-hz)*.4);}
+    float z=.11/(hz-uv.y+.004),x=q.x*z;
+    float sw=fbm(vec2(x*.7,z*.55-u_time*.35))+.5*sin(z*1.4-u_time*1.3+x*.3)*.5;
+    float road=exp(-pow((q.x-mc.x)*(3.+z*.6),2.))*(.55+.45*sin(z*9.-u_time*3.+fbm(vec2(x*3.,z))*6.));
+    float fade=smoothstep(0.,.05,hz-uv.y);
+    float v=(.12+.38*sw)*fade+road*.85*smoothstep(.0,.25,hz-uv.y+.02);
+    return vec2(v+.12*exp(-(hz-uv.y)*30.),clamp(.15+sw*.35+road*.6,0.,1.));}`],
+  /* fly low over a mountain range toward the sun */
+  terrain: ['#0b0614,#2a1250,#7a2f8a,#ff6b6b,#ffb45a,#fff2c4', `float tH(vec2 p){float h=0.,a=.55;for(int i=0;i<5;i++){h+=a*(1.-abs(noise(p)*2.-1.));p=p*2.03+vec2(1.7,9.2);a*=.48;}return h*h*1.5;}
+  vec2 scene(vec2 uv,vec2 q,vec2 cell,vec2 ci){
+    vec2 m=aspect(u_mouse);float t=u_time*.5;
+    vec2 cp=vec2(m.x*.5*u_hover,t);float ch=max(tH(cp*.55),max(tH((cp+vec2(0,.6))*.55),tH((cp+vec2(0,1.2))*.55)));
+    /* the camera rides above whatever is beneath and just ahead, so it never flies into a peak */
+    vec3 ro=vec3(cp.x,max(1.05,ch+.45),t),rd=normalize(vec3(q.x,q.y-.12+m.y*.12*u_hover,1.));
+    vec3 sun=normalize(vec3(.15,.12,1.));
+    float d=0.,hit=0.;
+    for(int i=0;i<48;i++){vec3 p=ro+rd*d;float h=tH(p.xz*.55);if(p.y<h){hit=1.;break;}d+=max(.035,(p.y-h)*.5);if(d>14.)break;}
+    float sd=max(dot(rd,sun),0.),glow=pow(sd,40.)*1.2+pow(sd,6.)*.45;
+    if(hit<.5)return vec2(.12+glow+max(0.,.3-rd.y)*.6,clamp(.45+glow*.7-rd.y*.5,0.,1.));
+    vec3 p=ro+rd*d;float e=.02,h=tH(p.xz*.55);
+    vec3 nrm=normalize(vec3(h-tH((p.xz+vec2(e,0))*.55),e,h-tH((p.xz+vec2(0,e))*.55)));
+    float lit=clamp(dot(nrm,normalize(vec3(-.4,.75,-.5))),0.,1.),snow=smoothstep(.75,1.,h)*smoothstep(.5,.9,nrm.y);
+    float fog=exp(-d*.13),surf=.1+lit*.8+snow*.4;
+    return vec2(mix(.32+glow*.5,surf,fog),clamp(mix(.62,.18+lit*.45+snow*.35,fog),0.,1.));}`],
+  /* a spiral galaxy, slowly turning */
+  galaxy: ['#05030d,#1c0b3e,#5b2bd6,#c43bd8,#ffb3e6,#fff8ee', `vec2 scene(vec2 uv,vec2 q,vec2 cell,vec2 ci){
+    vec2 m=aspect(u_mouse);vec2 p=(q-m*.1*u_hover)*1.35;p.y*=1.9;
+    float r=length(p),a=atan(p.y,p.x)+u_time*.07;
+    float arms=.5+.5*sin(2.*a-log(r+.02)*4.6+fbm(p*5.)*1.4);
+    float dust=fbm(vec2(a*2.,r*6.)-u_time*.04);
+    float v=exp(-r*1.9)*(.3+1.25*pow(arms,1.6))*(.65+dust*.7)+exp(-r*r*40.)*1.3;
+    float st=step(.992,hash(ci*.53+1.))*(.5+.5*sin(u_time*2.5+hash(ci)*40.));
+    return vec2(v+st*.8,clamp(1.05-r*1.05+arms*.25,0.,1.));}`],
+  /* a planet turning in space: continents, oceans, a lit limb and an atmosphere */
+  planet: ['#03040c,#0b1d4a,#1c5fae,#3fae7a,#c8f0a0,#ffffff', `vec2 scene(vec2 uv,vec2 q,vec2 cell,vec2 ci){
+    vec2 m=aspect(u_mouse);vec2 c=vec2(.18,-.04),p=(q-c)/.42;float r2=dot(p,p);
+    vec3 L=normalize(vec3(-.7+m.x*.6*u_hover,.35+m.y*.3*u_hover,.6));
+    float st=step(.993,hash(ci*.61+7.))*(.4+.4*sin(u_time*2.+hash(ci)*30.));
+    float rim=exp(-pow(sqrt(r2)-1.,2.)*90.)*.9*clamp(dot(normalize(vec3(p,.2)),L)+.6,0.,1.);
+    if(r2>1.)return vec2(st+rim+exp(-(sqrt(r2)-1.)*6.)*.15,.55+rim*.4);
+    vec3 n=vec3(p,sqrt(1.-r2));
+    float lon=atan(n.x,n.z)+u_time*.12,lat=asin(n.y);
+    float land=fbm(vec2(lon*1.3,lat*2.2)*1.6),isl=step(.52,land),cloud=smoothstep(.55,.8,fbm(vec2(lon*2.,lat*3.)*1.5+u_time*.03));
+    float lit=clamp(dot(n,L),0.,1.);
+    float v=(.15+.65*lit)*(isl>0.?.95:.6)+cloud*lit*.5+rim;
+    return vec2(v,isl>0.?.62+land*.4:.32+lit*.1);}`],
+  /* a city at night: three layers of skyline, windows lighting up and going out */
+  city: ['#05040d,#1a1036,#3b2a7a,#ff9b45,#ffd36b,#fff4d6', `vec2 scene(vec2 uv,vec2 q,vec2 cell,vec2 ci){
+    vec2 m=aspect(u_mouse);float v=.03+.22*uv.y*uv.y,col=.12+uv.y*.3;
+    vec2 mc=vec2(-.42,.27);float d=length(q-mc);v+=smoothstep(.075,.065,d)+exp(-d*6.)*.35;col+=exp(-d*6.)*.3;
+    v+=step(.994,hash(ci*.47))*step(.55,uv.y)*.7;
+    for(int i=2;i>=0;i--){float fi=float(i),sc=5.+fi*3.;
+      float x=q.x*sc+u_time*(.04+fi*.02)*sc+fi*17.+m.x*u_hover*(3.-fi)*.5,id=floor(x);
+      float bh=.12+.5*hash(vec2(id,fi))*(1.-fi*.22);
+      if(uv.y<bh){
+        /* windows sit on the character grid, every other cell, and switch on and off slowly */
+        float win=mod(ci.x,2.)*mod(ci.y+1.,2.)*step(.48,hash(ci+vec2(fi*31.,floor(u_time*.25+hash(ci+fi)*7.))));
+        float edge=step(bh-.012,uv.y);
+        v=.11+(2.-fi)*.03+win*(.85-fi*.15)+edge*.2;col=win>0.?.78-fi*.06:.22+fi*.04;}}
+    return vec2(v,col);}`],
+  /* down an endless tunnel */
+  tunnel: ['#020010,#1b0b52,#4a2bb0,#6b4cff,#58c8ff,#e8fbff', `vec2 scene(vec2 uv,vec2 q,vec2 cell,vec2 ci){
+    vec2 m=aspect(u_mouse);vec2 p=q-m*.2*u_hover;float r=length(p),a=atan(p.y,p.x);
+    float z=.35/max(r,.01)+u_time*.9,ang=a/3.1416*4.+u_time*.15;
+    float tex=fbm(vec2(ang*1.5,z*.6)),rings=pow(.5+.5*sin(z*6.),6.),seg=step(.9,fract(ang*2.));
+    float v=(tex*.75+rings*.5+seg*.3)*smoothstep(0.,.35,r);
+    return vec2(v,clamp(fract(z*.08)*.5+tex*.6,0.,1.));}`],
+  /* digital rain: columns falling at their own speed */
+  rain: ['#000805,#05301a,#0f7a36,#29d36a,#9cffb8,#f0fff4', `vec2 scene(vec2 uv,vec2 q,vec2 cell,vec2 ci){
+    float col=floor(cell.x/6.),rows=u_res.y/9.;
+    float sp=.25+.6*hash(vec2(col,3.)),len=.25+.5*hash(vec2(col,7.)),off=hash(vec2(col,11.));
+    float head=1.-fract(off+u_time*sp*.35),y=uv.y;
+    float d=y-head;if(d<0.)d+=1.+len;
+    float tail=d<len?pow(1.-d/len,1.8):0.,lead=smoothstep(.04,0.,abs(y-head));
+    float v=tail*.85+lead+.04;
+    return vec2(v,clamp(tail*.85+lead,0.,1.));}`],
+  /* storm clouds rolling by, lit from inside now and then */
+  storm: ['#04050a,#151a2c,#38415e,#7b86a8,#c9d3f2,#ffffff', `vec2 scene(vec2 uv,vec2 q,vec2 cell,vec2 ci){
+    vec2 m=aspect(u_mouse);vec2 p=q*1.3+vec2(u_time*.05,0.);
+    float c=fbm(p*1.2+fbm(p*2.1+u_time*.04)*1.5),top=smoothstep(.4,.75,c);
+    float k=floor(u_time*.42),ph=fract(u_time*.42);
+    float flash=step(.45,hash(vec2(k,2.)))*(exp(-ph*30.)+exp(-abs(ph-.06)*40.)*.7);
+    vec2 fc=vec2(hash(vec2(k,5.))*1.2-.6,.1);
+    float lit=flash*exp(-length(q-fc)*2.2)*2.+.35*exp(-length(q-m)*3.)*u_hover;
+    float v=top*.95+smoothstep(.3,.5,c)*.15+lit*smoothstep(.3,.6,c);
+    return vec2(v,clamp(top*.7+lit*.7,0.,1.));}`],
+  /* desert dunes under a low sun, heat shimmering */
+  dunes: ['#1a0b05,#5a2410,#b0521e,#f08a3c,#ffcf73,#fff4dc', `vec2 scene(vec2 uv,vec2 q,vec2 cell,vec2 ci){
+    vec2 m=aspect(u_mouse);float sh=sin(uv.y*90.+u_time*4.)*.004;
+    vec2 sc=vec2(.25-m.x*.1*u_hover,.18);float d=length(q-sc);
+    float v=.1+.35*uv.y+smoothstep(.11,.1,d)+exp(-d*4.)*.4,col=.55+uv.y*.4+exp(-d*4.)*.3;
+    for(int i=0;i<4;i++){float fi=float(i),x=q.x+sh+u_time*.012*(fi+1.);
+      float h=.38-fi*.09+.06*sin(x*(2.5+fi)+fi*2.)+.03*sin(x*(7.+fi*2.)+fi);
+      if(uv.y<h){float slope=cos(x*(2.5+fi)+fi*2.);v=.12+fi*.04+.45*clamp(slope*.5+.5,0.,1.)*(1.-fi*.18);col=.25+fi*.08+slope*.15;}}
+    return vec2(v,col);}`]
+};
+class PiixAsciiElement extends GLStage {
+  static get observedAttributes() { return [...GLStage.observedAttributes, 'scene', 'chars', 'haze']; }
+  get scene() { const s = this.getAttribute('scene'); return ASC_SCENES[s] ? s : 'glow'; }
+  get _defPal() { return ASC_SCENES[this.scene][0]; }
+  constructor() { super(); this._defPx = 2; this._defDither = 0; }
+  _hostCss() { return (this.hasAttribute('fill') ? '' : 'width:100%;') + (this.hasAttribute('fill') || this.getAttribute('height') ? '' : 'height:420px;'); }
+  _setup() {
+    if (this.hasAttribute('fill')) this.setAttribute('aria-hidden', 'true');
+    else if (!this.hasAttribute('aria-label')) { this.setAttribute('role', 'img'); this.setAttribute('aria-label', `An animated ASCII ${this.scene} scene`); }
+  }
+  _shader() {
+    const chars = ASC_RAMPS[this.getAttribute('chars')] ? this.getAttribute('chars') : 'ascii';
+    return ascGlyphFn(ASC_RAMPS[chars]) + ASC_SCENES[this.scene][1] + ASC_MAIN;
+  }
+  /* u_k: haze, flicker rate, flicker amount */
+  _uniforms() {
+    const hz = this.getAttribute('haze');
+    return { u_k: [hz === null ? (this.scene === 'glow' ? .8 : .55) : clamp(+hz, 0, 1), this.scene === 'rain' ? 14 : 3, this.scene === 'rain' ? .35 : .06, 0] };
+  }
+}
+define('piix-ascii', PiixAsciiElement);
+ELEMENTS.ascii = 'piix-ascii';
