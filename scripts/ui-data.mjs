@@ -367,4 +367,8 @@ export { HERO_CSS };
 /* ---------- games and sound ---------- */
 import { GAME_PAGES, PHYSICS_PAGES } from './ui-games.mjs';
 UI.push(...GAME_PAGES, ...PHYSICS_PAGES);
-SECTIONS.splice(SECTIONS.indexOf('Motion') + 1, 0, 'Physics & time', 'Games & sound');
+SECTIONS.splice(SECTIONS.indexOf('Motion') + 1, 0, 'Physics & time', 'Games & sound', 'Delight');
+
+/* ---------- delight: small website moments ---------- */
+import { DELIGHT_PAGES } from './ui-delight.mjs';
+UI.push(...DELIGHT_PAGES);
