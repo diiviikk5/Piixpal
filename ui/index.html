@@ -71,6 +71,10 @@
       <a href="mesh-gradient.html">Mesh gradient</a><a href="warp.html">Marble warp</a><a href="aurora.html">Aurora</a><a href="crystal.html">Crystal cells</a><a href="liquid-metal.html">Liquid metal</a><a href="horizon.html">Synthwave horizon</a><a href="nebula.html">Nebula</a><a href="topographic.html">Topographic</a><a href="dot-matrix.html">Dot matrix</a><a href="fire.html">Fire</a>
     </details>
     <details class="sg" open>
+      <summary><a href="./#ascii">ASCII</a><span class="n">12</span></summary>
+      <a href="ascii-glow.html">Glow horizon</a><a href="ascii-flow.html">Liquid flow</a><a href="ascii-aurora.html">Aurora</a><a href="ascii-ocean.html">Moonlit ocean</a><a href="ascii-terrain.html">Mountain flight</a><a href="ascii-galaxy.html">Spiral galaxy</a><a href="ascii-planet.html">Planet</a><a href="ascii-city.html">Night city</a><a href="ascii-tunnel.html">Warp tunnel</a><a href="ascii-rain.html">Digital rain</a><a href="ascii-storm.html">Storm</a><a href="ascii-dunes.html">Dunes</a>
+    </details>
+    <details class="sg" open>
       <summary><a href="./#sections">Sections</a><span class="n">3</span></summary>
       <a href="hero.html">Hero</a><a href="divider.html">Divider</a><a href="marquee.html">Marquee</a>
     </details>
@@ -132,7 +136,7 @@
 <header class="doc-head ui-head">
   <div class="crumbs"><a href="./">Pixel UI</a></div>
   <h1>Pixel UI</h1>
-  <p>A component library drawn on the GPU. Backgrounds, heroes, buttons, cards, text effects and form controls, all rendered on a pixel grid and dithered into a palette. 113 components, each one a plain web component: one script tag, then copy a tag.</p><div class="pills"><a class="pill" href="#scenes">Scenes · 10</a><a class="pill" href="#layouts">Layouts · 6</a><a class="pill" href="#hero-sections">Hero sections · 18</a><a class="pill" href="#3d-shaders">3D & Shaders · 19</a><a class="pill" href="#image-effects">Image effects · 10</a><a class="pill" href="#backgrounds">Backgrounds · 10</a><a class="pill" href="#sections">Sections · 3</a><a class="pill" href="#buttons">Buttons · 2</a><a class="pill" href="#cards">Cards · 1</a><a class="pill" href="#text">Text · 8</a><a class="pill" href="#media">Media · 1</a><a class="pill" href="#forms">Forms · 4</a><a class="pill" href="#navigation">Navigation · 1</a><a class="pill" href="#overlays">Overlays · 3</a><a class="pill" href="#feedback">Feedback · 2</a><a class="pill" href="#data">Data · 2</a><a class="pill" href="#motion">Motion · 2</a><a class="pill" href="#physics-time">Physics & time · 4</a><a class="pill" href="#games-sound">Games & sound · 4</a><a class="pill" href="#delight">Delight · 3</a></div>
+  <p>A component library drawn on the GPU. Backgrounds, heroes, buttons, cards, text effects and form controls, all rendered on a pixel grid and dithered into a palette. 125 components, each one a plain web component: one script tag, then copy a tag.</p><div class="pills"><a class="pill" href="#scenes">Scenes · 10</a><a class="pill" href="#layouts">Layouts · 6</a><a class="pill" href="#hero-sections">Hero sections · 18</a><a class="pill" href="#3d-shaders">3D & Shaders · 19</a><a class="pill" href="#image-effects">Image effects · 10</a><a class="pill" href="#backgrounds">Backgrounds · 10</a><a class="pill" href="#ascii">ASCII · 12</a><a class="pill" href="#sections">Sections · 3</a><a class="pill" href="#buttons">Buttons · 2</a><a class="pill" href="#cards">Cards · 1</a><a class="pill" href="#text">Text · 8</a><a class="pill" href="#media">Media · 1</a><a class="pill" href="#forms">Forms · 4</a><a class="pill" href="#navigation">Navigation · 1</a><a class="pill" href="#overlays">Overlays · 3</a><a class="pill" href="#feedback">Feedback · 2</a><a class="pill" href="#data">Data · 2</a><a class="pill" href="#motion">Motion · 2</a><a class="pill" href="#physics-time">Physics & time · 4</a><a class="pill" href="#games-sound">Games & sound · 4</a><a class="pill" href="#delight">Delight · 3</a></div>
 </header>
 <div class="ui-why">
   <div><h3>On the GPU</h3><p>Shaders run on one shared WebGL context, drawn at pixel resolution and scaled up crisp.</p></div>
@@ -570,6 +574,58 @@
   </a>
 </div>
 
+<h2 class="fam-h" id="ascii">ASCII <span class="n">12</span></h2>
+<div class="ui-grid">
+  <a class="ui-card" href="ascii-glow.html">
+    <div class="ui-thumb light" aria-hidden="true" inert><piix-ascii scene="glow" height="100%"></piix-ascii></div>
+    <h3>Glow horizon</h3><p>A pale world rising from below, its atmosphere burning blue and thinning into noise.</p>
+  </a>
+  <a class="ui-card" href="ascii-flow.html">
+    <div class="ui-thumb" aria-hidden="true" inert><piix-ascii scene="flow" height="100%"></piix-ascii></div>
+    <h3>Liquid flow</h3><p>A slow, domain-warped gradient that pours through the characters.</p>
+  </a>
+  <a class="ui-card" href="ascii-aurora.html">
+    <div class="ui-thumb" aria-hidden="true" inert><piix-ascii scene="aurora" height="100%"></piix-ascii></div>
+    <h3>Aurora</h3><p>Curtains of light rippling over a starry sky.</p>
+  </a>
+  <a class="ui-card" href="ascii-ocean.html">
+    <div class="ui-thumb" aria-hidden="true" inert><piix-ascii scene="ocean" height="100%"></piix-ascii></div>
+    <h3>Moonlit ocean</h3><p>Swells rolling toward you under a full moon, and its road across the water.</p>
+  </a>
+  <a class="ui-card" href="ascii-terrain.html">
+    <div class="ui-thumb" aria-hidden="true" inert><piix-ascii scene="terrain" height="100%"></piix-ascii></div>
+    <h3>Mountain flight</h3><p>Fly low over a ridged mountain range toward a setting sun.</p>
+  </a>
+  <a class="ui-card" href="ascii-galaxy.html">
+    <div class="ui-thumb" aria-hidden="true" inert><piix-ascii scene="galaxy" height="100%"></piix-ascii></div>
+    <h3>Spiral galaxy</h3><p>A spiral galaxy turning slowly, dust lanes and all.</p>
+  </a>
+  <a class="ui-card" href="ascii-planet.html">
+    <div class="ui-thumb" aria-hidden="true" inert><piix-ascii scene="planet" height="100%"></piix-ascii></div>
+    <h3>Planet</h3><p>A planet turning in space: continents, cloud and a lit atmosphere.</p>
+  </a>
+  <a class="ui-card" href="ascii-city.html">
+    <div class="ui-thumb" aria-hidden="true" inert><piix-ascii scene="city" height="100%"></piix-ascii></div>
+    <h3>Night city</h3><p>Three layers of skyline sliding past, windows switching on and off.</p>
+  </a>
+  <a class="ui-card" href="ascii-tunnel.html">
+    <div class="ui-thumb" aria-hidden="true" inert><piix-ascii scene="tunnel" height="100%"></piix-ascii></div>
+    <h3>Warp tunnel</h3><p>Down an endless tunnel of light.</p>
+  </a>
+  <a class="ui-card" href="ascii-rain.html">
+    <div class="ui-thumb" aria-hidden="true" inert><piix-ascii scene="rain" height="100%"></piix-ascii></div>
+    <h3>Digital rain</h3><p>Columns of characters falling, each at its own speed.</p>
+  </a>
+  <a class="ui-card" href="ascii-storm.html">
+    <div class="ui-thumb" aria-hidden="true" inert><piix-ascii scene="storm" height="100%"></piix-ascii></div>
+    <h3>Storm</h3><p>Storm clouds rolling by, lit from inside by lightning.</p>
+  </a>
+  <a class="ui-card" href="ascii-dunes.html">
+    <div class="ui-thumb" aria-hidden="true" inert><piix-ascii scene="dunes" height="100%"></piix-ascii></div>
+    <h3>Dunes</h3><p>Desert dunes under a low sun, the air shimmering with heat.</p>
+  </a>
+</div>
+
 <h2 class="fam-h" id="sections">Sections <span class="n">3</span></h2>
 <div class="ui-grid">
   <a class="ui-card" href="hero.html">
@@ -788,7 +844,7 @@
   </main>
   <nav class="ui-toc" aria-label="On this page"></nav>
 </div>
-<script src="../piixpal.js?v=e58f561a"></script>
+<script src="../piixpal.js?v=71698b8c"></script>
 <script src="../site/site.js" defer></script>
 <script src="../site/docs.js" defer></script>
 <script src="../site/ui.js" defer></script>
