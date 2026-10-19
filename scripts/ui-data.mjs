@@ -369,6 +369,11 @@ import { GAME_PAGES, PHYSICS_PAGES } from './ui-games.mjs';
 UI.push(...GAME_PAGES, ...PHYSICS_PAGES);
 SECTIONS.splice(SECTIONS.indexOf('Motion') + 1, 0, 'Physics & time', 'Games & sound', 'Delight');
 
+/* ---------- ascii: whole worlds in characters ---------- */
+import { ASCII_PAGES } from './ui-ascii.mjs';
+UI.push(...ASCII_PAGES);
+SECTIONS.splice(SECTIONS.indexOf('Backgrounds') + 1, 0, 'ASCII');
+
 /* ---------- delight: small website moments ---------- */
 import { DELIGHT_PAGES } from './ui-delight.mjs';
 UI.push(...DELIGHT_PAGES);
