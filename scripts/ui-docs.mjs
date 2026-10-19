@@ -217,7 +217,7 @@ const THUMB = {
   'toast': '<span class="t-toast"><i></i>Your changes are live.</span>',
   'tooltip': '<span class="t-tip">Copy link</span>'
 };
-const thumb = u => u.section === 'Scenes' ? u.demo.replace('height="460px"', 'height="100%" pixel="3"')
+const thumb = u => u.section === 'ASCII' ? u.demo.replace('height="460px"', 'height="100%"') : u.section === 'Scenes' ? u.demo.replace('height="460px"', 'height="100%" pixel="3"')
   : u.section === 'Layouts' || u.section === 'Hero sections' ? `<div class="scaled">${u.demo}</div>`
   : u.section === '3D & Shaders' ? u.demo.replace('height="480px"', 'height="100%" quality=".5"')
   : u.section === 'Image effects' ? u.demo.replace('height="440px"', 'height="100%"').replace('"../site/', '"../site/')
