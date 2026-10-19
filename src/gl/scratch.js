@@ -36,13 +36,14 @@ class PiixScratchElement extends HTMLElement {
 .in{position:relative}
 canvas{position:absolute;left:0;top:0;width:100%;height:100%;image-rendering:pixelated;cursor:crosshair;touch-action:none}
 :host([data-done]) canvas{pointer-events:none}
+.label{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
 .fall{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;image-rendering:pixelated;overflow:visible}
 button{position:absolute;inset:0;opacity:0;border:0;background:none;pointer-events:none}
 button:focus-visible{opacity:1;outline:3px dashed #17121f;outline-offset:4px;background:transparent}
 :host([data-done]) button{display:none}
-</style><div class="in"><slot></slot></div><canvas class="foil" aria-hidden="true"></canvas><canvas class="fall" aria-hidden="true"></canvas><button type="button" part="button"></button>`;
+</style><div class="in"><slot></slot></div><canvas class="foil" aria-hidden="true"></canvas><canvas class="label" aria-hidden="true"></canvas><canvas class="fall" aria-hidden="true"></canvas><button type="button" part="button"></button>`;
     const $ = s => this.shadowRoot.querySelector(s);
-    this._cv = $('.foil'); this._fc = $('.fall'); this._btn = $('button');
+    this._cv = $('.foil'); this._lc = $('.label'); this._fc = $('.fall'); this._btn = $('button');
     this._btn.setAttribute('aria-label', `Scratch card: ${this.getAttribute('label') || 'scratch me'}. Press to reveal.`);
     this._btn.addEventListener('click', e => { if (e.detail === 0) this.reveal(); });
     this._cv.addEventListener('pointerdown', this._pd = e => { if (this._done) return; this._cv.setPointerCapture(e.pointerId); this._down = true; this._last = null; this._at(e); });
@@ -52,8 +53,10 @@ button:focus-visible{opacity:1;outline:3px dashed #17121f;outline-offset:4px;bac
     this._ro = new ResizeObserver(() => this._size());
     this._ro.observe(this);
     this._hide(true);
+    /* the label is drawn on a canvas: draw it again once the pixel font has arrived */
+    if (document.fonts) { document.fonts.ready.then(() => !this._done && this._paint()); document.fonts.addEventListener('loadingdone', this._fd = () => !this._done && this._paint()); }
   }
-  disconnectedCallback() { this._ro.disconnect(); unsub(this._loop); this._hide(false); }
+  disconnectedCallback() { this._ro.disconnect(); unsub(this._loop); this._hide(false); if (document.fonts) document.fonts.removeEventListener('loadingdone', this._fd); }
   attributeChangedCallback() { if (this._cv && !this._done) { this._cells = null; this._size(); } }
   /* until it is revealed, what's under the foil can't be tabbed to or read out */
   _hide(on) { for (const c of this.children) { if (on) { c._scrWas = c.inert; c.inert = true; } else if ('_scrWas' in c) { c.inert = c._scrWas; delete c._scrWas; } } }
@@ -67,6 +70,7 @@ button:focus-visible{opacity:1;outline:3px dashed #17121f;outline-offset:4px;bac
     if (!this._cells || this._gw !== gw || this._gh !== gh) { this._cells = new Uint8Array(gw * gh).fill(1); this._left = gw * gh; }
     this._gw = gw; this._gh = gh; this._W = W; this._H = H;
     for (const c of [this._cv, this._fc]) { c.width = gw; c.height = gh; }
+    this._lc.width = W; this._lc.height = H;
     this._fc.style.cssText = `width:${W}px;height:${H + 200}px`; this._fc.height = gh + Math.ceil(200 / g);
     this._paint();
   }
@@ -88,14 +92,17 @@ button:focus-visible{opacity:1;outline:3px dashed #17121f;outline-offset:4px;bac
       d.set([c[0], c[1], c[2], 255], i * 4);
     }
     g.putImageData(img, 0, 0);
-    /* the label, drawn at foil resolution so it stays pixel-crisp */
-    const label = (this.getAttribute('label') || 'SCRATCH ME').toUpperCase();
-    const fs = Math.max(5, Math.min(Math.floor(gh * .32), Math.floor(gw / (label.length * .75))));
-    g.font = `400 ${fs}px ${KIT_FONT}`; g.textAlign = 'center'; g.textBaseline = 'middle';
-    g.fillStyle = P[2]; g.fillText(label, gw / 2 + 1, gh / 2 + 1);
-    g.fillStyle = P[3]; g.fillText(label, gw / 2, gh / 2);
-    /* the label was drawn over scratched spots too: punch them back out */
-    for (let i = 0; i < this._cells.length; i++) if (!this._cells[i]) g.clearRect(i % gw, (i / gw) | 0, 1, 1);
+    /* the label: crisp, at full resolution on its own layer, and scratched away with the foil */
+    const label = (this.getAttribute('label') || 'SCRATCH ME').toUpperCase(), l = this._lc.getContext('2d'), W = this._W, H = this._H;
+    l.clearRect(0, 0, W, H);
+    l.textAlign = 'center'; l.textBaseline = 'middle';
+    let fs = Math.max(8, Math.floor(H * .2));
+    for (; fs > 8; fs--) { l.font = `400 ${fs}px ${KIT_FONT}`; if (l.measureText(label).width <= W * .84) break; }
+    l.fillStyle = P[2]; l.fillText(label, W / 2 + 3, H / 2 + 3);
+    l.fillStyle = P[3]; l.fillText(label, W / 2, H / 2);
+    /* where the foil is already gone, so is the label */
+    const G = this._g;
+    for (let i = 0; i < this._cells.length; i++) if (!this._cells[i]) l.clearRect((i % gw) * G, ((i / gw) | 0) * G, G, G);
   }
   _at(e) {
     const r = this.getBoundingClientRect(), x = (e.clientX - r.left) / this._g, y = (e.clientY - r.top) / this._g;
@@ -116,7 +123,7 @@ button:focus-visible{opacity:1;outline:3px dashed #17121f;outline-offset:4px;bac
         this._cells[i] = 0; this._left--; n++;
         const px = g.getImageData(x, y, 1, 1).data;
         if (chance(.35)) this._bits.push({ x, y, vx: rnd(-8, 8), vy: rnd(-12, 2), c: `rgb(${px[0]},${px[1]},${px[2]})`, t: rnd(.5, 1.1) });
-        g.clearRect(x, y, 1, 1);
+        g.clearRect(x, y, 1, 1); this._lc.getContext('2d').clearRect(x * this._g, y * this._g, this._g, this._g);
       }
     if (!n) return;
     sfx('type', this, { pitch: rnd(.5, .8), gap: 45 });
@@ -134,7 +141,7 @@ button:focus-visible{opacity:1;outline:3px dashed #17121f;outline-offset:4px;bac
     for (let i = 0; i < this._cells.length; i++) if (this._cells[i]) left.push(i);
     for (let i = left.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [left[i], left[j]] = [left[j], left[i]]; }
     this._flake = left; this._flakeAt = 0;
-    if (reduced()) { this._cv.getContext('2d').clearRect(0, 0, this._gw, this._gh); this._flake = []; }
+    if (reduced()) { this._cv.getContext('2d').clearRect(0, 0, this._gw, this._gh); this._lc.getContext('2d').clearRect(0, 0, this._W, this._H); this._flake = []; }
     sfx('coin', this);
     this.dispatchEvent(new Event('reveal'));
     sub(this._loop);
@@ -148,7 +155,7 @@ button:focus-visible{opacity:1;outline:3px dashed #17121f;outline-offset:4px;bac
       for (const i of this._flake.slice(this._flakeAt, this._flakeAt += k)) {
         const x = i % gw, y = (i / gw) | 0;
         if (chance(.18)) { const px = g.getImageData(x, y, 1, 1).data; this._bits.push({ x, y, vx: rnd(-6, 6), vy: rnd(-8, 0), c: `rgb(${px[0]},${px[1]},${px[2]})`, t: rnd(.4, .9) }); }
-        this._cells[i] = 0; g.clearRect(x, y, 1, 1);
+        this._cells[i] = 0; g.clearRect(x, y, 1, 1); this._lc.getContext('2d').clearRect(x * this._g, y * this._g, this._g, this._g);
       }
     }
     /* shavings fall, spin a little, and fade */
