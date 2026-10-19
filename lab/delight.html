@@ -1,0 +1,32 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Pixel UI: delight</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono&family=Silkscreen&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #f3eee3; color: #17121f; font: 400 18px/1.5 "Bricolage Grotesque", system-ui }
+  main { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; max-width: 1200px; margin: 0 auto; padding: 50px 28px }
+  .coupon { padding: 28px 34px; background: #fbf8f1; box-shadow: inset 0 0 0 3px #17121f; text-align: center }
+  .coupon h3 { margin: 0 0 8px; font-size: 26px }
+  .coupon code { font: 700 30px "JetBrains Mono"; letter-spacing: .1em }
+  .secret { padding: 34px 30px; background: #6b4cff; color: #fff; height: 260px; box-sizing: border-box }
+  .secret h2 { margin: 0 0 10px; font-size: 40px; letter-spacing: -.03em }
+</style>
+<main>
+  <section><h4>Scratch</h4>
+    <piix-scratch id="sc"><div class="coupon"><h3>You won 20% off</h3><code>PIXEL20</code></div></piix-scratch></section>
+  <section><h4>Zipper</h4>
+    <piix-zipper id="zp"><div class="secret"><h2>Something new.</h2><p>Hidden until you unzip it. <a href="#x" style="color:#c6f432">A link</a></p></div></piix-zipper></section>
+  <section><h4>Receipt</h4>
+    <piix-receipt id="rc" width="300px">
+      <h3>Piixpal Store</h3>
+      <p data-center>#0042 · 19 Oct 2026</p>
+      <hr>
+      <p data-price="$12.00">Pixel pal (kitty)</p>
+      <p data-price="$4.00">Extra pats</p>
+      <p data-price="$0.00">Chiptune pack</p>
+      <hr>
+      <p data-price="$16.00" data-total>Total</p>
+      <p data-center>Thanks for shopping!</p>
+    </piix-receipt></section>
+</main>
+<script src="../piixpal.js"></script>
