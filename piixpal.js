@@ -14379,6 +14379,138 @@ canvas{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none
 define('piix-quake', PiixQuakeElement);
 ELEMENTS.quake = 'piix-quake';
 
+/* ---- gl/receipt.js ---- */
+/* RECEIPT: a little thermal printer that prints your content, line by line.   @component receipt
+ *
+ *   <piix-receipt>
+ *     <h3>Piixpal Store</h3>
+ *     <p data-price="$12.00">Pixel pal (kitty)</p>
+ *     <p data-price="$4.00">Extra pats</p>
+ *     <hr>
+ *     <p data-price="$16.00" data-total>Total</p>
+ *     <p>Thanks for shopping!</p>
+ *   </piix-receipt>
+ *
+ * When it scrolls into view the printer wakes up, its light blinks, and the paper feeds out one
+ * line at a time, each one swept on by the print head. Headings print as big pixel titles, <hr>
+ * as a dashed rule, and anything with data-price gets a dotted leader out to its price. When it's
+ * done, TEAR rips it off along a zigzag. Order confirmations, changelogs, end-of-year stats.
+ * It's your real markup the whole time: readable, selectable and searchable.
+ *
+ *   width     the paper's width                                    default: 320px
+ *   speed     lines a second                                       default: 7
+ *   start     view: print when it scrolls into view; manual: wait for print()   default: view
+ *   sound     make sounds even without <piix-chiptune> ("off" to stay silent)
+ *
+ *   methods: print(), reset(), tear()
+ *   events: printed, tear */
+let RCP_CSS = false;
+const rcpCss = () => {
+  if (RCP_CSS) return;
+  RCP_CSS = true;
+  const st = document.createElement('style');
+  /* the receipt's own typography for the content inside it */
+  st.textContent = `piix-receipt>*{margin:0}
+piix-receipt :is(h1,h2,h3,h4){margin:.15em 0 .55em;font:400 1.15em/1.25 ${KIT_FONT};text-align:center;text-transform:uppercase;letter-spacing:.06em}
+piix-receipt hr{margin:.65em 0;border:0;border-top:2px dashed currentColor;opacity:.45}
+piix-receipt [data-price]{display:flex;gap:.6ch;align-items:baseline}
+piix-receipt [data-price]::before{content:'';order:1;flex:1;min-width:2ch;border-bottom:2px dotted currentColor;opacity:.4;transform:translateY(-.3em)}
+piix-receipt [data-price]::after{content:attr(data-price);order:2;white-space:nowrap}
+piix-receipt [data-total]{font-weight:700;font-size:1.15em}
+piix-receipt [data-center]{text-align:center}`;
+  document.head.appendChild(st);
+};
+class PiixReceiptElement extends HTMLElement {
+  static get observedAttributes() { return ['width']; }
+  constructor() { super(); this.attachShadow({ mode: 'open' }); this._state = 'idle'; }
+  connectedCallback() {
+    rcpCss();
+    const paper = '#fbf8f1';
+    this.shadowRoot.innerHTML = `<style>
+:host{display:inline-block;vertical-align:top;--w:${this.getAttribute('width') || '320px'};color:#2a2433;font:400 14px/1.55 "JetBrains Mono",ui-monospace,Menlo,Consolas,monospace}
+.wrap{position:relative;width:calc(var(--w) + 28px)}
+.printer{position:relative;z-index:2;height:46px;background:#17121f;clip-path:${kitCorners(4)};display:flex;align-items:center;gap:10px;padding:0 16px}
+.printer::after{content:'';position:absolute;left:12px;right:12px;bottom:8px;height:4px;background:#000;box-shadow:0 -1px 0 #3a3048}
+.led{width:8px;height:8px;background:#2f4a1a;box-shadow:inset 0 0 0 2px rgba(0,0,0,.3)}
+:host([data-printing]) .led{background:#c6f432;box-shadow:0 0 8px #c6f432;animation:piixled .25s steps(2) infinite}
+@keyframes piixled{50%{background:#5d7a14;box-shadow:none}}
+.brand{font:400 11px/1 ${KIT_FONT};color:#8b7cff;letter-spacing:.12em;margin-top:-6px}
+.feed{position:relative;z-index:1;margin:-10px auto 0;width:var(--w);height:0;overflow:hidden}
+.paper{position:relative;padding:22px 20px 10px;background:${paper};box-shadow:inset 0 10px 8px -6px rgba(0,0,0,.25)}
+.paper::before{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.025) 0 1px,transparent 1px 3px)}
+.zig{height:10px;background:linear-gradient(135deg,${paper} 25%,transparent 25%) -5px 0/10px 10px,linear-gradient(225deg,${paper} 25%,transparent 25%) -5px 0/10px 10px}
+:host([data-torn]) .feed{animation:piixtear .5s steps(5) forwards}
+:host([data-torn]) .paper{-webkit-mask:linear-gradient(#000,#000) 0 10px/100% 100% no-repeat,linear-gradient(135deg,#000 25%,transparent 25%) -5px 0/10px 10px,linear-gradient(225deg,#000 25%,transparent 25%) -5px 0/10px 10px;mask:linear-gradient(#000,#000) 0 10px/100% 100% no-repeat,linear-gradient(135deg,#000 25%,transparent 25%) -5px 0/10px 10px,linear-gradient(225deg,#000 25%,transparent 25%) -5px 0/10px 10px}
+@keyframes piixtear{to{translate:0 26px;rotate:-2.5deg}}
+.tear{all:unset;display:block;margin:10px auto 0;padding:8px 14px 7px;background:#17121f;color:#c6f432;clip-path:${kitCorners(2)};font:400 11px/1 ${KIT_FONT};letter-spacing:.1em;cursor:pointer;opacity:0;pointer-events:none;transition:opacity .2s steps(2)}
+.tear:focus-visible{outline:2px dashed #17121f;outline-offset:3px}
+:host([data-done]:not([data-torn])) .tear{opacity:1;pointer-events:auto}
+@media (prefers-reduced-motion:reduce){:host([data-printing]) .led{animation:none}}
+</style><div class="wrap"><div class="printer" aria-hidden="true"><span class="led"></span><span class="brand">PIIX-80</span></div><div class="feed" part="paper"><div class="paper"><slot></slot></div><div class="zig"></div></div><button class="tear" type="button" part="tear">- - TEAR HERE - -</button></div>`;
+    this._feed = this.shadowRoot.querySelector('.feed');
+    this._paper = this.shadowRoot.querySelector('.paper');
+    this.shadowRoot.querySelector('.tear').addEventListener('click', () => this.tear());
+    if ((this.getAttribute('start') || 'view') === 'view') {
+      this._io = new IntersectionObserver(([en]) => { if (en.isIntersecting && this._state === 'idle') { this._io.disconnect(); this.print(); } }, { threshold: .4 });
+      this._io.observe(this);
+    }
+  }
+  disconnectedCallback() { if (this._io) this._io.disconnect(); clearTimeout(this._t); }
+  attributeChangedCallback() { if (this.shadowRoot.firstChild) this.style.setProperty('--w', this.getAttribute('width') || '320px'); }
+
+  /* feed the paper out to a height, in a few quick steps, the way a stepper motor moves */
+  _feedTo(h, ms) {
+    const from = this._feed.offsetHeight;
+    this._feed.style.height = h + 'px';
+    if (!reduced() && ms) this._feed.animate([{ height: from + 'px' }, { height: h + 'px' }], { duration: ms, easing: 'steps(4)' });
+  }
+  print() {
+    if (this._state === 'printing') return;
+    this.reset();
+    this._state = 'printing';
+    this.toggleAttribute('data-printing', true);
+    const lines = [...this.children].filter(c => !['SCRIPT', 'STYLE', 'TEMPLATE'].includes(c.tagName));
+    const per = 1000 / clamp(+this.getAttribute('speed') || 7, 1, 40);
+    const padTop = 22, padBottom = 10;
+    if (reduced()) { this._feedTo(this._paper.offsetHeight + 10, 0); return this._done(); }
+    this._feedTo(padTop, per * .6);
+    let i = 0;
+    const next = () => {
+      if (i >= lines.length) { this._feedTo(this._paper.offsetHeight + 10, per); this._t = setTimeout(() => this._done(), per); return; }
+      const el = lines[i++];
+      /* the line's bottom, measured on the paper, is how far the paper has to come out */
+      const bottom = el.offsetTop + el.offsetHeight + (i === lines.length ? padBottom : 0);
+      this._feedTo(bottom + 4, per * .55);
+      /* the print head sweeps across it */
+      el.animate([{ clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0 0 0)' }], { duration: per * .8, easing: 'steps(10)' });
+      for (let k = 0; k < 3; k++) setTimeout(() => sfx('type', this, { pitch: rnd(.35, .5), gap: 0 }), k * per * .22);
+      this._t = setTimeout(next, el.tagName === 'HR' ? per * .6 : per);
+    };
+    this._t = setTimeout(next, per * .6);
+  }
+  _done() {
+    this._state = 'done';
+    this.removeAttribute('data-printing'); this.toggleAttribute('data-done', true);
+    sfx('success', this);
+    this.dispatchEvent(new Event('printed'));
+  }
+  /* rip it off along the zigzag */
+  tear() {
+    if (this._state !== 'done' || this.hasAttribute('data-torn')) return;
+    this.toggleAttribute('data-torn', true);
+    sfx('break', this, { pitch: 1.4 });
+    this.dispatchEvent(new Event('tear'));
+  }
+  reset() {
+    clearTimeout(this._t);
+    this._state = 'idle';
+    for (const a of ['data-printing', 'data-done', 'data-torn']) this.removeAttribute(a);
+    if (this._feed) { this._feed.getAnimations().forEach(a => a.cancel()); this._feed.style.height = '0px'; }
+  }
+}
+define('piix-receipt', PiixReceiptElement);
+ELEMENTS.receipt = 'piix-receipt';
+
 /* ---- gl/reveal.js ---- */
 /* REVEAL: content that dissolves in, pixel by pixel, when it scrolls into view.   @component reveal
  *
@@ -15632,6 +15764,176 @@ class PiixSceneElement extends GLStage {
 define('piix-scene', PiixSceneElement);
 ELEMENTS.scene = 'piix-scene';
 
+/* ---- gl/scratch.js ---- */
+/* SCRATCH: a scratch-off card. Pixel foil over your content; scratch it away.   @component scratch
+ *
+ *   <piix-scratch>
+ *     <h3>You won 20% off</h3>
+ *     <code>PIXEL20</code>
+ *   </piix-scratch>
+ *
+ * Whatever is inside sits under a sheet of pixel foil with a pattern and a label. Drag over it
+ * (mouse, finger or pen) and the foil comes off in pixel blocks, curling off as shavings that
+ * fall away. Once most of it is gone, the rest flakes off by itself and the card announces it.
+ * Keyboard and screen-reader users get a real button: Enter or Space reveals it at once.
+ *
+ *   foil      silver | gold | holo | ink                           default: silver
+ *   label     the text printed on the foil                         default: SCRATCH ME
+ *   grain     the size of one foil pixel, px                        default: 6
+ *   brush     how wide you scratch, px                              default: 22
+ *   reveal    how much must be scratched before it all comes off   default: .55
+ *   sound     make sounds even without <piix-chiptune> ("off" to stay silent)
+ *
+ *   methods: reveal(), reset()
+ *   events: scratch (detail: { progress }), reveal */
+/* light, mid, dark, shine */
+const SCR_FOILS = {
+  silver: ['#e8e6ee', '#c3c0cc', '#8f8b9c', '#ffffff'],
+  gold: ['#ffe08a', '#f2b632', '#b97a12', '#fff6d0'],
+  holo: ['#c7f0ff', '#e4c7ff', '#ffc7e8', '#ffffff'],
+  ink: ['#3a3048', '#2a2236', '#17121f', '#6b5d85']
+};
+class PiixScratchElement extends HTMLElement {
+  static get observedAttributes() { return ['foil', 'label', 'grain']; }
+  constructor() { super(); this.attachShadow({ mode: 'open' }); this._done = false; this._bits = []; this._loop = dt => this._tick(dt); }
+  connectedCallback() {
+    this.shadowRoot.innerHTML = `<style>
+:host{position:relative;display:inline-block;vertical-align:middle;isolation:isolate;-webkit-tap-highlight-color:transparent}
+:host([hidden]){display:none}
+.in{position:relative}
+canvas{position:absolute;left:0;top:0;width:100%;height:100%;image-rendering:pixelated;cursor:crosshair;touch-action:none}
+:host([data-done]) canvas{pointer-events:none}
+.fall{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;image-rendering:pixelated;overflow:visible}
+button{position:absolute;inset:0;opacity:0;border:0;background:none;pointer-events:none}
+button:focus-visible{opacity:1;outline:3px dashed #17121f;outline-offset:4px;background:transparent}
+:host([data-done]) button{display:none}
+</style><div class="in"><slot></slot></div><canvas class="foil" aria-hidden="true"></canvas><canvas class="fall" aria-hidden="true"></canvas><button type="button" part="button"></button>`;
+    const $ = s => this.shadowRoot.querySelector(s);
+    this._cv = $('.foil'); this._fc = $('.fall'); this._btn = $('button');
+    this._btn.setAttribute('aria-label', `Scratch card: ${this.getAttribute('label') || 'scratch me'}. Press to reveal.`);
+    this._btn.addEventListener('click', e => { if (e.detail === 0) this.reveal(); });
+    this._cv.addEventListener('pointerdown', this._pd = e => { if (this._done) return; this._cv.setPointerCapture(e.pointerId); this._down = true; this._last = null; this._at(e); });
+    this._cv.addEventListener('pointermove', e => { if (this._down) this._at(e); });
+    const up = () => { this._down = false; this._last = null; };
+    this._cv.addEventListener('pointerup', up); this._cv.addEventListener('pointercancel', up);
+    this._ro = new ResizeObserver(() => this._size());
+    this._ro.observe(this);
+    this._hide(true);
+  }
+  disconnectedCallback() { this._ro.disconnect(); unsub(this._loop); this._hide(false); }
+  attributeChangedCallback() { if (this._cv && !this._done) { this._cells = null; this._size(); } }
+  /* until it is revealed, what's under the foil can't be tabbed to or read out */
+  _hide(on) { for (const c of this.children) { if (on) { c._scrWas = c.inert; c.inert = true; } else if ('_scrWas' in c) { c.inert = c._scrWas; delete c._scrWas; } } }
+
+  _size() {
+    const W = this.clientWidth, H = this.clientHeight;
+    if (!W || !H) return;
+    const g = this._g = clamp(+this.getAttribute('grain') || 6, 2, 16);
+    const gw = Math.ceil(W / g), gh = Math.ceil(H / g);
+    /* keep what was already scratched when the size stays the same */
+    if (!this._cells || this._gw !== gw || this._gh !== gh) { this._cells = new Uint8Array(gw * gh).fill(1); this._left = gw * gh; }
+    this._gw = gw; this._gh = gh; this._W = W; this._H = H;
+    for (const c of [this._cv, this._fc]) { c.width = gw; c.height = gh; }
+    this._fc.style.cssText = `width:${W}px;height:${H + 200}px`; this._fc.height = gh + Math.ceil(200 / g);
+    this._paint();
+  }
+  /* the foil: a dithered sheen across the card, a diamond pattern, the label in pixels, a border */
+  _paint() {
+    const g = this._cv.getContext('2d'), gw = this._gw, gh = this._gh, P = SCR_FOILS[this.getAttribute('foil')] || SCR_FOILS.silver;
+    const img = g.createImageData(gw, gh), d = img.data, cols = P.map(c => hexRGBA(c));
+    const BAY = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+    const holo = this.getAttribute('foil') === 'holo';
+    for (let y = 0; y < gh; y++) for (let x = 0; x < gw; x++) {
+      const i = y * gw + x;
+      if (!this._cells[i]) continue;
+      /* a diagonal sheen band, dithered between the foil's light and mid tones */
+      const t = ((x + y * 1.4) / (gw + gh * 1.4)), band = Math.abs(((t * 3) % 1) - .5) * 2, k = BAY[(y & 3) * 4 + (x & 3)] / 16;
+      let c = band > k ? cols[0] : cols[1];
+      if ((x + y) % 6 === 0 || (x - y + 600) % 6 === 0) c = cols[2];
+      if (x === 0 || y === 0 || x === gw - 1 || y === gh - 1) c = cols[2];
+      if (holo) c = cols[Math.floor((t * 6 + (y & 1)) % 3)];
+      d.set([c[0], c[1], c[2], 255], i * 4);
+    }
+    g.putImageData(img, 0, 0);
+    /* the label, drawn at foil resolution so it stays pixel-crisp */
+    const label = (this.getAttribute('label') || 'SCRATCH ME').toUpperCase();
+    const fs = Math.max(5, Math.min(Math.floor(gh * .32), Math.floor(gw / (label.length * .75))));
+    g.font = `400 ${fs}px ${KIT_FONT}`; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillStyle = P[2]; g.fillText(label, gw / 2 + 1, gh / 2 + 1);
+    g.fillStyle = P[3]; g.fillText(label, gw / 2, gh / 2);
+    /* the label was drawn over scratched spots too: punch them back out */
+    for (let i = 0; i < this._cells.length; i++) if (!this._cells[i]) g.clearRect(i % gw, (i / gw) | 0, 1, 1);
+  }
+  _at(e) {
+    const r = this.getBoundingClientRect(), x = (e.clientX - r.left) / this._g, y = (e.clientY - r.top) / this._g;
+    const from = this._last || { x, y }, rad = clamp(+this.getAttribute('brush') || 22, 6, 120) / this._g / 2;
+    /* fill the gap between two pointer events, so a fast stroke stays unbroken */
+    const n = Math.max(1, Math.ceil(Math.hypot(x - from.x, y - from.y) / Math.max(1, rad * .5)));
+    for (let s = 1; s <= n; s++) this._dig(from.x + (x - from.x) * s / n, from.y + (y - from.y) * s / n, rad);
+    this._last = { x, y };
+  }
+  _dig(cx, cy, rad) {
+    const g = this._cv.getContext('2d'), gw = this._gw, gh = this._gh;
+    let n = 0;
+    for (let y = Math.max(0, Math.floor(cy - rad)); y <= Math.min(gh - 1, Math.ceil(cy + rad)); y++)
+      for (let x = Math.max(0, Math.floor(cx - rad)); x <= Math.min(gw - 1, Math.ceil(cx + rad)); x++) {
+        const i = y * gw + x;
+        /* a slightly ragged brush: foil tears unevenly at the edge */
+        if (!this._cells[i] || (x - cx) ** 2 + (y - cy) ** 2 > rad * rad * (.75 + Math.random() * .5)) continue;
+        this._cells[i] = 0; this._left--; n++;
+        const px = g.getImageData(x, y, 1, 1).data;
+        if (chance(.35)) this._bits.push({ x, y, vx: rnd(-8, 8), vy: rnd(-12, 2), c: `rgb(${px[0]},${px[1]},${px[2]})`, t: rnd(.5, 1.1) });
+        g.clearRect(x, y, 1, 1);
+      }
+    if (!n) return;
+    sfx('type', this, { pitch: rnd(.5, .8), gap: 45 });
+    sub(this._loop);
+    const p = 1 - this._left / this._cells.length;
+    this.dispatchEvent(new CustomEvent('scratch', { detail: { progress: p } }));
+    if (p >= clamp(+(this.getAttribute('reveal') || .55), .05, 1)) this.reveal();
+  }
+  /* the rest of the foil flakes off, pixel by pixel, in a random order */
+  reveal() {
+    if (this._done) return;
+    this._done = true; this.toggleAttribute('data-done', true);
+    this._hide(false);
+    const left = [];
+    for (let i = 0; i < this._cells.length; i++) if (this._cells[i]) left.push(i);
+    for (let i = left.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [left[i], left[j]] = [left[j], left[i]]; }
+    this._flake = left; this._flakeAt = 0;
+    if (reduced()) { this._cv.getContext('2d').clearRect(0, 0, this._gw, this._gh); this._flake = []; }
+    sfx('coin', this);
+    this.dispatchEvent(new Event('reveal'));
+    sub(this._loop);
+  }
+  reset() { this._done = false; this.removeAttribute('data-done'); this._cells = null; this._bits = []; this._flake = null; this._hide(true); this._size(); }
+  _tick(dt) {
+    const g = this._cv.getContext('2d'), gw = this._gw;
+    /* flaking: about half a second for the whole sheet */
+    if (this._flake && this._flakeAt < this._flake.length) {
+      const k = Math.ceil(this._flake.length * dt / .5);
+      for (const i of this._flake.slice(this._flakeAt, this._flakeAt += k)) {
+        const x = i % gw, y = (i / gw) | 0;
+        if (chance(.18)) { const px = g.getImageData(x, y, 1, 1).data; this._bits.push({ x, y, vx: rnd(-6, 6), vy: rnd(-8, 0), c: `rgb(${px[0]},${px[1]},${px[2]})`, t: rnd(.4, .9) }); }
+        this._cells[i] = 0; g.clearRect(x, y, 1, 1);
+      }
+    }
+    /* shavings fall, spin a little, and fade */
+    const f = this._fc.getContext('2d');
+    f.clearRect(0, 0, this._fc.width, this._fc.height);
+    for (const b of this._bits) {
+      b.vy += 60 * dt; b.x += b.vx * dt; b.y += b.vy * dt; b.t -= dt;
+      f.globalAlpha = clamp(b.t * 2, 0, 1); f.fillStyle = b.c;
+      f.fillRect(Math.round(b.x), Math.round(b.y), chance(.5) ? 1 : 2, 1);
+    }
+    f.globalAlpha = 1;
+    this._bits = this._bits.filter(b => b.t > 0);
+    if (!this._bits.length && (!this._flake || this._flakeAt >= this._flake.length)) unsub(this._loop);
+  }
+}
+define('piix-scratch', PiixScratchElement);
+ELEMENTS.scratch = 'piix-scratch';
+
 /* ---- gl/shader.js ---- */
 /* SHADER: GPU pixel backgrounds.   @component shader
  *
@@ -16201,6 +16503,171 @@ class PiixTooltipElement extends HTMLElement {
 }
 define('piix-tooltip', PiixTooltipElement);
 ELEMENTS.tooltip = 'piix-tooltip';
+
+/* ---- gl/zipper.js ---- */
+/* ZIPPER: a zipped-up panel over your content. Pull it open.   @component zipper
+ *
+ *   <piix-zipper>
+ *     <h2>Something new</h2>
+ *     <p>Hidden until you unzip it.</p>
+ *   </piix-zipper>
+ *
+ * A panel of pixel fabric with a zip down the middle sits over whatever is inside. Grab the pull
+ * and drag it down: the teeth come apart, and the two halves part in a V that widens above the
+ * pull, the way a real zip does. Let go halfway and it stays halfway. Pull it nearly to the
+ * bottom and it gives way: the halves fall aside and your content is all yours. The pull is a
+ * real slider for keyboards (arrows move it, Enter opens it all).
+ *
+ *   fabric    denim | leather | lime | ink                         default: denim
+ *   teeth     brass | silver | lime                                default: brass
+ *   pixel     size of one pixel, px                                default: 3
+ *   sound     make sounds even without <piix-chiptune> ("off" to stay silent)
+ *
+ *   methods: open(), close()
+ *   events: pull (detail: { progress }), open */
+/* light, mid, dark, stitching */
+const ZIP_FABRIC = {
+  denim: ['#4a6db3', '#3b5b9e', '#26407a', '#e8b04a'],
+  leather: ['#9a5434', '#82442a', '#5a2c18', '#f0d9b5'],
+  lime: ['#d4fb5c', '#c6f432', '#8fb81c', '#17121f'],
+  ink: ['#342b44', '#2a2236', '#17121f', '#c6f432']
+};
+/* shine, metal, shade */
+const ZIP_TEETH = { brass: ['#ffe9a3', '#e0b443', '#8a6416'], silver: ['#ffffff', '#c3c8d4', '#6a7184'], lime: ['#f4ffc7', '#c6f432', '#6f8f12'] };
+class PiixZipperElement extends HTMLElement {
+  static get observedAttributes() { return ['fabric', 'teeth', 'pixel']; }
+  constructor() { super(); this.attachShadow({ mode: 'open' }); this._p = 0; this._want = 0; this._fall = 0; this._open = false; this._loop = dt => this._tick(dt); }
+  connectedCallback() {
+    this.shadowRoot.innerHTML = `<style>
+:host{position:relative;display:block;isolation:isolate}
+canvas{position:absolute;left:0;top:0;width:100%;height:100%;image-rendering:pixelated;touch-action:none;z-index:2}
+:host([data-open]) canvas{display:none}
+.knob{position:absolute;z-index:3;width:44px;height:64px;margin-left:-22px;border:0;padding:0;background:none;cursor:grab;touch-action:none}
+.knob:active{cursor:grabbing}
+.knob:focus-visible{outline:3px dashed #17121f;outline-offset:2px}
+:host([data-open]) .knob{display:none}
+</style><slot></slot><canvas aria-hidden="true"></canvas><button class="knob" type="button" role="slider" aria-label="Zipper" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" part="pull"></button>`;
+    this._cv = this.shadowRoot.querySelector('canvas'); this._knob = this.shadowRoot.querySelector('.knob');
+    const k = this._knob;
+    k.addEventListener('pointerdown', e => { k.setPointerCapture(e.pointerId); this._drag = true; this._dy = e.clientY - (this.getBoundingClientRect().top + this._p * this._H); });
+    k.addEventListener('pointermove', e => {
+      if (!this._drag) return;
+      const r = this.getBoundingClientRect();
+      this._want = clamp((e.clientY - this._dy - r.top) / r.height, 0, 1); this._wake();
+    });
+    const up = () => { if (!this._drag) return; this._drag = false; if (this._want > .9) this.open(); };
+    k.addEventListener('pointerup', up); k.addEventListener('pointercancel', up);
+    k.addEventListener('keydown', e => {
+      const d = { ArrowDown: .06, ArrowRight: .06, ArrowUp: -.06, ArrowLeft: -.06, PageDown: .25, PageUp: -.25 }[e.key];
+      if (d) { e.preventDefault(); this._want = clamp(this._want + d, 0, 1); this._wake(); if (this._want > .9) this.open(); }
+      else if (e.key === 'Enter' || e.key === 'End') { e.preventDefault(); this.open(); }
+      else if (e.key === 'Home') { e.preventDefault(); this.close(); }
+    });
+    this._ro = new ResizeObserver(() => { this._size(); this._draw(); });
+    this._ro.observe(this);
+    this._hide(true);
+  }
+  disconnectedCallback() { this._ro.disconnect(); unsub(this._loop); this._hide(false); }
+  attributeChangedCallback() { if (this._cv) { this._size(); this._draw(); } }
+  _hide(on) { for (const c of this.children) { if (on) { if (!('_zipWas' in c)) c._zipWas = c.inert; c.inert = true; } else if ('_zipWas' in c) { c.inert = c._zipWas; delete c._zipWas; } } }
+  _wake() { sub(this._loop); }
+  _size() {
+    const W = this.clientWidth, H = this.clientHeight;
+    if (!W || !H) return;
+    const g = this._g = clamp(+this.getAttribute('pixel') || 3, 1, 8);
+    this._W = W; this._H = H; this._gw = Math.ceil(W / g); this._gh = Math.ceil(H / g);
+    this._cv.width = this._gw; this._cv.height = this._gh;
+    this._img = new ImageData(this._gw, this._gh); this._u = new Uint32Array(this._img.data.buffer);
+    this._knob.style.left = W / 2 + 'px';
+  }
+  open() {
+    if (this._open) return;
+    this._want = 1; this._finishing = true; this._wake();
+  }
+  close() {
+    if (this._open) { this._open = false; this.removeAttribute('data-open'); this._hide(true); this._fall = 0; this._p = 1; }
+    this._finishing = false; this._want = 0; this._wake();
+  }
+
+  _tick(dt) {
+    const before = this._p;
+    /* the pull follows your hand closely, with a little weight */
+    this._p += (this._want - this._p) * Math.min(1, dt * (this._drag ? 22 : this._finishing ? 6 : 10));
+    if (Math.abs(this._want - this._p) < .001) this._p = this._want;
+    /* a click for every tooth the pull passes */
+    const th = 2 * this._g / this._H;
+    if (Math.floor(before / th) !== Math.floor(this._p / th)) sfx('type', this, { pitch: .6 + this._p * .8, gap: 25 });
+    /* all the way down: the halves fall aside */
+    if (this._finishing && this._p > .985) {
+      this._fall += dt * (reduced() ? 99 : 1);
+      if (this._fall > .55 && !this._open) {
+        this._open = true; this.setAttribute('data-open', ''); this._hide(false);
+        sfx('success', this);
+        this.dispatchEvent(new Event('open'));
+      }
+    }
+    this._knob.style.top = this._p * this._H - 10 + 'px';
+    this._knob.setAttribute('aria-valuenow', Math.round(this._p * 100));
+    if (before !== this._p) this.dispatchEvent(new CustomEvent('pull', { detail: { progress: this._p } }));
+    this._draw();
+    if (this._p === this._want && (!this._finishing || this._open)) unsub(this._loop);
+  }
+
+  _draw() {
+    if (!this._u) return;
+    const u = this._u, gw = this._gw, gh = this._gh;
+    const pack = h => { const [r, g, b] = hexRGBA(h); return (255 << 24 | b << 16 | g << 8 | r) >>> 0; };
+    const F = (ZIP_FABRIC[this.getAttribute('fabric')] || ZIP_FABRIC.denim).map(pack);
+    const T = (ZIP_TEETH[this.getAttribute('teeth')] || ZIP_TEETH.brass).map(pack);
+    u.fill(0);
+    const cx = gw / 2, py = this._p * gh, tw = 3, th = 2;
+    /* the halves slide out and drop once it gives way */
+    const fk = clamp(this._fall / .55, 0, 1), fx = fk * fk * gw * .6, fy = fk * fk * gh * .25;
+    const put = (x, y, c) => { x = Math.round(x); y = Math.round(y); if (x >= 0 && x < gw && y >= 0 && y < gh) u[y * gw + x] = c; };
+    for (let y = 0; y < gh; y++) {
+      /* above the pull the zip is open: a V that widens toward the top */
+      const gap = y < py ? Math.min(gw, (py - y) * .55 + (fk > 0 ? gw * fk : 0)) : 0;
+      const le = cx - gap / 2, re = cx + gap / 2;
+      for (let x = 0; x < gw; x++) {
+        const left = x < cx;
+        if (left ? x >= le : x < re) continue;
+        /* twill: diagonal lines in the weave, a darker hem along the outer edge */
+        const tw2 = ((x + y) % 4 === 0) ? 2 : ((x + y) % 4 === 2 ? 0 : 1);
+        let c = F[tw2];
+        /* the tape the teeth are sewn to, then a row of stitching beside it */
+        const edge = left ? le - x : x - re + 1;
+        if (edge <= tw + 1) c = F[2];
+        else if (edge === tw + 4 && (y >> 1) % 2 === 0) c = F[3];
+        if (x === 0 || x === gw - 1 || y === 0 || y === gh - 1) c = F[2];
+        put(x + (left ? -fx : fx), y + fy, c);
+      }
+      /* the teeth: each side has a tooth on alternate rows; where it's closed they interlock */
+      const row = Math.floor(y / th), leftTooth = row % 2 === 0;
+      const shade = y % th === 0 ? T[0] : T[1];
+      for (let k = 0; k < tw + (gap > 0 ? 0 : 1); k++) {
+        if (leftTooth) put(le - tw + k + (gap > 0 ? 0 : 1) - fx, y + fy, k === tw ? T[2] : shade);
+        else put(re + tw - 1 - k - (gap > 0 ? 0 : 1) + fx, y + fy, k === tw ? T[2] : shade);
+      }
+    }
+    /* the slider and its tab */
+    if (fk < 1) {
+      const sy = Math.min(py, gh - 1);
+      for (let y = -3; y <= 2; y++) for (let x = -4; x <= 3; x++) {
+        const w = 4 - Math.max(0, y) ;
+        if (Math.abs(x + .5) > w) continue;
+        put(cx + x, sy + y, y === -3 ? T[0] : (x === -4 || x === 3 || y === 2) ? T[2] : T[1]);
+      }
+      for (let y = 3; y <= 12; y++) for (let x = -2; x <= 1; x++) {
+        const hole = y >= 9 && y <= 10 && (x === -1 || x === 0);
+        if (hole) continue;
+        put(cx + x, sy + y, x === -2 ? T[0] : x === 1 || y === 12 ? T[2] : T[1]);
+      }
+    }
+    this._cv.getContext('2d').putImageData(this._img, 0, 0);
+  }
+}
+define('piix-zipper', PiixZipperElement);
+ELEMENTS.zipper = 'piix-zipper';
 
 K.start(document.currentScript);
 })();
