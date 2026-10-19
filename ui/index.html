@@ -122,13 +122,17 @@
       <summary><a href="./#games-sound">Games & sound</a><span class="n">4</span></summary>
       <a href="breakout.html">Breakout</a><a href="rpg-box.html">RPG dialogue</a><a href="handheld.html">Handheld</a><a href="chiptune.html">Chiptune</a>
     </details>
+    <details class="sg" open>
+      <summary><a href="./#delight">Delight</a><span class="n">3</span></summary>
+      <a href="scratch.html">Scratch card</a><a href="zipper.html">Zipper</a><a href="receipt.html">Receipt printer</a>
+    </details>
     <p class="side-none" hidden>Nothing by that name.</p>
   </aside>
   <main id="top">
 <header class="doc-head ui-head">
   <div class="crumbs"><a href="./">Pixel UI</a></div>
   <h1>Pixel UI</h1>
-  <p>A component library drawn on the GPU. Backgrounds, heroes, buttons, cards, text effects and form controls, all rendered on a pixel grid and dithered into a palette. 110 components, each one a plain web component: one script tag, then copy a tag.</p><div class="pills"><a class="pill" href="#scenes">Scenes · 10</a><a class="pill" href="#layouts">Layouts · 6</a><a class="pill" href="#hero-sections">Hero sections · 18</a><a class="pill" href="#3d-shaders">3D & Shaders · 19</a><a class="pill" href="#image-effects">Image effects · 10</a><a class="pill" href="#backgrounds">Backgrounds · 10</a><a class="pill" href="#sections">Sections · 3</a><a class="pill" href="#buttons">Buttons · 2</a><a class="pill" href="#cards">Cards · 1</a><a class="pill" href="#text">Text · 8</a><a class="pill" href="#media">Media · 1</a><a class="pill" href="#forms">Forms · 4</a><a class="pill" href="#navigation">Navigation · 1</a><a class="pill" href="#overlays">Overlays · 3</a><a class="pill" href="#feedback">Feedback · 2</a><a class="pill" href="#data">Data · 2</a><a class="pill" href="#motion">Motion · 2</a><a class="pill" href="#physics-time">Physics & time · 4</a><a class="pill" href="#games-sound">Games & sound · 4</a></div>
+  <p>A component library drawn on the GPU. Backgrounds, heroes, buttons, cards, text effects and form controls, all rendered on a pixel grid and dithered into a palette. 113 components, each one a plain web component: one script tag, then copy a tag.</p><div class="pills"><a class="pill" href="#scenes">Scenes · 10</a><a class="pill" href="#layouts">Layouts · 6</a><a class="pill" href="#hero-sections">Hero sections · 18</a><a class="pill" href="#3d-shaders">3D & Shaders · 19</a><a class="pill" href="#image-effects">Image effects · 10</a><a class="pill" href="#backgrounds">Backgrounds · 10</a><a class="pill" href="#sections">Sections · 3</a><a class="pill" href="#buttons">Buttons · 2</a><a class="pill" href="#cards">Cards · 1</a><a class="pill" href="#text">Text · 8</a><a class="pill" href="#media">Media · 1</a><a class="pill" href="#forms">Forms · 4</a><a class="pill" href="#navigation">Navigation · 1</a><a class="pill" href="#overlays">Overlays · 3</a><a class="pill" href="#feedback">Feedback · 2</a><a class="pill" href="#data">Data · 2</a><a class="pill" href="#motion">Motion · 2</a><a class="pill" href="#physics-time">Physics & time · 4</a><a class="pill" href="#games-sound">Games & sound · 4</a><a class="pill" href="#delight">Delight · 3</a></div>
 </header>
 <div class="ui-why">
   <div><h3>On the GPU</h3><p>Shaders run on one shared WebGL context, drawn at pixel resolution and scaled up crisp.</p></div>
@@ -765,10 +769,26 @@
     <h3>Chiptune</h3><p>8-bit sounds for your whole page, from one tag. No audio files.</p>
   </a>
 </div>
+
+<h2 class="fam-h" id="delight">Delight <span class="n">3</span></h2>
+<div class="ui-grid">
+  <a class="ui-card" href="scratch.html">
+    <div class="ui-thumb light" aria-hidden="true" inert><piix-scratch label="Scratch" grain="5"><div style="padding:18px 26px;background:#fbf8f1;box-shadow:inset 0 0 0 3px #17121f;font:800 24px Bricolage Grotesque,system-ui;color:#17121f">20% OFF</div></piix-scratch></div>
+    <h3>Scratch card</h3><p>A scratch-off card: pixel foil over your content. Scratch it away.</p>
+  </a>
+  <a class="ui-card" href="zipper.html">
+    <div class="ui-thumb light" aria-hidden="true" inert><piix-zipper style="width:70%;pointer-events:none"><div style="height:110px;background:#6b4cff"></div></piix-zipper></div>
+    <h3>Zipper</h3><p>A zipped-up panel of pixel fabric over your content. Pull it open.</p>
+  </a>
+  <a class="ui-card" href="receipt.html">
+    <div class="ui-thumb light" aria-hidden="true" inert><piix-receipt width="150px" speed="12" style="font-size:9px;pointer-events:none"><h3>Receipt</h3><p data-price="$12">Pal</p><p data-price="$12" data-total>Total</p></piix-receipt></div>
+    <h3>Receipt printer</h3><p>A little thermal printer that prints your content, line by line.</p>
+  </a>
+</div>
   </main>
   <nav class="ui-toc" aria-label="On this page"></nav>
 </div>
-<script src="../piixpal.js?v=6b63a7d1"></script>
+<script src="../piixpal.js?v=4f5c5058"></script>
 <script src="../site/site.js" defer></script>
 <script src="../site/docs.js" defer></script>
 <script src="../site/ui.js" defer></script>
