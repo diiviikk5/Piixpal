@@ -33,7 +33,7 @@ class PiixZipperElement extends HTMLElement {
   connectedCallback() {
     this.shadowRoot.innerHTML = `<style>
 :host{position:relative;display:block;isolation:isolate}
-canvas{position:absolute;left:0;top:0;width:100%;height:100%;image-rendering:pixelated;touch-action:none;z-index:2}
+canvas{position:absolute;left:0;top:0;width:100%;height:100%;image-rendering:pixelated;touch-action:none;z-index:2;cursor:grab}
 :host([data-open]) canvas{display:none}
 .knob{position:absolute;z-index:3;width:44px;height:64px;margin-left:-22px;border:0;padding:0;background:none;cursor:grab;touch-action:none}
 .knob:active{cursor:grabbing}
@@ -42,14 +42,21 @@ canvas{position:absolute;left:0;top:0;width:100%;height:100%;image-rendering:pix
 </style><slot></slot><canvas aria-hidden="true"></canvas><button class="knob" type="button" role="slider" aria-label="Zipper" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" part="pull"></button>`;
     this._cv = this.shadowRoot.querySelector('canvas'); this._knob = this.shadowRoot.querySelector('.knob');
     const k = this._knob;
-    k.addEventListener('pointerdown', e => { k.setPointerCapture(e.pointerId); this._drag = true; this._dy = e.clientY - (this.getBoundingClientRect().top + this._p * this._H); });
-    k.addEventListener('pointermove', e => {
+    /* grab the pull itself, or anywhere near the zip line: both start a drag */
+    const grab = (el, e) => { el.setPointerCapture(e.pointerId); this._drag = el; this._dy = e.clientY - (this.getBoundingClientRect().top + this._p * this._H); };
+    k.addEventListener('pointerdown', e => grab(k, e));
+    this._cv.addEventListener('pointerdown', e => {
+      const r = this.getBoundingClientRect();
+      if (Math.abs(e.clientX - r.left - r.width / 2) < 60) { grab(this._cv, e); this._dy = 0; this._want = clamp((e.clientY - r.top) / r.height, this._p, 1); this._wake(); }
+    });
+    const move = e => {
       if (!this._drag) return;
       const r = this.getBoundingClientRect();
       this._want = clamp((e.clientY - this._dy - r.top) / r.height, 0, 1); this._wake();
-    });
+    };
+    k.addEventListener('pointermove', move); this._cv.addEventListener('pointermove', move);
     const up = () => { if (!this._drag) return; this._drag = false; if (this._want > .9) this.open(); };
-    k.addEventListener('pointerup', up); k.addEventListener('pointercancel', up);
+    for (const el of [k, this._cv]) { el.addEventListener('pointerup', up); el.addEventListener('pointercancel', up); }
     k.addEventListener('keydown', e => {
       const d = { ArrowDown: .06, ArrowRight: .06, ArrowUp: -.06, ArrowLeft: -.06, PageDown: .25, PageUp: -.25 }[e.key];
       if (d) { e.preventDefault(); this._want = clamp(this._want + d, 0, 1); this._wake(); if (this._want > .9) this.open(); }
@@ -71,7 +78,8 @@ canvas{position:absolute;left:0;top:0;width:100%;height:100%;image-rendering:pix
     this._W = W; this._H = H; this._gw = Math.ceil(W / g); this._gh = Math.ceil(H / g);
     this._cv.width = this._gw; this._cv.height = this._gh;
     this._img = new ImageData(this._gw, this._gh); this._u = new Uint32Array(this._img.data.buffer);
-    this._knob.style.left = W / 2 + 'px';
+    /* the handle sits on the pull from the start, not only once it moves */
+    this._knob.style.left = W / 2 + 'px'; this._knob.style.top = this._p * H - 10 + 'px';
   }
   open() {
     if (this._open) return;
@@ -119,7 +127,7 @@ canvas{position:absolute;left:0;top:0;width:100%;height:100%;image-rendering:pix
     const put = (x, y, c) => { x = Math.round(x); y = Math.round(y); if (x >= 0 && x < gw && y >= 0 && y < gh) u[y * gw + x] = c; };
     for (let y = 0; y < gh; y++) {
       /* above the pull the zip is open: a V that widens toward the top */
-      const gap = y < py ? Math.min(gw, (py - y) * .55 + (fk > 0 ? gw * fk : 0)) : 0;
+      const gap = y < py ? Math.min(gw, (py - y) * .85 + (fk > 0 ? gw * fk : 0)) : 0;
       const le = cx - gap / 2, re = cx + gap / 2;
       for (let x = 0; x < gw; x++) {
         const left = x < cx;
