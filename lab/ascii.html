@@ -1,0 +1,29 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Pixel UI: ascii</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Silkscreen&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: #07060b; color: #f2eef8; font: 400 16px/1.5 "Bricolage Grotesque", system-ui }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 14px }
+  .tile { position: relative; height: 300px; overflow: hidden; background: #000 }
+  .tile.light { background: #fff }
+  .tile span { position: absolute; left: 10px; bottom: 8px; font: 400 11px Silkscreen; letter-spacing: .1em; background: #000a; padding: 4px 6px }
+  .hero { position: relative; height: 560px; display: grid; place-content: center; text-align: center; background: #fff; color: #0a1a8c }
+  .hero h1 { font-size: 88px; letter-spacing: -.05em; margin: 0 }
+</style>
+<section class="hero"><piix-ascii scene="glow" fill></piix-ascii><h1>Build in ASCII.</h1><p>The glow scene, behind a hero.</p></section>
+<div class="grid">
+  <div class="tile"><piix-ascii scene="flow" fill></piix-ascii><span>flow</span></div>
+  <div class="tile"><piix-ascii scene="aurora" fill></piix-ascii><span>aurora</span></div>
+  <div class="tile"><piix-ascii scene="ocean" fill></piix-ascii><span>ocean</span></div>
+  <div class="tile"><piix-ascii scene="terrain" fill></piix-ascii><span>terrain</span></div>
+  <div class="tile"><piix-ascii scene="galaxy" fill></piix-ascii><span>galaxy</span></div>
+  <div class="tile"><piix-ascii scene="planet" fill></piix-ascii><span>planet</span></div>
+  <div class="tile"><piix-ascii scene="city" fill></piix-ascii><span>city</span></div>
+  <div class="tile"><piix-ascii scene="tunnel" fill></piix-ascii><span>tunnel</span></div>
+  <div class="tile"><piix-ascii scene="rain" fill></piix-ascii><span>rain</span></div>
+  <div class="tile"><piix-ascii scene="storm" fill></piix-ascii><span>storm</span></div>
+  <div class="tile"><piix-ascii scene="dunes" fill></piix-ascii><span>dunes</span></div>
+  <div class="tile"><piix-ascii scene="galaxy" chars="blocks" palette="fire" fill></piix-ascii><span>blocks · fire</span></div>
+</div>
+<script src="../piixpal.js"></script>
