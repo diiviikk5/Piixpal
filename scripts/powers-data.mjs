@@ -46,6 +46,17 @@ export const POWERS = [
     code: '<!-- the whole page -->\n<piix-weather kind="snow"></piix-weather>\n\n<!-- or just inside one element -->\n<header class="hero">\n  <h1>Happy holidays</h1>\n  <piix-weather kind="snow" amount="2"></piix-weather>\n</header>'
   },
   {
+    id: 'lantern', fam: 'play', accent: 'var(--lime)', kind: 'element', tag: 'piix-lantern', where: 'body', tall: true,
+    uses: 'your layout as a maze of shadows: every heading, card, image and button casts one, worked out live from where your light is',
+    support: 'every modern browser · mouse, touch and pen · Escape or "Lights on" ends it',
+    try: 'move the light around; when a pair of eyes shows up in the dark, chase it and keep it lit',
+    desc: 'Hide-and-seek in the shadows of your own page. The lights go out and your pointer becomes a lantern: every element on the page casts a real shadow away from it, recalculated as you move. Glims live in those shadows, shy little ghosts you can only see by their blinking eyes. Catch one in your light and it freezes for a heartbeat, eyes wide, then bolts for the nearest shadow your layout offers, so you have to chase it into a corner. Keep it lit and it is yours. Catch them all and the lights come back on.',
+    attrs: [['glims', 'how many to find (default 5)'], ['radius', "the lantern's reach in px (default 190)"], ['hide', 'CSS selector for what casts shadows'], ['pixel', 'size of a pixel of darkness (default 3)'], ['start', '<code>manual</code> waits for <code>start()</code> instead of going dark when it scrolls into view']],
+    api: 'el.start()  el.lights()', events: 'found { found, total }, win',
+    hab: '<p class="h-text" style="bottom:auto;top:34px;left:28px;font-size:40px">Who is there?</p><div class="h-btns" style="bottom:80px;gap:16px"><button type="button" class="h-btn">Docs</button><button type="button" class="h-btn lime">Install</button><button type="button" class="h-btn">GitHub</button></div><piix-lantern glims="4" radius="150" hide=".h-text,.h-btn"></piix-lantern>',
+    code: '<!-- inside any section: the game stays in it -->\n<section class="hero">\n  <h1>Welcome</h1>\n  <p>…</p>\n  <piix-lantern></piix-lantern>\n</section>\n\n<!-- or the whole page -->\n<piix-lantern glims="8"></piix-lantern>'
+  },
+  {
     id: 'pidge', fam: 'jobs', accent: 'var(--violet)', kind: 'pal', does: 'courier', where: 'body',
     uses: 'a JavaScript call from anywhere: <code>Piixpal.toast("Saved!")</code>',
     support: 'every modern browser · notes are announced to screen readers',
