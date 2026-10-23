@@ -30,6 +30,13 @@ class PiixPalElement extends HTMLElement {
   _mount() {
     if (!this.isConnected || this._mounted) return;
     const name = (this.getAttribute('pal') || '').toLowerCase();
+    /* a pal that is its own element (the wyrm, weather…): put that element right here instead */
+    if (!SPRITES[name] && ELEMENTS[name]) {
+      const el = this._el = document.createElement(ELEMENTS[name]);
+      for (const at of this.attributes) if (at.name !== 'pal' && at.name !== 'style') el.setAttribute(at.name, at.value);
+      this.after(el); this._mounted = true;
+      return;
+    }
     const sel = this.getAttribute('on');
     let targets;
     try { targets = sel ? [...document.querySelectorAll(sel)] : [this.parentElement]; } catch (e) { targets = []; }
@@ -100,6 +107,7 @@ class PiixPalElement extends HTMLElement {
   }
   _unmount() {
     if (!this._mounted) return;
+    if (this._el) { this._el.remove(); this._el = null; this._mounted = false; return; }
     unsub(this._tick);
     if (this._ctl && this._ctl.destroy) this._ctl.destroy();
     if (this._ctl && this._ctl.crew) this._ctl.crew.forEach(c => c.destroy());
