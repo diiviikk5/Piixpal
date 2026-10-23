@@ -60,6 +60,10 @@ export const PALS = [
     desc: 'A very slow snail with a very nice shell. Glides along your text leaving a shimmering slime trail that fades behind it. Too close and it hides until you go away.',
     attrs: [['speed', 'creeping speed multiplier'], ['edge', '"text" or "box"']],
     hab: `<p class="h-text" id="d-shel" style="font-size:34px">Slow and steady.</p><piix-pal pal="shel" on="#d-shel"></piix-pal>`, code: '<h2>\n  Slow and steady.\n  <piix-pal pal="shel"></piix-pal>\n</h2>' },
+  { id: 'wyrm', does: 'swim', accent: 'var(--mint)', lives: 'the whole page, or the element you put it in, swimming through the air', scared: 'a poke on the body, which sends it darting off', poke: 'click anywhere and it turns and breathes fire at the spot',
+    desc: 'A long pixel dragon, every segment of its body following the one in front so it moves like it has a spine: scales, a rippling mane, paddling legs, horns, hair and whiskers streaming behind. It swims loops round your cursor and coils itself around your headings. Ignore it and it curls up and sleeps until you come near.',
+    attrs: [['color', 'jade, ember, void, frost or gold'], ['size', '0.4 to 2 (default 1)'], ['wrap', 'CSS selector for what it coils around (default h1, h2)'], ['fire', '"off" for no fire']],
+    hab: `<p class="h-text" style="bottom:auto;top:48px;font-size:40px">Here be dragons.</p><piix-pal pal="wyrm" size=".55" wrap=".h-text"></piix-pal>`, code: '<!-- anywhere: it has the whole screen -->\n<piix-pal pal="wyrm"></piix-pal>\n\n<!-- or inside a section, and it stays there -->\n<section class="hero">\n  <h1>Here be dragons.</h1>\n  <piix-pal pal="wyrm" color="ember"></piix-pal>\n</section>' },
   /* ----- more characters ----- */
   { id: 'gecko', does: 'climb', accent: 'var(--lime)', lives: 'the whole border of a box, upside-down underneath included', scared: 'being watched (it freezes)', poke: 'sprints the other way round',
     desc: 'A tiny lizard with sticky feet. Walks along the top of your card, down the side, upside-down along the bottom and back up the other side.',
