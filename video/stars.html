@@ -1,0 +1,106 @@
+<!doctype html>
+<!-- A 5-second GitHub stars clip. PAGE=stars.html NAME=piixpal-stars WAV=stars.wav node video/render.mjs -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Piixpal: stars</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@400;600&family=Silkscreen&display=swap" rel="stylesheet">
+<script>
+/* a clock the renderer owns: time, animation frames and timers only move when it is told to */
+(() => {
+  let now = 0, seed = 11, tid = 1;
+  window.__realNow = performance.now.bind(performance);
+  window.__realSetInterval = setInterval.bind(window);
+  window.__realClearInterval = clearInterval.bind(window);
+  const queue = [], timers = new Map();
+  performance.now = () => now;
+  Date.now = () => 1790000000000 + now;
+  window.requestAnimationFrame = cb => queue.push(cb);
+  window.cancelAnimationFrame = () => {};
+  window.setTimeout = (fn, ms = 0, ...a) => { const id = tid++; timers.set(id, { at: now + Math.max(0, +ms || 0), fn, a }); return id; };
+  window.setInterval = (fn, ms = 0, ...a) => { const id = tid++; timers.set(id, { at: now + Math.max(1, +ms || 0), fn, a, every: Math.max(1, +ms || 0) }); return id; };
+  window.clearTimeout = window.clearInterval = id => timers.delete(id);
+  Math.random = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+  window.__clock = {
+    get ms() { return now; },
+    step(dt) {
+      const end = now + Math.max(0, dt);
+      for (let guard = 0; guard < 5000; guard++) {
+        let best = null, bid = 0;
+        for (const [id, t] of timers) if (t.at <= end && (!best || t.at < best.at)) { best = t; bid = id; }
+        if (!best) break;
+        now = Math.max(now, best.at);
+        if (best.every) best.at += best.every; else timers.delete(bid);
+        try { typeof best.fn === 'function' && best.fn(...best.a); } catch (e) { console.error(e); }
+      }
+      now = end;
+      queue.splice(0).forEach(cb => { try { cb(now); } catch (e) { console.error(e); } });
+    }
+  };
+})();
+</script>
+<style>
+  html, body { margin: 0; background: #000; overflow: hidden }
+  #stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #0b0a10; color: #f2eef8; font-family: "Bricolage Grotesque", system-ui, sans-serif;
+    background-image: radial-gradient(#ffffff10 2px, transparent 2px); background-size: 40px 40px }
+  .top { position: absolute; left: 0; right: 0; top: 96px; display: flex; justify-content: center; align-items: center; gap: 22px; font: 400 34px Silkscreen; letter-spacing: .1em; color: #c6f432; text-transform: uppercase }
+  .top svg { width: 46px; height: 46px; fill: #f2eef8 }
+  .grid { position: absolute; left: 50%; top: 200px; transform: translateX(-50%); display: grid; grid-template-columns: repeat(9, 74px); gap: 14px }
+  .grid i { width: 74px; height: 74px; opacity: 0; transform: scale(.2) }
+  .grid i svg { width: 100%; height: 100% }
+  .count { position: absolute; left: 0; right: 0; bottom: 110px; text-align: center; font: 800 190px/1 "Bricolage Grotesque"; letter-spacing: -.05em }
+  .count small { display: inline-block; margin-left: 24px; font: 400 54px Silkscreen; letter-spacing: .08em; color: #ffd23f; vertical-align: 34px }
+  .end { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 30px; opacity: 0; background: #0b0a10 }
+  .end .big { font: 800 260px/1 "Bricolage Grotesque"; letter-spacing: -.06em; color: #ffd23f }
+  .end .url { font: 600 44px "JetBrains Mono"; color: #c6f432 }
+  .end .cta { font: 400 30px Silkscreen; letter-spacing: .12em; text-transform: uppercase; opacity: .85 }
+  .end piix-sprite { position: absolute; right: 230px; bottom: 150px }
+  #flash { position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="top"><svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>diiviikk5 / Piixpal</div>
+  <div class="grid" id="grid"></div>
+  <div class="count"><span id="n">0</span><small>★ stars</small></div>
+  <div class="end" id="end">
+    <div class="big"><span id="n2">54</span> ★</div>
+    <div class="url">github.com/diiviikk5/Piixpal</div>
+    <div class="cta">tiny pixel creatures for your website</div>
+    <piix-sprite name="loti" size="230" sleep-after="0"></piix-sprite>
+  </div>
+  <div id="flash"></div>
+</div>
+<script src="../piixpal.js"></script>
+<script>
+/* 0 to N stars: each pops into the grid as the counter climbs; then the big number and the link */
+const N = +(new URLSearchParams(location.search).get('n') || 54), DUR = 5, WARM = 60000;
+const STAR = '<svg viewBox="0 0 9 9" shape-rendering="crispEdges"><path fill="#17121f" d="M3 0h3v1h1v2h2v3H8v1H7v2H6V8H3v1H2V7H1V6H0V3h2V1h1z"/><path fill="#ffd23f" d="M4 1h1v2h3v1H7v1H6v2H5V6H4v1H3V5H2V4H1V3h3z"/><path fill="#fff4c0" d="M4 1h1v1H4zM2 3h1v1H2z"/></svg>';
+const grid = document.getElementById('grid');
+const cells = Array.from({ length: N }, () => { const i = document.createElement('i'); i.innerHTML = STAR; grid.appendChild(i); return i; });
+document.getElementById('n2').textContent = N;
+/* the stars arrive slowly, then faster and faster */
+const T0 = .45, T1 = 3.2, arrive = k => T0 + (T1 - T0) * Math.pow(k / N, .6);
+const cl = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const stepTo = ms => { while (ms - __clock.ms > .01) __clock.step(Math.min(1000 / 30, ms - __clock.ms)); };
+function frame(T) {
+  let shown = 0;
+  cells.forEach((c, k) => {
+    const a = arrive(k + 1), p = cl((T - a) / .16);
+    if (T >= a) shown = k + 1;
+    const s = p < 1 ? .2 + Math.floor(p * 4) / 4 * 1.05 : 1;
+    c.style.opacity = p > 0 ? 1 : 0; c.style.transform = `scale(${s})`;
+  });
+  document.getElementById('n').textContent = shown;
+  document.getElementById('end').style.opacity = Math.floor(cl((T - 3.55) / .25) * 4) / 4;
+  document.getElementById('flash').style.opacity = T > 3.45 && T < 3.75 ? (1 - (T - 3.45) / .3) * .8 : 0;
+  document.querySelector('.end .big').style.transform = `scale(${1.25 - Math.floor(cl((T - 3.6) / .3) * 4) / 4 * .25})`;
+  document.querySelector('.end piix-sprite').style.transform = `translateY(${T > 3.6 ? -Math.abs(Math.sin((T - 3.6) * 7)) * 30 : 0}px)`;
+  stepTo(WARM + T * 1000);
+}
+const ready = document.fonts.ready.then(() => Promise.all(['800 100px "Bricolage Grotesque"', '400 30px Silkscreen', '600 30px "JetBrains Mono"'].map(f => document.fonts.load(f)))).then(() => stepTo(WARM));
+window.__film = { DUR, ready, frame, cues: () => [] };
+if (!location.search.includes('render')) ready.then(() => { const t0 = __realNow(); __realSetInterval(() => frame(((__realNow() - t0) / 1000) % DUR), 1000 / 30); });
+</script>
+</body>
+</html>
