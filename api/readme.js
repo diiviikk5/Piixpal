@@ -8,6 +8,7 @@
  *
  *   text     what it says (up to 40 characters)                   default: none
  *   pals     up to 4 pal names, comma separated                    default: bitbug
+ *            (or Pal Maker codes: a pal someone made at piixpal.dvkk.dev/make)
  *   repo     owner/name: adds the repo's live star count
  *   theme    auto | light | dark | lime | paper                    default: auto (works on light and dark)
  *   color    the letters' colour, hex without #
@@ -19,6 +20,14 @@
  *
  * Pal pixels come from api/_pals.json, exported from the library by scripts/readme-data.mjs. */
 const PALS = require('./_pals.json');
+const MAKER = require('./_maker.js');
+/* a made pal, from its code: it walks, or flies if it has wings */
+const made = code => {
+  try {
+    const m = MAKER.decode(code), sp = MAKER.sprite(m), fly = m.wings > 0, clip = fly ? 'fly' : 'walk';
+    return { name: m.name, w: sp.w, h: sp.h, palette: sp.palette, frames: sp.frames[clip], fps: sp.fps[clip] || 8, fly, moves: true };
+  } catch (_) { return null; }
+};
 
 /* ---------- a 5 x 7 pixel font: capitals, digits and the punctuation people use ---------- */
 const G = s => s.split(' ');
@@ -119,9 +128,13 @@ async function render(q) {
   }
   const type = typeset(parts);
   /* the pals: up to four, known ones only */
-  const names = String(q.pals || q.pal || 'bitbug').toLowerCase().split(',').map(s => s.trim()).filter(n => PALS[n]).slice(0, 4);
-  if (!names.length) names.push('bitbug');
-  const pals = names.map(n => PALS[n]);
+  const pals = [], names = [];
+  for (const raw of String(q.pals || q.pal || 'bitbug').split(',').map(s => s.trim()).filter(Boolean)) {
+    if (pals.length >= 4) break;
+    const p = PALS[raw.toLowerCase()] || (raw.length > 20 ? made(raw) : null);
+    if (p) { pals.push(p); names.push(p.name || raw.toLowerCase()); }
+  }
+  if (!pals.length) { pals.push(PALS.bitbug); names.push('bitbug'); }
   const tallest = Math.max(...pals.map(p => p.h * ps + (p.fly ? 26 : 0)));
   /* layout: pals stand on the top edge of the letters */
   const textW = type.w * fs, textH = 7 * fs;
