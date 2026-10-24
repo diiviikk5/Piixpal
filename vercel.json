@@ -72,6 +72,10 @@
     {
       "source": "/readme",
       "destination": "/api/readme"
+    },
+    {
+      "source": "/p/:ref",
+      "destination": "/api/p?ref=:ref"
     }
   ]
 }
