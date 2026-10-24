@@ -1,15 +1,13 @@
-/* The Pal Maker: draw a pal (or turn an image or an emoji into one), give it a face, legs,
- * wings and something to do, watch it live on the page, and share it as a link or a tag.
- * Everything about the pal lives in its code (MAKER in src/maker.js), kept in the URL hash. */
+/* The Pal Maker's pixel mode: a pixel grid editor, plus pixelating any image, emoji or library
+ * pal. The pal is a MAKER code (src/maker.js); site/maker.js shows it live and shares it. */
 (() => {
-  const K = window.Piixpal && Piixpal._k, M = K && K.MAKER;
+  const K = window.Piixpal && Piixpal._k, M = K && K.MAKER, S = window.PIIX_MAKER;
   const $ = id => document.getElementById(id);
-  if (!M || !$('mk-cv')) return;
-  const ORIGIN = 'https://piixpal.dvkk.dev';
+  if (!M || !S || !$('mk-cv')) return;
+  const toast = t => S.toast(t);
 
   /* ---------- state ---------- */
-  let m;
-  try { m = location.hash.length > 8 ? M.decode(location.hash.slice(1)) : M.blank(); } catch (_) { m = M.blank(); }
+  let m = M.blank();
   let tool = 'pen', cur = 1, mirror = false;
   const undo = [], redo = [];
   const snap = () => JSON.stringify({ ...m, px: [...m.px] });
@@ -190,7 +188,7 @@
   cv.parentElement.addEventListener('dragover', e => { e.preventDefault(); cv.parentElement.classList.add('drop'); });
   cv.parentElement.addEventListener('dragleave', () => cv.parentElement.classList.remove('drop'));
   cv.parentElement.addEventListener('drop', e => { e.preventDefault(); cv.parentElement.classList.remove('drop'); fromFile(e.dataTransfer.files[0]); });
-  addEventListener('paste', e => { const f = [...(e.clipboardData || {}).files || []].find(f => /^image\//.test(f.type)); if (f) fromFile(f); });
+  addEventListener('paste', e => { if (S.mode !== 'pixel') return; const f = [...(e.clipboardData || {}).files || []].find(f => /^image\//.test(f.type)); if (f) fromFile(f); });
   const fromEmoji = () => {
     const t = $('mk-emoji').value.trim();
     if (!t) return;
@@ -207,7 +205,8 @@
     const crop = document.createElement('canvas'); crop.width = r - l + 1; crop.height = b - tp + 1;
     crop.getContext('2d').drawImage(c, l, tp, crop.width, crop.height, 0, 0, crop.width, crop.height);
     if (pixelate(crop, crop.width, crop.height, { emoji: true })) {
-      if (!m.name || m.name === 'blob' || m.name === 'pal') { m.name = 'mojo'; $('mk-name').value = m.name; }
+      const nm = S.common().name;
+      if (!nm || nm === 'blob' || nm === 'pal') S.setCommon({ name: 'mojo' });
       toast('Emoji in. Pick some legs and it’s alive.');
     }
   };
@@ -227,7 +226,7 @@
     m.colors = keys.map(k => sp.palette[k].slice(0, 7));
     rows.forEach((r, y) => [...r].slice(0, w).forEach((ch, x) => { const i = keys.indexOf(ch); if (i >= 0 && y + pad >= 0 && y + pad < h) m.px[(y + pad) * w + x] = i + 1; }));
     m.eyes.style = 0; m.mouth.style = 0; m.cheeks = false; m.outline = false;
-    m.name = name + ' remix'; $('mk-name').value = m.name;
+    S.setCommon({ name: name + ' remix' });
     cur = 1; changed();
     toast('Remixing ' + name + '. Recolour it, add wings, make it yours.');
   };
@@ -264,10 +263,9 @@
       name: P(['blip', 'mochi', 'nib', 'puddle', 'zuzu', 'plum', 'bean', 'fig', 'tuft', 'nugget', 'pip-pop', 'gumdrop'])
     });
     if (m.wings && Math.random() < .6) m.does = 'follow';
-    $('mk-name').value = m.name;
+    S.setCommon({ name: m.name, does: m.does });
     cur = 1; changed();
   };
-  $('mk-surprise').addEventListener('click', surprise);
 
   /* ---------- the controls ---------- */
   const segs = [];
@@ -280,18 +278,6 @@
   seg($('mk-mouth'), M.MOUTHS, () => m.mouth.style, v => { m.mouth.style = v; });
   seg($('mk-legs'), M.LEGS, () => m.legs, v => { m.legs = v; });
   seg($('mk-wings'), M.WINGS, () => m.wings, v => { m.wings = v; });
-  const DOES_TEXT = {
-    crawl: 'walks along your text, hops gaps, flips over when poked', bounce: 'hops along, leaps at the cursor, throw it around',
-    climb: 'walks all the way round an element', follow: 'naps until you come near, then follows the cursor about',
-    perch: 'sits on your buttons, flies off when you come close', hang: 'dangles from an element on a thread',
-    creep: 'creeps slowly, leaving a trail, hides when you come near', drop: 'parachutes onto your page when it scrolls into view',
-    lounge: 'lies about, dozes, swats at the cursor', slide: 'waddles, then belly-slides along the element',
-    toss: 'a toy: grab it and throw it around the page', float: 'floats on a string, like a balloon'
-  };
-  const dsel = $('mk-does');
-  M.DOES.forEach(d => dsel.add(new Option(d, d)));
-  dsel.addEventListener('change', () => { remember(); m.does = dsel.value; changed(); });
-  $('mk-name').addEventListener('input', e => { m.name = e.target.value.replace(/[^\w .!?'-]/g, '').slice(0, 16); changed(true); });
   $('mk-gap').addEventListener('input', e => { m.eyes.gap = +e.target.value; changed(); });
   $('mk-scale').addEventListener('input', e => { m.scale = +e.target.value; changed(); });
   $('mk-outline').addEventListener('change', e => { remember(); m.outline = e.target.checked; changed(); });
@@ -348,55 +334,33 @@
       else if (!['undo', 'redo', 'clear'].includes(t)) b.setAttribute('aria-pressed', t === tool);
     });
     segs.forEach(f => f());
-    dsel.value = m.does; $('mk-does-text').textContent = DOES_TEXT[m.does] || '';
-    $('mk-name').value = m.name; $('mk-gap').value = m.eyes.gap; $('mk-scale').value = m.scale;
+    $('mk-gap').value = m.eyes.gap; $('mk-scale').value = m.scale;
     $('mk-outline').checked = m.outline; $('mk-cheeks').checked = m.cheeks; $('mk-ink').value = m.ink;
     $('mk-size').value = [12, 16, 20, 24, 32].includes(m.w) && m.w === m.h ? m.w : '';
     cv.dataset.tool = tool;
     draw();
   };
 
-  /* ---------- the pal, live, and the ways to share it ---------- */
-  let code = '', liveT, hashT;
-  const live = () => {
-    const stage = $('mk-stage'), old = stage.querySelector('piix-pal');
-    if (old) old.remove();
-    $('mk-title').firstChild.textContent = m.name || 'my pal';
-    const p = document.createElement('piix-pal');
-    p.setAttribute('make', code);
-    /* perchers sit on buttons; everyone else lives on the heading */
-    if (m.does === 'perch') p.setAttribute('on', '#mk-stage .btn');
-    (m.does === 'perch' ? stage : $('mk-title')).appendChild(p);
+  /* ---------- hand the code to the page ---------- */
+  const changed = () => {
+    const com = S.common();
+    m.name = com.name; m.does = com.does;
+    ui();
+    S.publish(M.encode(m));
   };
-  const share = () => {
-    const link = ORIGIN + '/p/' + code, nm = (m.name || 'my pal').replace(/[<>"&]/g, '');
-    $('mk-link').value = link;
-    $('mk-open').href = '/p/' + code;
-    $('mk-embed').textContent = `<script src="${ORIGIN}/piixpal.min.js" defer></script>\n\n<h1>Hello <piix-pal make="${code}"></piix-pal></h1>`;
-    $('mk-readme').textContent = `![${nm}](${ORIGIN}/readme?text=${encodeURIComponent(nm).replace(/'/g, '%27')}&pals=${code})`;
-    $('mk-bytes').textContent = code.length + ' characters, and that’s the whole pal.';
-  };
-  const changed = (soft, keepUndo) => {
-    code = M.encode(m);
-    ui(); share();
-    clearTimeout(hashT); hashT = setTimeout(() => history.replaceState(null, '', '#' + code), 300);
-    clearTimeout(liveT); liveT = setTimeout(live, soft ? 500 : 220);
-  };
-
-  /* copy buttons and the PNG */
-  document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', () => {
-    const el = $(b.dataset.copy);
-    navigator.clipboard.writeText(el.value || el.textContent).then(() => { const t = b.textContent; b.textContent = 'Copied'; setTimeout(() => b.textContent = t, 1200); });
-  }));
-  $('mk-png').addEventListener('click', () => {
-    const sp = M.sprite(m), rows = sp.frames.idle[0], S = 12, c = document.createElement('canvas');
-    c.width = sp.w * S; c.height = sp.h * S;
-    const cg = c.getContext('2d'), pad = sp.h - rows.length;
-    rows.forEach((r, y) => [...r].forEach((ch, x) => { if (sp.palette[ch]) { cg.fillStyle = sp.palette[ch]; cg.fillRect(x * S, (y + pad) * S, S, S); } }));
-    c.toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = (m.name || 'pal').replace(/\W+/g, '-') + '.png'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000); });
+  addEventListener('resize', () => { if (S.mode === 'pixel') draw(); });
+  S.register('pixel', {
+    activate() { changed(); },
+    refresh: changed,
+    surprise,
+    load(code) { m = M.decode(code); S.setCommon({ name: m.name, does: m.does }); },
+    /* its standing frame, big, for the PNG download */
+    png() {
+      const sp = M.sprite(m), rows = sp.frames.idle[0], Z = 12, c = document.createElement('canvas');
+      c.width = sp.w * Z; c.height = sp.h * Z;
+      const cg = c.getContext('2d'), pad = sp.h - rows.length;
+      rows.forEach((r, y) => [...r].forEach((ch, x) => { if (sp.palette[ch]) { cg.fillStyle = sp.palette[ch]; cg.fillRect(x * Z, (y + pad) * Z, Z, Z); } }));
+      return c;
+    }
   });
-  const toast = t => { const el = $('mk-toast'); el.textContent = t; el.classList.add('on'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('on'), 2600); };
-
-  addEventListener('resize', draw);
-  changed();
 })();
