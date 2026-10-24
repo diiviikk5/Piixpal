@@ -1,8 +1,9 @@
 /* <piix-pal pal="bitbug" do="crawl" on="#title" scale="4" hue="0">
+ * <piix-pal make="AQ4M…">  a pal from the Pal Maker (piixpal.dvkk.dev/make), drawn from its code
  * Put it inside the element it should live on, or point at one with on="css selector".
  * The tag itself stays invisible; the pal is drawn on a shared overlay layer. */
 class PiixPalElement extends HTMLElement {
-  static get observedAttributes() { return ['pal', 'do', 'on', 'scale', 'hue', 'at', 'side']; }
+  static get observedAttributes() { return ['pal', 'make', 'do', 'on', 'scale', 'hue', 'at', 'side']; }
   connectedCallback() {
     this.style.display = 'none';
     if (this._mounted) return;
@@ -29,7 +30,11 @@ class PiixPalElement extends HTMLElement {
 
   _mount() {
     if (!this.isConnected || this._mounted) return;
-    const name = (this.getAttribute('pal') || '').toLowerCase();
+    let name = (this.getAttribute('pal') || '').toLowerCase();
+    if (this.hasAttribute('make')) {
+      try { name = MAKER.register(this.getAttribute('make')); }
+      catch (e) { console.warn('[piixpal] that make= code is broken', this); return; }
+    }
     /* a pal that is its own element (the wyrm, weather…): put that element right here instead */
     if (!SPRITES[name] && ELEMENTS[name]) {
       const el = this._el = document.createElement(ELEMENTS[name]);
