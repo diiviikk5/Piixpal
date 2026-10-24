@@ -21,7 +21,7 @@ const dir = d => existsSync(join(src, d))
 const read = f => `/* ---- ${f.split(sep).join('/')} ---- */\n` + readFileSync(join(src, f), 'utf8').trim();
 
 /* listed on every call, so a long-running dev server picks up new files */
-const CORE_LIST = () => ['core.js', 'icons.js', 'ui.js', 'text.js', 'drag.js', ...dir('elements'), 'boot.js'].filter(f => existsSync(join(src, f)));
+const CORE_LIST = () => ['core.js', 'icons.js', 'ui.js', 'text.js', 'drag.js', 'maker.js', ...dir('elements'), 'boot.js'].filter(f => existsSync(join(src, f)));
 const COMPONENT_LIST = () => [...dir('behaviors'), ...dir('pals'), ...dir('sprites'), ...dir('powers'), ...dir('studio'), ...dir('kit'), ...dir('gl')];
 
 /* everything the core declares at the top level becomes part of the shared toolkit */
@@ -129,6 +129,9 @@ export function build() {
   /* the home page loads the bundle by a fingerprinted URL, so browsers never keep an old one */
   const v = createHash('md5').update(code).digest('hex').slice(0, 8), home = join(root, 'index.html');
   if (existsSync(home)) writeFileSync(home, readFileSync(home, 'utf8').replace(/<script src="piixpal\.js(\?v=\w+)?"><\/script>/,`<script src="piixpal.js?v=${v}"></script>`));
+  /* the server draws made pals too (README banners, share cards): the same code, as a CommonJS module */
+  const maker = readFileSync(join(src, 'maker.js'), 'utf8').replace(/^Piixpal\.make = .*$/m, '');
+  writeFileSync(join(root, 'api', '_maker.js'), `// generated from src/maker.js by scripts/build.mjs, edit that instead\n${maker}module.exports = MAKER;\n`);
   return { files, bytes: Buffer.byteLength(code) };
 }
 
