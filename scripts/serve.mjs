@@ -5,8 +5,8 @@ import { join, dirname, extname, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build } from './build.mjs';
 import { createRequire } from 'node:module';
-/* the README image endpoint, as on Vercel (vercel.json rewrites /readme to it) */
-const readme = createRequire(import.meta.url)('../api/readme.js');
+/* the serverless functions in api/, as on Vercel (vercel.json rewrites /readme and /p/:ref to them) */
+const need = createRequire(import.meta.url), api = name => need(`../api/${name}.js`);
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const port = +process.env.PORT || 5173;
@@ -18,7 +18,10 @@ const types = {
 
 createServer(async (req, res) => {
   let p = decodeURIComponent(new URL(req.url, 'http://x').pathname);
-  if (p === '/readme' || p === '/api/readme') return readme(req, res);
+  if (p === '/readme') return api('readme')(req, res);
+  if (p.startsWith('/p/')) { req.url = '/api/p?ref=' + encodeURIComponent(p.slice(3)); return api('p')(req, res); }
+  const fn = /^\/api\/([a-z]+)$/.exec(p);
+  if (fn) { try { return await api(fn[1])(req, res); } catch (e) { res.writeHead(404).end(String(e.message)); return; } }
   if (!extname(p) && !p.endsWith('/')) p += '.html';
   if (p.endsWith('/')) p += 'index.html';
   const file = normalize(join(root, p));
