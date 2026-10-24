@@ -32,7 +32,8 @@ class PiixPalElement extends HTMLElement {
     if (!this.isConnected || this._mounted) return;
     let name = (this.getAttribute('pal') || '').toLowerCase();
     if (this.hasAttribute('make')) {
-      try { name = MAKER.register(this.getAttribute('make')); }
+      /* pixel pals draw at once; smooth ones (drawings, photos, emoji) rasterise first, so mounting retries */
+      try { const c = this.getAttribute('make').trim(); name = RIG.smooth(c) || c.length < 16 ? RIG.register(c) : MAKER.register(c); }
       catch (e) { console.warn('[piixpal] that make= code is broken', this); return; }
     }
     /* a pal that is its own element (the wyrm, weather…): put that element right here instead */

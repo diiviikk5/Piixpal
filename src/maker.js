@@ -267,4 +267,4 @@ const MAKER = (() => {
 
   return { DOES, EYES, MOUTHS, LEGS, WINGS, KEYS, blank, encode, decode, sprite, frame, bounds, register };
 })();
-Piixpal.make = code => MAKER.register(code);
+Piixpal.make = code => { code = String(code).trim(); return RIG.smooth(code) || code.length < 16 ? RIG.register(code) : MAKER.register(code); };
