@@ -3,6 +3,7 @@
 import { readFileSync, readdirSync, writeFileSync, mkdirSync } from 'node:fs';
 import { POWERS, FAMILIES } from './powers-data.mjs';
 import { STUDIO } from './studio-data.mjs';
+import { makerBody } from './maker-page.mjs';
 import { gzipSync } from 'node:zlib';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -772,118 +773,8 @@ const builderBody = `<header class="doc-head">
 </div>
 <script>window.PIIX_BUILDER = ${JSON.stringify(PALS.map(p => ({ id: p.id, kind: p.kind || 'pal', does: p.does })).concat(sprites.map(s => ({ id: s.name, kind: 'sprite', big: s.big }))))};</script>`;
 
-/* ---------- the Pal Maker: site/maker.js drives it, src/maker.js draws the pal ---------- */
-const MAKER_V = (await import('node:crypto')).createHash('md5').update(readFileSync(join(root, 'site/maker.js'))).digest('hex').slice(0, 8);
-const makerBody = `<header class="doc-head">
-  <div class="crumbs"><a href="./">Components</a><span>/</span><span>Pal Maker</span></div>
-  <h1>Pal Maker</h1>
-  <p>Draw a pal, or turn anything into one: drop in a logo, a photo or an emoji. Give it eyes, legs and wings, pick what it does, and it comes alive below. Then share the link, or paste one tag into any site.</p>
-</header>
-<style>
-.mk{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,300px);gap:20px;align-items:start}
-@media (max-width:980px){.mk{grid-template-columns:1fr}}
-.mk-card{border:2px solid var(--ink);border-radius:14px;background:var(--paper);padding:16px;display:grid;gap:14px}
-.mk-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.mk-bar .sep{width:1px;align-self:stretch;background:currentColor;opacity:.15;margin:0 4px}
-.mk button.t{font:600 13px/1 var(--f-sans);padding:8px 10px;border-radius:9px;border:2px solid var(--ink);background:var(--bg);color:var(--ink);cursor:pointer}
-.mk button.t[aria-pressed=true]{background:var(--ink);color:var(--paper)}
-.mk button.t kbd{font:500 10px/1 var(--f-mono, monospace);opacity:.5;margin-left:4px}
-.mk-well{display:grid;place-items:center;padding:10px;border-radius:12px;background:var(--bg);border:2px dashed transparent;transition:border-color .2s}
-.mk-well.drop{border-color:var(--ink)}
-#mk-cv{touch-action:none;cursor:crosshair;border-radius:4px;box-shadow:0 0 0 2px var(--ink)}
-#mk-cv[data-tool=fill]{cursor:cell}#mk-cv[data-tool=pick]{cursor:copy}#mk-cv[data-tool=eyes],#mk-cv[data-tool=mouth]{cursor:pointer}
-.mk-pal{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-.mk-pal button{width:30px;height:30px;border-radius:8px;border:2px solid var(--ink);background:var(--c);cursor:pointer;padding:0}
-.mk-pal button[aria-pressed=true]{outline:3px solid var(--ink);outline-offset:2px}
-.mk-pal .mk-plus{background:var(--bg);color:var(--ink);font:700 16px/1 var(--f-sans)}
-.mk input[type=color]{width:42px;height:32px;border:2px solid var(--ink);border-radius:8px;padding:0;background:none;cursor:pointer}
-.mk-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
-.mk-row label,.mk-opt{font:700 13px/1.2 var(--f-sans)}
-.mk-opt{display:grid;gap:7px}
-.mk-opt small,.mk small{font-weight:500;color:var(--muted)}
-.mk input[type=text],.mk select{font:500 14px/1 var(--f-sans);padding:9px 11px;border-radius:9px;border:2px solid var(--ink);background:var(--bg);color:var(--ink)}
-.mk input[type=text]{width:100%;box-sizing:border-box}
-.mk input[type=range]{width:100%;accent-color:var(--ink)}
-.mk .seg button{padding:7px 9px;font-size:12.5px}
-.mk-any{display:grid;gap:10px;padding:14px;border-radius:12px;background:var(--bg)}
-.mk-any b{font:800 14px/1.2 var(--f-sans)}
-.mk-any .mk-row input[type=text]{width:120px}
-.mk-file{position:relative;overflow:hidden}
-.mk-file input{position:absolute;inset:0;opacity:0;cursor:pointer}
-.mk-live{margin-top:26px;border:2px solid var(--ink);border-radius:16px;padding:90px 24px 40px;background:var(--paper);position:relative;overflow:hidden;min-height:260px}
-.mk-live .tag{position:absolute;top:14px;left:16px;font:600 12px/1 var(--f-sans);color:var(--muted)}
-#mk-title{font:800 clamp(40px,7vw,76px)/1 var(--f-display, var(--f-sans));letter-spacing:-.03em;margin:0 0 16px;display:inline-block}
-.mk-live p{max-width:46ch;margin:0 0 18px;color:var(--muted)}
-.mk-share{display:grid;gap:14px;margin-top:22px}
-.mk-share .c-code{white-space:pre-wrap;word-break:break-all;margin:0}
-.mk-share .mk-row{justify-content:space-between}
-.mk-link{display:flex;gap:8px}
-.mk-link input{flex:1}
-#mk-toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:var(--ink);color:var(--paper);font:600 14px/1.3 var(--f-sans);padding:11px 16px;border-radius:10px;transition:opacity .25s,transform .25s;z-index:50}
-#mk-toast.on{opacity:1;transform:translate(-50%,0)}
-</style>
-<div class="mk">
-  <div class="mk-card">
-    <div class="mk-bar" id="mk-tools">
-      <button type="button" class="t" data-t="pen">Pencil<kbd>B</kbd></button>
-      <button type="button" class="t" data-t="erase">Eraser<kbd>E</kbd></button>
-      <button type="button" class="t" data-t="fill">Fill<kbd>G</kbd></button>
-      <button type="button" class="t" data-t="pick">Pick<kbd>I</kbd></button>
-      <span class="sep"></span>
-      <button type="button" class="t" data-t="eyes">Place eyes</button>
-      <button type="button" class="t" data-t="mouth">Place mouth</button>
-      <span class="sep"></span>
-      <button type="button" class="t" data-t="mirror">Mirror<kbd>M</kbd></button>
-      <button type="button" class="t" data-t="undo" aria-label="Undo">↶</button>
-      <button type="button" class="t" data-t="redo" aria-label="Redo">↷</button>
-      <button type="button" class="t" data-t="clear">Clear</button>
-    </div>
-    <div class="mk-well"><canvas id="mk-cv" aria-label="Pixel editor: draw your pal facing right"></canvas></div>
-    <div class="mk-row"><div class="mk-pal" id="mk-pal"></div><input type="color" id="mk-col" aria-label="Change this colour"></div>
-    <small>Draw it facing right; it turns round by itself. Right-click erases. Eyes and mouth aren't painted: place them, and they blink and change with its mood.</small>
-    <div class="mk-any">
-      <b>Turn anything into a pal</b>
-      <div class="mk-row">
-        <span class="btn btn-sm btn-lime mk-file">Upload an image<input type="file" id="mk-file" accept="image/*"></span>
-        <small>or drop / paste one</small>
-      </div>
-      <div class="mk-row">
-        <input type="text" id="mk-emoji" placeholder="🐸 🍄 👾" aria-label="An emoji"><button type="button" class="btn btn-sm" id="mk-emoji-go">Emoji to pal</button>
-        <select id="mk-remix" aria-label="Remix a pal"><option value="">Remix a pal…</option></select>
-        <button type="button" class="btn btn-sm" id="mk-surprise">Surprise me</button>
-      </div>
-      <label class="mk-row">Colours when pixelating <input type="range" id="mk-ncol" min="2" max="15" value="8" style="width:140px"></label>
-    </div>
-  </div>
-  <div class="mk-card">
-    <label class="mk-opt">Name <input type="text" id="mk-name" maxlength="16" spellcheck="false"></label>
-    <div class="mk-opt">Eyes <div class="seg" id="mk-eyes"></div><label class="mk-row" style="font-weight:500">gap <input type="range" id="mk-gap" min="1" max="8"></label></div>
-    <div class="mk-opt">Mouth <div class="seg" id="mk-mouth"></div></div>
-    <div class="mk-opt">Legs <div class="seg" id="mk-legs"></div></div>
-    <div class="mk-opt">Wings <div class="seg" id="mk-wings"></div></div>
-    <label class="mk-opt">What it does <select id="mk-does"></select><small id="mk-does-text"></small></label>
-    <div class="mk-row"><label><input type="checkbox" id="mk-outline"> Outline</label><label><input type="checkbox" id="mk-cheeks"> Cheeks</label><label>Ink <input type="color" id="mk-ink"></label></div>
-    <label class="mk-opt">Grid <select id="mk-size"><option value="">custom</option>${[12, 16, 20, 24, 32].map(s => `<option value="${s}">${s} × ${s}</option>`).join('')}</select></label>
-    <label class="mk-opt">Size on the page <input type="range" id="mk-scale" min="2" max="6"></label>
-  </div>
-</div>
-<section class="mk-live" id="mk-stage">
-  <span class="tag">Live: it's the real component. Poke it, grab it, chase it.</span>
-  <h2 id="mk-title">my pal</h2>
-  <p>This is where it lives on your site. Move the cursor about and see what it makes of you.</p>
-  <span class="btn btn-lime">A button</span> <span class="btn">Another</span>
-</section>
-<section class="mk-share">
-  <h2>Share it</h2>
-  <div class="mk-link"><input type="text" id="mk-link" readonly aria-label="Share link"><button type="button" class="btn btn-sm btn-lime" data-copy="mk-link">Copy link</button><a class="btn btn-sm" id="mk-open" target="_blank" rel="noopener">Open</a></div>
-  <small id="mk-bytes"></small>
-  <div class="mk-row"><b>Put it on your site</b><button type="button" class="btn btn-sm" data-copy="mk-embed">Copy</button></div>
-  <pre class="c-code" id="mk-embed"></pre>
-  <div class="mk-row"><b>Put it on your GitHub README</b><button type="button" class="btn btn-sm" data-copy="mk-readme">Copy</button></div>
-  <pre class="c-code" id="mk-readme"></pre>
-  <div class="mk-row"><b>Or just the picture</b><button type="button" class="btn btn-sm" id="mk-png">Download PNG</button></div>
-</section>
-<div id="mk-toast" role="status"></div>`;
+/* ---------- the Pal Maker: markup in scripts/maker-page.mjs, behaviour in site/maker*.js ---------- */
+const MAKER_V = (await import('node:crypto')).createHash('md5').update(['maker.js', 'maker-smooth.js', 'maker-pixel.js'].map(f => readFileSync(join(root, 'site', f), 'utf8')).join('')).digest('hex').slice(0, 8);
 
 /* ---------- pals for GitHub READMEs: a live image, made by api/readme.js ---------- */
 /* props that only make sense next to their pal stay out of the picker */
@@ -1015,7 +906,7 @@ const pages = [
   ['3d.html', { key: 'studio', title: '3D', desc: 'Pals as real 3D models: spinning toys, holo trading cards, a voxel planet, a snow globe, a hologram and voxel dioramas.', body: studioBody }],
   ['install.html', { key: 'install', title: 'Install', desc: 'Every way to add Piixpal to a site: one tag, single files, no-markup, JS, React, Vue, Svelte, bookmarklet.', body: installBody }],
   ['builder.html', { key: 'builder', title: 'Builder', desc: 'Pick pals, choose where they live, copy one line.', body: builderBody }],
-  ['make.html', { key: 'make', title: 'Pal Maker', desc: 'Draw a pal or turn any image or emoji into one, then share it as a link or one tag.', body: makerBody, extra: `<script src="../site/maker.js?v=${MAKER_V}" defer></script>` }],
+  ['make.html', { key: 'make', title: 'Pal Maker', desc: 'Turn anything into a pal: doodle one, drop in a photo, a logo or an emoji, or draw pixel art. Share it as a link or one tag.', body: makerBody, extra: ['maker', 'maker-smooth', 'maker-pixel'].map(f => `<script src="../site/${f}.js?v=${MAKER_V}" defer></script>`).join(String.fromCharCode(10)) }],
   ['readme.html', { key: 'readme', title: 'GitHub README pals', desc: 'Pals that live on your GitHub profile: an animated pixel banner with your words, one image link.', body: readmeBody }],
   ['crowd.html', { key: 'crowd', title: 'Crowd', desc: 'A stage of hundreds of tiny agents: crowd, swarm and formation modes.', body: crowdBody }],
   ['type.html', { key: 'type', title: 'Pixel type', desc: 'Chunky extruded pixel lettering that pals can walk on.', body: typeBody, fonts: '<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@800&family=Instrument+Serif&family=Pacifico&display=swap" rel="stylesheet">\n' }]
