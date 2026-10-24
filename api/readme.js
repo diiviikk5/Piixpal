@@ -22,7 +22,18 @@
 const PALS = require('./_pals.json');
 const MAKER = require('./_maker.js');
 /* a made pal, from its code: it walks, or flies if it has wings */
-const made = code => {
+const RIG = require('./_rig.js');
+const store = require('./_store.js');
+const made = async code => {
+  /* smooth ones (drawings, photos, emoji): their frames are SVG already */
+  if (RIG.smooth(code)) {
+    try {
+      const m = await RIG.decode(code), g = RIG.geo(m), { clips, fps } = RIG.poses(m), fly = m.wings > 0, clip = fly ? 'fly' : 'walk';
+      const h = Math.min(84, m.size), w = g.box[2] * h / g.box[3], [bx, by, bw, bh] = g.box;
+      const svg = clips[clip].map((pose, k) => `<svg width="${w.toFixed(1)}" height="${h}" shape-rendering="geometricPrecision" viewBox="${bx} ${by} ${bw} ${bh}">${RIG.frameSVG(m, pose, { inner: true, uid: 'm' + k })}</svg>`);
+      return { name: m.name, svg, pw: Math.round(w), ph: h, fps: fps[clip] || 8, fly, moves: true };
+    } catch (_) { return null; }
+  }
   try {
     const m = MAKER.decode(code), sp = MAKER.sprite(m), fly = m.wings > 0, clip = fly ? 'fly' : 'walk';
     return { name: m.name, w: sp.w, h: sp.h, palette: sp.palette, frames: sp.frames[clip], fps: sp.fps[clip] || 8, fly, moves: true };
@@ -131,11 +142,12 @@ async function render(q) {
   const pals = [], names = [];
   for (const raw of String(q.pals || q.pal || 'bitbug').split(',').map(s => s.trim()).filter(Boolean)) {
     if (pals.length >= 4) break;
-    const p = PALS[raw.toLowerCase()] || (raw.length > 20 ? made(raw) : null);
+    let p = PALS[raw.toLowerCase()];
+    if (!p) { const code = await store.resolve(raw); if (code) p = await made(code); }
     if (p) { pals.push(p); names.push(p.name || raw.toLowerCase()); }
   }
   if (!pals.length) { pals.push(PALS.bitbug); names.push('bitbug'); }
-  const tallest = Math.max(...pals.map(p => p.h * ps + (p.fly ? 26 : 0)));
+  const tallest = Math.max(...pals.map(p => (p.svg ? p.ph : p.h * ps) + (p.fly ? 26 : 0)));
   /* layout: pals stand on the top edge of the letters */
   const textW = type.w * fs, textH = 7 * fs;
   const W = Math.round(num(q.width, Math.max(textW + 80, 420), 200, 1400));
@@ -145,11 +157,11 @@ async function render(q) {
   const L = type.runs.length ? tx : pad, R = type.runs.length ? tx + textW : W - pad;
   let css = '', body = '';
   pals.forEach((p, i) => {
-    const pw = p.w * ps, ph = p.h * ps, n = p.frames.length, T = (n / p.fps).toFixed(3);
+    const pw = p.svg ? p.pw : p.w * ps, ph = p.svg ? p.ph : p.h * ps, n = (p.svg || p.frames).length, T = (n / p.fps).toFixed(3);
     const groundY = ty - ph, flyY = groundY - 22;
     /* the frames take turns being visible: frame k shows for its slice of every cycle */
     css += `@keyframes f${i}{0%{visibility:visible}${(100 / n).toFixed(3)}%,100%{visibility:hidden}}.f${i}{visibility:hidden;animation:f${i} ${T}s step-end infinite}`;
-    const frames = p.frames.map((rows, k) => `<g class="f${i}" style="animation-delay:-${((n - k) * T / n).toFixed(3)}s">${rects(palRuns(p, rows), ps)}</g>`).join('');
+    const frames = (p.svg || p.frames).map((fr, k) => `<g class="f${i}" style="animation-delay:-${((n - k) * T / n).toFixed(3)}s">${p.svg ? fr : rects(palRuns(p, fr), ps)}</g>`).join('');
     if (p.moves) {
       /* patrol: walk to one end, turn round, walk back; each pal at its own pace and place */
       const x0 = L, x1 = Math.max(L, R - pw), dist = Math.max(1, x1 - x0);
