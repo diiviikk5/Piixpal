@@ -4,6 +4,9 @@ import { readFile } from 'node:fs/promises';
 import { join, dirname, extname, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { build } from './build.mjs';
+import { createRequire } from 'node:module';
+/* the README image endpoint, as on Vercel (vercel.json rewrites /readme to it) */
+const readme = createRequire(import.meta.url)('../api/readme.js');
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const port = +process.env.PORT || 5173;
@@ -15,6 +18,8 @@ const types = {
 
 createServer(async (req, res) => {
   let p = decodeURIComponent(new URL(req.url, 'http://x').pathname);
+  if (p === '/readme' || p === '/api/readme') return readme(req, res);
+  if (!extname(p) && !p.endsWith('/')) p += '.html';
   if (p.endsWith('/')) p += 'index.html';
   const file = normalize(join(root, p));
   if (!file.startsWith(root)) { res.writeHead(403).end(); return; }
