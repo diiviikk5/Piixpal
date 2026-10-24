@@ -44,6 +44,15 @@
           "value": "public, max-age=3600"
         }
       ]
+    },
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        }
+      ]
     }
   ],
   "redirects": [
@@ -57,6 +66,12 @@
       ],
       "destination": "https://piixpal.dvkk.dev/:path*",
       "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/readme",
+      "destination": "/api/readme"
     }
   ]
 }
