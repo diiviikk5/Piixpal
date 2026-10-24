@@ -19,8 +19,10 @@
   let cell = 20;
   const ink = { k: () => m.ink, w: () => '#ffffff', m: () => '#ff5d73', c: () => '#ff9ab8' };
   const draw = () => {
-    const box = cv.parentElement.clientWidth || 420;
-    cell = Math.max(8, Math.floor(Math.min(box - 4, 460) / Math.max(m.w, m.h)));
+    /* as big as fits beside its controls and inside the window */
+    const ed = cv.closest('.mk-ed'), beside = getComputedStyle(ed).gridTemplateColumns.split(' ').length > 1 ? 220 : 0;
+    const box = Math.min(ed.clientWidth - beside || 420, Math.max(280, innerHeight - 400), 560);
+    cell = Math.max(8, Math.floor((box - 4) / Math.max(m.w, m.h)));
     const W = m.w * cell, H = m.h * cell, dpr = devicePixelRatio || 1;
     if (cv.width !== W * dpr || cv.height !== H * dpr) { cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + 'px'; cv.style.height = H + 'px'; }
     g.setTransform(dpr, 0, 0, dpr, 0, 0);
