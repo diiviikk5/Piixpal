@@ -263,3 +263,22 @@
 
 /* 3D habitats: everything centred, wrapping */
 .h3d{position:absolute;inset:0;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;align-content:center;gap:14px;padding:16px;overflow:hidden}
+
+/* ---------- the sidebar folds away to a thin rail, for more room (remembered; [ toggles it) ---------- */
+.side-tog{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin:0 0 10px;padding:8px 10px;border:2px solid var(--ink);border-radius:10px;background:var(--card);color:var(--ink);font:600 13px/1 var(--f-sans);cursor:pointer;transition:background-color .2s}
+.side-tog:hover{background:var(--paper-2)}
+.side-tog svg{width:14px;height:14px;flex:none;transition:transform .3s var(--spring, ease)}
+.side-tog kbd{margin-left:auto;font:500 10px/1 var(--f-mono, monospace);opacity:.5}
+@media (min-width:901px){
+  .docs{transition:grid-template-columns .35s var(--spring, ease)}
+  .side-min .docs{grid-template-columns:44px minmax(0,1fr)}
+  .side-min .ui-docs{grid-template-columns:44px minmax(0,1fr) 168px}
+  .side-min .ui-docs.no-toc{grid-template-columns:44px minmax(0,1fr)}
+  .side-min .side{overflow:visible;padding-right:0}
+  .side-min .side > :not(.side-tog){display:none}
+  .side-min .side-tog{width:40px;height:40px;padding:0}
+  .side-min .side-tog span,.side-min .side-tog kbd{display:none}
+  .side-min .side-tog svg{transform:rotate(180deg)}
+}
+@media (min-width:901px) and (max-width:1240px){.side-min .ui-docs{grid-template-columns:44px minmax(0,1fr)}}
+@media (max-width:900px){.side-tog{display:none}}

@@ -289,3 +289,25 @@ if (matchMedia('(max-width: 900px)').matches) document.querySelectorAll('.side .
   while (side.firstChild) d.appendChild(side.firstChild);
   side.appendChild(d);
 })();
+
+/* ---------- fold the sidebar away for more room, and remember it ---------- */
+(() => {
+  const side = document.querySelector('.side');
+  if (!side) return;
+  const b = document.createElement('button');
+  b.type = 'button'; b.className = 'side-tog';
+  b.innerHTML = '<svg viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M5 1h1v1H5zM4 2h1v1H4zM3 3h1v2H3zM4 5h1v1H4zM5 6h1v1H5z"/></svg><span>Hide sidebar</span><kbd>[</kbd>';
+  const html = document.documentElement;
+  const sync = () => { const min = html.classList.contains('side-min'); b.setAttribute('aria-expanded', !min); b.setAttribute('aria-label', min ? 'Show the sidebar' : 'Hide the sidebar'); b.title = (min ? 'Show' : 'Hide') + ' the sidebar ( [ )'; };
+  const flip = () => {
+    html.classList.toggle('side-min');
+    try { localStorage.setItem('piix-side', html.classList.contains('side-min') ? 'min' : 'open'); } catch (e) { /* private mode */ }
+    sync();
+    /* layouts that measure themselves (the maker's canvases) get a nudge once it has settled */
+    setTimeout(() => dispatchEvent(new Event('resize')), 380);
+  };
+  b.addEventListener('click', flip);
+  addEventListener('keydown', e => { if (e.key === '[' && !e.ctrlKey && !e.metaKey && !/INPUT|SELECT|TEXTAREA/.test(document.activeElement.tagName) && !document.activeElement.isContentEditable) flip(); });
+  side.prepend(b);
+  sync();
+})();
