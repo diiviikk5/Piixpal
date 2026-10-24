@@ -264,7 +264,7 @@ export const navBar = (key, pre = '', ui = '../ui/') => `<header class="nav" id=
 const page = ({ key, title: t, desc, body, extra = '', fonts = '' }) => `<!doctype html>
 <html lang="en">
 <head>
-<script>(()=>{const d=document.documentElement;d.classList.add('js');let t;try{t=localStorage.getItem('piix-theme')}catch(e){}d.dataset.theme=t||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'white')})()</script>
+<script>(()=>{const d=document.documentElement;d.classList.add('js');let t,s;try{t=localStorage.getItem('piix-theme');s=localStorage.getItem('piix-side')}catch(e){}if(s==='min')d.classList.add('side-min');d.dataset.theme=t||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'white')})()</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>${esc(t)} · Piixpal components</title>
