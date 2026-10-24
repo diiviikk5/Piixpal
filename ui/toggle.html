@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script>(()=>{const d=document.documentElement;d.classList.add('js');let t;try{t=localStorage.getItem('piix-theme')}catch(e){}d.dataset.theme=t||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'white')})()</script>
+<script>(()=>{const d=document.documentElement;d.classList.add('js');let t,s;try{t=localStorage.getItem('piix-theme');s=localStorage.getItem('piix-side')}catch(e){}if(s==='min')d.classList.add('side-min');d.dataset.theme=t||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'white')})()</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Toggle · Piixpal Pixel UI</title>
@@ -237,7 +237,7 @@ export default function Page() {
   </main>
   <nav class="ui-toc" aria-label="On this page"><h4>On this page</h4><a href="#preview">Preview</a><a href="#installation">Installation</a><a href="#usage">Usage</a><a href="#examples">Examples</a><a href="#api">API reference</a><a href="#events">Events</a><a href="#accessibility">Accessibility</a></nav>
 </div>
-<script src="../piixpal.js?v=d37637b9"></script>
+<script src="../piixpal.js?v=dbb7856b"></script>
 <script src="../site/site.js" defer></script>
 <script src="../site/docs.js" defer></script>
 <script src="../site/ui.js" defer></script>
