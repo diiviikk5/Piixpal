@@ -229,7 +229,7 @@ const sidebar = active => {
     </details>`;
   return `<aside class="side" aria-label="Components">
     <input class="side-find" type="search" placeholder="Find a component…" aria-label="Find a component">
-    <nav class="side-start">${link('./', 'Overview', 'index')}${link('install.html', 'Install', 'install')}${link('builder.html', 'Builder', 'builder')}</nav>
+    <nav class="side-start">${link('./', 'Overview', 'index')}${link('install.html', 'Install', 'install')}${link('builder.html', 'Builder', 'builder')}${link('readme.html', 'GitHub README', 'readme')}</nav>
     ${group('sprites', 'Sprites', 'sprites.html', sprites.length, [['Big 3D', bigs.map(x => item('sprites.html#s-' + x.name, x.name, x.accent))], ['Small', smalls.map(x => item('sprites.html#s-' + x.name, x.name, x.accent))]])}
     ${group('pals', 'Pals', 'pals.html', PALS.length, [['Characters', kinds.pal.map(p => item('pals.html#' + p.id, p.id, p.accent))], ['Interactions', kinds.play.map(p => item('pals.html#' + p.id, p.id, p.accent))], ['Toys', kinds.toy.map(p => item('pals.html#' + p.id, p.id, p.accent))], ['Groups', kinds.group.map(p => item('pals.html#' + p.id, p.id, p.accent))]])}
     ${group('powers', 'Superpowers', 'powers.html', POWERS.length, FAMILIES.map(([id, name]) => [name, POWERS.filter(p => p.fam === id).map(p => item('powers.html#' + p.id, p.id, p.accent))]))}
@@ -250,6 +250,7 @@ export const navBar = (key, pre = '', ui = '../ui/') => `<header class="nav" id=
       <a href="${ui}"${key.startsWith('ui') ? ' aria-current="page"' : ''}>Pixel UI</a>
       <a href="${pre}install.html"${key === 'install' ? ' aria-current="page"' : ''}>Install</a>
       <a href="${pre}builder.html"${key === 'builder' ? ' aria-current="page"' : ''}>Builder</a>
+      <a href="${pre}readme.html"${key === 'readme' ? ' aria-current="page"' : ''}>README</a>
     </nav>
     <div class="theme" role="group" aria-label="Theme">
       <button type="button" data-theme-set="white" title="White" aria-label="White theme"><svg viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M3 0h2v1H3zM3 7h2v1H3zM0 3h1v2H0zM7 3h1v2H7zM2 2h4v4H2z"/></svg></button>
@@ -771,6 +772,128 @@ const builderBody = `<header class="doc-head">
 </div>
 <script>window.PIIX_BUILDER = ${JSON.stringify(PALS.map(p => ({ id: p.id, kind: p.kind || 'pal', does: p.does })).concat(sprites.map(s => ({ id: s.name, kind: 'sprite', big: s.big }))))};</script>`;
 
+/* ---------- pals for GitHub READMEs: a live image, made by api/readme.js ---------- */
+/* props that only make sense next to their pal stay out of the picker */
+const README_PROPS = ['fence', 'molehill', 'thread', 'pebble', 'ball', 'can', 'cube', 'dice'];
+const README_PALS = Object.entries(JSON.parse(readFileSync(join(root, 'api/_pals.json'), 'utf8'))).filter(([id]) => !README_PROPS.includes(id)).map(([id, p]) => ({ id, moves: p.moves, fly: p.fly }));
+const readmeBody = `<header class="doc-head">
+  <div class="crumbs"><a href="./">Components</a><span>/</span><span>GitHub README</span></div>
+  <h1>Pals for your GitHub README</h1>
+  <p>Your words in pixel letters, with pals living on them: walkers patrol the tops of the letters, fliers bob above, the rest sit on a letter and do their thing. It's one image link, so it works on your GitHub profile, any README, a blog or a forum post. No scripts, nothing to install.</p>
+</header>
+<style>
+.rm{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:22px;align-items:start}
+@media (max-width:860px){.rm{grid-template-columns:1fr}}
+.rm-ctl{display:grid;gap:16px;padding:18px;border:2px solid var(--ink);border-radius:14px;background:var(--paper)}
+.rm-ctl label,.rm-ctl .lab{display:grid;gap:7px;font:700 13px/1.2 var(--f-sans)}
+.rm-ctl small{font-weight:500;color:var(--muted)}
+.rm-ctl input[type=text]{font:500 15px/1 var(--f-sans);padding:10px 12px;border-radius:9px;border:2px solid var(--ink);background:var(--bg);color:var(--ink);width:100%;box-sizing:border-box}
+.rm-ctl input[type=range]{width:100%;accent-color:var(--ink)}
+.rm-pals{display:flex;flex-wrap:wrap;gap:5px;max-height:190px;overflow:auto;padding:2px}
+.rm-pals button{font:600 12.5px/1 var(--f-sans);padding:7px 9px;border-radius:8px;border:2px solid var(--line, #0002);background:var(--bg);color:var(--ink);cursor:pointer}
+.rm-pals button[aria-pressed=true]{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+.rm-pals button i{font-style:normal;opacity:.55;margin-left:3px}
+.rm-stage{display:grid;gap:12px}
+.rm-view{border-radius:14px;border:2px solid var(--ink);padding:22px;display:grid;place-items:center;min-height:190px;overflow:auto;background-color:#ffffff;background-image:linear-gradient(45deg,#0000000a 25%,transparent 25%,transparent 75%,#0000000a 75%),linear-gradient(45deg,#0000000a 25%,transparent 25%,transparent 75%,#0000000a 75%);background-size:18px 18px;background-position:0 0,9px 9px;transition:background-color .25s}
+.rm-view.dark{background-color:#0d1117}
+.rm-view img{max-width:100%;height:auto;image-rendering:pixelated}
+.rm-out{display:grid;gap:8px}
+.rm-out .c-code{white-space:pre-wrap;word-break:break-all;margin:0}
+.rm-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.rm-ex{display:grid;gap:14px;margin-top:34px}
+.rm-ex figure{margin:0;display:grid;gap:8px}
+.rm-ex .rm-view{min-height:0;padding:16px}
+.rm-ex figcaption{font:500 13.5px/1.4 var(--f-sans);color:var(--muted)}
+.rm-ex code{font-size:12.5px}
+</style>
+<div class="rm">
+  <form class="rm-ctl" id="rm-ctl" onsubmit="return false">
+    <label>Text <input type="text" id="rm-text" value="Hi, I'm Divik" maxlength="40" spellcheck="false"><small>Up to 40 characters: letters, digits and most punctuation.</small></label>
+    <div class="lab">Pals <small id="rm-n">Pick up to 4. Tap a picked one to drop it.</small>
+      <div class="rm-pals" id="rm-pals">${README_PALS.map(p => `<button type="button" data-id="${p.id}" aria-pressed="false">${p.id}${p.fly ? '<i>flies</i>' : p.moves ? '' : '<i>sits</i>'}</button>`).join('')}</div>
+    </div>
+    <label>Star count <input type="text" id="rm-repo" placeholder="owner/repo" spellcheck="false"><small>Adds a live star count after your text, refreshed every hour.</small></label>
+    <div class="lab">Theme
+      <div class="seg" id="rm-theme" role="group" aria-label="Theme">${['auto', 'light', 'dark', 'lime', 'paper'].map((t, i) => `<button type="button" data-v="${t}" aria-pressed="${i === 0}">${t}</button>`).join('')}</div>
+      <small>Auto has no background and works on GitHub's light and dark modes.</small>
+    </div>
+    <label>Letter size <input type="range" id="rm-size" min="3" max="10" value="6"></label>
+    <label>Pal size <input type="range" id="rm-scale" min="2" max="5" value="3"></label>
+    <label>Walking speed <input type="range" id="rm-speed" min="0.25" max="3" step="0.25" value="1"></label>
+  </form>
+  <div class="rm-stage">
+    <div class="rm-row"><b>Preview</b>
+      <div class="seg" id="rm-bg" role="group" aria-label="Preview background"><button type="button" data-v="light" aria-pressed="true">GitHub light</button><button type="button" data-v="dark" aria-pressed="false">GitHub dark</button></div>
+    </div>
+    <div class="rm-view" id="rm-view"><img id="rm-img" alt="README pals preview"></div>
+    <div class="rm-out">
+      <div class="rm-row"><b>Paste this into your README.md</b><button type="button" class="btn btn-sm btn-lime" id="rm-copy">Copy</button></div>
+      <pre class="c-code" id="rm-md"></pre>
+      <div class="rm-row"><b>Or as HTML</b><button type="button" class="btn btn-sm" id="rm-copy2">Copy</button></div>
+      <pre class="c-code" id="rm-html"></pre>
+    </div>
+  </div>
+</div>
+<section class="rm-ex">
+  <h2>A few ideas</h2>
+  ${[
+    ['?text=Hi, I\'m Ada&pals=bitbug,bumble,tri', 'A profile hello, with a beetle, a bee and a triangle.'],
+    ['?text=Piixpal&repo=diiviikk5/Piixpal&pals=penguin,pip&theme=dark', 'A project banner with its live star count.'],
+    ['?text=shipping daily&pals=gecko,scrolly&theme=paper&size=5', 'Paper, smaller letters.'],
+    ['?text=open to work&pals=sparrows,nomad&theme=lime&scale=2', 'Lime, with sparrows overhead.']
+  ].map(([q, cap]) => `<figure><div class="rm-view"><img loading="lazy" src="/readme${esc(q.replace(/ /g, '%20'))}" alt="${esc(cap)}"></div><figcaption>${esc(cap)} <code>piixpal.dvkk.dev/readme${esc(q)}</code></figcaption></figure>`).join('\n  ')}
+  <h2>All the options</h2>
+  <pre class="c-code">text     what it says, up to 40 characters
+pals     up to 4 pal names, comma separated            (bitbug)
+repo     owner/name: adds the repo's live star count
+theme    auto | light | dark | lime | paper           (auto)
+color    the letters' colour, hex without the #
+size     letter pixel size, 2 to 12                    (6)
+scale    pal pixel size, 2 to 6                        (3)
+speed    walking speed, 0.25 to 3                      (1)
+width    image width in px                             (fits the text)
+credit   0 hides the little "piixpal" in the corner</pre>
+  <p>It respects <code>prefers-reduced-motion</code>, and GitHub caches the image, so a change can take a few minutes to show up.</p>
+</section>
+<script>
+(() => {
+  const $ = id => document.getElementById(id), ORIGIN = 'https://piixpal.dvkk.dev';
+  let picked = ['bitbug', 'bumble', 'tri'], theme = 'auto', timer;
+  const seg = (box, on) => box.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; box.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); on(b.dataset.v); });
+  const query = () => {
+    const p = new URLSearchParams();
+    if ($('rm-text').value.trim()) p.set('text', $('rm-text').value.trim());
+    p.set('pals', picked.join(',') || 'bitbug');
+    if (/^[\\w.-]+\\/[\\w.-]+$/.test($('rm-repo').value.trim())) p.set('repo', $('rm-repo').value.trim());
+    if (theme !== 'auto') p.set('theme', theme);
+    if ($('rm-size').value !== '6') p.set('size', $('rm-size').value);
+    if ($('rm-scale').value !== '3') p.set('scale', $('rm-scale').value);
+    if ($('rm-speed').value !== '1') p.set('speed', $('rm-speed').value);
+    return '?' + p.toString().replace(/\\+/g, '%20').replace(/%2C/g, ',').replace(/%2F/g, '/');
+  };
+  const update = () => {
+    const q = query(), alt = $('rm-text').value.trim() || 'Piixpal pals';
+    $('rm-md').textContent = '![' + alt + '](' + ORIGIN + '/readme' + q + ')';
+    $('rm-html').textContent = '<p align="center"><img src="' + ORIGIN + '/readme' + q.replace(/&/g, '&amp;') + '" alt="' + alt.replace(/"/g, '&quot;') + '"></p>';
+    clearTimeout(timer); timer = setTimeout(() => { $('rm-img').src = '/readme' + q; }, 220);
+    $('rm-pals').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', picked.includes(b.dataset.id)));
+    $('rm-n').textContent = picked.length + ' of 4 picked. Tap a picked one to drop it.';
+  };
+  $('rm-pals').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    const id = b.dataset.id;
+    picked = picked.includes(id) ? picked.filter(x => x !== id) : picked.concat(id).slice(-4);
+    update();
+  });
+  seg($('rm-theme'), v => { theme = v; update(); });
+  seg($('rm-bg'), v => { $('rm-view').classList.toggle('dark', v === 'dark'); });
+  ['rm-text', 'rm-repo', 'rm-size', 'rm-scale', 'rm-speed'].forEach(id => $(id).addEventListener('input', update));
+  const copy = (btn, el) => btn.addEventListener('click', () => { navigator.clipboard.writeText(el.textContent).then(() => { const t = btn.textContent; btn.textContent = 'Copied'; setTimeout(() => btn.textContent = t, 1200); }); });
+  copy($('rm-copy'), $('rm-md')); copy($('rm-copy2'), $('rm-html'));
+  update();
+})();
+</script>`;
+
 const pages = [
   ['index.html', { key: 'index', title: 'Components', desc: 'Every Piixpal component: sprites, pals and pixel type.', body: indexBody }],
   ['sprites.html', { key: 'sprites', title: 'Sprites', desc: `${sprites.length} inline pixel sprites with cursor-following eyes. Copy a tag, paste it anywhere.`, body: spritesBody }],
@@ -779,6 +902,7 @@ const pages = [
   ['3d.html', { key: 'studio', title: '3D', desc: 'Pals as real 3D models: spinning toys, holo trading cards, a voxel planet, a snow globe, a hologram and voxel dioramas.', body: studioBody }],
   ['install.html', { key: 'install', title: 'Install', desc: 'Every way to add Piixpal to a site: one tag, single files, no-markup, JS, React, Vue, Svelte, bookmarklet.', body: installBody }],
   ['builder.html', { key: 'builder', title: 'Builder', desc: 'Pick pals, choose where they live, copy one line.', body: builderBody }],
+  ['readme.html', { key: 'readme', title: 'GitHub README pals', desc: 'Pals that live on your GitHub profile: an animated pixel banner with your words, one image link.', body: readmeBody }],
   ['crowd.html', { key: 'crowd', title: 'Crowd', desc: 'A stage of hundreds of tiny agents: crowd, swarm and formation modes.', body: crowdBody }],
   ['type.html', { key: 'type', title: 'Pixel type', desc: 'Chunky extruded pixel lettering that pals can walk on.', body: typeBody, fonts: '<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@800&family=Instrument+Serif&family=Pacifico&display=swap" rel="stylesheet">\n' }]
 ];
