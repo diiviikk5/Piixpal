@@ -83,7 +83,7 @@ const surfaceAt = (el, x, r = rectOf(el)) => {
 const LAYER_CSS = `
 :host{all:initial}
 .a{position:absolute;left:0;top:0;pointer-events:none;will-change:transform;contain:layout style}
-.a canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;pointer-events:auto;cursor:grab;transform-origin:50% 100%;touch-action:none;-webkit-user-drag:none;user-select:none}
+.a canvas.smooth{image-rendering:auto!important}.a canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;pointer-events:auto;cursor:grab;transform-origin:50% 100%;touch-action:none;-webkit-user-drag:none;user-select:none}
 .a.held canvas{cursor:grabbing}
 .a.nograb canvas{cursor:pointer}
 .a.ghost canvas{pointer-events:none}
@@ -148,6 +148,8 @@ const defineSprite = (name, spec) => {
 };
 const baked = spec => {
   if (spec._baked) return spec._baked;
+  /* smooth pals (the Pal Maker's drawings and photos) arrive as finished canvases, res times sharper */
+  if (spec.canvases) return (spec._baked = spec.canvases);
   const pal = {};
   for (const k in spec.palette) pal[k] = hexRGBA(spec.palette[k]);
   const out = {};
@@ -188,7 +190,9 @@ class Actor {
     n.style.setProperty('--p', Math.max(3, this.s) + 'px');
     n.style.setProperty('--g', Math.max(6, this.s * 2) + 'px');
     const cv = this.cv = document.createElement('canvas');
-    cv.width = spec.w; cv.height = spec.h;
+    const res = spec.res || 1;
+    cv.width = spec.w * res; cv.height = spec.h * res;
+    if (res > 1) cv.classList.add('smooth');
     cv.style.width = spec.w * this.s + 'px';
     cv.style.height = spec.h * this.s + 'px';
     if (opts.hue) cv.style.filter = `hue-rotate(${+opts.hue}deg)`;
@@ -229,7 +233,7 @@ class Actor {
     const f = this.frames[this.clip][this.fi];
     if (f !== this._drawn) {
       this._drawn = f;
-      this.g.clearRect(0, 0, this.spec.w, this.spec.h);
+      this.g.clearRect(0, 0, this.cv.width, this.cv.height);
       this.g.drawImage(f, 0, 0);
     }
     const W = this.w, H = this.h;
