@@ -105,6 +105,12 @@ const LAYER_CSS = `
 .bub canvas{pointer-events:none;cursor:default;image-rendering:pixelated}
 .thread{position:absolute;left:0;top:0;transform-origin:50% 0;pointer-events:none;background:currentColor;opacity:.75}
 `;
+/* styles for a shadow root: a constructed stylesheet where it can (strict CSP sites block <style>,
+   which matters when pals visit other people's sites), a <style> where it can't */
+const shadowCSS = (root, css) => {
+  try { const sh = new CSSStyleSheet(); sh.replaceSync(css); root.adoptedStyleSheets = [...root.adoptedStyleSheets, sh]; return; } catch (e) { /* older browsers */ }
+  const st = document.createElement('style'); st.textContent = css; root.appendChild(st);
+};
 let layer = null, layerRoot = null;
 const origin = { x: 0, y: 0 };
 const getLayer = () => {
@@ -114,9 +120,7 @@ const getLayer = () => {
   layer.setAttribute('aria-hidden', 'true');
   layer.style.cssText = 'position:absolute;left:0;top:0;width:0;height:0;overflow:visible;z-index:var(--piix-z,2147482000);pointer-events:none;margin:0;padding:0;border:0';
   layerRoot = layer.attachShadow({ mode: 'open' });
-  const st = document.createElement('style');
-  st.textContent = LAYER_CSS;
-  layerRoot.appendChild(st);
+  shadowCSS(layerRoot, LAYER_CSS);
   document.body.appendChild(layer);
   layerOrigin();
   return layerRoot;
@@ -463,12 +467,11 @@ const uiRoot = () => {
   uiHost.setAttribute('data-piixpal-ui', '');
   uiHost.style.cssText = 'position:absolute;left:0;top:0;width:0;height:0;overflow:visible;z-index:calc(var(--piix-z,2147482000) + 1);margin:0;padding:0;border:0';
   uiShadow = uiHost.attachShadow({ mode: 'open' });
-  const st = document.createElement('style');
-  st.textContent = UI_CSS;
+  shadowCSS(uiShadow, UI_CSS);
   uiLive = document.createElement('div');
   uiLive.className = 'sr';
   uiLive.setAttribute('aria-live', 'polite');
-  uiShadow.append(st, uiLive);
+  uiShadow.append(uiLive);
   document.body.appendChild(uiHost);
   return uiShadow;
 };
@@ -3018,7 +3021,35 @@ class PiixPalElement extends HTMLElement {
   }
 }
 
-const define = (n, c) => { if (!customElements.get(n)) customElements.define(n, c); };
+/* components style their shadow roots with <style> tags; a strict Content-Security-Policy (common
+   on big sites, where pals visit through the extension) blocks those. Mirror each into a
+   constructed stylesheet, which CSP allows, and keep it in step when the shadow is redrawn. */
+const STYLE_SHEETS = new Map();
+const mirrorStyles = root => {
+  if (!('adoptedStyleSheets' in root)) return;
+  const ours = new Set();
+  const sweep = () => {
+    const sheets = [];
+    for (const st of root.children) {
+      if (st.tagName !== 'STYLE') continue;
+      const css = st.textContent;
+      let sh = STYLE_SHEETS.get(css);
+      if (!sh) { try { sh = new CSSStyleSheet(); sh.replaceSync(css); } catch (e) { continue; } STYLE_SHEETS.set(css, sh); }
+      sheets.push(sh);
+    }
+    const keep = root.adoptedStyleSheets.filter(x => !ours.has(x));
+    ours.clear(); sheets.forEach(x => ours.add(x));
+    root.adoptedStyleSheets = [...keep, ...sheets];
+  };
+  new MutationObserver(sweep).observe(root, { childList: true });
+};
+const define = (n, c) => {
+  if (customElements.get(n)) return;
+  if (!Object.prototype.hasOwnProperty.call(c.prototype, 'attachShadow')) {
+    c.prototype.attachShadow = function (o) { const r = HTMLElement.prototype.attachShadow.call(this, o); mirrorStyles(r); return r; };
+  }
+  customElements.define(n, c);
+};
 
 /* ---------- JS API: add pals without writing any markup ---------- */
 /* Piixpal.add('bitbug', 'h1')                      a pal living on the first h1
@@ -3086,10 +3117,10 @@ Object.assign(Piixpal, {
   clear: () => document.querySelectorAll(['piix-pal', 'piix-sprite', ...Object.values(ELEMENTS)].join()).forEach(e => e.remove())
 });
 
-Piixpal._k = { reduceMQ, reduced, clamp, rnd, chance, pick, lerp, now, hexRGBA, ptr, ptrDist, scroll, subs, raf, frame, sub, unsub, rectOf, docW, boxOf, pin, areaOf, onScreen, surfaceAt, LAYER_CSS, layer, origin, getLayer, layerOrigin, SPRITES, bake, defineSprite, baked, ACTORS, shout, Actor, recruit, BEHAVIORS, defineBehavior, Piixpal, art, lastT, layerRoot, ICON_PAL, ICONS, DIGITS, numberIcon, iconCache, iconPal, bakeIcon, UI_INK, UI_PAPER, UI_FONT, UI_MONO, UI_CSS, uiHost, uiRoot, uiStyles, uiStyle, uiEl, uiIcon, uiCard, uiPlace, uiAt, uiClose, uiAnnounce, uiShadow, uiLive, measureCtx, glyphTop, textProfile, segAt, LAND, platCache, TEXTY, surfaceOf, platforms, drag, MAKER, RIG, BLIP, CROWD_COLORS, PiixCrowdElement, GL, GL_PALETTES, glPalette, GL_VERT, GL_PRELUDE, GL_MAIN, glInit, glProgram, glReady, glDraw, GLStage, GL_FRAME, GL_LOOK_HEAD, GL_LOOKS, glLook, GL_LOOK_TEXT, glLookHost, glRGB, KIT_U, kitCorners, KIT_TONES, kitTone, KIT_FONT, kitCss, kitPal, kitClip, SFX, sfxMuted, sfxCtx, sfxTone, sfxNoise, sfxRun, SFX_BANK, sfxAllowed, sfx, FIGURES, defineFigure, mixHex, figurePalette, bakeFigure, HEAD, PiixSpriteElement, RENDERS, lum, BAYER, ASCII, TEXTURES, BIG, PiixTypeElement, CELL_SHAPES, VOX_LOOKS, VOX_DIRS, voxKey, voxNorm, voxArt, voxModel, VOX_MODELS, voxFromArt, voxCells, voxDraw, VOX_BUF, voxBuf, VOX_BAYER, VOX_RAMP, voxPaint, VoxStage, PiixPalElement, define, ELEMENTS, add, autoAttach, SCRIPT, start };
+Piixpal._k = { reduceMQ, reduced, clamp, rnd, chance, pick, lerp, now, hexRGBA, ptr, ptrDist, scroll, subs, raf, frame, sub, unsub, rectOf, docW, boxOf, pin, areaOf, onScreen, surfaceAt, LAYER_CSS, shadowCSS, layer, origin, getLayer, layerOrigin, SPRITES, bake, defineSprite, baked, ACTORS, shout, Actor, recruit, BEHAVIORS, defineBehavior, Piixpal, art, lastT, layerRoot, ICON_PAL, ICONS, DIGITS, numberIcon, iconCache, iconPal, bakeIcon, UI_INK, UI_PAPER, UI_FONT, UI_MONO, UI_CSS, uiHost, uiRoot, uiStyles, uiStyle, uiEl, uiIcon, uiCard, uiPlace, uiAt, uiClose, uiAnnounce, uiShadow, uiLive, measureCtx, glyphTop, textProfile, segAt, LAND, platCache, TEXTY, surfaceOf, platforms, drag, MAKER, RIG, BLIP, CROWD_COLORS, PiixCrowdElement, GL, GL_PALETTES, glPalette, GL_VERT, GL_PRELUDE, GL_MAIN, glInit, glProgram, glReady, glDraw, GLStage, GL_FRAME, GL_LOOK_HEAD, GL_LOOKS, glLook, GL_LOOK_TEXT, glLookHost, glRGB, KIT_U, kitCorners, KIT_TONES, kitTone, KIT_FONT, kitCss, kitPal, kitClip, SFX, sfxMuted, sfxCtx, sfxTone, sfxNoise, sfxRun, SFX_BANK, sfxAllowed, sfx, FIGURES, defineFigure, mixHex, figurePalette, bakeFigure, HEAD, PiixSpriteElement, RENDERS, lum, BAYER, ASCII, TEXTURES, BIG, PiixTypeElement, CELL_SHAPES, VOX_LOOKS, VOX_DIRS, voxKey, voxNorm, voxArt, voxModel, VOX_MODELS, voxFromArt, voxCells, voxDraw, VOX_BUF, voxBuf, VOX_BAYER, VOX_RAMP, voxPaint, VoxStage, PiixPalElement, STYLE_SHEETS, mirrorStyles, define, ELEMENTS, add, autoAttach, SCRIPT, start };
 return Piixpal._k;
 })();
-const { reduceMQ, reduced, clamp, rnd, chance, pick, lerp, now, hexRGBA, ptr, ptrDist, scroll, subs, raf, frame, sub, unsub, rectOf, docW, boxOf, pin, areaOf, onScreen, surfaceAt, LAYER_CSS, layer, origin, getLayer, layerOrigin, SPRITES, bake, defineSprite, baked, ACTORS, shout, Actor, recruit, BEHAVIORS, defineBehavior, Piixpal, art, lastT, layerRoot, ICON_PAL, ICONS, DIGITS, numberIcon, iconCache, iconPal, bakeIcon, UI_INK, UI_PAPER, UI_FONT, UI_MONO, UI_CSS, uiHost, uiRoot, uiStyles, uiStyle, uiEl, uiIcon, uiCard, uiPlace, uiAt, uiClose, uiAnnounce, uiShadow, uiLive, measureCtx, glyphTop, textProfile, segAt, LAND, platCache, TEXTY, surfaceOf, platforms, drag, MAKER, RIG, BLIP, CROWD_COLORS, PiixCrowdElement, GL, GL_PALETTES, glPalette, GL_VERT, GL_PRELUDE, GL_MAIN, glInit, glProgram, glReady, glDraw, GLStage, GL_FRAME, GL_LOOK_HEAD, GL_LOOKS, glLook, GL_LOOK_TEXT, glLookHost, glRGB, KIT_U, kitCorners, KIT_TONES, kitTone, KIT_FONT, kitCss, kitPal, kitClip, SFX, sfxMuted, sfxCtx, sfxTone, sfxNoise, sfxRun, SFX_BANK, sfxAllowed, sfx, FIGURES, defineFigure, mixHex, figurePalette, bakeFigure, HEAD, PiixSpriteElement, RENDERS, lum, BAYER, ASCII, TEXTURES, BIG, PiixTypeElement, CELL_SHAPES, VOX_LOOKS, VOX_DIRS, voxKey, voxNorm, voxArt, voxModel, VOX_MODELS, voxFromArt, voxCells, voxDraw, VOX_BUF, voxBuf, VOX_BAYER, VOX_RAMP, voxPaint, VoxStage, PiixPalElement, define, ELEMENTS, add, autoAttach, SCRIPT, start } = K;
+const { reduceMQ, reduced, clamp, rnd, chance, pick, lerp, now, hexRGBA, ptr, ptrDist, scroll, subs, raf, frame, sub, unsub, rectOf, docW, boxOf, pin, areaOf, onScreen, surfaceAt, LAYER_CSS, shadowCSS, layer, origin, getLayer, layerOrigin, SPRITES, bake, defineSprite, baked, ACTORS, shout, Actor, recruit, BEHAVIORS, defineBehavior, Piixpal, art, lastT, layerRoot, ICON_PAL, ICONS, DIGITS, numberIcon, iconCache, iconPal, bakeIcon, UI_INK, UI_PAPER, UI_FONT, UI_MONO, UI_CSS, uiHost, uiRoot, uiStyles, uiStyle, uiEl, uiIcon, uiCard, uiPlace, uiAt, uiClose, uiAnnounce, uiShadow, uiLive, measureCtx, glyphTop, textProfile, segAt, LAND, platCache, TEXTY, surfaceOf, platforms, drag, MAKER, RIG, BLIP, CROWD_COLORS, PiixCrowdElement, GL, GL_PALETTES, glPalette, GL_VERT, GL_PRELUDE, GL_MAIN, glInit, glProgram, glReady, glDraw, GLStage, GL_FRAME, GL_LOOK_HEAD, GL_LOOKS, glLook, GL_LOOK_TEXT, glLookHost, glRGB, KIT_U, kitCorners, KIT_TONES, kitTone, KIT_FONT, kitCss, kitPal, kitClip, SFX, sfxMuted, sfxCtx, sfxTone, sfxNoise, sfxRun, SFX_BANK, sfxAllowed, sfx, FIGURES, defineFigure, mixHex, figurePalette, bakeFigure, HEAD, PiixSpriteElement, RENDERS, lum, BAYER, ASCII, TEXTURES, BIG, PiixTypeElement, CELL_SHAPES, VOX_LOOKS, VOX_DIRS, voxKey, voxNorm, voxArt, voxModel, VOX_MODELS, voxFromArt, voxCells, voxDraw, VOX_BUF, voxBuf, VOX_BAYER, VOX_RAMP, voxPaint, VoxStage, PiixPalElement, STYLE_SHEETS, mirrorStyles, define, ELEMENTS, add, autoAttach, SCRIPT, start } = K;
 
 /* ---- behaviors/beeline.js ---- */
 /* beeline: a little line of worker bees buzzing round their element. Come close and
