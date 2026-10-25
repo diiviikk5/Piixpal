@@ -44,12 +44,11 @@ const uiRoot = () => {
   uiHost.setAttribute('data-piixpal-ui', '');
   uiHost.style.cssText = 'position:absolute;left:0;top:0;width:0;height:0;overflow:visible;z-index:calc(var(--piix-z,2147482000) + 1);margin:0;padding:0;border:0';
   uiShadow = uiHost.attachShadow({ mode: 'open' });
-  const st = document.createElement('style');
-  st.textContent = UI_CSS;
+  shadowCSS(uiShadow, UI_CSS);
   uiLive = document.createElement('div');
   uiLive.className = 'sr';
   uiLive.setAttribute('aria-live', 'polite');
-  uiShadow.append(st, uiLive);
+  uiShadow.append(uiLive);
   document.body.appendChild(uiHost);
   return uiShadow;
 };

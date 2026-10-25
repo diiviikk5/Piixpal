@@ -97,6 +97,12 @@ const LAYER_CSS = `
 .bub canvas{pointer-events:none;cursor:default;image-rendering:pixelated}
 .thread{position:absolute;left:0;top:0;transform-origin:50% 0;pointer-events:none;background:currentColor;opacity:.75}
 `;
+/* styles for a shadow root: a constructed stylesheet where it can (strict CSP sites block <style>,
+   which matters when pals visit other people's sites), a <style> where it can't */
+const shadowCSS = (root, css) => {
+  try { const sh = new CSSStyleSheet(); sh.replaceSync(css); root.adoptedStyleSheets = [...root.adoptedStyleSheets, sh]; return; } catch (e) { /* older browsers */ }
+  const st = document.createElement('style'); st.textContent = css; root.appendChild(st);
+};
 let layer = null, layerRoot = null;
 const origin = { x: 0, y: 0 };
 const getLayer = () => {
@@ -106,9 +112,7 @@ const getLayer = () => {
   layer.setAttribute('aria-hidden', 'true');
   layer.style.cssText = 'position:absolute;left:0;top:0;width:0;height:0;overflow:visible;z-index:var(--piix-z,2147482000);pointer-events:none;margin:0;padding:0;border:0';
   layerRoot = layer.attachShadow({ mode: 'open' });
-  const st = document.createElement('style');
-  st.textContent = LAYER_CSS;
-  layerRoot.appendChild(st);
+  shadowCSS(layerRoot, LAYER_CSS);
   document.body.appendChild(layer);
   layerOrigin();
   return layerRoot;
