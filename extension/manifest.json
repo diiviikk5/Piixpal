@@ -1,0 +1,62 @@
+{
+  "manifest_version": 3,
+  "name": "Piixpal: pixel pets for every website",
+  "short_name": "Piixpal",
+  "version": "0.4.0",
+  "description": "A tiny pixel pet that lives on every site you visit, and one click to throw a party, make it snow, or let a dragon loose on any page.",
+  "homepage_url": "https://piixpal.dvkk.dev/components/visit",
+  "icons": {
+    "16": "icons/16.png",
+    "32": "icons/32.png",
+    "48": "icons/48.png",
+    "128": "icons/128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Piixpal",
+    "default_icon": {
+      "16": "icons/16.png",
+      "32": "icons/32.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js",
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "permissions": [
+    "storage",
+    "scripting",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "bridge.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "commands": {
+    "toggle-panel": {
+      "suggested_key": {
+        "default": "Alt+Shift+P"
+      },
+      "description": "Open or hide the Piixpal panel on this page"
+    }
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "piixpal@dvkk.dev",
+      "strict_min_version": "128.0"
+    }
+  }
+}
