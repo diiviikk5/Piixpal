@@ -123,7 +123,35 @@ class PiixPalElement extends HTMLElement {
   }
 }
 
-const define = (n, c) => { if (!customElements.get(n)) customElements.define(n, c); };
+/* components style their shadow roots with <style> tags; a strict Content-Security-Policy (common
+   on big sites, where pals visit through the extension) blocks those. Mirror each into a
+   constructed stylesheet, which CSP allows, and keep it in step when the shadow is redrawn. */
+const STYLE_SHEETS = new Map();
+const mirrorStyles = root => {
+  if (!('adoptedStyleSheets' in root)) return;
+  const ours = new Set();
+  const sweep = () => {
+    const sheets = [];
+    for (const st of root.children) {
+      if (st.tagName !== 'STYLE') continue;
+      const css = st.textContent;
+      let sh = STYLE_SHEETS.get(css);
+      if (!sh) { try { sh = new CSSStyleSheet(); sh.replaceSync(css); } catch (e) { continue; } STYLE_SHEETS.set(css, sh); }
+      sheets.push(sh);
+    }
+    const keep = root.adoptedStyleSheets.filter(x => !ours.has(x));
+    ours.clear(); sheets.forEach(x => ours.add(x));
+    root.adoptedStyleSheets = [...keep, ...sheets];
+  };
+  new MutationObserver(sweep).observe(root, { childList: true });
+};
+const define = (n, c) => {
+  if (customElements.get(n)) return;
+  if (!Object.prototype.hasOwnProperty.call(c.prototype, 'attachShadow')) {
+    c.prototype.attachShadow = function (o) { const r = HTMLElement.prototype.attachShadow.call(this, o); mirrorStyles(r); return r; };
+  }
+  customElements.define(n, c);
+};
 
 /* ---------- JS API: add pals without writing any markup ---------- */
 /* Piixpal.add('bitbug', 'h1')                      a pal living on the first h1
