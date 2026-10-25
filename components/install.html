@@ -42,7 +42,7 @@
 <div class="docs">
   <aside class="side" aria-label="Components">
     <input class="side-find" type="search" placeholder="Find a component…" aria-label="Find a component">
-    <nav class="side-start"><a href="./">Overview</a><a href="install.html" aria-current="page">Install</a><a href="make.html">Pal Maker</a><a href="builder.html">Builder</a><a href="readme.html">GitHub README</a></nav>
+    <nav class="side-start"><a href="./">Overview</a><a href="install.html" aria-current="page">Install</a><a href="make.html">Pal Maker</a><a href="builder.html">Builder</a><a href="visit.html">Pals anywhere</a><a href="readme.html">GitHub README</a></nav>
     <details class="sg">
       <summary><a href="sprites.html">Sprites</a><span class="n">50</span></summary>
       <h5>Big 3D</h5><a href="sprites.html#s-astronaut" style="--dot:var(--sky)"><i></i>Astronaut</a><a href="sprites.html#s-bolt" style="--dot:var(--sun)"><i></i>Bolt</a><a href="sprites.html#s-brain" style="--dot:var(--mint)"><i></i>Brain</a><a href="sprites.html#s-crt" style="--dot:var(--lime)"><i></i>Crt</a><a href="sprites.html#s-elephant" style="--dot:var(--coral)"><i></i>Elephant</a><a href="sprites.html#s-flick" style="--dot:var(--violet)"><i></i>Flick</a><a href="sprites.html#s-fluff" style="--dot:var(--sky)"><i></i>Fluff</a><a href="sprites.html#s-gloop" style="--dot:var(--sun)"><i></i>Gloop</a><a href="sprites.html#s-gpu" style="--dot:var(--mint)"><i></i>Gpu</a><a href="sprites.html#s-hops" style="--dot:var(--lime)"><i></i>Hops</a><a href="sprites.html#s-inky" style="--dot:var(--coral)"><i></i>Inky</a><a href="sprites.html#s-keycap" style="--dot:var(--violet)"><i></i>Keycap</a><a href="sprites.html#s-llama" style="--dot:var(--sky)"><i></i>Llama</a><a href="sprites.html#s-loti" style="--dot:var(--sun)"><i></i>Loti</a><a href="sprites.html#s-mumu" style="--dot:var(--mint)"><i></i>Mumu</a><a href="sprites.html#s-server" style="--dot:var(--lime)"><i></i>Server</a><a href="sprites.html#s-spud" style="--dot:var(--coral)"><i></i>Spud</a><a href="sprites.html#s-tofu" style="--dot:var(--violet)"><i></i>Tofu</a><a href="sprites.html#s-unicorn" style="--dot:var(--sky)"><i></i>Unicorn</a><a href="sprites.html#s-whale" style="--dot:var(--sun)"><i></i>Whale</a>
@@ -76,7 +76,7 @@
 </header>
 
 <section class="doc-sec" id="cdn" aria-labelledby="i1"><h2 id="i1">Everything, one tag</h2>
-  <p>All 128 components in one file (about 212 KB gzipped), served free by jsDelivr. Then use any tag from these pages.</p>
+  <p>All 128 components in one file (about 213 KB gzipped), served free by jsDelivr. Then use any tag from these pages.</p>
   <pre class="codebox"><button class="copy" type="button" data-copy="&lt;script src=&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js&quot;&gt;&lt;/script&gt;
 
 &lt;h1&gt;Hello &lt;piix-pal pal=&quot;bitbug&quot;&gt;&lt;/piix-pal&gt;&lt;/h1&gt;">Copy</button>&lt;script src=&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js&quot;&gt;&lt;/script&gt;
@@ -258,13 +258,13 @@ vue({ template: { compilerOptions: { isCustomElement: t =&gt; t.startsWith(&quot
 </section>
 
 <section class="doc-sec" id="bookmarklet" aria-labelledby="i7"><h2 id="i7">Try it on any website</h2>
-  <p>Drag this button to your bookmarks bar, open any website, and click it. Pals move in for a visit (only on your screen, nothing is changed). Some sites block outside scripts; they will tell you.</p>
-  <p><a class="btn btn-lime bookmarklet" href="javascript:(()=&gt;{if(window.Piixpal&amp;&amp;Piixpal.add){Piixpal.clear();}const go=()=&gt;{const q=s=&gt;document.querySelector(s);const h=q('h1')||q('h2');if(h)Piixpal.add('bitbug',h);const p=q('main p')||q('p');if(p)Piixpal.add('moss',p);Piixpal.add('pip','a,button');const f=q('footer')||q('nav')||q('header');if(f)Piixpal.add('boing',f);Piixpal.add('bees','body');};if(window.Piixpal&amp;&amp;Piixpal.add)return go();const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js';s.onload=go;s.onerror=()=&gt;alert('This site blocks outside scripts, so the pals cannot visit. Try another site!');document.head.appendChild(s);})();" onclick="event.preventDefault();alert('Drag me to your bookmarks bar, then click me on any website.')">Piixpal visit</a></p>
+  <p>Drag this button to your bookmarks bar, open any website, and click it: a little panel lets you throw a party, make it snow or let a dragon loose (only on your screen, nothing is changed). Some sites block outside scripts; for those, and for a pet that lives on every site, get the <a href="visit.html">browser extension</a>.</p>
+  <p><a class="btn btn-lime bookmarklet" href="javascript:(()=&gt;{const S='https://piixpal.dvkk.dev',go=()=&gt;PiixVisit.open(),load=(u,f)=&gt;{const s=document.createElement('script');s.src=u;s.onload=f;s.onerror=()=&gt;alert('This site blocks outside scripts, so the bookmarklet cannot bring pals here. The Piixpal browser extension can: '+S+'/components/visit');(document.head||document.documentElement).appendChild(s)};if(window.PiixVisit)return go();const v=()=&gt;load(S+'/extension/visit.js',go);window.Piixpal&amp;&amp;Piixpal.list?v():load(S+'/piixpal.min.js',v)})();" onclick="event.preventDefault();alert('Drag me to your bookmarks bar, then click me on any website.')">Piixpal visit</a></p>
 </section>
   </main>
 </div>
 
-<script src="../piixpal.js?v=dbb7856b"></script>
+<script src="../piixpal.js?v=7bb7d4a3"></script>
 <script src="../site/site.js" defer></script>
 <script src="../site/docs.js" defer></script>
 </body>

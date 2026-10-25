@@ -4,6 +4,7 @@ import { readFileSync, readdirSync, writeFileSync, mkdirSync } from 'node:fs';
 import { POWERS, FAMILIES } from './powers-data.mjs';
 import { STUDIO } from './studio-data.mjs';
 import { makerBody } from './maker-page.mjs';
+import { visitBody } from './visit-page.mjs';
 import { gzipSync } from 'node:zlib';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -230,7 +231,7 @@ const sidebar = active => {
     </details>`;
   return `<aside class="side" aria-label="Components">
     <input class="side-find" type="search" placeholder="Find a component…" aria-label="Find a component">
-    <nav class="side-start">${link('./', 'Overview', 'index')}${link('install.html', 'Install', 'install')}${link('make.html', 'Pal Maker', 'make')}${link('builder.html', 'Builder', 'builder')}${link('readme.html', 'GitHub README', 'readme')}</nav>
+    <nav class="side-start">${link('./', 'Overview', 'index')}${link('install.html', 'Install', 'install')}${link('make.html', 'Pal Maker', 'make')}${link('builder.html', 'Builder', 'builder')}${link('visit.html', 'Pals anywhere', 'visit')}${link('readme.html', 'GitHub README', 'readme')}</nav>
     ${group('sprites', 'Sprites', 'sprites.html', sprites.length, [['Big 3D', bigs.map(x => item('sprites.html#s-' + x.name, x.name, x.accent))], ['Small', smalls.map(x => item('sprites.html#s-' + x.name, x.name, x.accent))]])}
     ${group('pals', 'Pals', 'pals.html', PALS.length, [['Characters', kinds.pal.map(p => item('pals.html#' + p.id, p.id, p.accent))], ['Interactions', kinds.play.map(p => item('pals.html#' + p.id, p.id, p.accent))], ['Toys', kinds.toy.map(p => item('pals.html#' + p.id, p.id, p.accent))], ['Groups', kinds.group.map(p => item('pals.html#' + p.id, p.id, p.accent))]])}
     ${group('powers', 'Superpowers', 'powers.html', POWERS.length, FAMILIES.map(([id, name]) => [name, POWERS.filter(p => p.fam === id).map(p => item('powers.html#' + p.id, p.id, p.accent))]))}
@@ -678,7 +679,8 @@ const indexBody = `<header class="doc-head">
 </section>`;
 
 /* ---------- install ---------- */
-const BOOKMARKLET = `javascript:(()=>{if(window.Piixpal&&Piixpal.add){Piixpal.clear();}const go=()=>{const q=s=>document.querySelector(s);const h=q('h1')||q('h2');if(h)Piixpal.add('bitbug',h);const p=q('main p')||q('p');if(p)Piixpal.add('moss',p);Piixpal.add('pip','a,button');const f=q('footer')||q('nav')||q('header');if(f)Piixpal.add('boing',f);Piixpal.add('bees','body');};if(window.Piixpal&&Piixpal.add)return go();const s=document.createElement('script');s.src='${CDN_ALL}';s.onload=go;s.onerror=()=>alert('This site blocks outside scripts, so the pals cannot visit. Try another site!');document.head.appendChild(s);})();`;
+/* the bookmarklet: loads the library and the visit panel from this site, then opens the panel */
+const BOOKMARKLET = `javascript:(()=>{const S='https://piixpal.dvkk.dev',go=()=>PiixVisit.open(),load=(u,f)=>{const s=document.createElement('script');s.src=u;s.onload=f;s.onerror=()=>alert('This site blocks outside scripts, so the bookmarklet cannot bring pals here. The Piixpal browser extension can: '+S+'/components/visit');(document.head||document.documentElement).appendChild(s)};if(window.PiixVisit)return go();const v=()=>load(S+'/extension/visit.js',go);window.Piixpal&&Piixpal.list?v():load(S+'/piixpal.min.js',v)})();`;
 const installBody = `<header class="doc-head">
   <div class="crumbs"><a href="./">Components</a><span>/</span><span>Install</span></div>
   <h1>Install</h1>
@@ -744,7 +746,7 @@ const installBody = `<header class="doc-head">
 </section>
 
 <section class="doc-sec" id="bookmarklet" aria-labelledby="i7"><h2 id="i7">Try it on any website</h2>
-  <p>Drag this button to your bookmarks bar, open any website, and click it. Pals move in for a visit (only on your screen, nothing is changed). Some sites block outside scripts; they will tell you.</p>
+  <p>Drag this button to your bookmarks bar, open any website, and click it: a little panel lets you throw a party, make it snow or let a dragon loose (only on your screen, nothing is changed). Some sites block outside scripts; for those, and for a pet that lives on every site, get the <a href="visit.html">browser extension</a>.</p>
   <p><a class="btn btn-lime bookmarklet" href="${esc(BOOKMARKLET)}" onclick="event.preventDefault();alert('Drag me to your bookmarks bar, then click me on any website.')">Piixpal visit</a></p>
 </section>`;
 
@@ -907,6 +909,7 @@ const pages = [
   ['install.html', { key: 'install', title: 'Install', desc: 'Every way to add Piixpal to a site: one tag, single files, no-markup, JS, React, Vue, Svelte, bookmarklet.', body: installBody }],
   ['builder.html', { key: 'builder', title: 'Builder', desc: 'Pick pals, choose where they live, copy one line.', body: builderBody }],
   ['make.html', { key: 'make', title: 'Pal Maker', desc: 'Turn anything into a pal: doodle one, drop in a photo, a logo or an emoji, or draw pixel art. Share it as a link or one tag.', body: makerBody, extra: ['maker', 'maker-smooth', 'maker-pixel'].map(f => `<script src="../site/${f}.js?v=${MAKER_V}" defer></script>`).join(String.fromCharCode(10)) }],
+  ['visit.html', { key: 'visit', title: 'Pals on any website', desc: 'A browser extension and a bookmarklet: a pixel pet on every site you visit, and one click to throw a party, make it snow or let a dragon loose on any page.', body: visitBody(BOOKMARKLET, esc) }],
   ['readme.html', { key: 'readme', title: 'GitHub README pals', desc: 'Pals that live on your GitHub profile: an animated pixel banner with your words, one image link.', body: readmeBody }],
   ['crowd.html', { key: 'crowd', title: 'Crowd', desc: 'A stage of hundreds of tiny agents: crowd, swarm and formation modes.', body: crowdBody }],
   ['type.html', { key: 'type', title: 'Pixel type', desc: 'Chunky extruded pixel lettering that pals can walk on.', body: typeBody, fonts: '<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@800&family=Instrument+Serif&family=Pacifico&display=swap" rel="stylesheet">\n' }]
