@@ -5,6 +5,7 @@ import { POWERS, FAMILIES } from './powers-data.mjs';
 import { STUDIO } from './studio-data.mjs';
 import { makerBody } from './maker-page.mjs';
 import { visitBody } from './visit-page.mjs';
+import { agentsBody } from './agents-page.mjs';
 import { gzipSync } from 'node:zlib';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -231,7 +232,7 @@ const sidebar = active => {
     </details>`;
   return `<aside class="side" aria-label="Components">
     <input class="side-find" type="search" placeholder="Find a component…" aria-label="Find a component">
-    <nav class="side-start">${link('./', 'Overview', 'index')}${link('install.html', 'Install', 'install')}${link('make.html', 'Pal Maker', 'make')}${link('builder.html', 'Builder', 'builder')}${link('visit.html', 'Pals anywhere', 'visit')}${link('readme.html', 'GitHub README', 'readme')}</nav>
+    <nav class="side-start">${link('./', 'Overview', 'index')}${link('install.html', 'Install', 'install')}${link('make.html', 'Pal Maker', 'make')}${link('builder.html', 'Builder', 'builder')}${link('visit.html', 'Pals anywhere', 'visit')}${link('agents.html', 'Agent pets', 'agents')}${link('readme.html', 'GitHub README', 'readme')}</nav>
     ${group('sprites', 'Sprites', 'sprites.html', sprites.length, [['Big 3D', bigs.map(x => item('sprites.html#s-' + x.name, x.name, x.accent))], ['Small', smalls.map(x => item('sprites.html#s-' + x.name, x.name, x.accent))]])}
     ${group('pals', 'Pals', 'pals.html', PALS.length, [['Characters', kinds.pal.map(p => item('pals.html#' + p.id, p.id, p.accent))], ['Interactions', kinds.play.map(p => item('pals.html#' + p.id, p.id, p.accent))], ['Toys', kinds.toy.map(p => item('pals.html#' + p.id, p.id, p.accent))], ['Groups', kinds.group.map(p => item('pals.html#' + p.id, p.id, p.accent))]])}
     ${group('powers', 'Superpowers', 'powers.html', POWERS.length, FAMILIES.map(([id, name]) => [name, POWERS.filter(p => p.fam === id).map(p => item('powers.html#' + p.id, p.id, p.accent))]))}
@@ -910,6 +911,7 @@ const pages = [
   ['builder.html', { key: 'builder', title: 'Builder', desc: 'Pick pals, choose where they live, copy one line.', body: builderBody }],
   ['make.html', { key: 'make', title: 'Pal Maker', desc: 'Turn anything into a pal: doodle one, drop in a photo, a logo or an emoji, or draw pixel art. Share it as a link or one tag.', body: makerBody, extra: ['maker', 'maker-smooth', 'maker-pixel'].map(f => `<script src="../site/${f}.js?v=${MAKER_V}" defer></script>`).join(String.fromCharCode(10)) }],
   ['visit.html', { key: 'visit', title: 'Pals on any website', desc: 'A browser extension and a bookmarklet: a pixel pet on every site you visit, and one click to throw a party, make it snow or let a dragon loose on any page.', body: visitBody(BOOKMARKLET, esc) }],
+  ['agents.html', { key: 'agents', title: 'Pets for coding agents', desc: 'A pixel pet in your terminal that watches Claude Code or Codex work and reacts: thinking, reading, editing, failing, done. No setup.', body: agentsBody(esc, ['bitbug', 'pip', 'boing', 'moss', 'kitty', 'penguin', 'gecko', 'tri', 'bumble', 'shibe', 'capy', 'frog', 'duckling', 'shel', 'roomba', 'hiss', 'termi', 'beep']) }],
   ['readme.html', { key: 'readme', title: 'GitHub README pals', desc: 'Pals that live on your GitHub profile: an animated pixel banner with your words, one image link.', body: readmeBody }],
   ['crowd.html', { key: 'crowd', title: 'Crowd', desc: 'A stage of hundreds of tiny agents: crowd, swarm and formation modes.', body: crowdBody }],
   ['type.html', { key: 'type', title: 'Pixel type', desc: 'Chunky extruded pixel lettering that pals can walk on.', body: typeBody, fonts: '<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@800&family=Instrument+Serif&family=Pacifico&display=swap" rel="stylesheet">\n' }]
