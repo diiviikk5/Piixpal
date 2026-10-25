@@ -1,0 +1,113 @@
+<!doctype html>
+<!-- Every stargazer, scrolling past. node video/beat-stars2.mjs && PAGE=stars2.html NAME=piixpal-stars-77 WAV=stars2.wav node video/render.mjs
+     Avatars come from video/out/stargazers (gh api …/stargazers, see the README note in beat-stars2.mjs). -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Piixpal: every stargazer</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;800;900&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<script>
+/* a clock the renderer owns: time, animation frames and timers only move when it is told to */
+(() => {
+  let now = 0, seed = 11, tid = 1;
+  window.__realNow = performance.now.bind(performance);
+  window.__realSetInterval = setInterval.bind(window);
+  window.__realClearInterval = clearInterval.bind(window);
+  const queue = [], timers = new Map();
+  performance.now = () => now;
+  Date.now = () => 1790000000000 + now;
+  window.requestAnimationFrame = cb => queue.push(cb);
+  window.cancelAnimationFrame = () => {};
+  window.setTimeout = (fn, ms = 0, ...a) => { const id = tid++; timers.set(id, { at: now + Math.max(0, +ms || 0), fn, a }); return id; };
+  window.setInterval = (fn, ms = 0, ...a) => { const id = tid++; timers.set(id, { at: now + Math.max(1, +ms || 0), fn, a, every: Math.max(1, +ms || 0) }); return id; };
+  window.clearTimeout = window.clearInterval = id => timers.delete(id);
+  Math.random = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+  window.__clock = {
+    get ms() { return now; },
+    step(dt) {
+      const end = now + Math.max(0, dt);
+      for (let guard = 0; guard < 5000; guard++) {
+        let best = null, bid = 0;
+        for (const [id, t] of timers) if (t.at <= end && (!best || t.at < best.at)) { best = t; bid = id; }
+        if (!best) break;
+        now = Math.max(now, best.at);
+        if (best.every) best.at += best.every; else timers.delete(bid);
+        try { typeof best.fn === 'function' && best.fn(...best.a); } catch (e) { console.error(e); }
+      }
+      now = end;
+      queue.splice(0).forEach(cb => { try { cb(now); } catch (e) { console.error(e); } });
+    }
+  };
+})();
+</script>
+<style>
+  html, body { margin: 0; background: #000; overflow: hidden }
+  #stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #fff; color: #0f172a; font-family: Inter, system-ui, sans-serif }
+  .who { position: absolute; left: 110px; top: 110px; display: flex; align-items: center; gap: 30px; font: 500 86px/1 Inter; letter-spacing: -.035em }
+  .who img { width: 128px; height: 128px; border-radius: 50%; object-fit: cover }
+  .who .sl { color: #94a3b8; margin: 0 6px }
+  .who b { font-weight: 800 }
+  .strip { position: absolute; left: 0; top: 330px; height: 330px; width: 1920px }
+  .av { position: absolute; top: 0; width: 210px; display: grid; justify-items: center; gap: 22px; will-change: transform }
+  .av img { width: 176px; height: 176px; border-radius: 50%; object-fit: cover; box-shadow: 0 10px 30px #0f172a22; background: #f1f5f9 }
+  .av svg { width: 46px; height: 46px }
+  .av span { font: 500 22px "JetBrains Mono", monospace; color: #64748b; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+  .fade { position: absolute; top: 300px; height: 400px; width: 200px; pointer-events: none }
+  .fade.l { left: 0; background: linear-gradient(90deg, #fff 20%, #fff0) }
+  .fade.r { right: 0; background: linear-gradient(270deg, #fff 10%, #fff0) }
+  .count { position: absolute; right: 110px; bottom: 90px; display: flex; align-items: baseline; gap: 30px; transform-origin: 100% 100% }
+  .count #n { font: 900 250px/1 Inter; letter-spacing: -.06em; font-variant-numeric: tabular-nums }
+  .count small { font: 500 130px/1 Inter; letter-spacing: -.04em }
+  .url { position: absolute; left: 110px; bottom: 110px; font: 500 34px "JetBrains Mono"; color: #64748b; opacity: 0 }
+  .url b { color: #0f172a; font-weight: 500 }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div class="who"><img id="owner" alt=""><span>diiviikk5<span class="sl"> / </span><b>Piixpal</b></span></div>
+  <div class="strip" id="strip"></div>
+  <div class="fade l"></div><div class="fade r"></div>
+  <div class="count" id="count"><span id="n">0</span><small>stars</small><piix-pal pal="bitbug" scale="5" at=".2" speed="1.4"></piix-pal></div>
+  <div class="url" id="url">github.com/<b>diiviikk5/Piixpal</b></div>
+</div>
+<script src="out/stargazers/data.js"></script>
+<script src="../piixpal.js"></script>
+<script src="stars2-time.js"></script>
+<script>
+/* every stargazer slides in from the right, slowly, then in a rush, then slowly again;
+   the count ticks as each one arrives; the last lands, the number pops */
+const L = window.STARGAZERS, N = L.length, DUR = 5, WARM = 60000, T = STARS_TIME(N), LAND = T.when(N - 1);
+const STAR = '<svg viewBox="0 0 24 24"><path fill="#fbbf24" stroke="#d97706" stroke-width="1.2" stroke-linejoin="round" d="M12 2.5l2.9 6.2 6.6.7-5 4.6 1.4 6.6L12 17.3l-5.9 3.3 1.4-6.6-5-4.6 6.6-.7z"/></svg>';
+document.getElementById('owner').src = 'out/stargazers/' + OWNER.file;
+const strip = document.getElementById('strip');
+const els = L.map(u => {
+  const d = document.createElement('div'); d.className = 'av';
+  d.innerHTML = `<img src="out/stargazers/${u.file}" alt="">${STAR}<span>@${u.login}</span>`;
+  strip.appendChild(d); return d;
+});
+const cl = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const stepTo = ms => { while (ms - __clock.ms > .01) __clock.step(Math.min(1000 / 30, ms - __clock.ms)); };
+function frame(t) {
+  const s = T.scroll(t);
+  let n = 0;
+  els.forEach((d, k) => {
+    const x = T.x(k, s);
+    d.style.transform = `translateX(${x.toFixed(1)}px)`;
+    d.style.visibility = x > -260 && x < 1960 ? 'visible' : 'hidden';
+    if (T.arrived(k, s)) n = k + 1;
+  });
+  document.getElementById('n').textContent = n;
+  /* the landing: a pop on the number, the link fades in */
+  const p = cl((t - LAND) / .35);
+  const pop = t > LAND ? 1 + .14 * Math.sin(Math.PI * p) : 1;
+  document.getElementById('count').style.transform = `scale(${pop.toFixed(3)})`;
+  document.getElementById('url').style.opacity = cl((t - LAND - .15) / .4);
+  stepTo(WARM + t * 1000);
+}
+const ready = document.fonts.ready.then(() => Promise.all(['900 100px Inter', '500 100px Inter', '800 100px Inter', '500 30px "JetBrains Mono"'].map(f => document.fonts.load(f))))
+  .then(() => Promise.all([...document.images].map(i => i.decode().catch(() => {})))).then(() => stepTo(WARM));
+window.__film = { DUR, ready, frame, cues: () => [] };
+if (!location.search.includes('render')) ready.then(() => { const t0 = __realNow(); __realSetInterval(() => frame(((__realNow() - t0) / 1000) % DUR), 1000 / 30); });
+</script>
+</body>
+</html>
