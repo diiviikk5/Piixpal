@@ -1,0 +1,13 @@
+{
+  "name": "piixpal-pet",
+  "version": "1.0.0",
+  "description": "A pixel pet for your coding agent: it watches Claude Code or Codex work and reacts in a terminal pane. No setup, no dependencies.",
+  "type": "module",
+  "bin": { "piixpal-pet": "piixpal-pet.mjs" },
+  "files": ["piixpal-pet.mjs", "README.md"],
+  "engines": { "node": ">=18" },
+  "keywords": ["claude-code", "codex", "terminal", "pet", "pixel-art", "tamagotchi", "cli", "ai-agent", "piixpal"],
+  "homepage": "https://piixpal.dvkk.dev/components/agents",
+  "repository": { "type": "git", "url": "git+https://github.com/diiviikk5/Piixpal.git", "directory": "pet" },
+  "license": "MIT"
+}
