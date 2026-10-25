@@ -1,0 +1,29 @@
+*{box-sizing:border-box}
+body{width:330px;margin:0;padding:14px;font:13px/1.4 ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;background:#fbf8f1;color:#17121f}
+header{display:flex;align-items:center;gap:8px}
+header b{font-size:16px}
+.logo{width:14px;height:14px;background:#c6f432;box-shadow:0 0 0 2px #17121f;display:block}
+.sp{flex:1}
+.sub{margin:6px 0 12px;color:#5b5466}
+h2{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:#5b5466;margin:14px 0 6px}
+.big{width:100%;padding:11px;border:3px solid #17121f;border-radius:10px;background:#c6f432;color:#17121f;font:800 13px/1.2 inherit;cursor:pointer;box-shadow:3px 3px 0 #17121f}
+.big:active{transform:translate(2px,2px);box-shadow:1px 1px 0 #17121f}
+.tiny{margin:6px 0 0;font-size:11px;color:#5b5466}
+kbd{font:inherit;border:1.5px solid #17121f;border-radius:4px;padding:0 3px;background:#fff}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.pet{display:grid;justify-items:center;gap:2px;padding:6px 2px 4px;border:2px solid #d9d3c7;border-radius:9px;background:#fff;cursor:pointer;font:600 10px/1 inherit;color:#17121f}
+.pet canvas{width:48px;height:40px;image-rendering:pixelated}
+.pet[aria-pressed=true]{border-color:#17121f;background:#efffc0;box-shadow:2px 2px 0 #17121f}
+.row{display:flex;gap:6px}
+input[type=text]{flex:1;min-width:0;padding:8px;border:2px solid #17121f;border-radius:8px;font:inherit;background:#fff}
+.sm{padding:8px 12px;border:2px solid #17121f;border-radius:8px;background:#17121f;color:#fbf8f1;font:700 12px/1 inherit;cursor:pointer}
+.site{display:flex;align-items:center;gap:8px;margin:14px 0 0;padding:9px 10px;border:2px solid #17121f;border-radius:9px;background:#fff;cursor:pointer}
+footer{display:flex;justify-content:space-between;margin-top:12px;font-size:11px}
+footer a{color:#6b4cff;font-weight:700;text-decoration:none}
+.sw{position:relative;width:40px;height:22px;cursor:pointer}
+.sw input{opacity:0;position:absolute;inset:0;margin:0;cursor:pointer}
+.sw span{position:absolute;inset:0;border:2px solid #17121f;border-radius:6px;background:#e6e0d4;pointer-events:none}
+.sw span::after{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;background:#17121f;border-radius:3px;transition:transform .15s}
+.sw input:checked + span{background:#c6f432}
+.sw input:checked + span::after{transform:translateX(18px)}
+.off .grid,.off .site{opacity:.45}

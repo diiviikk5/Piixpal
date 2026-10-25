@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Piixpal</title>
+<link rel="stylesheet" href="popup.css">
+</head>
+<body>
+<header>
+  <i class="logo"></i><b>piixpal</b><span class="sp"></span>
+  <label class="sw" title="Your pet on every site"><input type="checkbox" id="on"><span></span></label>
+</header>
+<p class="sub" id="sub">Your pet lives on every site you visit.</p>
+
+<button type="button" class="big" id="panel">Open the party panel on this page</button>
+<p class="tiny">Party, snow, a dragon, lights out… <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd></p>
+
+<h2>Your pet</h2>
+<div class="grid" id="pets"></div>
+
+<h2>Or one you made</h2>
+<div class="row"><input type="text" id="code" placeholder="paste a Pal Maker link" spellcheck="false"><button type="button" class="sm" id="use">Use</button></div>
+<p class="tiny" id="made"></p>
+
+<label class="site"><input type="checkbox" id="here"> <span>Pet on <b id="host">this site</b></span></label>
+
+<footer><a href="https://piixpal.dvkk.dev/components/make" target="_blank" rel="noopener">Make a pal ↗</a><a href="https://piixpal.dvkk.dev" target="_blank" rel="noopener">piixpal.dvkk.dev</a></footer>
+<script src="lib/piixpal.min.js"></script>
+<script src="popup.js"></script>
+</body>
+</html>
