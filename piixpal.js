@@ -91,6 +91,8 @@ const surfaceAt = (el, x, r = rectOf(el)) => {
 const LAYER_CSS = `
 :host{all:initial}
 .a{position:absolute;left:0;top:0;pointer-events:none;will-change:transform;contain:layout style}
+/* a page flipped dark by the bulb (toggle="invert") flips its pals back */
+.a,svg{filter:var(--piix-unfilter)}
 .a canvas.smooth{image-rendering:auto!important}.a canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;pointer-events:auto;cursor:grab;transform-origin:50% 100%;touch-action:none;-webkit-user-drag:none;user-select:none}
 .a.held canvas{cursor:grabbing}
 .a.nograb canvas{cursor:pointer}
@@ -8266,6 +8268,8 @@ defineBehavior('strength', (a, [el], host) => {
  *
  *   toggle="class:dark"              toggle a class on the target (default)
  *   toggle="data-theme:dark|light"   or cycle an attribute; the first value is "lights off"
+ *   toggle="invert"                  any page, even one with no dark mode: flips its colours
+ *                                    (photos, video and pals stay true); on a dark page, that's light mode
  *   target="selector"                what to toggle (default <html>)
  *   at=".9"   where across the screen it hangs, 0–1     length="120"   chain length in px
  *   top="0"   px from the top (clear a sticky header)
@@ -8308,6 +8312,38 @@ defineBehavior('strength', (a, [el], host) => {
   });
 })();
 
+/* toggle="invert": the whole page's colours flipped (and softened a touch, so white isn't pitch black),
+   then photos, video and embeds given the exact opposite, so they come out true.
+   Pals live in their own layer, which undoes it through --piix-unfilter (see LAYER_CSS).
+   The extension ships the same rules as a content stylesheet, so its pages flip before they paint. */
+const INVERT_CSS = `html.piix-invert{filter:invert(1) hue-rotate(180deg) contrast(.9)!important;background-color:var(--piix-page,#fff)!important;--piix-unfilter:contrast(1.111) hue-rotate(180deg) invert(1)}
+html.piix-invert :is(img,video,canvas,iframe,embed,object):not(:is(img,video,canvas,iframe,embed,object) *){filter:contrast(1.111) hue-rotate(180deg) invert(1)!important}`;
+const invertCSS = () => {
+  if (window.__piixInvert) return;
+  window.__piixInvert = true;
+  pagePaint();
+  try { const sh = new CSSStyleSheet(); sh.replaceSync(INVERT_CSS); document.adoptedStyleSheets = [...document.adoptedStyleSheets, sh]; return; } catch (e) { /* older browsers */ }
+  const st = document.createElement('style'); st.textContent = INVERT_CSS; document.head.appendChild(st);
+};
+/* the colour behind everything, so the flip has something to flip (a transparent <html> paints white) */
+const solid = c => !/transparent|rgba\([^)]*,\s*0\)/.test(c);
+const pagePaint = () => {
+  const h = getComputedStyle(document.documentElement).backgroundColor, b = document.body && getComputedStyle(document.body).backgroundColor;
+  document.documentElement.style.setProperty('--piix-page', solid(h) ? h : b && solid(b) ? b : '#fff');
+};
+/* is the page dark to begin with? the first solid background behind the middle of the screen */
+const pageIsDark = () => {
+  const lum = el => {
+    for (; el && el.nodeType === 1; el = el.parentElement) {
+      const m = /rgba?\(([\d.]+),\s*([\d.]+),\s*([\d.]+)(?:,\s*([\d.]+))?/.exec(getComputedStyle(el).backgroundColor);
+      if (m && (m[4] == null || +m[4] > .5)) return (.2126 * m[1] + .7152 * m[2] + .0722 * m[3]) / 255;
+    }
+    return null;
+  };
+  const l = lum(document.elementFromPoint(innerWidth / 2, innerHeight / 2)) ?? lum(document.body);
+  return l != null && l < .45;
+};
+
 /* cord: a verlet chain from the top of the area down to the pal, which you pull */
 defineBehavior('cord', (a, targets, host) => {
   const S = a.s / 3;
@@ -8318,14 +8354,20 @@ defineBehavior('cord', (a, targets, host) => {
   const tSel = host.getAttribute('target');
   let target = document.documentElement;
   if (tSel) try { target = host.closest(tSel) || document.querySelector(tSel) || target; } catch (_) { /* bad selector */ }
-  const isDark = () => mode === 'class' ? target.classList.contains(values[0]) : target.getAttribute(mode) === values[0];
+  const inv = mode === 'invert';
+  if (inv) { target = document.documentElement; invertCSS(); }
+  /* invert mode: the page looks dark when it was dark to begin with, or when it's flipped (not both) */
+  let base = null;
+  const flipped = () => target.classList.contains('piix-invert');
+  const isDark = () => inv ? (base == null ? (base = pageIsDark()) : base) !== flipped() : mode === 'class' ? target.classList.contains(values[0]) : target.getAttribute(mode) === values[0];
   const flip = () => {
     const dark = !isDark();
-    if (mode === 'class') target.classList.toggle(values[0], dark);
+    if (inv) target.classList.toggle('piix-invert', !flipped());
+    else if (mode === 'class') target.classList.toggle(values[0], dark);
     else if (dark) target.setAttribute(mode, values[0]);
     else if (values[1] != null) target.setAttribute(mode, values[1]);
     else target.removeAttribute(mode);
-    const detail = { dark, value: mode === 'class' ? dark : target.getAttribute(mode) };
+    const detail = { dark, value: inv ? flipped() : mode === 'class' ? dark : target.getAttribute(mode) };
     host.dispatchEvent(new CustomEvent('piix:toggle', { bubbles: true, detail }));
     if (target !== host && !target.contains(host)) target.dispatchEvent(new CustomEvent('piix:toggle', { detail }));
     uiAnnounce(dark ? 'Lights off' : 'Lights on');
@@ -8336,7 +8378,7 @@ defineBehavior('cord', (a, targets, host) => {
   const len = (+host.getAttribute('length') || 120) * S;
   const L = len / N;
   const pts = Array.from({ length: N + 1 }, () => ({ x: 0, y: 0, px: 0, py: 0 }));
-  let anchor = null, held = null, pull = 0, tug = 0, moodT = 0, ready = false;
+  let lastDark = null, anchor = null, held = null, pull = 0, tug = 0, moodT = 0, ready = false;
   const NS = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(NS, 'svg');
   svg.setAttribute('aria-hidden', 'true');
@@ -8350,6 +8392,7 @@ defineBehavior('cord', (a, targets, host) => {
   a.node.parentNode.insertBefore(svg, a.node);
 
   const moth = recruit(a, '_moth');
+  moth.node.classList.add('ghost'); /* it flutters over the bulb: clicks go through it to the bulb */
   if (!boxEl) pin(moth);
   let mx = 0, my = 0, mt = rnd(0, 6);
 
@@ -8451,8 +8494,7 @@ defineBehavior('cord', (a, targets, host) => {
       if (held && held.moved) a.play(dark ? 'pulledOff' : 'pulled');
       else if (moodT > .2 && !dark) a.play('happy');
       else a.play(dark ? 'off' : 'on');
-      const glow = dark ? '' : `drop-shadow(0 0 ${Math.round(5 * S)}px rgba(255,214,90,.95))`;
-      if (a.cv.style.filter !== glow) a.cv.style.filter = glow;
+      if (dark !== lastDark) { lastDark = dark; a.cv.style.filter = dark ? '' : `drop-shadow(0 0 ${Math.round(5 * S)}px rgba(255,214,90,.95))`; }
 
       /* the moth: loops around the bulb in the light, rests on the chain in the dark */
       mt += dt;
