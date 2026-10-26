@@ -2,7 +2,7 @@
  * browser extension (extension/). Needs window.Piixpal (piixpal.min.js) on the page.
  *
  *   PiixVisit.open()            the little panel: vibes, add a pal, your own pal, clear
- *   PiixVisit.vibe('party')     party | snow | dragon | lights | trail | stickers | shuffle
+ *   PiixVisit.vibe('party')     party | ocean | snow | dragon | lights | trail | stickers | shuffle
  *   PiixVisit.add('pip')        one pal, wherever it fits best on this page
  *   PiixVisit.pet({ pal })      the extension's browser pet: one pal that lives on every page
  *   PiixVisit.clear()
@@ -97,6 +97,7 @@
   const WANDERERS = ['bitbug', 'boing', 'moss', 'pip', 'kitty', 'gecko', 'penguin', 'shibe', 'capy', 'frog', 'duckling', 'bumble', 'tri', 'nomad', 'scrolly', 'pix', 'crumb', 'hiss', 'sprout', 'tabby', 'pidge', 'shel'];
   const VIBES = {
     party: { label: 'Party', icon: '★', run: () => { add('bitbug', 'headings'); add('moss', 'paragraphs'); add('pip', 'buttons'); add('boing', 'bar'); if (has('bees')) add('bees', 'any'); } },
+    ocean: { label: 'Ocean', icon: '≋', run: () => power('piix-shoal', { fish: 130, schools: 4 }) },
     snow: { label: 'Snow day', icon: '❄', run: () => { power('piix-weather', { kind: 'snow', amount: 2 }); add('penguin', 'headings'); } },
     dragon: { label: 'Dragon', icon: '🐉', run: () => power('piix-wyrm', { color: ['jade', 'ember', 'void', 'frost', 'gold'][Math.floor(Math.random() * 5)] }) },
     lights: { label: 'Lights out', icon: '🔦', run: () => power('piix-lantern') },
