@@ -7897,6 +7897,251 @@ defineFigure('onigiri', {
   });
 })();
 
+/* ---- powers/aqua.js ---- */
+/* AQUA: the engine under the ASCII water components (pond, shoal).   @component aqua
+ * A grid of glyphs on a canvas, creatures with a spine that are rasterised into that grid cell
+ * by cell (shaded with glyph ramps, patterned, finned), fish that school like real fish
+ * (align, cohere, keep apart, mill), and two fields that live on the grid: ripples (a damped
+ * wave equation) and a wake that spreads and fades behind whatever swims.
+ * With thanks to stackedlol/ascii-sharks for the idea of drawing sea life this way. */
+
+const AQ_FONT = 'ui-monospace,"SF Mono","Cascadia Mono",Menlo,Consolas,monospace';
+
+/* a glyph grid: put() cells, flush() draws them in as few colour batches as it can */
+class AQGrid {
+  constructor(cv, cell = 14) {
+    this.cv = cv; this.g = cv.getContext('2d'); this.cell = cell;
+    this.batches = new Map(); this.cols = 0; this.rows = 0; this.cw = 8; this.ch = cell; this.dpr = 1;
+  }
+  resize(w, h) {
+    const dpr = this.dpr = Math.min(2, devicePixelRatio || 1);
+    this.cv.width = Math.max(1, Math.round(w * dpr)); this.cv.height = Math.max(1, Math.round(h * dpr));
+    this.cv.style.width = w + 'px'; this.cv.style.height = h + 'px';
+    const g = this.g;
+    g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    g.font = `600 ${this.cell * .82}px ${AQ_FONT}`;
+    this.cw = Math.max(5, g.measureText('M').width); this.ch = this.cell;
+    this.cols = Math.ceil(w / this.cw); this.rows = Math.ceil(h / this.ch);
+    this.w = w; this.h = h;
+  }
+  put(c, r, glyph, color) {
+    let b = this.batches.get(color);
+    if (!b) this.batches.set(color, (b = []));
+    b.push(c, r, glyph);
+  }
+  flush(bg) {
+    const g = this.g;
+    if (bg) { g.fillStyle = bg; g.fillRect(0, 0, this.w, this.h); } else g.clearRect(0, 0, this.w, this.h);
+    g.font = `600 ${this.cell * .82}px ${AQ_FONT}`; g.textBaseline = 'middle'; g.textAlign = 'center';
+    for (const [color, b] of this.batches) {
+      g.fillStyle = color;
+      for (let i = 0; i < b.length; i += 3) g.fillText(b[i + 2], (b[i] + .5) * this.cw, (b[i + 1] + .5) * this.ch);
+      b.length = 0;
+    }
+  }
+}
+/* colours as rgba strings, with the alpha rounded so batches stay few */
+const AQ_RGBA = new Map();
+const aqColor = (r, g, b, a = 1) => {
+  r = r & 255; g = g & 255; b = b & 255; a = Math.round(clamp(a, 0, 1) * 12) / 12;
+  const k = (r << 16 | g << 8 | b) * 16 + Math.round(a * 12);
+  let s = AQ_RGBA.get(k);
+  if (!s) AQ_RGBA.set(k, (s = `rgba(${r},${g},${b},${a.toFixed(3)})`));
+  return s;
+};
+/* a cheap, stable hash and smooth value noise */
+const aqHash = (x, y, z = 0) => { let h = Math.imul(x | 0, 374761393) ^ Math.imul(y | 0, 668265263) ^ Math.imul(z | 0, 1442695041); h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
+const aqNoise = (x, y, z = 0) => {
+  const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi, u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
+  const a = aqHash(xi, yi, z), b = aqHash(xi + 1, yi, z), c = aqHash(xi, yi + 1, z), d = aqHash(xi + 1, yi + 1, z);
+  return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
+};
+/* a slowly turning, divergence-free current (the curl of a drifting stream function) */
+const aqCurrent = (x, y, t, out) => {
+  const a = x / 260 + t * .07, b = y / 310 - t * .05, c = (x + y) / 190 + t * .11;
+  out.x = (-Math.sin(a) * Math.sin(b) / 310 + .5 * Math.cos(c) / 190) * 3400;
+  out.y = (-Math.cos(a) * Math.cos(b) / 260 - .5 * Math.cos(c) / 190) * 3400;
+  return out;
+};
+
+/* ---------- a field on the grid: ripples (wave equation) or wake (diffuse and fade) ---------- */
+class AQField {
+  constructor() { this.cols = 0; this.rows = 0; }
+  resize(cols, rows) { this.cols = cols; this.rows = rows; this.a = new Float32Array(cols * rows); this.b = new Float32Array(cols * rows); }
+  add(c, r, v) { c |= 0; r |= 0; if (c >= 0 && r >= 0 && c < this.cols && r < this.rows) this.a[r * this.cols + c] += v; }
+  get(c, r) { c |= 0; r |= 0; return c >= 0 && r >= 0 && c < this.cols && r < this.rows ? this.a[r * this.cols + c] : 0; }
+  /* ripples: the classic two-buffer wave, damped */
+  wave(damp = .985) {
+    const { cols, rows, a, b } = this;
+    for (let r = 1; r < rows - 1; r++) for (let c = 1; c < cols - 1; c++) {
+      const i = r * cols + c;
+      b[i] = ((a[i - 1] + a[i + 1] + a[i - cols] + a[i + cols]) * .5 - b[i]) * damp;
+    }
+    this.a = b; this.b = a;
+  }
+  /* wake: blur into the neighbours, then fade */
+  spread(keep = .93) {
+    const { cols, rows, a, b } = this;
+    for (let r = 1; r < rows - 1; r++) for (let c = 1; c < cols - 1; c++) {
+      const i = r * cols + c;
+      b[i] = (a[i] * .6 + (a[i - 1] + a[i + 1] + a[i - cols] + a[i + cols]) * .1) * keep;
+    }
+    this.a = b; this.b = a;
+  }
+}
+
+/* ---------- a creature with a spine: the head steers, every node follows the one in front ---------- */
+class AQSpine {
+  constructor({ x, y, len = 120, nodes = 14, heading = 0, width, pattern, fins = 'koi', speed = 60, seed = Math.random() * 1000 }) {
+    this.len = len; this.n = nodes; this.seg = len / (nodes - 1);
+    this.width = width || (s => .11 * Math.sin(Math.PI * Math.pow(Math.min(1, s), .7)) + .02);
+    this.pattern = pattern; this.fins = fins; this.speed = speed; this.seed = seed;
+    this.heading = heading; this.turn = 0; this.t = Math.random() * 10; this.gulp = 0;
+    this.pts = Array.from({ length: nodes }, (_, i) => ({ x: x - Math.cos(heading) * this.seg * i, y: y - Math.sin(heading) * this.seg * i }));
+  }
+  get head() { return this.pts[0]; }
+  /* steer toward a point, turning at most `agility` radians a second, swimming with a wiggle */
+  steer(tx, ty, dt, speed = this.speed, agility = 2.2) {
+    const h = this.pts[0];
+    const want = Math.atan2(ty - h.y, tx - h.x);
+    let d = want - this.heading;
+    while (d > Math.PI) d -= Math.PI * 2;
+    while (d < -Math.PI) d += Math.PI * 2;
+    this.turn = clamp(d, -agility * dt, agility * dt);
+    this.heading += this.turn;
+    this.t += dt * (1.5 + speed / 40);
+    const wig = Math.sin(this.t * 3.2) * .35;
+    h.x += Math.cos(this.heading + wig * .3) * speed * dt;
+    h.y += Math.sin(this.heading + wig * .3) * speed * dt;
+    this.follow();
+  }
+  follow() {
+    for (let i = 1; i < this.n; i++) {
+      const a = this.pts[i - 1], b = this.pts[i], dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy) || 1;
+      b.x = a.x + dx / d * this.seg; b.y = a.y + dy / d * this.seg;
+    }
+  }
+  /* nearest point on the spine to (px, py): s along it (0 head .. 1 tail), distance, and which side */
+  nearest(px, py) {
+    let best = 1e9, bs = 0, side = 1;
+    for (let i = 0; i < this.n - 1; i++) {
+      const a = this.pts[i], b = this.pts[i + 1], ex = b.x - a.x, ey = b.y - a.y, l2 = ex * ex + ey * ey || 1;
+      let u = ((px - a.x) * ex + (py - a.y) * ey) / l2; u = u < 0 ? 0 : u > 1 ? 1 : u;
+      const qx = a.x + ex * u - px, qy = a.y + ey * u - py, d = qx * qx + qy * qy;
+      if (d < best) { best = d; bs = (i + u) / (this.n - 1); side = ex * (py - a.y) - ey * (px - a.x) > 0 ? 1 : -1; }
+    }
+    return [bs, Math.sqrt(best), side];
+  }
+  /* rasterise into the grid. paint(c, r, glyph, color) */
+  draw(grid, paint, light = 1) {
+    const { cw, ch } = grid, L = this.len, maxW = L * .2;
+    let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+    for (const p of this.pts) { x0 = Math.min(x0, p.x); y0 = Math.min(y0, p.y); x1 = Math.max(x1, p.x); y1 = Math.max(y1, p.y); }
+    const pad = maxW + L * .14;
+    const c0 = Math.max(0, Math.floor((x0 - pad) / cw)), c1 = Math.min(grid.cols - 1, Math.ceil((x1 + pad) / cw));
+    const r0 = Math.max(0, Math.floor((y0 - pad) / ch)), r1 = Math.min(grid.rows - 1, Math.ceil((y1 + pad) / ch));
+    const tail = this.pts[this.n - 1], pre = this.pts[this.n - 2], tdx = tail.x - pre.x, tdy = tail.y - pre.y, tl = Math.hypot(tdx, tdy) || 1;
+    const sway = Math.sin(this.t * 3.2 + 1.2) * .5;
+    /* the pectoral fins: at a quarter of the way down, flapping */
+    const fi = Math.max(1, Math.round((this.n - 1) * .24)), fa = this.pts[fi - 1], fb = this.pts[fi], fdx = fa.x - fb.x, fdy = fa.y - fb.y, fl = Math.hypot(fdx, fdy) || 1;
+    const flap = .55 + Math.sin(this.t * 2.4) * .35;
+    for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) {
+      const px = (c + .5) * cw, py = (r + .5) * ch;
+      const [s, d, side] = this.nearest(px, py);
+      const hw = this.width(s) * L;
+      let part = 0, v = 0;
+      if (d <= hw && s < .995) { part = 1; v = d / hw * side; }
+      else if (this.fins) {
+        /* the tail fan, past the last node, swaying */
+        const ux = tdx / tl, uy = tdy / tl, rx = px - tail.x, ry = py - tail.y, along = rx * ux + ry * uy, across = -rx * uy + ry * ux;
+        const spread = along * (this.fins === 'manta' ? .3 : .9), off = along * sway;
+        if (along > -2 && along < L * (this.fins === 'manta' ? .3 : .17) && Math.abs(across - off) < spread + 1.5) { part = 2; v = (across - off) / (spread + 1.5); }
+        else if (this.fins === 'koi') {
+          /* pectoral fins, either side, swept back */
+          const nx = -fdy / fl, ny = fdx / fl;
+          for (const sg of [-1, 1]) {
+            const bx = fb.x + nx * sg * this.width(.24) * L, by = fb.y + ny * sg * this.width(.24) * L;
+            const qx = px - bx, qy = py - by, a2 = qx * nx * sg + qy * ny * sg, b2 = -(qx * fdx + qy * fdy) / fl;
+            if (a2 > 0 && a2 < L * .12 * flap && b2 > -1 && b2 < a2 * .9 + 1) { part = 3; v = a2 / (L * .12); }
+          }
+        }
+      }
+      if (!part) continue;
+      paint(c, r, s, v, part, light);
+    }
+  }
+}
+
+/* ---------- schools: many little fish, each a glyph; obstacles and predators steer them ---------- */
+class AQSchool {
+  constructor(n, { x, y, w, h, kind = 'sardine' }) {
+    const K = {
+      sardine: { cruise: 46, max: 120, align: 1.6, cohesion: .9, sep: 28, mill: 40, jitter: 30, rgb: [150, 190, 230] },
+      anchovy: { cruise: 56, max: 140, align: 3, cohesion: .4, sep: 26, mill: 0, jitter: 24, rgb: [120, 220, 210] },
+      goby: { cruise: 34, max: 110, align: .4, cohesion: .9, sep: 28, mill: 0, jitter: 90, rgb: [240, 190, 90] },
+      neon: { cruise: 50, max: 130, align: 2.2, cohesion: .7, sep: 24, mill: 30, jitter: 35, rgb: [80, 230, 255] }
+    }[kind] || {};
+    this.k = K;
+    const a = Math.random() * Math.PI * 2;
+    this.fish = Array.from({ length: n }, () => ({ x: x + Math.random() * w * .2, y: y + Math.random() * h * .2, vx: Math.cos(a) * K.cruise, vy: Math.sin(a) * K.cruise, glint: 0 }));
+  }
+  /* one step. avoid(x, y) -> [ax, ay] pushes away from walls, text and predators */
+  step(dt, avoid, t) {
+    const F = this.fish, K = this.k, R = 64, R2 = R * R, cur = { x: 0, y: 0 };
+    let mx = 0, my = 0;
+    for (const f of F) { mx += f.x; my += f.y; }
+    mx /= F.length; my /= F.length;
+    for (const f of F) {
+      let ax = 0, ay = 0, n = 0, cx = 0, cy = 0, vx = 0, vy = 0;
+      for (const o of F) {
+        if (o === f) continue;
+        const dx = o.x - f.x, dy = o.y - f.y, d2 = dx * dx + dy * dy;
+        if (d2 > R2) continue;
+        n++; cx += o.x; cy += o.y; vx += o.vx; vy += o.vy;
+        if (d2 < K.sep * K.sep) { const d = Math.sqrt(d2) || 1; ax -= dx / d * (K.sep - d) * 9; ay -= dy / d * (K.sep - d) * 9; }
+      }
+      if (n) {
+        ax += (vx / n - f.vx) * K.align + (cx / n - f.x) * K.cohesion;
+        ay += (vy / n - f.vy) * K.align + (cy / n - f.y) * K.cohesion;
+      }
+      /* a mill: swing round the school's centre */
+      if (K.mill) { const dx = f.x - mx, dy = f.y - my, d = Math.hypot(dx, dy) || 1; ax += -dy / d * K.mill; ay += dx / d * K.mill; }
+      aqCurrent(f.x, f.y, t, cur); ax += cur.x * .4; ay += cur.y * .4;
+      ax += (Math.random() - .5) * K.jitter * 2; ay += (Math.random() - .5) * K.jitter * 2;
+      const [px, py, scare] = avoid(f.x, f.y);
+      ax += px; ay += py;
+      const pv = Math.hypot(f.vx, f.vy);
+      f.vx += ax * dt; f.vy += ay * dt;
+      /* fish swim level: damp the vertical a little */
+      f.vy *= Math.pow(.6, dt);
+      let sp = Math.hypot(f.vx, f.vy) || 1;
+      const want = clamp(sp, K.cruise * .6, (scare ? K.max : K.cruise * 1.4));
+      f.vx = f.vx / sp * want; f.vy = f.vy / sp * want;
+      f.glint = Math.max(f.glint * Math.pow(.02, dt), Math.abs(sp - pv) > 25 || scare ? 1 : 0);
+      f.x += f.vx * dt; f.y += f.vy * dt;
+    }
+  }
+}
+/* a little fish, as one glyph pointing the way it swims */
+const aqFishGlyph = (vx, vy) => {
+  const a = Math.atan2(vy, vx * 1.6), o = ((a / Math.PI * 4 + 8.5) | 0) % 8;
+  return ['-', '\\', '|', '/', '-', '\\', '|', '/'][o];
+};
+/* push away from a rectangle (x0, y0, x1, y1) within `reach` */
+const aqRectPush = (x, y, rc, reach, k, out) => {
+  const qx = clamp(x, rc[0], rc[2]), qy = clamp(y, rc[1], rc[3]), dx = x - qx, dy = y - qy, d = Math.hypot(dx, dy);
+  if (d > reach) return 0;
+  if (d < .01) {
+    /* inside: out the nearest side */
+    const l = x - rc[0], r = rc[2] - x, t = y - rc[1], b = rc[3] - y, m = Math.min(l, r, t, b);
+    if (m === l) out[0] -= k * 2; else if (m === r) out[0] += k * 2; else if (m === t) out[1] -= k * 2; else out[1] += k * 2;
+    return 1;
+  }
+  const f = k * Math.pow(1 - d / reach, 2);
+  out[0] += dx / d * f; out[1] += dy / d * f;
+  return f / k;
+};
+
 /* ---- powers/buff.js ---- */
 /* BUFF: a password-strength meter that lifts. Buff stands on your password field with a
  * barbell; the stronger the password, the bigger the plates. Weak ones make it strain
@@ -11071,6 +11316,219 @@ defineBehavior('read', (a, [el], host) => {
   };
 });
 
+/* ---- powers/pond.js ---- */
+/* POND: a koi pond drawn in ASCII.   @component pond  @needs aqua
+ *
+ *   <div style="height:420px"><piix-pond></piix-pond></div>
+ *
+ * The element it's in becomes a pond: dark water, shimmering, with lily pads drifting on top.
+ * Koi swim under them: real koi, with spines that bend as they swim, sweeping tails, flapping
+ * fins and the classic patterns (kohaku, sanke, showa, ogon, asagi, tancho, chagoi), shaded in
+ * glyphs. Click and the water ripples out from your finger, a few pellets of food sink, and the
+ * koi race for them and gulp them down. Keep the cursor still over the water and they gather
+ * under it, mouths up, hoping. Drag across the water to draw ripples.
+ *
+ *   koi       how many, 1 to 12                                  default: 5
+ *   pads      lily pads, 0 to 10                                 default: 4
+ *   kinds     which koi, comma separated                         default: a mix
+ *   theme     night | day | ink                                  default: night
+ *   cell      glyph size, px                                     default: 10 */
+const POND_THEMES = {
+  night: { bg: [5, 18, 26], dot: [70, 150, 170], ripple: [170, 235, 245], pad: [52, 140, 78], padHi: [110, 200, 110] },
+  day: { bg: [14, 64, 72], dot: [120, 205, 210], ripple: [225, 255, 250], pad: [60, 160, 80], padHi: [140, 220, 120] },
+  ink: { bg: [12, 10, 16], dot: [110, 100, 140], ripple: [230, 225, 245], pad: [70, 120, 90], padHi: [140, 190, 150] }
+};
+/* koi patterns: colour at s (head 0 .. tail 1), v (across the back, -1 .. 1) */
+const KOI = {
+  kohaku: (s, v, n) => n(s * 3.2, v * 1.3) > .52 && s < .86 ? [226, 58, 38] : [244, 240, 230],
+  sanke: (s, v, n) => n(s * 9, v * 3, 7) > .8 ? [72, 68, 84] : n(s * 3.2, v * 1.3) > .55 && s < .86 ? [226, 58, 38] : [244, 240, 230],
+  showa: (s, v, n) => n(s * 3, v * 1.2) > .5 && s < .9 ? [222, 60, 34] : n(s * 4, v * 1.6, 3) > .62 ? [244, 240, 230] : [72, 68, 84],
+  ogon: (s, v, n, t) => { const k = 30 * Math.sin(t * 2 + s * 9 + v * 2); return [236 + k * .3, 186 + k, 66 + k * .5]; },
+  asagi: (s, v) => (Math.abs(v) > .62 || s < .06 ? [234, 118, 48] : [104 + 20 * Math.abs(v), 138, 172]),
+  tancho: (s, v) => (s > .03 && s < .14 && Math.abs(v) < .62 ? [226, 40, 40] : [246, 244, 238]),
+  chagoi: (s, v, n) => { const k = n(s * 6, v * 2) * 40; return [160 + k, 110 + k * .6, 64]; }
+};
+const POND_RAMP = ':;=+x%#8@';
+
+class PiixPondElement extends HTMLElement {
+  constructor() { super(); this._loop = (dt, t) => this._tick(dt, t / 1000); }
+  connectedCallback() {
+    const box = this._box = this.parentElement || document.body;
+    if (box !== document.body && getComputedStyle(box).position === 'static') box.style.position = 'relative';
+    Object.assign(this.style, { position: box === document.body ? 'fixed' : 'absolute', inset: '0', display: 'block', overflow: 'hidden', borderRadius: 'inherit', touchAction: 'none', cursor: 'crosshair' });
+    this.setAttribute('role', 'img');
+    this.setAttribute('aria-label', 'A koi pond: click to feed the koi');
+    if (!this._cv) { this._cv = document.createElement('canvas'); this._cv.style.display = 'block'; this.appendChild(this._cv); }
+    this._grid = new AQGrid(this._cv, +this.getAttribute('cell') || 10);
+    this._ripple = new AQField();
+    this._food = []; this._bubbles = []; this._ptr = null; this._still = 0;
+    this._ro = new ResizeObserver(() => this._resize()); this._ro.observe(box);
+    this._io = new IntersectionObserver(([e]) => { this._vis = e.isIntersecting; if (this._vis) sub(this._loop); else unsub(this._loop); });
+    this._io.observe(this);
+    this._down = e => this._poke(e, true); this._move = e => this._poke(e, false); this._leave = () => { this._ptr = null; };
+    this.addEventListener('pointerdown', this._down); this.addEventListener('pointermove', this._move); this.addEventListener('pointerleave', this._leave);
+    this._resize();
+  }
+  disconnectedCallback() { unsub(this._loop); this._ro && this._ro.disconnect(); this._io && this._io.disconnect(); }
+  _resize() {
+    const r = this.getBoundingClientRect(), w = Math.max(60, r.width), h = Math.max(60, r.height);
+    this._grid.resize(w, h);
+    this._ripple.resize(this._grid.cols, this._grid.rows);
+    this._w = w; this._h = h;
+    if (!this._koi) this._spawn();
+    else for (const k of this._koi) { k.head.x = clamp(k.head.x, 20, w - 20); k.head.y = clamp(k.head.y, 20, h - 20); k.follow(); }
+    if (!this._vis || reduced()) this._tick(0, performance.now() / 1000);
+  }
+  _spawn() {
+    const w = this._w, h = this._h, n = clamp(+this.getAttribute('koi') || 5, 1, 12);
+    const kinds = (this.getAttribute('kinds') || '').split(',').map(s => s.trim()).filter(k => KOI[k]);
+    const mix = kinds.length ? kinds : ['kohaku', 'ogon', 'showa', 'asagi', 'sanke', 'tancho', 'chagoi'];
+    const L = clamp(Math.min(w, h) * .4, 90, 230);
+    this._koi = Array.from({ length: n }, (_, i) => {
+      const len = L * rnd(.8, 1.15), kind = mix[i % mix.length];
+      /* koi are chunky: widest a third of the way down, a slim wrist before the tail */
+      const k = new AQSpine({ x: rnd(len, w - len), y: rnd(len * .6, h - len * .6), len, nodes: 16, heading: rnd(0, 6.28), speed: rnd(34, 52), seed: i * 97 + 13, width: s => (s < .3 ? .04 + .075 * Math.sin(Math.PI / 2 * Math.pow(s / .3, .55)) : .115 * Math.pow(1 - (s - .3) / .7, 1.2) + .014) });
+      k.kind = kind; k.target = null; k.wake = 0;
+      return k;
+    });
+    const np = clamp(+(this.getAttribute('pads') ?? 4), 0, 10);
+    this._pads = Array.from({ length: np }, () => ({ x: rnd(0, w), y: rnd(0, h), r: rnd(20, 38) * clamp(Math.min(w, h) / 420, .7, 1.4), rot: rnd(0, 6.28), vx: rnd(-3, 3), vy: rnd(-2, 2), flower: chance(.35) }));
+  }
+  /* the pointer in the water: a click feeds and splashes, a drag draws ripples, stillness invites */
+  _poke(e, down) {
+    const r = this.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top, g = this._grid;
+    const moved = !this._ptr || Math.hypot(x - this._ptr.x, y - this._ptr.y) > 3;
+    this._ptr = { x, y, at: moved ? performance.now() : this._ptr.at };
+    if (down) {
+      e.preventDefault();
+      this._ripple.add(x / g.cw, y / g.ch, 14);
+      for (let i = 0; i < 3 + (Math.random() * 3 | 0); i++) this._food.push({ x: x + rnd(-22, 22), y: y + rnd(-14, 14), age: 0 });
+      sfx('blip', this, { pitch: .55, gap: 80 });
+    } else if (e.buttons) this._ripple.add(x / g.cw, y / g.ch, 4);
+  }
+  _tick(dt, t) {
+    const g = this._grid, R = this._ripple, w = this._w, h = this._h, T = POND_THEMES[this.getAttribute('theme')] || POND_THEMES.night;
+    if (!g.cols) return;
+    const still = reduced() ? 0 : dt;
+    /* ---------- the koi decide where to go ---------- */
+    const ptr = this._ptr, begging = ptr && performance.now() - ptr.at > 900;
+    const order = begging ? this._koi.slice().sort((a, b) => Math.hypot(a.head.x - ptr.x, a.head.y - ptr.y) - Math.hypot(b.head.x - ptr.x, b.head.y - ptr.y)) : [];
+    for (const k of this._koi) {
+      const hd = k.head;
+      let tx, ty, sp = k.speed;
+      /* food first: the nearest pellet */
+      let food = null, fd = 1e9;
+      for (const f of this._food) { const d = Math.hypot(f.x - hd.x, f.y - hd.y); if (d < fd) { fd = d; food = f; } }
+      if (food && fd < Math.max(w, h)) { tx = food.x; ty = food.y; sp = k.speed * 2.6; if (fd < k.len * .12) { this._food.splice(this._food.indexOf(food), 1); k.gulp = 1; R.add(hd.x / g.cw, hd.y / g.ch, 6); for (let i = 0; i < 3; i++) this._bubbles.push({ x: hd.x + rnd(-6, 6), y: hd.y + rnd(-6, 6), age: -i * .15 }); } }
+      else if (begging && order.indexOf(k) < 3) {
+        const i = order.indexOf(k), a = i * 2.1 + t * .3;
+        tx = ptr.x + Math.cos(a) * 28; ty = ptr.y + Math.sin(a) * 18; sp = k.speed * .9;
+        if (Math.hypot(tx - hd.x, ty - hd.y) < 30 && chance(dt * .8)) this._bubbles.push({ x: hd.x, y: hd.y, age: 0 });
+      } else {
+        if (!k.target || Math.hypot(k.target.x - hd.x, k.target.y - hd.y) < k.len * .4) k.target = { x: rnd(w * .1, w * .9), y: rnd(h * .12, h * .88) };
+        tx = k.target.x; ty = k.target.y;
+      }
+      /* keep out of each other's way */
+      /* koi keep their distance: from every other koi's body, not just its head */
+      for (const o of this._koi) if (o !== k) for (let j = 0; j < o.n; j += 3) { const p = o.pts[j], dx = hd.x - p.x, dy = hd.y - p.y, d = Math.hypot(dx, dy); if (d < k.len * .55 && d > 0) { const f = (1 - d / (k.len * .55)) * 160; tx += dx / d * f; ty += dy / d * f; } }
+      /* the walls */
+      const m = k.len * .35;
+      if (hd.x < m) tx = Math.max(tx, w * .5); if (hd.x > w - m) tx = Math.min(tx, w * .5);
+      if (hd.y < m * .7) ty = Math.max(ty, h * .5); if (hd.y > h - m * .7) ty = Math.min(ty, h * .5);
+      if (still) k.steer(tx, ty, dt, sp, food ? 3.4 : 2);
+      k.gulp = Math.max(0, k.gulp - dt * 2);
+      /* a koi near the surface stirs it */
+      if (still && (k.wake -= dt) <= 0) { k.wake = .35; R.add(hd.x / g.cw, hd.y / g.ch, .55); }
+    }
+    /* food sinks and fades; bubbles rise and pop */
+    for (const f of this._food) f.age += dt;
+    this._food = this._food.filter(f => f.age < 9);
+    for (const b of this._bubbles) b.age += dt;
+    this._bubbles = this._bubbles.filter(b => b.age < 1.1);
+    /* pads drift, and ripples push them */
+    for (const p of this._pads) {
+      const c = p.x / g.cw, r = p.y / g.ch, gx = R.get(c + 2, r) - R.get(c - 2, r), gy = R.get(c, r + 2) - R.get(c, r - 2);
+      p.vx += (-gx * 30 - p.vx * .3) * dt; p.vy += (-gy * 30 - p.vy * .3) * dt; p.rot += (p.vx * .01) * dt;
+      p.x += p.vx * dt; p.y += p.vy * dt;
+      if (p.x < -p.r) p.x = w + p.r; if (p.x > w + p.r) p.x = -p.r; if (p.y < -p.r) p.y = h + p.r; if (p.y > h + p.r) p.y = -p.r;
+    }
+    if (still) R.wave(.975);
+
+    /* ---------- drawing, layer by layer into a cell buffer ---------- */
+    const cols = g.cols, rows = g.rows, N = cols * rows;
+    if (!this._G || this._G.length !== N) { this._G = new Array(N); this._C = new Array(N); }
+    const G = this._G, C = this._C;
+    const [br, bg, bb] = T.bg, [dr, dg, db] = T.dot, [rr, rg, rb] = T.ripple;
+    /* water: a dotted grid that shimmers with caustics, lit up by the ripples */
+    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+      const i = r * cols + c, u = R.a[i] || 0, au = Math.abs(u);
+      if (au > .22) {
+        const k = Math.min(1, au / 3);
+        G[i] = '.,:;=+*'[Math.min(6, (k * 7) | 0)];
+        C[i] = aqColor(rr, rg, rb, .25 + k * .7);
+      } else if ((c + r) % 2 === 0) {
+        const ca = aqNoise(c * .16 + t * .35, r * .3 - t * .22, 1) * aqNoise(c * .09 - t * .2, r * .17 + t * .15, 2);
+        G[i] = ca > .42 ? '·' : '.';
+        C[i] = aqColor(dr, dg, db, .1 + ca * .55);
+      } else G[i] = null;
+    }
+    /* koi */
+    const nz = (x, y, z = 0) => aqNoise(x, y, z);
+    for (const k of this._koi) {
+      const pat = KOI[k.kind] || KOI.kohaku, seed = k.seed;
+      k.draw(g, (c, r, s, v, part) => {
+        const i = r * cols + c;
+        if (part === 1) {
+          const rgb = pat(s, v, (x, y, z = 0) => nz(x + seed, y + seed * .7, z), t);
+          /* round body: lit along the spine, darker at the flanks, light from the top-left */
+          const shade = clamp(.35 + .65 * (1 - v * v) - v * .12, 0, 1), lit = .5 + .5 * shade;
+          G[i] = POND_RAMP[Math.min(POND_RAMP.length - 1, (shade * POND_RAMP.length) | 0)];
+          C[i] = aqColor(rgb[0] * lit, rgb[1] * lit, rgb[2] * lit, 1);
+        } else {
+          /* fins: see-through, the koi's colour over the water */
+          const rgb = pat(part === 2 ? .95 : .3, 0, (x, y, z = 0) => nz(x + seed, y + seed * .7, z), t);
+          G[i] = part === 2 ? (Math.abs(v) > .6 ? '\'' : ':') : '.';
+          C[i] = aqColor(rgb[0], rgb[1], rgb[2], .55);
+        }
+      });
+      /* eyes, and a mouth that opens to gulp */
+      const p0 = k.pts[0], p1 = k.pts[1], dx = p0.x - p1.x, dy = p0.y - p1.y, dl = Math.hypot(dx, dy) || 1, nx = -dy / dl, ny = dx / dl, ew = k.width(.08) * k.len * .7;
+      for (const sg of [-1, 1]) { const ex = ((p0.x - dx / dl * 4 + nx * ew * sg) / g.cw) | 0, ey = ((p0.y - dy / dl * 4 + ny * ew * sg) / g.ch) | 0; if (ex >= 0 && ey >= 0 && ex < cols && ey < rows) { G[ey * cols + ex] = '•'; C[ey * cols + ex] = aqColor(14, 12, 18, 1); } }
+      if (k.gulp > 0) { const mx = ((p0.x + dx / dl * 5) / g.cw) | 0, my = ((p0.y + dy / dl * 5) / g.ch) | 0; if (mx >= 0 && my >= 0 && mx < cols && my < rows) { G[my * cols + mx] = 'O'; C[my * cols + mx] = aqColor(40, 20, 30, 1); } }
+    }
+    /* food, sinking */
+    for (const f of this._food) { const c = (f.x / g.cw) | 0, r = (f.y / g.ch) | 0; if (c >= 0 && r >= 0 && c < cols && r < rows) { G[r * cols + c] = '•'; C[r * cols + c] = aqColor(214, 170, 104, 1 - f.age / 9); } }
+    /* lily pads, on top: koi swim under them */
+    const [pr, pg, pb] = T.pad, [hr, hg, hb] = T.padHi;
+    for (const p of this._pads) {
+      const c0 = Math.floor((p.x - p.r) / g.cw), c1 = Math.ceil((p.x + p.r) / g.cw), r0 = Math.floor((p.y - p.r) / g.ch), r1 = Math.ceil((p.y + p.r) / g.ch);
+      for (let r = r0; r <= r1; r++) for (let c = c0; c <= c1; c++) {
+        if (c < 0 || r < 0 || c >= cols || r >= rows) continue;
+        const x = (c + .5) * g.cw - p.x, y = (r + .5) * g.ch - p.y, d = Math.hypot(x, y) / p.r;
+        if (d > 1) continue;
+        let a = Math.atan2(y, x) - p.rot; a = Math.atan2(Math.sin(a), Math.cos(a));
+        if (Math.abs(a) < .3 && d > .12) continue; /* the notch */
+        const i = r * cols + c, edge = d > .78, vein = Math.abs(Math.sin(a * 4)) < .12 && d > .2;
+        G[i] = edge ? '%' : vein ? '-' : '@';
+        C[i] = edge ? aqColor(pr * .8, pg * .8, pb * .8, 1) : aqColor(vein ? hr : pr + (hr - pr) * (1 - d) * .5, vein ? hg : pg + (hg - pg) * (1 - d) * .5, vein ? hb : pb + (hb - pb) * (1 - d) * .5, 1);
+      }
+      if (p.flower) {
+        const c = (p.x / g.cw) | 0, r = (p.y / g.ch) | 0;
+        for (const [dc, dr2, ch2, col] of [[0, 0, '*', [255, 220, 90]], [-1, 0, '(', [255, 150, 190]], [1, 0, ')', [255, 150, 190]], [0, -1, '^', [255, 190, 215]]]) {
+          const cc = c + dc, rr2 = r + dr2;
+          if (cc >= 0 && rr2 >= 0 && cc < cols && rr2 < rows) { G[rr2 * cols + cc] = ch2; C[rr2 * cols + cc] = aqColor(col[0], col[1], col[2], 1); }
+        }
+      }
+    }
+    /* bubbles, on top of everything */
+    for (const b of this._bubbles) { if (b.age < 0) continue; const c = (b.x / g.cw) | 0, r = ((b.y - b.age * 10) / g.ch) | 0; if (c >= 0 && r >= 0 && c < cols && r < rows) { G[r * cols + c] = b.age < .5 ? 'o' : b.age < .85 ? '°' : '·'; C[r * cols + c] = aqColor(220, 245, 250, 1 - b.age * .7); } }
+    for (let i = 0; i < N; i++) if (G[i]) g.put(i % cols, (i / cols) | 0, G[i], C[i]);
+    g.flush(`rgb(${br},${bg},${bb})`);
+  }
+}
+define('piix-pond', PiixPondElement);
+ELEMENTS.pond = 'piix-pond';
+
 /* ---- powers/scout.js ---- */
 /* SCOUT: an onboarding tour guide. Scout hops from element to element, stands on each
  * one and holds up its flag while a spotlight and a card explain what it's for.
@@ -11281,6 +11739,164 @@ defineBehavior('tour', (a, [el], host) => {
     destroy() { removeEventListener('keydown', kd); veil.remove(); if (card) card.remove(); }
   };
 });
+
+/* ---- powers/shoal.js ---- */
+/* SHOAL: schools of ASCII fish that swim around your page.   @component shoal  @needs aqua
+ *
+ *   <section class="hero"> … <piix-shoal></piix-shoal></section>      or anywhere in <body>
+ *
+ * Little fish, one glyph each, schooling the way real fish do: polarised ribbons, loose swarms,
+ * a slowly turning bait ball. Your layout is the reef: they read where your headings,
+ * paragraphs, buttons and images are and swim between them, never over your words. Your cursor
+ * is a predator; schools burst apart around it and close up behind, leaving a glowing wake.
+ * Add predator="manta" and a manta ray glides through now and then, parting the schools.
+ * Inside an element it stays in that element; anywhere else it swims over the whole screen.
+ *
+ *   fish       how many, 10 to 240                                 default: 90
+ *   schools    how many schools, 1 to 6                            default: 3
+ *   kinds      sardine | anchovy | goby | neon, comma separated    default: a mix
+ *   predator   none | manta                                        default: none
+ *   cell       glyph size, px                                      default: 14 */
+const SHOAL_REEF = 'h1,h2,h3,h4,h5,h6,p,li,dt,dd,blockquote,pre,button,a,label,small,img,video,svg,canvas:not(piix-shoal canvas),input,textarea,select,table,figure,footer,nav,.btn,[class*=card]';
+
+class PiixShoalElement extends HTMLElement {
+  constructor() { super(); this._loop = (dt, t) => this._tick(dt, t / 1000); }
+  connectedCallback() {
+    const par = this.parentElement;
+    this._page = !par || par === document.body || par === document.documentElement;
+    this._box = this._page ? document.body : par;
+    if (!this._page && getComputedStyle(par).position === 'static') par.style.position = 'relative';
+    Object.assign(this.style, { position: this._page ? 'fixed' : 'absolute', inset: '0', display: 'block', pointerEvents: 'none', zIndex: this._page ? '2147481000' : '3', overflow: 'hidden' });
+    this.setAttribute('aria-hidden', 'true');
+    if (!this._cv) { this._cv = document.createElement('canvas'); this._cv.style.display = 'block'; this.appendChild(this._cv); }
+    this._grid = new AQGrid(this._cv, +this.getAttribute('cell') || 14);
+    this._wake = new AQField();
+    this._ptr = { x: -1e4, y: -1e4, v: 0 };
+    this._rocks = []; this._rockAt = 0;
+    this._pm = e => { const r = this._origin(); const x = e.clientX - r.x, y = e.clientY - r.y; this._ptr.v = Math.hypot(x - this._ptr.x, y - this._ptr.y); this._ptr.x = x; this._ptr.y = y; };
+    this._pl = () => { this._ptr.x = this._ptr.y = -1e4; };
+    addEventListener('pointermove', this._pm, { passive: true }); document.documentElement.addEventListener('pointerleave', this._pl);
+    this._sc = () => { this._rockAt = 0; };
+    addEventListener('scroll', this._sc, { passive: true });
+    this._ro = new ResizeObserver(() => this._resize()); this._ro.observe(this._page ? document.documentElement : par);
+    this._io = new IntersectionObserver(([e]) => { if (e.isIntersecting) sub(this._loop); else unsub(this._loop); }); this._io.observe(this);
+    this._resize();
+  }
+  disconnectedCallback() {
+    unsub(this._loop); this._ro && this._ro.disconnect(); this._io && this._io.disconnect();
+    removeEventListener('pointermove', this._pm); document.documentElement.removeEventListener('pointerleave', this._pl); removeEventListener('scroll', this._sc);
+  }
+  _origin() { if (this._page) return { x: 0, y: 0 }; const r = this.getBoundingClientRect(); return { x: r.left, y: r.top }; }
+  _resize() {
+    const r = this.getBoundingClientRect(), w = Math.max(80, this._page ? innerWidth : r.width), h = Math.max(80, this._page ? innerHeight : r.height);
+    this._w = w; this._h = h;
+    this._grid.resize(w, h); this._wake.resize(this._grid.cols, this._grid.rows);
+    this._rockAt = 0;
+    /* on a light page the fish go darker, so they show */
+    this._light = (() => { let el = this._box; while (el) { const c = getComputedStyle(el).backgroundColor, m = /rgba?\(([\d.]+),\s*([\d.]+),\s*([\d.]+)(?:,\s*([\d.]+))?/.exec(c); if (m && (m[4] === undefined || +m[4] > .5)) return (+m[1] * .3 + +m[2] * .59 + +m[3] * .11) > 140; el = el.parentElement; } return true; })();
+    if (!this._schools) this._spawn();
+    if (reduced()) this._tick(0, 0);
+  }
+  /* the reef: where your content is, in this element's coordinates */
+  _reef() {
+    const o = this._origin(), w = this._w, h = this._h, out = [];
+    const scope = this._page ? document.body : this._box;
+    for (const el of scope.querySelectorAll(SHOAL_REEF)) {
+      if (el === this || this.contains(el) || el.closest('piix-shoal,piix-pal,[data-piixpal],[data-piixpal-ui],[data-piixpal-visit-ui]')) continue;
+      const r = el.getBoundingClientRect();
+      if (r.width < 4 || r.height < 4) continue;
+      const x0 = r.left - o.x, y0 = r.top - o.y, x1 = r.right - o.x, y1 = r.bottom - o.y;
+      if (x1 < -40 || y1 < -40 || x0 > w + 40 || y0 > h + 40) continue;
+      /* wrappers as big as the whole space aren't rocks */
+      if ((x1 - x0) * (y1 - y0) > w * h * .45) continue;
+      out.push([x0, y0, x1, y1]);
+      if (out.length > 160) break;
+    }
+    return out;
+  }
+  _free() {
+    /* somewhere not inside a rock */
+    for (let i = 0; i < 40; i++) { const x = rnd(this._w * .05, this._w * .95), y = rnd(this._h * .05, this._h * .95); if (!this._rocks.some(r => x > r[0] - 10 && x < r[2] + 10 && y > r[1] - 10 && y < r[3] + 10)) return [x, y]; }
+    return [rnd(0, this._w), rnd(0, this._h)];
+  }
+  _spawn() {
+    this._rocks = this._reef();
+    const total = clamp(+this.getAttribute('fish') || 90, 10, 240), ns = clamp(+this.getAttribute('schools') || 3, 1, 6);
+    const kinds = (this.getAttribute('kinds') || 'sardine,neon,anchovy,goby').split(',').map(s => s.trim()).filter(Boolean);
+    this._schools = Array.from({ length: ns }, (_, i) => { const [x, y] = this._free(); return new AQSchool(Math.round(total / ns), { x, y, w: this._w * .3, h: this._h * .3, kind: kinds[i % kinds.length] }); });
+    if (this.getAttribute('predator') === 'manta') {
+      const L = clamp(Math.min(this._w, this._h) * .42, 110, 300);
+      this._manta = new AQSpine({ x: -L, y: this._h * .5, len: L, nodes: 12, heading: 0, speed: 46, fins: 'manta', width: s => (s < .62 ? .52 * Math.sin(Math.PI * Math.pow(s / .62, .8)) * (1 - s * .3) + .04 : .03 * (1 - s)) });
+      this._manta.target = { x: this._w * .5, y: this._h * .5 };
+    }
+  }
+  _tick(dt, t) {
+    const g = this._grid, W = this._wake, w = this._w, h = this._h, still = reduced() ? 0 : dt;
+    if (!g.cols) return;
+    if ((this._rockAt -= dt) <= 0) { this._rocks = this._reef(); this._rockAt = .3; }
+    const rocks = this._rocks, ptr = this._ptr, manta = this._manta;
+    /* where to keep away from: the edges, the reef, the cursor, the manta */
+    const push = [0, 0];
+    const avoid = (x, y) => {
+      push[0] = 0; push[1] = 0;
+      let scare = 0;
+      const m = 36;
+      if (x < m) push[0] += (m - x) * 18; if (x > w - m) push[0] -= (x - (w - m)) * 18;
+      if (y < m) push[1] += (m - y) * 18; if (y > h - m) push[1] -= (y - (h - m)) * 18;
+      for (const rc of rocks) aqRectPush(x, y, rc, 30, 1400, push);
+      const pd = Math.hypot(x - ptr.x, y - ptr.y);
+      if (pd < 150) { const f = (1 - pd / 150) * 3600; push[0] += (x - ptr.x) / (pd || 1) * f; push[1] += (y - ptr.y) / (pd || 1) * f; scare = 1; }
+      if (manta) { const hd = manta.pts[3], md = Math.hypot(x - hd.x, y - hd.y), R = manta.len * .55; if (md < R) { const f = (1 - md / R) * 3000; push[0] += (x - hd.x) / (md || 1) * f; push[1] += (y - hd.y) / (md || 1) * f; scare = 1; } }
+      return [push[0], push[1], scare];
+    };
+    if (still) for (const s of this._schools) s.step(Math.min(dt, .033), avoid, t);
+    /* the manta glides across, turns, glides back */
+    if (manta && still) {
+      const hd = manta.head;
+      if (Math.hypot(manta.target.x - hd.x, manta.target.y - hd.y) < manta.len * .5) manta.target = { x: hd.x < w / 2 ? w + manta.len * .6 : -manta.len * .6, y: rnd(h * .2, h * .8) };
+      manta.steer(manta.target.x, manta.target.y, dt, manta.speed, .7);
+    }
+    /* wake: fish stir it, it spreads and fades */
+    const cw = g.cw, ch = g.ch;
+    for (const s of this._schools) for (const f of s.fish) W.add(f.x / cw, f.y / ch, .18);
+    if (still) W.spread(.9);
+    /* ---------- draw ---------- */
+    const L = this._light;
+    const wk = L ? [40, 90, 200] : [110, 230, 255];
+    const cols = g.cols, rows = g.rows;
+    for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
+      const v = W.a[r * cols + c];
+      if (v > .1) g.put(c, r, '·', aqColor(wk[0], wk[1], wk[2], Math.min(.4, v * .6)));
+    }
+    if (manta) {
+      const base = L ? [70, 80, 105] : [58, 70, 96], RAMP = '.:-=+*#%@';
+      /* it glides beneath your content: no glyph where the page has something */
+      const under = (c, r) => { const x = (c + .5) * cw, y = (r + .5) * ch; for (const rc of rocks) if (x > rc[0] && x < rc[2] && y > rc[1] && y < rc[3]) return true; return false; };
+      manta.draw(g, (c, r, s, v, part) => {
+        if (under(c, r)) return;
+        const shade = clamp(.3 + .7 * (1 - v * v), 0, 1), k = .6 + .4 * shade + Math.sin(t * 2 + s * 6) * .05;
+        g.put(c, r, part === 1 ? RAMP[Math.min(8, (shade * 9) | 0)] : '.', aqColor(base[0] * k, base[1] * k, base[2] * k + 20 * shade, part === 1 ? .82 : .5));
+      });
+    }
+    for (const s of this._schools) {
+      const [r0, g0, b0] = s.k.rgb, k = L ? .5 : 1;
+      for (const f of s.fish) {
+        const c = (f.x / cw) | 0, r = (f.y / ch) | 0;
+        if (c < 0 || r < 0 || c >= cols || r >= rows) continue;
+        const gl = f.glint > .5, col = gl ? (L ? aqColor(20, 40, 90, 1) : aqColor(240, 252, 255, 1)) : aqColor(r0 * k, g0 * k, b0 * k, .92);
+        /* swimming sideways: a tail and a head, ->  <- ; up or down: one stroke */
+        if (Math.abs(f.vx) > Math.abs(f.vy) * 1.2) {
+          const dir = f.vx > 0 ? 1 : -1, tc = c - dir;
+          if (tc >= 0 && tc < cols) g.put(tc, r, gl ? '=' : '-', aqColor(r0 * k, g0 * k, b0 * k, .6));
+          g.put(c, r, dir > 0 ? '>' : '<', col);
+        } else g.put(c, r, gl ? '=' : aqFishGlyph(f.vx, f.vy), col);
+      }
+    }
+    g.flush(null);
+  }
+}
+define('piix-shoal', PiixShoalElement);
+ELEMENTS.shoal = 'piix-shoal';
 
 /* ---- powers/sprout.js ---- */
 /* SPROUT: a desk plant that grows while you focus. Click it for a focus timer; it grows
