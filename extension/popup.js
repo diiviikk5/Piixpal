@@ -4,7 +4,7 @@
 (() => {
   const api = globalThis.browser || globalThis.chrome;
   const $ = id => document.getElementById(id);
-  const DEFAULTS = { on: true, pal: 'bitbug', code: '', off: [] };
+  const DEFAULTS = { on: true, pal: 'bitbug', code: '', off: [], bulb: true };
   /* pets that make good company on any page (they all have their own small file in lib/c) */
   const PETS = ['bitbug', 'pip', 'boing', 'moss', 'kitty', 'penguin', 'gecko', 'tri', 'bumble', 'shibe', 'capy', 'frog', 'duckling', 'shel', 'roomba', 'hiss'];
   let s = { ...DEFAULTS }, tab = null, host = '';
@@ -45,7 +45,15 @@
     $('made').textContent = s.code ? 'Your own pal is your pet. Pick one above to switch back.' : '';
     $('here').checked = !(s.off || []).includes(host);
     $('here').disabled = !host;
+    $('bulb').checked = s.bulb;
   };
+  /* the light switch on this tab: lights.js flips it and says which way it went */
+  const lamp = flipped => { $('flip').textContent = flipped ? 'Lights back on here' : 'Flip the lights on this site'; $('flip').classList.toggle('lit', !!flipped); };
+  $('flip').addEventListener('click', async () => {
+    const r = tab && await api.tabs.sendMessage(tab.id, { type: 'flip' }).catch(() => null);
+    if (r) lamp(r.flipped); else $('flip').textContent = 'This page can’t be flipped (try a normal website)';
+  });
+  $('bulb').addEventListener('change', e => save({ bulb: e.target.checked }));
 
   $('on').addEventListener('change', e => save({ on: e.target.checked }));
   $('here').addEventListener('change', e => {
@@ -73,5 +81,6 @@
     try { const u = new URL(tab.url); if (/^https?:$/.test(u.protocol)) host = u.hostname; } catch (e) { host = ''; }
     $('host').textContent = host || 'this page';
     paint();
+    if (tab) api.tabs.sendMessage(tab.id, { type: 'flipped' }).then(r => r && lamp(r.flipped), () => { $('flip').disabled = true; });
   })();
 })();

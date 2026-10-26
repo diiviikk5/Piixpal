@@ -5,6 +5,7 @@
  *   PiixVisit.vibe('party')     party | ocean | snow | dragon | lights | trail | stickers | shuffle
  *   PiixVisit.add('pip')        one pal, wherever it fits best on this page
  *   PiixVisit.pet({ pal })      the extension's browser pet: one pal that lives on every page
+ *   PiixVisit.bulb(true)        the light switch: pull its chain to flip any page dark (or light)
  *   PiixVisit.clear()
  *
  * It only adds things (in a container at the end of <body>, and a data attribute on the elements
@@ -128,6 +129,13 @@
   };
   const unpet = () => { clearInterval(pet.watch); if (pet.el) { pet.el.remove(); added.delete(pet.el); } pet.el = null; pet.cfg = null; };
 
+  /* ---------- the light switch: a bulb on a chain at the top right; pull it to flip the page ---------- */
+  const bulb = on => {
+    if (bulb.el) { bulb.el.remove(); bulb.el = null; }
+    /* not one of the things clear() takes away: it stays until you turn it off */
+    if (on) { bulb.el = host({ pal: 'bulb', toggle: 'invert', at: '.985', length: '64' }); added.delete(bulb.el); }
+  };
+
   /* ---------- the panel ---------- */
   let panel = null, root = null, mini = null;
   const CSS = `
@@ -219,5 +227,5 @@ select,input[type=text]{flex:1;min-width:0;padding:7px 8px;border:2px solid #171
   const show = on => { if (!panel) return; open.p.hidden = !on; mini.hidden = on; };
   const toggle = () => { if (!panel) open(); else show(open.p.hidden); };
 
-  window.PiixVisit = { open, toggle, vibe, add, addMade, clear, pet, unpet, refOf, VIBES };
+  window.PiixVisit = { open, toggle, vibe, add, addMade, clear, pet, unpet, bulb, refOf, VIBES };
 })();

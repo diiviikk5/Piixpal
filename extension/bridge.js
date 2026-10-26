@@ -2,13 +2,15 @@
  * the pet only where it's on; it follows setting changes live, so the popup works instantly. */
 (() => {
   const api = globalThis.browser || globalThis.chrome;
-  const DEFAULTS = { on: true, pal: 'bitbug', code: '', off: [] };
+  const DEFAULTS = { on: true, pal: 'bitbug', code: '', off: [], bulb: true };
   const host = location.hostname;
-  let petted = false;
+  let petted = false, bulbed = false;
   const apply = s => {
     const want = s.on && !(s.off || []).includes(host);
     if (want) { api.runtime.sendMessage({ type: 'pet' }); petted = true; }
     else if (petted) { api.runtime.sendMessage({ type: 'unpet' }); petted = false; }
+    /* the light switch's bulb, hanging at the top right */
+    if (s.bulb !== bulbed) { api.runtime.sendMessage({ type: 'bulb', on: s.bulb }); bulbed = s.bulb; }
   };
   api.storage.sync.get(DEFAULTS).then(apply);
   api.storage.onChanged.addListener((_, area) => { if (area === 'sync') api.storage.sync.get(DEFAULTS).then(apply); });

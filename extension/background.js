@@ -2,7 +2,7 @@
  * elements don't exist in an extension's isolated world), and only when it's wanted: the pet's
  * core and one pal on sites where the pet is on, the whole library when you open the panel. */
 const api = globalThis.browser || globalThis.chrome;
-const DEFAULTS = { on: true, pal: 'bitbug', code: '', off: [] };
+const DEFAULTS = { on: true, pal: 'bitbug', code: '', off: [], bulb: true };
 const settings = async () => ({ ...DEFAULTS, ...(await api.storage.sync.get(DEFAULTS)) });
 
 const inject = (tabId, files) => api.scripting.executeScript({ target: { tabId }, files, world: 'MAIN' });
@@ -16,6 +16,12 @@ const petTab = async tabId => {
   await run(tabId, cfg => window.PiixVisit && window.PiixVisit.pet(cfg), [{ pal: s.pal, code: s.code }]);
 };
 const unpetTab = tabId => run(tabId, () => window.PiixVisit && window.PiixVisit.unpet());
+/* the light switch: the bulb pal in the page (lights.js remembers what it does) */
+const bulbTab = async (tabId, on) => {
+  const s = await settings();
+  if (on) await inject(tabId, s.code ? ['lib/piixpal.min.js', 'visit.js'] : ['lib/core.min.js', 'lib/c/bulb.min.js', 'visit.js']);
+  await run(tabId, on => window.PiixVisit && window.PiixVisit.bulb(on), [on]);
+};
 const panelTab = async tabId => {
   await inject(tabId, ['lib/piixpal.min.js', 'visit.js']);
   await run(tabId, () => window.PiixVisit && window.PiixVisit.toggle());
@@ -24,7 +30,7 @@ const panelTab = async tabId => {
 api.runtime.onMessage.addListener((msg, sender, reply) => {
   const tabId = msg.tabId || (sender.tab && sender.tab.id);
   if (!tabId) return;
-  const job = msg.type === 'pet' ? petTab(tabId) : msg.type === 'unpet' ? unpetTab(tabId) : msg.type === 'panel' ? panelTab(tabId) : null;
+  const job = msg.type === 'pet' ? petTab(tabId) : msg.type === 'unpet' ? unpetTab(tabId) : msg.type === 'bulb' ? bulbTab(tabId, msg.on) : msg.type === 'panel' ? panelTab(tabId) : null;
   if (!job) return;
   /* some pages (the stores, browser pages, PDF viewers) can't take scripts: say so instead of failing loudly */
   job.then(() => reply({ ok: true }), e => reply({ ok: false, error: String(e && e.message || e) }));
@@ -32,9 +38,10 @@ api.runtime.onMessage.addListener((msg, sender, reply) => {
 });
 
 api.commands.onCommand.addListener(async cmd => {
-  if (cmd !== 'toggle-panel') return;
   const [tab] = await api.tabs.query({ active: true, currentWindow: true });
-  if (tab && tab.id) panelTab(tab.id).catch(() => {});
+  if (!tab || !tab.id) return;
+  if (cmd === 'toggle-panel') panelTab(tab.id).catch(() => {});
+  if (cmd === 'toggle-lights') api.tabs.sendMessage(tab.id, { type: 'flip' }).catch(() => {});
 });
 
 api.runtime.onInstalled.addListener(async ({ reason }) => {

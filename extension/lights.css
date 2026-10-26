@@ -1,0 +1,2 @@
+html.piix-invert{filter:invert(1) hue-rotate(180deg) contrast(.9)!important;background-color:var(--piix-page,#fff)!important;--piix-unfilter:contrast(1.111) hue-rotate(180deg) invert(1)}
+html.piix-invert :is(img,video,canvas,iframe,embed,object):not(:is(img,video,canvas,iframe,embed,object) *){filter:contrast(1.111) hue-rotate(180deg) invert(1)!important}

@@ -27,3 +27,6 @@ footer a{color:#6b4cff;font-weight:700;text-decoration:none}
 .sw input:checked + span{background:#c6f432}
 .sw input:checked + span::after{transform:translateX(18px)}
 .off .grid,.off .site{opacity:.45}
+.lamp{background:#ffe066}
+.lamp.lit{background:#17121f;color:#ffe066}
+.site + .tiny{margin-top:6px}

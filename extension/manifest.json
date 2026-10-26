@@ -3,7 +3,7 @@
   "name": "Piixpal: pixel pets for every website",
   "short_name": "Piixpal",
   "version": "0.4.0",
-  "description": "A tiny pixel pet that lives on every site you visit, and one click to throw a party, make it snow, or let a dragon loose on any page.",
+  "description": "A tiny pixel pet that lives on every site you visit, a pull-chain light switch that turns any page dark, and one click to throw a party, make it snow, or let a dragon loose.",
   "homepage_url": "https://piixpal.dvkk.dev/components/visit",
   "icons": {
     "16": "icons/16.png",
@@ -39,6 +39,19 @@
         "http://*/*",
         "https://*/*"
       ],
+      "css": [
+        "lights.css"
+      ],
+      "js": [
+        "lights.js"
+      ],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
       "js": [
         "bridge.js"
       ],
@@ -51,6 +64,12 @@
         "default": "Alt+Shift+P"
       },
       "description": "Open or hide the Piixpal panel on this page"
+    },
+    "toggle-lights": {
+      "suggested_key": {
+        "default": "Alt+Shift+L"
+      },
+      "description": "Lights on or off: flip this page dark (or light)"
     }
   },
   "browser_specific_settings": {

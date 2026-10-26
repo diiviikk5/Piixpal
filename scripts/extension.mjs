@@ -17,7 +17,11 @@ rmSync(join(ext, 'lib'), { recursive: true, force: true });
 mkdirSync(join(ext, 'lib', 'c'), { recursive: true });
 writeFileSync(join(ext, 'lib', 'piixpal.min.js'), readFileSync(join(root, 'piixpal.min.js')));
 writeFileSync(join(ext, 'lib', 'core.min.js'), readFileSync(join(root, 'dist', 'core.min.js')));
-for (const p of PETS) writeFileSync(join(ext, 'lib', 'c', p + '.min.js'), readFileSync(join(root, 'dist', 'c', p + '.min.js')));
+for (const p of [...PETS, 'bulb']) writeFileSync(join(ext, 'lib', 'c', p + '.min.js'), readFileSync(join(root, 'dist', 'c', p + '.min.js')));
+/* the light switch's look: the bulb's own invert rules, as a stylesheet the browser adds before a page paints
+   (and which no site's content security policy can block) */
+const bulbSrc = readFileSync(join(root, 'src', 'powers', 'bulb.js'), 'utf8');
+writeFileSync(join(ext, 'lights.css'), /const INVERT_CSS = `([^`]+)`/.exec(bulbSrc)[1] + '\n');
 /* the extension's version follows the library's */
 const pkg = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
 const manifest = JSON.parse(readFileSync(join(ext, 'manifest.json'), 'utf8'));
