@@ -57,6 +57,26 @@ export const POWERS = [
     code: '<!-- inside any section: the game stays in it -->\n<section class="hero">\n  <h1>Welcome</h1>\n  <p>…</p>\n  <piix-lantern></piix-lantern>\n</section>\n\n<!-- or the whole page -->\n<piix-lantern glims="8"></piix-lantern>'
   },
   {
+    id: 'pond', fam: 'play', accent: 'var(--sky)', kind: 'element', tag: 'piix-pond', where: 'body', tall: true,
+    uses: 'any element as the pond: it fills it, and keeps to it',
+    support: 'every modern browser · mouse, touch and pen · stills for reduced motion',
+    try: 'click the water to feed them; hold the cursor still over the pond and they gather, hoping; drag to make ripples',
+    desc: 'A koi pond, drawn entirely in ASCII. Every koi has a spine that bends as it swims, a sweeping tail and flapping fins, shaded in glyphs, in the real patterns: kohaku, sanke, showa, ogon, asagi, tancho, chagoi. Lily pads drift on top and the koi swim beneath them. Click and the water ripples out from your finger, food sinks, and the koi race for it and gulp it down. Hold the cursor still and they gather under it, mouths up.',
+    attrs: [['koi', 'how many, 1 to 12 (default 5)'], ['pads', 'lily pads, 0 to 10 (default 4)'], ['kinds', 'which koi, comma separated: kohaku, sanke, showa, ogon, asagi, tancho, chagoi'], ['theme', '<code>night</code>, <code>day</code> or <code>ink</code>'], ['cell', 'glyph size in px (default 10)']],
+    hab: '<piix-pond koi="5" pads="4"></piix-pond>',
+    code: '<!-- any element becomes the pond -->\n<div style="height:420px">\n  <piix-pond koi="6"></piix-pond>\n</div>'
+  },
+  {
+    id: 'shoal', fam: 'play', accent: 'var(--sky)', kind: 'element', tag: 'piix-shoal', where: 'body', tall: true,
+    uses: 'your layout as a reef: headings, paragraphs, buttons and images are rocks the fish swim between',
+    support: 'every modern browser · mouse, touch and pen · stills for reduced motion',
+    try: 'move the cursor into a school and watch it burst apart and close up behind you',
+    desc: 'Schools of ASCII fish that swim around your page. They school the way real fish do (polarised ribbons, loose swarms, a slowly turning bait ball) and they read your layout: every heading, paragraph, button and image is a rock, and they keep to the water between, never over your words. Your cursor is a predator; schools part around it and leave a glowing wake. Add a manta ray and it glides beneath your content, parting the schools as it goes.',
+    attrs: [['fish', 'how many, 10 to 240 (default 90)'], ['schools', 'how many schools (default 3)'], ['kinds', '<code>sardine</code>, <code>anchovy</code>, <code>goby</code>, <code>neon</code>, comma separated'], ['predator', '<code>manta</code> for a manta ray (default none)'], ['cell', 'glyph size in px (default 14)']],
+    hab: '<p class="h-text" style="bottom:auto;top:34px;left:28px;font-size:34px;max-width:360px">Fish swim around your words</p><div class="h-btns" style="bottom:60px;left:28px;gap:12px"><button type="button" class="h-btn lime">Dive in</button><button type="button" class="h-btn">Docs</button></div><piix-shoal fish="80" predator="manta"></piix-shoal>',
+    code: '<!-- inside any section: they swim around its content -->\n<section class="hero">\n  <h1>Welcome</h1>\n  <p>…</p>\n  <piix-shoal predator="manta"></piix-shoal>\n</section>\n\n<!-- or over the whole page -->\n<piix-shoal fish="140"></piix-shoal>'
+  },
+  {
     id: 'pidge', fam: 'jobs', accent: 'var(--violet)', kind: 'pal', does: 'courier', where: 'body',
     uses: 'a JavaScript call from anywhere: <code>Piixpal.toast("Saved!")</code>',
     support: 'every modern browser · notes are announced to screen readers',
