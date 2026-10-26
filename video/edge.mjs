@@ -27,7 +27,7 @@ export async function browser({ port = 9341, width = 1920, height = 1080, args =
   mkdirSync(PROFILES, { recursive: true });
   const profile = mkdtempSync(join(PROFILES, 'p-'));
   const edge = spawn(EDGE, ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${profile}`,
-    '--no-first-run', '--hide-scrollbars', '--force-device-scale-factor=1', ...args, 'about:blank'], { stdio: 'ignore' });
+    '--no-first-run', '--hide-scrollbars', '--force-device-scale-factor=1', ...args, 'about:blank'], { stdio: 'ignore', env: { ...process.env, TEMP: profile, TMP: profile } });
   let t;
   for (let i = 0; i < 60; i++) { try { t = await (await fetch(`http://127.0.0.1:${port}/json`)).json(); if (t.length) break; } catch {} await sleep(250); }
   const ws = new WebSocket(t.find(x => x.type === 'page').webSocketDebuggerUrl);
