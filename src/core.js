@@ -83,6 +83,8 @@ const surfaceAt = (el, x, r = rectOf(el)) => {
 const LAYER_CSS = `
 :host{all:initial}
 .a{position:absolute;left:0;top:0;pointer-events:none;will-change:transform;contain:layout style}
+/* a page flipped dark by the bulb (toggle="invert") flips its pals back */
+.a,svg{filter:var(--piix-unfilter)}
 .a canvas.smooth{image-rendering:auto!important}.a canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges;pointer-events:auto;cursor:grab;transform-origin:50% 100%;touch-action:none;-webkit-user-drag:none;user-select:none}
 .a.held canvas{cursor:grabbing}
 .a.nograb canvas{cursor:pointer}
