@@ -2038,37 +2038,53 @@ import { Lantern } from &quot;@/components/piixpal/lantern&quot;;
 </section>
 
 <section class="cmp" id="pond" aria-labelledby="pond-h" style="--accent:var(--sky)">
-  <header class="cmp-head"><h2 id="pond-h">Pond</h2><code class="cmp-tag">&lt;piix-pond&gt;</code><p>A koi pond, drawn entirely in ASCII.</p></header>
+  <header class="cmp-head"><h2 id="pond-h">Pond</h2><code class="cmp-tag">&lt;piix-pond&gt;</code><p>A koi pond for the background of a section, drawn in ASCII.</p></header>
   <div class="cmp-body pal-doc">
-    <div class="habitat tall"><piix-pond koi="5" pads="4"></piix-pond></div>
+    <div class="habitat tall"><p class="h-text" style="bottom:auto;top:34px;left:28px;font-size:38px;color:#f4f1ea">Still water</p><piix-pond koi="4" theme="dark"></piix-pond></div>
     <div class="cmp-code"><div class="tabs" data-tabs>
   <div class="tab-bar" role="tablist"><button type="button" role="tab" aria-selected="true">HTML</button><button type="button" role="tab" aria-selected="false">Single file</button><button type="button" role="tab" aria-selected="false">No markup</button><button type="button" role="tab" aria-selected="false">JS</button><button type="button" role="tab" aria-selected="false">React</button><button type="button" role="tab" aria-selected="false">shadcn</button><button type="button" role="tab" aria-selected="false">Vue</button><button type="button" role="tab" aria-selected="false">Svelte</button></div>
   <pre class="codebox tab-pane"><button class="copy" type="button" data-copy="&lt;!-- once, anywhere on the page --&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js&quot;&gt;&lt;/script&gt;
 
-&lt;!-- any element becomes the pond --&gt;
-&lt;div style=&quot;height:420px&quot;&gt;
-  &lt;piix-pond koi=&quot;6&quot;&gt;&lt;/piix-pond&gt;
-&lt;/div&gt;">Copy</button>&lt;!-- once, anywhere on the page --&gt;
+&lt;!-- the background of any section: it sits behind the content --&gt;
+&lt;section class=&quot;hero&quot;&gt;
+  &lt;h1&gt;Still water&lt;/h1&gt;
+  &lt;piix-pond&gt;&lt;/piix-pond&gt;
+&lt;/section&gt;
+
+&lt;!-- or behind the whole page --&gt;
+&lt;piix-pond kinds=&quot;kohaku,ogon,asagi&quot;&gt;&lt;/piix-pond&gt;">Copy</button>&lt;!-- once, anywhere on the page --&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js&quot;&gt;&lt;/script&gt;
 
-&lt;!-- any element becomes the pond --&gt;
-&lt;div style=&quot;height:420px&quot;&gt;
-  &lt;piix-pond koi=&quot;6&quot;&gt;&lt;/piix-pond&gt;
-&lt;/div&gt;</pre>
+&lt;!-- the background of any section: it sits behind the content --&gt;
+&lt;section class=&quot;hero&quot;&gt;
+  &lt;h1&gt;Still water&lt;/h1&gt;
+  &lt;piix-pond&gt;&lt;/piix-pond&gt;
+&lt;/section&gt;
+
+&lt;!-- or behind the whole page --&gt;
+&lt;piix-pond kinds=&quot;kohaku,ogon,asagi&quot;&gt;&lt;/piix-pond&gt;</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="&lt;!-- just pond (the shared engine loads itself, once) --&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/pond.min.js&quot;&gt;&lt;/script&gt;
 
-&lt;!-- any element becomes the pond --&gt;
-&lt;div style=&quot;height:420px&quot;&gt;
-  &lt;piix-pond koi=&quot;6&quot;&gt;&lt;/piix-pond&gt;
-&lt;/div&gt;">Copy</button>&lt;!-- just pond (the shared engine loads itself, once) --&gt;
+&lt;!-- the background of any section: it sits behind the content --&gt;
+&lt;section class=&quot;hero&quot;&gt;
+  &lt;h1&gt;Still water&lt;/h1&gt;
+  &lt;piix-pond&gt;&lt;/piix-pond&gt;
+&lt;/section&gt;
+
+&lt;!-- or behind the whole page --&gt;
+&lt;piix-pond kinds=&quot;kohaku,ogon,asagi&quot;&gt;&lt;/piix-pond&gt;">Copy</button>&lt;!-- just pond (the shared engine loads itself, once) --&gt;
 &lt;script src=&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/pond.min.js&quot;&gt;&lt;/script&gt;
 
-&lt;!-- any element becomes the pond --&gt;
-&lt;div style=&quot;height:420px&quot;&gt;
-  &lt;piix-pond koi=&quot;6&quot;&gt;&lt;/piix-pond&gt;
-&lt;/div&gt;</pre>
+&lt;!-- the background of any section: it sits behind the content --&gt;
+&lt;section class=&quot;hero&quot;&gt;
+  &lt;h1&gt;Still water&lt;/h1&gt;
+  &lt;piix-pond&gt;&lt;/piix-pond&gt;
+&lt;/section&gt;
+
+&lt;!-- or behind the whole page --&gt;
+&lt;piix-pond kinds=&quot;kohaku,ogon,asagi&quot;&gt;&lt;/piix-pond&gt;</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="&lt;script src=&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/pond.min.js&quot;
   data-pals=&quot;pond@body&quot;&gt;&lt;/script&gt;">Copy</button>&lt;script src=&quot;https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/pond.min.js&quot;
   data-pals=&quot;pond@body&quot;&gt;&lt;/script&gt;</pre>
@@ -2093,29 +2109,45 @@ import { Pond } from &quot;@/components/piixpal/pond&quot;;
 &lt;Pond /&gt;</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="// main.js: app.use(Piixpal) from &quot;piixpal/vue&quot;
 
-&lt;!-- any element becomes the pond --&gt;
-&lt;div style=&quot;height:420px&quot;&gt;
-  &lt;piix-pond koi=&quot;6&quot;&gt;&lt;/piix-pond&gt;
-&lt;/div&gt;">Copy</button>// main.js: app.use(Piixpal) from &quot;piixpal/vue&quot;
+&lt;!-- the background of any section: it sits behind the content --&gt;
+&lt;section class=&quot;hero&quot;&gt;
+  &lt;h1&gt;Still water&lt;/h1&gt;
+  &lt;piix-pond&gt;&lt;/piix-pond&gt;
+&lt;/section&gt;
 
-&lt;!-- any element becomes the pond --&gt;
-&lt;div style=&quot;height:420px&quot;&gt;
-  &lt;piix-pond koi=&quot;6&quot;&gt;&lt;/piix-pond&gt;
-&lt;/div&gt;</pre>
+&lt;!-- or behind the whole page --&gt;
+&lt;piix-pond kinds=&quot;kohaku,ogon,asagi&quot;&gt;&lt;/piix-pond&gt;">Copy</button>// main.js: app.use(Piixpal) from &quot;piixpal/vue&quot;
+
+&lt;!-- the background of any section: it sits behind the content --&gt;
+&lt;section class=&quot;hero&quot;&gt;
+  &lt;h1&gt;Still water&lt;/h1&gt;
+  &lt;piix-pond&gt;&lt;/piix-pond&gt;
+&lt;/section&gt;
+
+&lt;!-- or behind the whole page --&gt;
+&lt;piix-pond kinds=&quot;kohaku,ogon,asagi&quot;&gt;&lt;/piix-pond&gt;</pre>
   <pre class="codebox tab-pane" hidden><button class="copy" type="button" data-copy="&lt;script&gt;import Piixpal from &quot;piixpal/svelte&quot;;&lt;/script&gt;
 &lt;Piixpal /&gt;
 
-&lt;!-- any element becomes the pond --&gt;
-&lt;div style=&quot;height:420px&quot;&gt;
-  &lt;piix-pond koi=&quot;6&quot;&gt;&lt;/piix-pond&gt;
-&lt;/div&gt;">Copy</button>&lt;script&gt;import Piixpal from &quot;piixpal/svelte&quot;;&lt;/script&gt;
+&lt;!-- the background of any section: it sits behind the content --&gt;
+&lt;section class=&quot;hero&quot;&gt;
+  &lt;h1&gt;Still water&lt;/h1&gt;
+  &lt;piix-pond&gt;&lt;/piix-pond&gt;
+&lt;/section&gt;
+
+&lt;!-- or behind the whole page --&gt;
+&lt;piix-pond kinds=&quot;kohaku,ogon,asagi&quot;&gt;&lt;/piix-pond&gt;">Copy</button>&lt;script&gt;import Piixpal from &quot;piixpal/svelte&quot;;&lt;/script&gt;
 &lt;Piixpal /&gt;
 
-&lt;!-- any element becomes the pond --&gt;
-&lt;div style=&quot;height:420px&quot;&gt;
-  &lt;piix-pond koi=&quot;6&quot;&gt;&lt;/piix-pond&gt;
-&lt;/div&gt;</pre>
-</div><details class="opts"><summary>Options</summary><dl><dt><code>koi</code></dt><dd>how many, 1 to 12 (default 5)</dd><dt><code>pads</code></dt><dd>lily pads, 0 to 10 (default 4)</dd><dt><code>kinds</code></dt><dd>which koi, comma separated: kohaku, sanke, showa, ogon, asagi, tancho, chagoi</dd><dt><code>theme</code></dt><dd><code>night</code>, <code>day</code> or <code>ink</code></dd><dt><code>cell</code></dt><dd>glyph size in px (default 10)</dd></dl></details></div>
+&lt;!-- the background of any section: it sits behind the content --&gt;
+&lt;section class=&quot;hero&quot;&gt;
+  &lt;h1&gt;Still water&lt;/h1&gt;
+  &lt;piix-pond&gt;&lt;/piix-pond&gt;
+&lt;/section&gt;
+
+&lt;!-- or behind the whole page --&gt;
+&lt;piix-pond kinds=&quot;kohaku,ogon,asagi&quot;&gt;&lt;/piix-pond&gt;</pre>
+</div><details class="opts"><summary>Options</summary><dl><dt><code>koi</code></dt><dd>how many, 1 to 14 (default: fits the space)</dd><dt><code>kinds</code></dt><dd>which varieties, comma separated</dd><dt><code>minnows</code></dt><dd>how many small fish, 0 to 300</dd><dt><code>pads</code></dt><dd>lily pads, 0 to 12</dd><dt><code>theme</code></dt><dd><code>dark</code> or <code>light</code> (default: follows the page)</dd><dt><code>grid</code></dt><dd><code>0</code> hides the faint cell grid</dd></dl></details></div>
   </div>
 </section>
 
@@ -2473,7 +2505,7 @@ import { Stickers } from &quot;@/components/piixpal/stickers&quot;;
   </main>
 </div>
 
-<script src="../piixpal.js?v=ef694f69"></script>
+<script src="../piixpal.js?v=8b18aaca"></script>
 <script src="../site/site.js" defer></script>
 <script src="../site/docs.js" defer></script>
 </body>

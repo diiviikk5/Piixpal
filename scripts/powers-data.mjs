@@ -58,13 +58,13 @@ export const POWERS = [
   },
   {
     id: 'pond', fam: 'play', accent: 'var(--sky)', kind: 'element', tag: 'piix-pond', where: 'body', tall: true,
-    uses: 'any element as the pond: it fills it, and keeps to it',
-    support: 'every modern browser · mouse, touch and pen · stills for reduced motion',
-    try: 'click the water to feed them; hold the cursor still over the pond and they gather, hoping; drag to make ripples',
-    desc: 'A koi pond, drawn entirely in ASCII. Every koi has a spine that bends as it swims, a sweeping tail and flapping fins, shaded in glyphs, in the real patterns: kohaku, sanke, showa, ogon, asagi, tancho, chagoi. Lily pads drift on top and the koi swim beneath them. Click and the water ripples out from your finger, food sinks, and the koi race for it and gulp it down. Hold the cursor still and they gather under it, mouths up.',
-    attrs: [['koi', 'how many, 1 to 12 (default 5)'], ['pads', 'lily pads, 0 to 10 (default 4)'], ['kinds', 'which koi, comma separated: kohaku, sanke, showa, ogon, asagi, tancho, chagoi'], ['theme', '<code>night</code>, <code>day</code> or <code>ink</code>'], ['cell', 'glyph size in px (default 10)']],
-    hab: '<piix-pond koi="5" pads="4"></piix-pond>',
-    code: '<!-- any element becomes the pond -->\n<div style="height:420px">\n  <piix-pond koi="6"></piix-pond>\n</div>'
+    uses: 'the section it is in: it becomes the background, behind your content, and follows the page between light and dark',
+    support: 'every modern browser · mouse, touch and pen · a still pond for reduced motion · pauses off screen',
+    try: 'click the water to splash and feed them; hold the cursor still and they gather under it',
+    desc: 'A koi pond for the background of a section, drawn in ASCII. Each koi is a solid, sculpted body of shaded colour blocks with dark glyphs cut into them, anti-aliased at the edges, the scales glinting as it turns: a spine with a travelling wave, paddle fins that bank into turns, a lit dorsal ridge and a long translucent tail. The real varieties, in colour: kohaku, tancho, sanke, showa, ogon, platinum, asagi with its scale net, chagoi, kumonryu. Minnows school between them and dart away, lily pads and lotus float on top, and every swimmer leaves a wake. Black water at night, paper and ink by day.',
+    attrs: [['koi', 'how many, 1 to 14 (default: fits the space)'], ['kinds', 'which varieties, comma separated'], ['minnows', 'how many small fish, 0 to 300'], ['pads', 'lily pads, 0 to 12'], ['theme', '<code>dark</code> or <code>light</code> (default: follows the page)'], ['grid', '<code>0</code> hides the faint cell grid']],
+    hab: '<p class="h-text" style="bottom:auto;top:34px;left:28px;font-size:38px;color:#f4f1ea">Still water</p><piix-pond koi="4" theme="dark"></piix-pond>',
+    code: '<!-- the background of any section: it sits behind the content -->\n<section class="hero">\n  <h1>Still water</h1>\n  <piix-pond></piix-pond>\n</section>\n\n<!-- or behind the whole page -->\n<piix-pond kinds="kohaku,ogon,asagi"></piix-pond>'
   },
   {
     id: 'shoal', fam: 'play', accent: 'var(--sky)', kind: 'element', tag: 'piix-shoal', where: 'body', tall: true,
