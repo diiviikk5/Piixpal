@@ -36,7 +36,10 @@ b.close(); srv.close();
 
 /* the Pal Maker's decoder and animator, minus the browser bits */
 const maker = readFileSync(join(root, 'api', '_maker.js'), 'utf8').replace(/^\/\/.*\n/, '').replace(/module\.exports = MAKER;\s*$/, '');
+/* the agent watcher, inlined (the file stays one file): no imports, no exports, HOME is the pet's */
+const agents = readFileSync(join(root, 'pet', 'agents.mjs'), 'utf8').replace(/^import .*\n/gm, '').replace(/^const HOME = .*\n/m, '').replace(/^export /gm, '');
 const src = readFileSync(join(root, 'pet', 'src.mjs'), 'utf8')
+  .replace(/^import \{[^}]*\} from '\.\/agents\.mjs';\n/m, () => agents)
   .replace('/*__PALS__*/null', JSON.stringify(pals))
   .replace('/*__MAKER__*/', maker);
 writeFileSync(join(root, 'pet', 'piixpal-pet.mjs'), src);

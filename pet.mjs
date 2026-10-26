@@ -323,6 +323,11 @@ const CLIPS = {
 const clipFor = (pal, mood) => (CLIPS[mood] || ['idle']).find(c => pal.frames[c] && pal.frames[c].length) || Object.keys(pal.frames)[0];
 const WALKS = new Set(['think', 'read', 'run']);
 
+/* The agent watcher, shared by the terminal pet (pet/src.mjs) and the desktop pet (desktop/):
+ * finds the live Claude Code or Codex session from the logs they write, and turns each new log
+ * line into an event: { kind: think | read | edit | run | oops | done, text, tool?, done?, prompt? }. */
+
+
 /* ---------- what the agent is doing, from its session log ---------- */
 const base = p => path.basename(String(p || ''));
 const short = (s, n = 38) => { s = String(s || '').replace(/\s+/g, ' ').trim(); return s.length > n ? s.slice(0, n - 1) + '…' : s; };
@@ -411,12 +416,54 @@ const codexFiles = () => {
   for (const y of kids(root).slice(0, 2)) for (const m of kids(path.join(root, y)).slice(0, 2)) for (const d of kids(path.join(root, y, m)).slice(0, 3)) list(path.join(root, y, m, d), 0, out);
   return out;
 };
-const newest = () => {
+const newest = (AGENT = 'auto') => {
   const c = AGENT === 'codex' ? [] : list(path.join(HOME, '.claude', 'projects'), 1).map(f => ['claude', f]);
   const x = AGENT === 'claude' ? [] : codexFiles().map(f => ['codex', f]);
   let best = null;
   for (const [agent, f] of [...c, ...x]) { let t; try { t = fs.statSync(f).mtimeMs; } catch { continue; } if (!best || t > best.t) best = { agent, f, t }; }
   return best;
+};
+
+
+/* follow the newest session as it's written: onEvent(e) for each event, onSwitch({ agent, file, project }) when it changes */
+const watchAgents = ({ agent: AGENT = 'auto', onEvent, onSwitch }) => {
+  let file = null, agent = null, offset = 0, partial = '';
+  const projectOf = f => {
+    try {
+      const fd = fs.openSync(f, 'r'), b = Buffer.alloc(65536), n = fs.readSync(fd, b, 0, b.length, 0); fs.closeSync(fd);
+      const m = /"cwd":\s*"((?:[^"\\]|\\.)+)"/.exec(b.toString('utf8', 0, n));
+      return m ? path.basename(JSON.parse('"' + m[1] + '"').replace(/[\\/]+$/, '').replace(/\\/g, '/')) : '';
+    } catch { return ''; }
+  };
+  const follow = () => {
+    const n = newest(AGENT);
+    if (n && n.f !== file) {
+      file = n.f; agent = n.agent; partial = '';
+      try { offset = fs.statSync(file).size; } catch { offset = 0; }
+      onSwitch && onSwitch({ agent, file, project: projectOf(file) });
+    }
+  };
+  const read = () => {
+    if (!file) return;
+    let size;
+    try { size = fs.statSync(file).size; } catch { return; }
+    if (size < offset) offset = 0;
+    if (size === offset) return;
+    const fd = fs.openSync(file, 'r'), len = Math.min(size - offset, 4 << 20), buf = Buffer.alloc(len);
+    fs.readSync(fd, buf, 0, len, offset); fs.closeSync(fd);
+    offset += len;
+    const lines = (partial + buf.toString('utf8')).split('\n');
+    partial = lines.pop();
+    for (const l of lines) {
+      if (!l.trim()) continue;
+      let j; try { j = JSON.parse(l); } catch { continue; }
+      const e = agent === 'codex' ? parseCodex(j) : parseClaude(j);
+      if (e) onEvent(e);
+    }
+  };
+  follow();
+  const t1 = setInterval(follow, 2000), t2 = setInterval(read, 250);
+  return () => { clearInterval(t1); clearInterval(t2); };
 };
 
 /* ---------- stats, kept between sessions ---------- */
@@ -479,7 +526,7 @@ function watch() {
   let lastFrame = '';
   const out = TEST ? { columns: +TEST.split('x')[0], rows: +TEST.split('x')[1], isTTY: true, write: s => { if (s.startsWith('\x1b[H')) lastFrame = s; }, on() {} } : process.stdout;
   const pal = loadPal();
-  let mood = 'idle', text = 'waiting for your agent…', moodAt = Date.now(), lastEvent = Date.now(), agent = null, file = null, offset = 0, partial = '';
+  let mood = 'idle', text = 'waiting for your agent…', moodAt = Date.now(), lastEvent = Date.now(), agent = null, file = null;
   let x = 2, face = 1, hop = 0, flash = 0, lvlShown = level(stats.xp), lastPing = 0;
   const set = (m, t) => { mood = m; if (t) text = t; moodAt = Date.now(); };
   const onEvent = e => {
@@ -491,34 +538,9 @@ function watch() {
     if (level(stats.xp) > lvlShown) { lvlShown = level(stats.xp); set('done', `level up! lvl ${lvlShown} ★`); hop = 1; }
     saveStats();
   };
-  /* follow the newest session file, from its end */
-  /* which project the session is in: the first "cwd" in its log */
+  /* follow the newest session as it's written */
   let project = '';
-  const projectOf = f => {
-    try { const fd = fs.openSync(f, 'r'), b = Buffer.alloc(65536), n = fs.readSync(fd, b, 0, b.length, 0); fs.closeSync(fd); const m = /"cwd":\s*"((?:[^"\\]|\\.)+)"/.exec(b.toString('utf8', 0, n)); return m ? path.basename(JSON.parse('"' + m[1] + '"').replace(/[\\/]+$/, '').replace(/\\/g, '/')) : ''; } catch { return ''; }
-  };
-  const follow = () => {
-    const n = newest();
-    if (n && n.f !== file) { file = n.f; agent = n.agent; try { offset = fs.statSync(file).size; } catch { offset = 0; } partial = ''; project = projectOf(file); set('idle', `watching ${agent === 'codex' ? 'Codex' : 'Claude Code'}`); }
-  };
-  const read = () => {
-    if (!file) return;
-    let size;
-    try { size = fs.statSync(file).size; } catch { return; }
-    if (size < offset) offset = 0;
-    if (size === offset) return;
-    const fd = fs.openSync(file, 'r'), len = Math.min(size - offset, 4 << 20), buf = Buffer.alloc(len);
-    fs.readSync(fd, buf, 0, len, offset); fs.closeSync(fd);
-    offset += len;
-    const lines = (partial + buf.toString('utf8')).split('\n');
-    partial = lines.pop();
-    for (const l of lines) {
-      if (!l.trim()) continue;
-      let j; try { j = JSON.parse(l); } catch { continue; }
-      const e = agent === 'codex' ? parseCodex(j) : parseClaude(j);
-      if (e) onEvent(e);
-    }
-  };
+  const startWatching = () => watchAgents({ agent: AGENT, onEvent, onSwitch: w => { agent = w.agent; file = w.file; project = w.project; set('idle', `watching ${agent === 'codex' ? 'Codex' : 'Claude Code'}`); } });
   const ping = () => {
     try {
       const p = JSON.parse(fs.readFileSync(path.join(STATE, 'ping'), 'utf8'));
@@ -601,8 +623,7 @@ function watch() {
   if (TEST) setTimeout(() => { process.stdout.write(lastFrame + '\n'); process.exit(0); }, +process.env.PIIXPAL_PET_MS || 1500);
   else if (process.stdin.isTTY) { process.stdin.setRawMode(true); process.stdin.on('data', d => { const k = d.toString(); if (k === 'q' || k === '\x03') bye(); if (k === 'p') { hop = 1; set('done', 'hi!'); } }); }
   out.on('resize', () => out.write('\x1b[2J'));
-  follow(); ping();
-  setInterval(follow, 2000);
-  setInterval(() => { read(); ping(); }, 250);
+  startWatching(); ping();
+  setInterval(ping, 250);
   setInterval(draw, 1000 / 12);
 }
