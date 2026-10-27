@@ -43,6 +43,8 @@ body{min-height:100vh;display:grid;grid-template-rows:auto 1fr auto}
 </style>
 <script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};</script>
 <script defer src="/_vercel/insights/script.js"></script>
+<!-- Microsoft Clarity: heatmaps and session recordings -->
+<script>(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","z45d6i2fi1");</script>
 </head>
 <body>
 <header class="pp-top"><a class="logo" href="/">piixpal</a><a class="btn btn-sm btn-lime" href="/components/make">Make your own pal</a></header>
