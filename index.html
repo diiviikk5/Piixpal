@@ -53,7 +53,11 @@
 <section class="hero" aria-labelledby="lede">
   <div class="hero-bg" aria-hidden="true"></div>
   <div class="wrap">
-    <a class="chip rv" href="#install"><span class="blip" aria-hidden="true"></span> v0.4 · 124 components · free &amp; open source <span class="arr" aria-hidden="true">→</span></a>
+    <div class="backed-row rv">
+      <a class="backed" id="backed" href="https://vercel.com" target="_blank" rel="noopener">Backed by <svg viewBox="0 0 76 65" aria-hidden="true"><path d="M37.53 0 75.05 65H0z" fill="currentColor"/></svg> Vercel</a>
+      <piix-pal pal="pip" do="hoist" on="#backed" at=".08" scale="2" length="-7"></piix-pal>
+      <piix-pal pal="bumble" do="hoist" on="#backed" at=".92" scale="2" length="-7"></piix-pal>
+    </div>
 
     <div class="wordmark rv">
       <piix-type id="mark" text="piixpal" rows="22" cell="15" depth="1" gap=".08" shade="#c6f432" fit></piix-type>
@@ -411,7 +415,7 @@ pal.<span class="c-a">poke</span>()
 <!-- one bird, many perches -->
 <piix-pal pal="pip" on=".perch"></piix-pal>
 
-<script src="piixpal.js?v=127bcc59"></script>
+<script src="piixpal.js?v=5a9c3792"></script>
 <script src="site/site.js" defer></script>
 </body>
 </html>

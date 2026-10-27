@@ -99,6 +99,14 @@ code,kbd,pre{font-family:var(--f-mono)}
 .chip:hover{transform:translateY(-2px);box-shadow:0 5px 0 0 var(--ink)}
 .chip .arr{transition:transform .25s var(--spring)}
 .chip:hover .arr{transform:translateX(3px)}
+/* the banner two pals hoist over the wordmark: same height as a chip, so nothing below moves */
+.backed{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 30px;background:var(--ink);color:var(--paper);
+  font:600 14px/1 var(--f-sans);text-decoration:none;white-space:nowrap;transform-origin:50% 0;
+  clip-path:polygon(0 0,100% 0,calc(100% - 13px) 50%,100% 100%,0 100%,13px 50%);animation:backed-sway 3.2s ease-in-out infinite}
+.backed svg{width:15px;height:13px;margin-top:-2px}
+.backed:hover{background:var(--ink-2)}
+@keyframes backed-sway{0%,100%{transform:translateY(0) rotate(-.7deg)}50%{transform:translateY(-3px) rotate(.7deg)}}
+@media (prefers-reduced-motion:reduce){.backed{animation:none}}
 .blip{width:9px;height:9px;background:var(--lime-2);box-shadow:0 0 0 2px var(--ink);animation:blip 1.6s steps(1) infinite}
 @keyframes blip{50%{background:var(--lime)}}
 .wordmark{position:relative;margin:30px 0 0;color:var(--ink)}
