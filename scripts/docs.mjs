@@ -261,7 +261,8 @@ export const navBar = (key, pre = '', ui = '../ui/') => `<header class="nav" id=
       <button type="button" data-theme-set="paper" title="Paper" aria-label="Paper theme"><svg viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M1 0h4v1h1v1h1v6H1zM2 3h4v1H2zM2 5h4v1H2z" fill-rule="evenodd"/></svg></button>
       <button type="button" data-theme-set="dark" title="Dark" aria-label="Dark theme"><svg viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M3 0h3v1H4v1H3v4h1v1h3v1H2V7H1V6H0V2h1V1h2z"/></svg></button>
     </div>
-    <a class="btn btn-sm btn-ink" href="https://github.com/diiviikk5/Piixpal" target="_blank" rel="noopener">${GH} Star on GitHub</a>
+    <a class="btn btn-sm btn-heart" href="https://checkout.dodopayments.com/buy/pdt_0Nqn39orKzYwAaPYyimd1?quantity=1" target="_blank" rel="noopener" title="Sponsor Piixpal"><svg viewBox="0 0 8 7" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M1 0h2v1h2V0h2v1h1v2H7v1H6v1H5v1H3V5H2V4H1V3H0V1h1z"/></svg><span>Sponsor</span></a>
+    <a class="btn btn-sm btn-ink" href="https://github.com/diiviikk5/Piixpal" target="_blank" rel="noopener">${GH} Star</a>
   </div>
 </header>`;
 const page = ({ key, title: t, desc, body, extra = '', fonts = '' }) => `<!doctype html>

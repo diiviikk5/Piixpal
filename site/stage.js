@@ -726,6 +726,11 @@ $('#b-empty-tpl').addEventListener('click', () => openTemplates());
 $('#b-share').addEventListener('click', () => openShare());
 $('#b-export').addEventListener('click', () => openExport());
 $('#b-help').addEventListener('click', () => openKeys());
+$('#b-support').addEventListener('click', () => openModal(h('h3', { id: 'modal-h' }, 'Keep the pals fed'),
+  h('p', { class: 'lead' }, 'Stage and every pal are free. If you like what you made here, you can help keep it that way.'),
+  h('div', { class: 'backs' },
+    h('a', { class: 'back-opt', href: 'https://checkout.dodopayments.com/buy/pdt_0Nqn39orKzYwAaPYyimd1?quantity=1', target: '_blank', rel: 'noopener' }, h('span', { class: 'lbl' }, 'Monthly'), h('b', {}, 'Sponsor'), h('small', {}, 'A little every month keeps Piixpal growing.'), h('span', { class: 'tb heart' }, h('i', { class: 'ic ic-heart' }), 'Become a sponsor')),
+    h('a', { class: 'back-opt', href: 'https://checkout.dodopayments.com/buy/pdt_0Nqn3w3rmEdaceOHhh7xT?quantity=1', target: '_blank', rel: 'noopener' }, h('span', { class: 'lbl' }, 'One time'), h('b', {}, 'Support'), h('small', {}, 'A one-off thank-you. Buy the pals a coffee.'), h('span', { class: 'tb' }, 'Support once →')))));
 $('#b-narrow').addEventListener('click', () => $('#narrow').classList.add('off'));
 
 addEventListener('keydown', e => {

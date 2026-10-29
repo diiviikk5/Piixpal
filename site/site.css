@@ -80,7 +80,7 @@ code,kbd,pre{font-family:var(--f-mono)}
 .logo .i:nth-of-type(2)::after{background:var(--coral);animation:dot-hop 3.6s steps(2) infinite}
 @keyframes dot-hop{0%,86%,100%{transform:translateY(0)}90%{transform:translateY(-.14em)}}
 .links{display:flex;gap:4px;margin-left:auto}
-.links a{position:relative;text-decoration:none;font-weight:550;font-size:15.5px;padding:8px 12px;border-radius:9px;color:var(--ink-2);transition:background-color .2s,color .2s}
+.links a{position:relative;white-space:nowrap;text-decoration:none;font-weight:550;font-size:15.5px;padding:8px 12px;border-radius:9px;color:var(--ink-2);transition:background-color .2s,color .2s}
 .links a:hover{background:var(--paper-2);color:var(--ink)}
 .links .new{position:relative;top:-7px;margin-left:3px;padding:2px 4px;border-radius:4px;background:var(--lime);color:#17121f;font:400 8px/1 var(--f-pix);letter-spacing:.04em;text-transform:uppercase}
 .nav .btn{margin-left:4px}
@@ -389,3 +389,16 @@ code,kbd,pre{font-family:var(--f-mono)}
   .logo span{font-size:inherit}
 }
 @media (max-width:440px){.links{justify-content:space-between;margin:0}.links a{font-size:14px;padding:7px 6px}}
+/* sponsor and support */
+.btn-heart{--bg:#ff5c8a;--fg:#fff;--sh:#b8174a}
+.btn-heart svg{width:16px;height:14px}
+@media (max-width:1240px){.nav .btn-heart span{display:none}.nav .btn-heart{padding:0 12px}}
+.back{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;max-width:880px}
+.back .way .btn{align-self:flex-start;margin-top:8px}
+@media (max-width:700px){.back{grid-template-columns:minmax(0,1fr)}}
+/* a full nav: tighten before anything spills */
+.nav-in{gap:16px}
+.links{gap:0}
+.links a{padding:8px 10px}
+@media (max-width:1360px){.nav .btn-heart span{display:none}.nav .btn-heart{padding:0 12px}}
+@media (max-width:1200px){.links a{padding:8px 7px;font-size:14.5px}.nav .theme{display:none}}

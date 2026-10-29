@@ -412,6 +412,13 @@ copyrighted character, so they're safe to use anywhere.
 
 Issues and pull requests are welcome. New pals are especially welcome: draw one with `Piixpal.sprite` (see above), give it a behaviour, and open a PR. Run `npm run dev` and `node scripts/sheet.mjs src/pals/yours.js` to check your art.
 
+## Support
+
+Piixpal is free and stays free. If it made your site happier, you can help keep new pals coming:
+
+- **[Sponsor monthly](https://checkout.dodopayments.com/buy/pdt_0Nqn39orKzYwAaPYyimd1?quantity=1)**: a little every month
+- **[Support once](https://checkout.dodopayments.com/buy/pdt_0Nqn3w3rmEdaceOHhh7xT?quantity=1)**: a one-off thank-you
+
 ## License
 
 MIT. Use it anywhere, free forever. A star on GitHub is plenty.
