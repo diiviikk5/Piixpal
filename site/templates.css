@@ -45,3 +45,8 @@
 .tg-step a{color:inherit;text-underline-offset:3px}
 @media (max-width:860px){.tg-how{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:520px){.tg-acts .tg-btn{padding:0 10px;font-size:12.5px}}
+/* the headline in pixel blocks; the real words stay in the h1 for readers and search */
+.tg-h1{margin:22px 0 0;max-width:min(100%,980px);display:grid;gap:clamp(10px,1.4vw,18px)}
+.tg-h1 piix-type{width:100%;color:var(--ink)}
+.tg-h1 .tg-l2{width:100%}
+.tg-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}

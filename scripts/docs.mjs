@@ -247,14 +247,11 @@ export const navBar = (key, pre = '', ui = '../ui/') => `<header class="nav" id=
   <div class="wrap nav-in">
     <a class="logo" href="../" aria-label="Piixpal home">${LOGO}<span>p<span class="i">ı</span><span class="i">ı</span>xpal</span></a>
     <nav class="links" aria-label="Site">
-      <a href="${pre}./"${key === 'index' || key === 'sprites' || key === 'pals' || key === 'crowd' || key === 'type' ? ' aria-current="page"' : ''}>Components</a>
-      <a href="${pre}powers.html"${key === 'powers' ? ' aria-current="page"' : ''}>Superpowers</a>
-      <a href="${pre}3d.html"${key === 'studio' ? ' aria-current="page"' : ''}>3D</a>
+      <a href="${pre}./"${['index', 'sprites', 'pals', 'crowd', 'type', 'powers', 'studio', 'visit', 'agents', 'readme', 'nomad'].includes(key) ? ' aria-current="page"' : ''}>Components</a>
       <a href="${ui}"${key.startsWith('ui') ? ' aria-current="page"' : ''}>Pixel UI</a>
       <a href="/templates/"${key === 'templates' ? ' aria-current="page"' : ''}>Templates</a>
       <a href="${pre}install.html"${key === 'install' ? ' aria-current="page"' : ''}>Install</a>
-      <a href="${pre}make.html"${key === 'make' ? ' aria-current="page"' : ''}>Maker</a>
-      <a href="${pre}builder.html"${key === 'builder' ? ' aria-current="page"' : ''}>Builder</a>
+      <a href="${pre}builder.html"${key === 'builder' || key === 'make' ? ' aria-current="page"' : ''}>Builder</a>
       <a href="/stage/">Stage<b class="new">new</b></a>
     </nav>
     <div class="theme" role="group" aria-label="Theme">
@@ -757,7 +754,11 @@ const installBody = `<header class="doc-head">
 </section>`;
 
 /* ---------- builder ---------- */
-const builderBody = `<header class="doc-head">
+const builderTabs = active => `<nav class="btabs" aria-label="Builder">
+  <a href="make.html"${active === 'make' ? ' aria-current="page"' : ''}><b>Make a pal</b><span>Doodle, photo, emoji or pixel art</span></a>
+  <a href="builder.html"${active === 'builder' ? ' aria-current="page"' : ''}><b>Build your page</b><span>Pick pals, place them, copy one line</span></a>
+</nav>`;
+const builderBody = builderTabs('builder') + `<header class="doc-head">
   <div class="crumbs"><a href="./">Components</a><span>/</span><span>Builder</span></div>
   <h1>Builder</h1>
   <p>Tick the pals you want, choose where each one lives, watch them move in below, then copy one line into your site. No markup needed.</p>
@@ -914,7 +915,7 @@ const pages = [
   ['3d.html', { key: 'studio', title: '3D', desc: 'Pals as real 3D models: spinning toys, holo trading cards, a voxel planet, a snow globe, a hologram and voxel dioramas.', body: studioBody }],
   ['install.html', { key: 'install', title: 'Install', desc: 'Every way to add Piixpal to a site: one tag, single files, no-markup, JS, React, Vue, Svelte, bookmarklet.', body: installBody }],
   ['builder.html', { key: 'builder', title: 'Builder', desc: 'Pick pals, choose where they live, copy one line.', body: builderBody }],
-  ['make.html', { key: 'make', title: 'Pal Maker', desc: 'Turn anything into a pal: doodle one, drop in a photo, a logo or an emoji, or draw pixel art. Share it as a link or one tag.', body: makerBody, extra: ['maker', 'maker-smooth', 'maker-pixel'].map(f => `<script src="../site/${f}.js?v=${MAKER_V}" defer></script>`).join(String.fromCharCode(10)) }],
+  ['make.html', { key: 'make', title: 'Pal Maker', desc: 'Turn anything into a pal: doodle one, drop in a photo, a logo or an emoji, or draw pixel art. Share it as a link or one tag.', body: builderTabs('make') + makerBody, extra: ['maker', 'maker-smooth', 'maker-pixel'].map(f => `<script src="../site/${f}.js?v=${MAKER_V}" defer></script>`).join(String.fromCharCode(10)) }],
   ['visit.html', { key: 'visit', title: 'Pals on any website', desc: 'A browser extension and a bookmarklet: a pixel pet on every site you visit, and one click to throw a party, make it snow or let a dragon loose on any page.', body: visitBody(BOOKMARKLET, esc) }],
   ['agents.html', { key: 'agents', title: 'Pets for coding agents', desc: 'A pixel pet in your terminal that watches Claude Code or Codex work and reacts: thinking, reading, editing, failing, done. No setup.', body: agentsBody(esc, ['bitbug', 'pip', 'boing', 'moss', 'kitty', 'penguin', 'gecko', 'tri', 'bumble', 'shibe', 'capy', 'frog', 'duckling', 'shel', 'roomba', 'hiss', 'termi', 'beep']) }],
   ['readme.html', { key: 'readme', title: 'GitHub README pals', desc: 'Pals that live on your GitHub profile: an animated pixel banner with your words, one image link.', body: readmeBody }],
