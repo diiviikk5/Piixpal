@@ -1,6 +1,8 @@
 // Every template registers itself here. The gallery (templates/index.html) reads this list.
 // poster: CSS background shown before the live preview loads.
 window.TEMPLATES = [
+  { slug:'afterglow', name:'Afterglow', tags:['image','scroll','gsap','experience','fire','pixel'], poster:'url(afterglow/sunset.webp) center/cover' },
+  { slug:'flameblade', name:'Emberblade', tags:['image','fire','anime','gaming','interactive','dark'], poster:'radial-gradient(40% 50% at 70% 55%,#ff7a1a,#5a0d04 55%,#070304)' },
   { slug:'vermilion', name:'Vermilion', tags:['webgl','scroll','gsap','experience','dark'], poster:'url(vermilion/c1_s.jpg) center/cover' },
   { slug:'relic', name:'Relic', tags:['webgl','engraving','dark','tattoo','scroll'], poster:'radial-gradient(22% 34% at 64% 50%,#d8d3c8,#3a3936 45%,#000 70%)' },
   { slug:'starmind', name:'Starmind', tags:['image','space','dark','research','particles'], poster:'url(starmind/scene.jpg) 70% 25%/cover,#000' },

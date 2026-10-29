@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Emberblade — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Shippori+Mincho:wght@800&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root { --ink:#fff4ea; --muted:rgba(255,236,220,.7); --line:rgba(255,220,190,.22); --hot:#ff5a1f; --gold:#ffc35a; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#070304; color:var(--ink); font-family:"Space Grotesk",system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+  .hero { position:relative; min-height:100vh; min-height:100svh; display:flex; flex-direction:column; isolation:isolate; overflow:hidden; cursor:crosshair; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-2; display:block; }
+  .hero::after { content:""; position:absolute; inset:0; z-index:-1; pointer-events:none; background:linear-gradient(180deg,rgba(7,3,4,.55),transparent 22%,transparent 52%,rgba(7,3,4,.9)); }
+  nav { display:flex; justify-content:space-between; align-items:center; gap:24px; padding:22px clamp(20px,4vw,56px); font-size:13px; letter-spacing:.08em; text-transform:uppercase; }
+  .logo { display:flex; align-items:center; gap:10px; font-family:Anton,sans-serif; font-size:22px; letter-spacing:.08em; }
+  .logo i { width:10px; height:10px; background:var(--hot); box-shadow:0 0 14px var(--hot); transform:rotate(45deg); }
+  .links { display:flex; gap:30px; color:var(--muted); } .links a:hover { color:var(--ink); }
+  .pill { padding:10px 16px; border:1px solid var(--line); border-radius:999px; backdrop-filter:blur(8px); background:rgba(7,3,4,.35); transition:border-color .3s,background .3s; }
+  .pill:hover { border-color:var(--gold); background:rgba(255,90,31,.15); }
+  .kanji { position:absolute; right:clamp(16px,3vw,44px); top:50%; transform:translateY(-50%); writing-mode:vertical-rl; font-family:"Shippori Mincho",serif; font-weight:800; font-size:clamp(70px,9vw,150px); line-height:1; color:transparent; -webkit-text-stroke:1px rgba(255,195,90,.35); z-index:-1; pointer-events:none; }
+  .copy { margin-top:auto; padding:0 clamp(20px,5vw,80px) clamp(28px,5vh,56px); display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:end; gap:32px; }
+  .eyebrow { display:flex; align-items:center; gap:12px; font-size:12px; letter-spacing:.3em; text-transform:uppercase; color:var(--gold); }
+  .eyebrow::before { content:""; width:34px; height:1px; background:var(--gold); }
+  h1 { margin-top:14px; font-family:Anton,sans-serif; font-weight:400; font-size:clamp(76px,12.5vw,220px); line-height:.82; text-transform:uppercase; letter-spacing:.005em; }
+  h1 span { display:block; background:linear-gradient(90deg,#fff3d6,var(--gold) 30%,var(--hot) 70%,#a5100b); -webkit-background-clip:text; background-clip:text; color:transparent; filter:drop-shadow(0 0 28px rgba(255,90,31,.45)); }
+  .side { max-width:360px; padding:22px 22px 20px; border:1px solid var(--line); border-radius:6px; background:rgba(7,3,4,.62); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); }
+  .sub { font-size:15px; line-height:1.65; color:var(--muted); }
+  .ctas { margin-top:22px; display:flex; gap:10px; flex-wrap:wrap; }
+  .btn { display:inline-flex; align-items:center; gap:10px; padding:15px 22px; border-radius:4px; font-weight:600; font-size:14px; letter-spacing:.04em; transition:transform .3s cubic-bezier(.2,.9,.2,1),box-shadow .3s,background .3s; }
+  .btn.p { background:linear-gradient(90deg,var(--hot),#ff8a2a); color:#1a0603; box-shadow:0 0 0 rgba(255,90,31,0); }
+  .btn.p:hover { transform:translateY(-2px); box-shadow:0 10px 40px -6px rgba(255,90,31,.8); }
+  .btn.g { border:1px solid var(--line); background:rgba(7,3,4,.4); backdrop-filter:blur(8px); } .btn.g:hover { border-color:var(--ink); }
+  .meta { margin-top:22px; padding-top:18px; border-top:1px solid var(--line); display:flex; gap:28px; font-size:11px; color:var(--muted); letter-spacing:.12em; text-transform:uppercase; }
+  .meta b { display:block; font-family:Anton,sans-serif; font-weight:400; font-size:28px; color:var(--ink); letter-spacing:.02em; margin-bottom:2px; }
+  .hint { position:absolute; left:50%; top:86px; transform:translateX(-50%); font-size:11px; letter-spacing:.24em; text-transform:uppercase; color:rgba(255,236,220,.55); pointer-events:none; white-space:nowrap; }
+  .rv { opacity:0; transform:translateY(26px); filter:blur(8px); animation:rise 1s cubic-bezier(.16,1,.3,1) forwards; animation-delay:calc(var(--d,0)*1ms + var(--intro,2000ms)); }
+  .preview .rv { --intro:0ms; }
+  @keyframes rise { to { opacity:1; transform:none; filter:none; } }
+  @media (prefers-reduced-motion:reduce){ .rv{ animation:none; opacity:1; transform:none; filter:none; } }
+  @media (max-width:860px){ .links,.kanji,.hint{ display:none; } .copy{ grid-template-columns:1fr; gap:18px; } .meta{ display:none; } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+  <nav class="rv" style="--d:0"><a class="logo" href="#"><i></i>Emberblade</a><div class="links"><a href="#">Story</a><a href="#">Forms</a><a href="#">Press kit</a></div><a class="pill" href="#">Wishlist</a></nav>
+  <p class="hint rv" style="--d:900">Move to fan the flames · click to ignite</p>
+  <div class="copy">
+    <div>
+      <p class="eyebrow rv" style="--d:100">A hand-drawn action game</p>
+      <h1 class="rv" style="--d:220">Draw the<span>blade.</span></h1>
+    </div>
+    <div class="side rv" style="--d:380">
+      <p class="sub rv" style="--d:420">Twelve forms of fire, one sword, no second chances. Every frame painted by hand, every cut timed to the beat.</p>
+      <div class="ctas rv" style="--d:540"><a class="btn p" href="#">Wishlist on Steam</a><a class="btn g" href="#">Watch the trailer</a></div>
+      <div class="meta rv" style="--d:660"><div><b>12</b>fire forms</div><div><b>60</b>fps, hand-drawn</div><div><b>2026</b>early access</div></div>
+    </div>
+  </div>
+</section>
+<script>if (/[?&]preview/.test(location.search) || navigator.webdriver) document.documentElement.classList.add('preview');</script>
+<script src="bg.js"></script>
+</body>
+</html>
