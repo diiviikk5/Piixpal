@@ -46,6 +46,17 @@ export const POWERS = [
     code: '<!-- the whole page -->\n<piix-weather kind="snow"></piix-weather>\n\n<!-- or just inside one element -->\n<header class="hero">\n  <h1>Happy holidays</h1>\n  <piix-weather kind="snow" amount="2"></piix-weather>\n</header>'
   },
   {
+    id: 'slash', fam: 'play', accent: 'var(--coral)', kind: 'element', tag: 'piix-slash', where: 'body',
+    uses: 'your whole page, snapshotted by the browser (View Transitions): text, images, video and WebGL all come apart',
+    support: 'Chrome, Edge and Safari 18+ cut the page; other browsers get the slash and a glowing seam · mouse and touch',
+    try: 'press “Slash the page”, or pick up the sword and drag a line anywhere',
+    desc: 'A pixel sword that cuts your actual website in two, like paper. It rests stuck in the corner of the page; pick it up and drag a line, and a streak of light races along your stroke, sparks fly, and the page comes apart in two halves along the cut, hangs there over a paper backing, then presses back together and the seam glows as it heals. Nothing is cloned or faked: the browser snapshots the real page, so it works on any site. Wire it to a button for a delete that feels like one.',
+    attrs: [['rest', 'br, bl or none: where the sword waits (default br)'], ['trigger', '"selector:event" cuts straight through that element, e.g. <code>#delete:click</code>'], ['color', 'the glow of the slash (default lime)'], ['hold', 'how long the halves stay apart, ms (default 650)'], ['sound', 'a sharp shing']],
+    api: 'el.slash(x1, y1, x2, y2)  el.pickup()  el.drop()', events: 'piix:slash { x1, y1, x2, y2 }',
+    hab: '<p class="h-text" style="bottom:auto;top:84px;font-size:52px">Cut me.</p><div class="h-btns" style="bottom:22px;gap:10px"><button type="button" class="h-btn lime" data-call="#d-slash:slash">Slash the page</button><button type="button" class="h-btn" data-call="#d-slash:pickup">Pick up the sword</button></div><piix-slash id="d-slash" rest="none" sound></piix-slash>',
+    code: '<!-- a sword in the corner: pick it up, drag to cut -->\n<piix-slash></piix-slash>\n\n<!-- or a delete button that really cuts -->\n<piix-slash rest="none" trigger="#delete:click"></piix-slash>'
+  },
+  {
     id: 'lantern', fam: 'play', accent: 'var(--lime)', kind: 'element', tag: 'piix-lantern', where: 'body', tall: true,
     uses: 'your layout as a maze of shadows: every heading, card, image and button casts one, worked out live from where your light is',
     support: 'every modern browser · mouse, touch and pen · Escape or "Lights on" ends it',
