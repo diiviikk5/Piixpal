@@ -1,0 +1,47 @@
+/* Templates gallery: landing heroes, in Piixpal's ink-and-lime clothes. */
+.tg-head{position:relative;padding:clamp(48px,7vw,96px) 0 28px}
+.tg-head h1{margin:18px 0 0;font:780 clamp(44px,7.4vw,104px)/.92 var(--f-sans);letter-spacing:-.05em;max-width:14ch;text-wrap:balance}
+.tg-head h1 em{font-style:normal;color:transparent;-webkit-text-stroke:2px var(--ink);background:linear-gradient(90deg,var(--violet),var(--coral),var(--sun));-webkit-background-clip:text;background-clip:text}
+.tg-lead{margin:22px 0 0;max-width:60ch;color:var(--ink-2);font-size:clamp(16px,1.4vw,19px);line-height:1.55;text-wrap:pretty}
+.tg-lead code{font:500 .88em var(--f-mono);padding:2px 6px;border-radius:6px;background:var(--paper-2)}
+.tg-bar{display:flex;flex-wrap:wrap;align-items:center;gap:14px 18px;margin-top:34px}
+.tg-mode{display:inline-flex;padding:4px;border:2px solid var(--ink);border-radius:12px;background:var(--card);box-shadow:0 3px 0 var(--ink)}
+.tg-mode button{height:34px;padding:0 15px;border:0;border-radius:8px;background:transparent;color:var(--ink-2);font:650 14px/1 var(--f-sans);cursor:pointer;transition:background .15s,color .15s}
+.tg-mode button[aria-pressed=true]{background:var(--ink);color:var(--paper)}
+.tg-filters{display:flex;flex-wrap:wrap;gap:7px}
+.tg-filters button{height:32px;padding:0 12px;border:2px solid var(--line-2);border-radius:999px;background:transparent;color:var(--ink-2);font:400 11px/1 var(--f-pix);letter-spacing:.04em;text-transform:uppercase;cursor:pointer;transition:border-color .15s,background .15s,color .15s,transform .2s var(--spring)}
+.tg-filters button:hover{border-color:var(--ink);color:var(--ink);transform:translateY(-1px)}
+.tg-filters button[aria-pressed=true]{border-color:var(--ink);background:var(--lime);color:#17121f}
+.tg-filters button span{opacity:.6;margin-left:3px}
+
+.tg-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,360px),1fr));gap:30px 26px;padding-top:18px;padding-bottom:20px}
+.tg-card{display:flex;flex-direction:column;min-width:0}
+.tg-frame{position:relative;display:block;aspect-ratio:16/10;border:2px solid var(--ink);border-radius:16px;overflow:hidden;background-color:#09090b;box-shadow:0 4px 0 var(--ink);
+  transition:transform .35s var(--spring),box-shadow .35s var(--spring)}
+.tg-card:hover .tg-frame,.tg-card:focus-within .tg-frame{transform:translateY(-4px);box-shadow:0 8px 0 var(--ink)}
+.tg-card[data-slug="pixel-sword"] .tg-frame{image-rendering:pixelated}
+.tg-frame iframe{position:absolute;left:0;top:0;border:0;transform-origin:0 0;pointer-events:none;opacity:0;transition:opacity .5s}
+.tg-frame iframe.ready{opacity:1}
+.tg-num{position:absolute;left:12px;top:11px;z-index:1;padding:4px 6px;border-radius:6px;background:rgba(9,9,11,.6);color:#fff;font:400 10px/1 var(--f-pix);letter-spacing:.05em;backdrop-filter:blur(6px)}
+.tg-meta{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:16px 2px 0}
+.tg-meta h2{margin:0;font:740 19px/1.1 var(--f-sans);letter-spacing:-.02em}
+.tg-meta span{font:500 12px/1 var(--f-mono);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tg-acts{display:flex;align-items:center;gap:8px;margin-top:12px}
+.tg-btn{height:34px;padding:0 13px;border:2px solid var(--ink);border-radius:10px;background:var(--card);color:var(--ink);font:650 13px/1 var(--f-sans);cursor:pointer;box-shadow:0 2px 0 var(--ink);transition:transform .15s var(--spring),box-shadow .15s,background .15s}
+.tg-btn:hover{transform:translateY(-1px);box-shadow:0 3px 0 var(--ink)}
+.tg-btn:active{transform:translateY(2px);box-shadow:0 0 0 var(--ink)}
+.tg-btn.primary{background:var(--ink);color:var(--paper)}
+.tg-btn.ok{background:var(--lime);color:#17121f}
+.tg-open{margin-left:auto;font:600 13px/1 var(--f-sans);color:var(--ink-2);text-decoration:none;padding:8px 4px}
+.tg-open:hover{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+.tg-empty{grid-column:1/-1;color:var(--muted)}
+
+.tg-how{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;padding-top:60px;padding-bottom:110px}
+.tg-step{position:relative;padding:24px;border:2px solid var(--ink);border-radius:var(--r-lg);background:var(--card);box-shadow:0 4px 0 var(--ink)}
+.tg-step b{display:grid;place-items:center;width:34px;height:34px;border:2px solid var(--ink);border-radius:9px;background:var(--lime);color:#17121f;font:400 14px/1 var(--f-pix)}
+.tg-step h3{margin:14px 0 6px;font:740 21px/1.15 var(--f-sans);letter-spacing:-.02em}
+.tg-step p{margin:0;color:var(--ink-2);font-size:15px;line-height:1.55}
+.tg-step code{font:500 .9em var(--f-mono)}
+.tg-step a{color:inherit;text-underline-offset:3px}
+@media (max-width:860px){.tg-how{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:520px){.tg-acts .tg-btn{padding:0 10px;font-size:12.5px}}

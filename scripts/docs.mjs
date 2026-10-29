@@ -251,6 +251,7 @@ export const navBar = (key, pre = '', ui = '../ui/') => `<header class="nav" id=
       <a href="${pre}powers.html"${key === 'powers' ? ' aria-current="page"' : ''}>Superpowers</a>
       <a href="${pre}3d.html"${key === 'studio' ? ' aria-current="page"' : ''}>3D</a>
       <a href="${ui}"${key.startsWith('ui') ? ' aria-current="page"' : ''}>Pixel UI</a>
+      <a href="/templates/"${key === 'templates' ? ' aria-current="page"' : ''}>Templates</a>
       <a href="${pre}install.html"${key === 'install' ? ' aria-current="page"' : ''}>Install</a>
       <a href="${pre}make.html"${key === 'make' ? ' aria-current="page"' : ''}>Maker</a>
       <a href="${pre}builder.html"${key === 'builder' ? ' aria-current="page"' : ''}>Builder</a>
