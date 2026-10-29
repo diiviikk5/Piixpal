@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Respite — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;1,9..144,300&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root { --ink:#1f2a22; --muted:rgba(31,42,34,.62); --line:rgba(31,42,34,.16); --leaf:#2f6b3a; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#eef0e8; color:var(--ink); font-family:Inter,system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+  .hero { position:relative; min-height:100vh; min-height:100svh; display:flex; flex-direction:column; isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-2; display:block; }
+  nav { display:flex; justify-content:space-between; align-items:center; padding:24px clamp(20px,4vw,56px); font-size:14px; max-width:58%; }
+  .logo { font-family:Fraunces,serif; font-size:24px; font-weight:500; letter-spacing:-.02em; }
+  .links { display:flex; gap:26px; color:var(--muted); } .links a:hover { color:var(--ink); }
+  .copy { margin:auto 0; padding:0 clamp(20px,6vw,96px) 40px; max-width:58%; }
+  .eyebrow { font-size:12px; letter-spacing:.22em; text-transform:uppercase; color:var(--leaf); }
+  h1 { margin-top:18px; font-family:Fraunces,serif; font-weight:300; font-size:clamp(50px,6.6vw,112px); line-height:.95; letter-spacing:-.035em; }
+  h1 em { font-style:italic; color:var(--leaf); }
+  .sub { margin-top:22px; font-size:17px; line-height:1.6; color:var(--muted); max-width:430px; }
+  .ctas { margin-top:30px; display:flex; gap:12px; flex-wrap:wrap; }
+  .btn { padding:15px 26px; border-radius:999px; font-weight:500; font-size:15px; transition:transform .25s, box-shadow .25s, background .25s; }
+  .btn.p { background:var(--ink); color:#f3f4ee; } .btn.p:hover { transform:translateY(-2px); box-shadow:0 14px 40px rgba(47,107,58,.3); }
+  .btn.g { border:1px solid var(--line); background:rgba(255,255,255,.4); } .btn.g:hover { border-color:var(--ink); }
+  .note { margin-top:40px; display:flex; align-items:center; gap:14px; font-size:13px; color:var(--muted); }
+  .note b { color:var(--ink); font-weight:500; }
+  .dots { display:flex; } .dots i { width:30px; height:30px; border-radius:50%; border:2px solid #eef0e8; margin-left:-8px; background:linear-gradient(135deg,#c9b38a,#6c8a5a); } .dots i:first-child { margin-left:0; background:linear-gradient(135deg,#8fb3d6,#3b6b8a); } .dots i:last-child { background:linear-gradient(135deg,#e2a46a,#a0522d); }
+  .rv { opacity:0; transform:translateY(16px); filter:blur(8px); animation:rise 1.4s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:calc(var(--d,0)*1ms); }
+  @keyframes rise { to { opacity:1; transform:none; filter:blur(0); } }
+  @media (prefers-reduced-motion:reduce){ .rv{ animation:none; opacity:1; transform:none; filter:none; } }
+  @media (max-width:860px){ nav,.copy{ max-width:none; } .links{ display:none; } .copy{ margin-top:auto; margin-bottom:0; padding-bottom:32px; } .hero::before{ content:""; position:absolute; inset:0; z-index:-1; background:linear-gradient(180deg,transparent 35%,rgba(238,240,232,.92) 62%); } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+  <nav class="rv"><a class="logo" href="#">Respite</a><div class="links"><a href="#">How it works</a><a href="#">Stories</a><a href="#">For teams</a></div></nav>
+  <div class="copy">
+    <p class="eyebrow rv" style="--d:200">Rest is part of the quest</p>
+    <h1 class="rv" style="--d:350">Put the sword<br>down <em>for a while.</em></h1>
+    <p class="sub rv" style="--d:550">Respite schedules real breaks around your calendar and guards them like a knight would. Ten minutes under a tree beats ten more tabs.</p>
+    <div class="ctas rv" style="--d:750"><a class="btn p" href="#">Take a break — free</a><a class="btn g" href="#">How breaks work</a></div>
+    <div class="note rv" style="--d:950"><span class="dots"><i></i><i></i><i></i></span><span><b>41,000</b> people rested today</span></div>
+  </div>
+</section>
+<script src="bg.js"></script>
+</body>
+</html>

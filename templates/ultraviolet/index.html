@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ultraviolet — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root { --fg:#fbf7ff; --muted:rgba(251,247,255,.7); --line:rgba(255,255,255,.16); --glass:rgba(255,255,255,.07); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#06040f; color:var(--fg); font-family:"Inter Tight",system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+  .mono { font-family:"JetBrains Mono",monospace; font-size:12px; letter-spacing:.04em; text-transform:uppercase; }
+
+  .hero { position:relative; min-height:100vh; min-height:100svh; display:flex; flex-direction:column; padding:20px clamp(20px,4vw,56px) clamp(28px,5vh,56px); isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-1; display:block; }
+
+  nav { align-self:center; display:flex; align-items:center; gap:28px; padding:8px 8px 8px 20px; border:1px solid var(--line); border-radius:999px; background:var(--glass); backdrop-filter:blur(18px) saturate(140%); -webkit-backdrop-filter:blur(18px) saturate(140%); }
+  .logo { display:flex; align-items:center; gap:8px; font-weight:600; letter-spacing:-.02em; }
+  .logo svg { width:18px; height:18px; }
+  .links { display:flex; gap:22px; font-size:14px; color:var(--muted); }
+  .links a:hover { color:var(--fg); }
+  .pill { display:inline-flex; align-items:center; gap:8px; padding:10px 18px; border-radius:999px; font-size:14px; font-weight:500; transition:transform .25s, box-shadow .25s, background .25s; }
+  .pill:hover { transform:translateY(-1px); }
+  .pill.light { background:var(--fg); color:#1a0b3a; }
+  .pill.light:hover { box-shadow:0 10px 40px rgba(246,168,236,.45); }
+  .pill.glass { border:1px solid var(--line); background:var(--glass); backdrop-filter:blur(12px); }
+  .pill.glass:hover { background:rgba(255,255,255,.14); }
+
+  .meta { display:flex; justify-content:space-between; margin-top:28px; color:var(--muted); }
+
+  .cardpos { position:absolute; right:clamp(20px,6vw,90px); top:30%; }
+  .card { width:260px; padding:18px; border:1px solid var(--line); border-radius:18px; background:rgba(20,10,50,.25); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); box-shadow:0 30px 80px rgba(0,0,0,.35); }
+  .card .row { display:flex; justify-content:space-between; color:var(--muted); }
+  .card strong { display:block; margin-top:10px; font-size:40px; font-weight:600; letter-spacing:-.04em; }
+  .card strong small { font-size:15px; color:#f6a8ec; font-weight:500; margin-left:6px; letter-spacing:0; }
+  .card svg { margin-top:10px; width:100%; height:56px; overflow:visible; }
+  .card path.line { fill:none; stroke:#f6a8ec; stroke-width:2; stroke-dasharray:400; stroke-dashoffset:400; animation:draw 2.4s 1.2s cubic-bezier(.6,0,.2,1) forwards; }
+  .card path.area { fill:url(#fade); opacity:0; animation:fadein 1.2s 2.4s forwards; }
+  @keyframes draw { to { stroke-dashoffset:0; } }
+  @keyframes fadein { to { opacity:1; } }
+  .float { animation:bob 7s ease-in-out infinite; }
+  @keyframes bob { 50% { transform:translateY(-12px); } }
+
+  .bottom { margin-top:auto; display:grid; grid-template-columns:1fr minmax(260px,380px); gap:40px; align-items:end; }
+  h1 { font-weight:600; font-size:clamp(56px,11vw,184px); line-height:.86; letter-spacing:-.06em; }
+  h1 .line { display:block; overflow:hidden; padding-bottom:.06em; }
+  h1 .line span { display:block; transform:translateY(105%); animation:up 1.2s cubic-bezier(.2,.8,.2,1) forwards; }
+  h1 .line:nth-child(2) span { animation-delay:.12s; }
+  h1 .soft { background:linear-gradient(180deg,#fff 10%,rgba(255,255,255,.18) 95%); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  h1 .line:nth-child(3) span { animation-delay:.24s; }
+  @keyframes up { to { transform:none; } }
+  .side p { font-size:17px; line-height:1.55; color:var(--muted); }
+  .side .ctas { display:flex; gap:10px; margin-top:22px; flex-wrap:wrap; }
+  .side .ctas .pill { padding:13px 22px; font-size:15px; }
+  .side .mono { margin-top:26px; display:flex; gap:18px; color:rgba(255,255,255,.55); }
+
+  .rv { opacity:0; transform:translateY(16px); filter:blur(8px); animation:rise 1s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:calc(var(--d,0) * 1ms); }
+  @keyframes rise { to { opacity:1; transform:none; filter:blur(0); } }
+  @media (prefers-reduced-motion:reduce){ .rv,h1 .line span,.card path{ animation:none!important; opacity:1; transform:none; filter:none; stroke-dashoffset:0; } .float{ animation:none; } }
+  @media (max-width:900px){ .links{ display:none; } .bottom{ grid-template-columns:1fr; } .cardpos{ display:none; } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+
+  <nav class="rv">
+    <a class="logo" href="#"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 1a9 9 0 0 1 0 18z" fill="currentColor"/></svg>Prism Labs</a>
+    <div class="links"><a href="#">Research</a><a href="#">Platform</a><a href="#">Customers</a><a href="#">Careers</a></div>
+    <a class="pill light" href="#">Request access</a>
+  </nav>
+
+  <div class="meta mono rv" style="--d:200"><span>[01] — Vision models for the real world</span><span>Remote · Est. 2026</span></div>
+
+  <div class="cardpos rv" style="--d:900" aria-hidden="true"><div class="card float">
+    <div class="row mono"><span>Detection accuracy</span><span>Live</span></div>
+    <strong>98.7%<small>+12.4</small></strong>
+    <svg viewBox="0 0 220 56" preserveAspectRatio="none">
+      <defs><linearGradient id="fade" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#f6a8ec" stop-opacity=".35"/><stop offset="1" stop-color="#f6a8ec" stop-opacity="0"/></linearGradient></defs>
+      <path class="area" d="M0 48 C20 46 30 40 50 42 S80 30 100 32 S130 18 150 22 S190 6 220 4 L220 56 L0 56Z"/>
+      <path class="line" d="M0 48 C20 46 30 40 50 42 S80 30 100 32 S130 18 150 22 S190 6 220 4"/>
+    </svg>
+  </div></div>
+
+  <div class="bottom">
+    <h1><span class="line"><span>See what</span></span><span class="line"><span class="soft">others</span></span><span class="line"><span>miss.</span></span></h1>
+    <div class="side">
+      <p class="rv" style="--d:600">Prism turns raw camera feeds into structured, searchable insight. Ship perception features in an afternoon, not a quarter.</p>
+      <div class="ctas rv" style="--d:750"><a class="pill light" href="#">Start for free →</a><a class="pill glass" href="#">Read the paper</a></div>
+      <div class="mono rv" style="--d:900"><span>SOC 2</span><span>Edge-ready</span><span>Open weights</span></div>
+    </div>
+  </div>
+</section>
+<script src="bg.js"></script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Starmind — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Michroma&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  :root { --ink:#eef3fa; --muted:rgba(238,243,250,.56); --line:rgba(238,243,250,.14); --red:#ff4a3a; --ice:#9cc8ff; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#000; color:var(--ink); font-family:Inter,system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+
+  .hero { position:relative; min-height:100vh; min-height:100svh; display:flex; flex-direction:column; isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-1; display:block; }
+
+  nav { display:flex; justify-content:space-between; align-items:center; padding:26px clamp(20px,4vw,56px); font-size:13px; }
+  .logo { font-family:Michroma,sans-serif; font-size:15px; letter-spacing:.62em; }
+  .links { display:flex; gap:32px; color:var(--muted); letter-spacing:.04em; }
+  .links a:hover { color:var(--ink); }
+  .nb { font-family:Michroma,sans-serif; font-size:11px; letter-spacing:.24em; border-bottom:1px solid var(--red); padding-bottom:4px; }
+
+  .copy { margin:auto 0; padding:0 clamp(20px,6vw,96px) 40px; max-width:960px; }
+  .eyebrow { font-family:Michroma,sans-serif; font-size:11px; letter-spacing:.42em; color:var(--muted); display:flex; align-items:center; gap:14px; }
+  .eyebrow i { width:6px; height:6px; border-radius:50%; background:var(--red); box-shadow:0 0 14px var(--red); }
+  h1 { margin-top:26px; font-weight:300; font-size:clamp(42px,5.4vw,92px); line-height:1.02; letter-spacing:-.04em; }
+  h1 b { font-weight:500; background:linear-gradient(90deg,#fff 0%,var(--ice) 100%); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .sub { margin-top:24px; font-size:17px; line-height:1.65; color:var(--muted); max-width:420px; }
+  .ctas { margin-top:32px; display:flex; gap:12px; flex-wrap:wrap; }
+  .btn { padding:15px 26px; border-radius:999px; font-weight:500; font-size:14px; letter-spacing:.02em; transition:transform .25s, box-shadow .25s, background .25s; }
+  .btn.p { background:var(--ink); color:#000; } .btn.p:hover { transform:translateY(-2px); box-shadow:0 0 0 1px #fff,0 18px 50px rgba(156,200,255,.35); }
+  .btn.g { border:1px solid var(--line); } .btn.g:hover { border-color:var(--ink); }
+  .stats { margin-top:52px; display:flex; gap:40px; flex-wrap:wrap; }
+  .stats b { display:block; font-family:Michroma,sans-serif; font-size:20px; letter-spacing:.06em; }
+  .stats span { font-size:12px; color:var(--muted); letter-spacing:.04em; }
+
+  .rv { opacity:0; transform:translateY(18px); filter:blur(10px); animation:rise 1.6s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:calc(var(--d,0) * 1ms); }
+  @keyframes rise { to { opacity:1; transform:none; filter:blur(0); } }
+  @media (prefers-reduced-motion:reduce){ .rv{ animation:none; opacity:1; transform:none; filter:none; } }
+  @media (max-width:860px){ .links{ display:none; } .copy{ margin:auto 0 0; padding-bottom:36px; } .hero::after{ content:""; position:absolute; inset:0; z-index:-1; background:linear-gradient(180deg,transparent 30%,rgba(0,0,0,.85) 70%); } .stats{ display:none; } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+
+  <nav class="rv">
+    <a class="logo" href="#">STARMIND</a>
+    <div class="links"><a href="#">Missions</a><a href="#">Research</a><a href="#">Fellows</a><a href="#">Press</a></div>
+    <a class="nb" href="#">APPLY</a>
+  </nav>
+
+  <div class="copy">
+    <p class="eyebrow rv" style="--d:250"><i></i>Fellowship · Cohort 07 open</p>
+    <h1 class="rv" style="--d:400">Reach for what<br><b>you can't see yet.</b></h1>
+    <p class="sub rv" style="--d:600">A year-long research fellowship for people building the next decade of space: propulsion, orbital compute, and life beyond the pale blue dot.</p>
+    <div class="ctas rv" style="--d:800"><a class="btn p" href="#">Apply by March 1</a><a class="btn g" href="#">Meet the fellows</a></div>
+    <div class="stats rv" style="--d:1000"><div><b>42</b><span>Fellows to date</span></div><div><b>11</b><span>Payloads flown</span></div><div><b>$0</b><span>Tuition, always</span></div></div>
+  </div>
+</section>
+<script src="bg.js"></script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Grotto — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root { --fg:#eafffb; --muted:rgba(234,255,251,.68); --line:rgba(234,255,251,.18); --aqua:#5cf2d8; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#031615; color:var(--fg); font-family:Inter,system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+  button { font:inherit; color:inherit; cursor:pointer; }
+
+  .hero { position:relative; min-height:100vh; min-height:100svh; display:flex; flex-direction:column; align-items:center; isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-2; display:block; }
+  .hero::after { content:""; position:absolute; inset:0; z-index:-1; background:radial-gradient(60% 34% at 50% 22%,rgba(2,16,15,.62),transparent 75%); pointer-events:none; }
+
+  nav { width:100%; display:flex; justify-content:space-between; align-items:center; padding:24px clamp(20px,4vw,56px); }
+  .logo { font-family:Fraunces,serif; font-weight:300; font-size:26px; font-style:italic; }
+  .links { display:flex; gap:28px; font-size:14px; color:var(--muted); }
+  .links a:hover { color:var(--fg); }
+  .get { font-size:14px; font-weight:600; padding:10px 18px; border-radius:999px; background:rgba(234,255,251,.12); border:1px solid var(--line); backdrop-filter:blur(12px); }
+
+  h1 { margin-top:4vh; text-align:center; font-family:Fraunces,serif; font-weight:400; font-size:clamp(46px,6.6vw,104px); line-height:.98; letter-spacing:-.03em; text-shadow:0 8px 50px rgba(0,20,18,.6); padding:0 20px; }
+  h1 em { font-style:italic; color:var(--aqua); }
+  .sub { margin-top:16px; text-align:center; font-size:17px; color:rgba(234,255,251,.9); text-shadow:0 1px 14px rgba(0,0,0,.7); max-width:460px; padding:0 20px; line-height:1.55; }
+
+  /* focus player */
+  .player { margin-top:auto; margin-bottom:clamp(24px,5vh,48px); width:min(560px,calc(100% - 40px)); padding:18px; border-radius:24px; background:rgba(3,22,21,.5); border:1px solid var(--line); backdrop-filter:blur(22px) saturate(140%); -webkit-backdrop-filter:blur(22px) saturate(140%); box-shadow:0 30px 80px rgba(0,0,0,.35); }
+  .top { display:flex; align-items:center; gap:16px; }
+  .ring { position:relative; width:84px; height:84px; flex:none; }
+  .ring svg { width:100%; height:100%; transform:rotate(-90deg); }
+  .ring circle { fill:none; stroke-width:5; }
+  .ring .bg { stroke:rgba(234,255,251,.12); } .ring .fg { stroke:var(--aqua); stroke-linecap:round; stroke-dasharray:251; transition:stroke-dashoffset 1s linear; filter:drop-shadow(0 0 6px rgba(92,242,216,.6)); }
+  .ring b { position:absolute; inset:0; display:grid; place-items:center; font-weight:600; font-size:17px; font-variant-numeric:tabular-nums; }
+  .info { flex:1; }
+  .info small { font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
+  .info h3 { margin-top:2px; font-family:Fraunces,serif; font-weight:300; font-size:24px; }
+  .start { width:56px; height:56px; border-radius:50%; border:0; background:var(--fg); color:#031615; display:grid; place-items:center; transition:transform .2s; }
+  .start:hover { transform:scale(1.06); }
+  .start svg { width:18px; height:18px; }
+  .scenes { margin-top:16px; display:flex; gap:8px; flex-wrap:wrap; }
+  .scenes button { padding:8px 14px; border-radius:999px; border:1px solid var(--line); background:transparent; font-size:13px; color:var(--muted); transition:all .2s; }
+  .scenes button.on, .scenes button:hover { background:rgba(92,242,216,.15); color:var(--fg); border-color:rgba(92,242,216,.45); }
+
+  .rv { opacity:0; transform:translateY(16px); filter:blur(10px); animation:rise 1.4s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:calc(var(--d,0) * 1ms); }
+  @keyframes rise { to { opacity:1; transform:none; filter:blur(0); } }
+  @media (prefers-reduced-motion:reduce){ .rv{ animation:none; opacity:1; transform:none; filter:none; } }
+  @media (max-width:760px){ .links{ display:none; } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+
+  <nav class="rv">
+    <a class="logo" href="#">cenote</a>
+    <div class="links"><a href="#">Soundscapes</a><a href="#">Science</a><a href="#">Teams</a><a href="#">Pricing</a></div>
+    <a class="get" href="#">Get the app</a>
+  </nav>
+
+  <h1 class="rv" style="--d:250">Sink into <em>deep</em> focus.</h1>
+  <p class="sub rv" style="--d:450">Real field recordings, tuned to quiet your mind and hold your attention for hours. Hit play, start the timer, disappear.</p>
+
+  <div class="player rv" style="--d:700">
+    <div class="top">
+      <div class="ring" aria-hidden="true"><svg viewBox="0 0 90 90"><circle class="bg" cx="45" cy="45" r="40"/><circle class="fg" id="arc" cx="45" cy="45" r="40" style="stroke-dashoffset:0"/></svg><b id="clock">25:00</b></div>
+      <div class="info"><small>Now playing</small><h3 id="scene">Hidden waterfall</h3></div>
+      <button class="start" id="go" type="button" aria-label="Start focus session"><svg viewBox="0 0 14 14" fill="currentColor"><path d="M3 1l10 6-10 6z"/></svg></button>
+    </div>
+    <div class="scenes" id="scenes"><button class="on" type="button">Hidden waterfall</button><button type="button">Rain on leaves</button><button type="button">Night ocean</button><button type="button">Cave drips</button></div>
+  </div>
+</section>
+<script src="bg.js"></script>
+<script>
+  // a real 25-minute focus timer
+  const L = 25 * 60; let left = L, timer = null;
+  const arc = document.getElementById('arc'), clock = document.getElementById('clock'), go = document.getElementById('go');
+  const play = '<svg viewBox="0 0 14 14" fill="currentColor"><path d="M3 1l10 6-10 6z"/></svg>', pause = '<svg viewBox="0 0 14 14" fill="currentColor"><path d="M3 1h3v12H3zM8 1h3v12H8z"/></svg>';
+  const draw = () => { clock.textContent = `${String(left / 60 | 0).padStart(2, '0')}:${String(left % 60).padStart(2, '0')}`; arc.style.strokeDashoffset = 251 * (1 - left / L); };
+  go.onclick = () => {
+    if (timer) { clearInterval(timer); timer = null; go.innerHTML = play; return; }
+    go.innerHTML = pause;
+    timer = setInterval(() => { left = Math.max(0, left - 1); draw(); if (!left) { clearInterval(timer); timer = null; go.innerHTML = play; left = L; } }, 1000);
+  };
+  document.getElementById('scenes').onclick = e => {
+    const b = e.target.closest('button'); if (!b) return;
+    document.querySelectorAll('#scenes button').forEach(x => x.classList.toggle('on', x === b));
+    document.getElementById('scene').textContent = b.textContent;
+  };
+  draw();
+</script>
+</body>
+</html>

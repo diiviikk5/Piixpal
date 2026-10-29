@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Orbit — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+<style>
+  :root { --fg:#eef4ff; --muted:rgba(238,244,255,.6); --line:rgba(238,244,255,.12); --cy:#6fe3ff; --pk:#ff7ad9; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#03060f; color:var(--fg); font-family:"Inter Tight",system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+  .mono { font-family:"JetBrains Mono",monospace; font-size:12px; }
+
+  .hero { position:relative; min-height:100vh; min-height:100svh; display:flex; flex-direction:column; isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-1; display:block; }
+
+  nav { display:flex; justify-content:space-between; align-items:center; padding:22px clamp(20px,4vw,56px); }
+  .logo { display:flex; align-items:center; gap:10px; font-weight:700; font-size:18px; letter-spacing:-.02em; }
+  .logo i { width:22px; height:22px; border-radius:50%; border:2px solid var(--cy); box-shadow:inset -6px -3px 0 rgba(111,227,255,.35), 0 0 14px rgba(111,227,255,.4); }
+  .links { display:flex; gap:28px; font-size:14px; color:var(--muted); }
+  .links a:hover { color:var(--fg); }
+  .nr { display:flex; gap:10px; font-size:14px; font-weight:500; }
+  .nr a { padding:9px 16px; border-radius:10px; }
+  .nr .s { border:1px solid var(--line); } .nr .p { background:var(--fg); color:#03060f; }
+
+  .copy { margin:auto 0; padding:0 clamp(20px,4vw,56px) 6vh; max-width:min(640px,52vw); }
+  .badge { display:inline-flex; align-items:center; gap:8px; padding:6px 12px; border-radius:999px; border:1px solid var(--line); background:rgba(111,227,255,.06); color:var(--muted); }
+  .badge i { width:6px; height:6px; border-radius:50%; background:var(--cy); box-shadow:0 0 8px var(--cy); }
+  h1 { margin-top:22px; font-weight:600; font-size:clamp(46px,6.2vw,98px); line-height:.96; letter-spacing:-.05em; }
+  h1 span { background:linear-gradient(90deg,var(--pk),var(--cy)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .sub { margin-top:20px; font-size:18px; line-height:1.55; color:var(--muted); max-width:460px; }
+  .ctas { margin-top:30px; display:flex; gap:12px; flex-wrap:wrap; }
+  .btn { padding:14px 22px; border-radius:12px; font-weight:600; font-size:15px; transition:transform .25s, box-shadow .25s; }
+  .btn.p { background:var(--fg); color:#03060f; } .btn.p:hover { transform:translateY(-2px); box-shadow:0 12px 40px rgba(111,227,255,.3); }
+  .btn.s { border:1px solid var(--line); backdrop-filter:blur(8px); }
+
+  .ticker { margin-top:36px; display:flex; gap:28px; flex-wrap:wrap; color:var(--muted); }
+  .ticker b { display:block; font-family:"Inter Tight",sans-serif; font-size:26px; font-weight:600; color:var(--fg); letter-spacing:-.03em; font-variant-numeric:tabular-nums; }
+  .feed { position:absolute; right:clamp(20px,4vw,56px); bottom:28px; display:grid; gap:6px; text-align:right; color:rgba(238,244,255,.8); padding:12px 14px; border-radius:12px; background:rgba(3,6,15,.72); border:1px solid var(--line); backdrop-filter:blur(10px); min-width:250px; }
+  .feed div { opacity:0; transform:translateY(6px); animation:in .5s forwards; }
+  .feed span { color:var(--cy); }
+  @keyframes in { to { opacity:1; transform:none; } }
+
+  .rv { opacity:0; transform:translateY(16px); filter:blur(8px); animation:rise 1.2s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:calc(var(--d,0) * 1ms); }
+  @keyframes rise { to { opacity:1; transform:none; filter:blur(0); } }
+  @media (prefers-reduced-motion:reduce){ .rv,.feed div{ animation:none; opacity:1; transform:none; filter:none; } }
+  @media (max-width:900px){ .links,.feed{ display:none; } .copy{ max-width:none; } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+
+  <nav class="rv">
+    <a class="logo" href="#"><i></i>Meridian</a>
+    <div class="links"><a href="#">Payments</a><a href="#">Payouts</a><a href="#">Network</a><a href="#">Developers</a></div>
+    <div class="nr"><a class="s" href="#">Sign in</a><a class="p" href="#">Get started</a></div>
+  </nav>
+
+  <div class="copy">
+    <span class="badge mono rv" style="--d:150"><i></i>Live in 140 countries</span>
+    <h1 class="rv" style="--d:300">Move money <span>at the speed of light.</span></h1>
+    <p class="sub rv" style="--d:450">One API to accept, hold and pay out in 46 currencies. Settled in seconds, routed over the cheapest rail, every time.</p>
+    <div class="ctas rv" style="--d:600"><a class="btn p" href="#">Start integrating</a><a class="btn s" href="#">Talk to sales</a></div>
+    <div class="ticker mono rv" style="--d:800">
+      <div><b id="vol">$4.21B</b>processed today</div>
+      <div><b>0.8s</b>median settlement</div>
+      <div><b>99.999%</b>uptime</div>
+    </div>
+  </div>
+
+  <div class="feed mono" id="feed" aria-hidden="true"></div>
+</section>
+<script src="bg.js"></script>
+<script>
+  // live-ish volume + a short feed of transfers matching the arcs
+  let v = 4.21; setInterval(() => { v += Math.random() * .004; document.getElementById('vol').textContent = '$' + v.toFixed(2) + 'B'; }, 900);
+  const routes = ['USD → EUR', 'EUR → INR', 'INR → SGD', 'SGD → JPY', 'USD → BRL', 'EUR → ZAR'], feed = document.getElementById('feed');
+  let i = 0;
+  setInterval(() => {
+    const amt = (Math.random() * 9000 + 120).toFixed(2);
+    const d = document.createElement('div'); d.innerHTML = `${routes[i++ % routes.length]} · <span>$${amt}</span> · settled`;
+    feed.append(d); if (feed.children.length > 4) feed.firstChild.remove();
+  }, 1600);
+</script>
+</body>
+</html>

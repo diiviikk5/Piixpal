@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Solstice — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Oswald:wght@300;400&display=swap" rel="stylesheet" />
+<style>
+  :root { --fg:#ffe9d2; --ink:#2a0302; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#330402; color:var(--fg); font-family:Oswald,system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+
+  .hero { position:relative; height:100vh; height:100svh; min-height:640px; isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-1; display:block; }
+
+  nav { position:absolute; top:0; left:0; right:0; display:flex; justify-content:space-between; align-items:center; padding:24px clamp(20px,4vw,52px); font-weight:300; font-size:13px; letter-spacing:.28em; text-transform:uppercase; }
+  nav .links { display:flex; gap:30px; opacity:.8; }
+  nav .links a:hover { opacity:1; }
+  nav .mark { font-family:"Cormorant Garamond",serif; font-size:20px; letter-spacing:.32em; font-weight:600; }
+
+  /* title sits across the lower half of the sun as a silhouette */
+  h1 { position:absolute; left:0; right:0; top:44%; transform:translateY(-50%); text-align:center; font-family:"Cormorant Garamond",serif; font-weight:600; font-size:clamp(56px,12.5vw,210px); letter-spacing:.24em; padding-left:.24em; color:var(--ink); line-height:1; mix-blend-mode:multiply; }
+  h1 span { display:inline-block; opacity:0; filter:blur(14px); animation:in 2.2s cubic-bezier(.2,.7,.2,1) forwards; }
+  @keyframes in { to { opacity:1; filter:blur(0); } }
+
+  .below { position:absolute; left:0; right:0; top:58%; display:flex; flex-direction:column; align-items:center; gap:18px; color:var(--ink); text-align:center; }
+  .below p { font-family:"Cormorant Garamond",serif; font-style:italic; font-weight:500; font-size:clamp(20px,2vw,28px); }
+  .play { display:inline-flex; align-items:center; gap:12px; font-size:13px; letter-spacing:.24em; text-transform:uppercase; color:var(--ink); }
+  .play b { width:44px; height:44px; border-radius:50%; border:1px solid rgba(42,3,2,.45); display:grid; place-items:center; transition:background .3s, color .3s, transform .3s; }
+  .play:hover b { background:var(--ink); color:#ffb35a; transform:scale(1.06); }
+  .play svg { width:14px; height:14px; margin-left:2px; }
+
+  .billing { position:absolute; left:clamp(20px,4vw,52px); bottom:22px; max-width:420px; font-weight:300; font-size:10.5px; line-height:1.35; letter-spacing:.06em; text-transform:uppercase; color:rgba(42,3,2,.72); transform:scaleY(1.25); transform-origin:bottom left; }
+  .date { position:absolute; right:clamp(20px,4vw,52px); bottom:22px; text-align:right; color:var(--ink); font-size:12px; letter-spacing:.3em; text-transform:uppercase; }
+  .date b { display:block; font-family:"Cormorant Garamond",serif; font-weight:600; font-size:30px; letter-spacing:.12em; margin-top:2px; }
+
+  .rv { opacity:0; animation:fade 1.6s ease forwards; animation-delay:calc(var(--d,0) * 1ms); }
+  @keyframes fade { to { opacity:1; } }
+  @media (prefers-reduced-motion:reduce){ .rv,h1 span{ animation:none; opacity:1; filter:none; } }
+  @media (max-width:760px){ nav .links{ display:none; } .billing{ display:none; } .date{ left:0; right:0; text-align:center; } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg data-focus=".5,.5" aria-hidden="true"></canvas>
+
+  <nav class="rv">
+    <a class="mark" href="#">LUMEN</a>
+    <div class="links"><a href="#">Trailer</a><a href="#">Story</a><a href="#">Cast</a><a href="#">Tickets</a></div>
+  </nav>
+
+  <h1 aria-label="Solstice" data-letters>SOLSTICE</h1>
+
+  <div class="below">
+    <p class="rv" style="--d:1600">The longest day ends with one choice.</p>
+    <a class="play rv" style="--d:1900" href="#"><b><svg viewBox="0 0 14 14" fill="currentColor"><path d="M2 1l11 6-11 6z"/></svg></b>Watch the trailer</a>
+  </div>
+
+  <p class="billing rv" style="--d:2200">Lumen Pictures presents a Halcyon production · a film by Ava Moreno · music by Kai Okafor · edited by Rin Sato · director of photography Lior Ben-Ami · produced by Maya Chen · written and directed by Ava Moreno</p>
+  <div class="date rv" style="--d:2200">In theaters<b>12 · 21</b></div>
+</section>
+<script src="bg.js"></script>
+<script>
+  document.querySelectorAll('[data-letters]').forEach(el => {
+    el.innerHTML = [...el.textContent].map((c, i) => `<span aria-hidden="true" style="animation-delay:${300 + i * 140}ms">${c}</span>`).join('');
+  });
+</script>
+</body>
+</html>

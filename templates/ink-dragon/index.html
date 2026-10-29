@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ink Dragon — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;900&family=Playfair+Display:ital,wght@0,500;0,800;1,500&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root { --ink:#121212; --muted:rgba(18,18,18,.6); --seal:#c8281e; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#efefed; color:var(--ink); font-family:Inter,system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+
+  .hero { position:relative; height:100vh; height:100svh; min-height:640px; isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-1; display:block; }
+
+  nav { position:absolute; inset:0 0 auto; display:flex; justify-content:space-between; align-items:center; padding:24px clamp(20px,4vw,52px); font-size:13px; letter-spacing:.14em; text-transform:uppercase; }
+  .logo { display:flex; align-items:center; gap:12px; font-family:"Playfair Display",serif; font-weight:800; font-size:22px; letter-spacing:.02em; text-transform:none; }
+  .seal { width:34px; height:34px; display:grid; place-items:center; background:var(--seal); color:#fff; font-family:"Noto Serif JP",serif; font-weight:900; font-size:16px; border-radius:3px; }
+  .links { display:flex; gap:28px; }
+  .links a { opacity:.7; } .links a:hover { opacity:1; }
+
+  .title { position:absolute; right:clamp(20px,4vw,52px); top:12%; text-align:right; }
+  .title small { font-size:12px; letter-spacing:.3em; text-transform:uppercase; color:var(--muted); }
+  h1 { margin-top:10px; font-family:"Playfair Display",serif; font-weight:800; font-size:clamp(46px,5.4vw,86px); line-height:.95; letter-spacing:-.02em; }
+  h1 em { font-weight:500; }
+
+  .book { position:absolute; right:clamp(20px,4vw,52px); bottom:clamp(28px,6vh,56px); width:min(360px,40vw); }
+  .book p { font-size:15px; line-height:1.6; color:var(--muted); }
+  .book .row { margin-top:18px; display:flex; gap:10px; }
+  .btn { flex:1; text-align:center; padding:15px 18px; font-size:13px; letter-spacing:.14em; text-transform:uppercase; font-weight:500; transition:background .3s, color .3s; }
+  .btn.d { background:var(--ink); color:#efefed; } .btn.d:hover { background:var(--seal); }
+  .btn.l { border:1px solid var(--ink); } .btn.l:hover { background:var(--ink); color:#efefed; }
+  .slots { margin-top:14px; font-size:12px; color:var(--muted); letter-spacing:.06em; }
+  .slots b { color:var(--seal); font-weight:500; }
+
+  .tate { position:absolute; left:clamp(20px,4vw,52px); bottom:clamp(28px,6vh,56px); writing-mode:vertical-rl; font-family:"Noto Serif JP",serif; font-size:15px; letter-spacing:.5em; color:var(--muted); }
+
+  .rv { opacity:0; filter:blur(8px); animation:fade 1.8s ease forwards; animation-delay:calc(var(--d,0) * 1ms); }
+  @keyframes fade { to { opacity:1; filter:blur(0); } }
+  @media (prefers-reduced-motion:reduce){ .rv{ animation:none; opacity:1; filter:none; } }
+  @media (max-width:820px){ .links,.tate{ display:none; } .title{ top:14%; } .book{ left:20px; right:20px; width:auto; } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+
+  <nav class="rv">
+    <a class="logo" href="#"><span class="seal">墨</span>Sumi Studio</a>
+    <div class="links"><a href="#">Artists</a><a href="#">Flash</a><a href="#">Aftercare</a><a href="#">Visit</a></div>
+  </nav>
+
+  <div class="title rv" style="--d:2600">
+    <small>Hand-poked &amp; machine · since 2009</small>
+    <h1>Black ink.<br><em>Bold lines.</em></h1>
+  </div>
+
+  <div class="book rv" style="--d:3200">
+    <p>Japanese-inspired blackwork, drawn by hand for your skin only. Every piece starts as a brush sketch on paper, just like this one.</p>
+    <div class="row"><a class="btn d" href="#">Book a consult</a><a class="btn l" href="#">See flash</a></div>
+    <p class="slots">Next opening: <b>Tue, 3 pm</b> · 4 slots left this month</p>
+  </div>
+
+  <p class="tate rv" style="--d:3000">龍は墨より生まれる</p>
+</section>
+<script src="bg.js"></script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Prism — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root { --fg:#fff; --muted:rgba(255,255,255,.66); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#05030e; color:var(--fg); font-family:Inter,system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+
+  .hero { position:relative; min-height:100vh; min-height:100svh; display:flex; flex-direction:column; padding:24px clamp(20px,4vw,52px); isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-1; display:block; }
+
+  nav { display:flex; justify-content:space-between; align-items:center; }
+  .logo { font-family:Syne,sans-serif; font-weight:800; font-size:24px; letter-spacing:-.02em; }
+  .logo sup { font-size:11px; font-weight:500; }
+  .navr { display:flex; gap:10px; }
+  .navr a { font-size:14px; font-weight:500; padding:11px 20px; border-radius:999px; transition:background .25s, color .25s; }
+  .navr .talk { background:#fff; color:#000; }
+  .navr .talk:hover { background:#d1ff4d; }
+  .navr .menu { border:1px solid rgba(255,255,255,.3); display:flex; align-items:center; gap:10px; }
+  .navr .menu:hover { background:rgba(255,255,255,.1); }
+  .navr .menu i { display:grid; gap:4px; } .navr .menu i::before, .navr .menu i::after { content:""; width:16px; height:1.5px; background:currentColor; }
+
+  .center { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; position:relative; }
+  .center small { font-size:13px; letter-spacing:.24em; text-transform:uppercase; color:var(--muted); }
+  h1 { margin-top:20px; font-family:Syne,sans-serif; font-weight:800; font-size:clamp(46px,8.2vw,136px); line-height:.9; letter-spacing:-.04em; text-transform:uppercase; }
+  h1 .row { display:block; overflow:hidden; }
+  h1 .row > span { display:inline-block; transform:translateY(110%); animation:up 1.1s cubic-bezier(.2,.8,.2,1) forwards; }
+  h1 .row:nth-child(2) > span { animation-delay:.1s; } h1 .row:nth-child(3) > span { animation-delay:.2s; }
+  h1 .out { background:linear-gradient(100deg,#fff 20%,#d1ff4d 40%,#ff4fa3 55%,#fff 75%) 0 0/250% 100%; -webkit-background-clip:text; background-clip:text; color:transparent; animation:up 1.1s .1s cubic-bezier(.2,.8,.2,1) forwards, shimmer 6s 1.2s linear infinite; }
+  @keyframes shimmer { to { background-position:-250% 0; } }
+  @keyframes up { to { transform:none; } }
+
+  .badge { position:absolute; right:6%; bottom:4%; width:130px; height:130px; display:grid; place-items:center; }
+  .badge svg { position:absolute; inset:0; animation:spin 14s linear infinite; }
+  .badge text { font-family:Syne,sans-serif; font-size:10.5px; font-weight:700; letter-spacing:.24em; fill:#fff; text-transform:uppercase; }
+  .badge b { width:54px; height:54px; border-radius:50%; background:#fff; color:#000; display:grid; place-items:center; font-size:22px; transition:transform .3s, background .3s; }
+  .badge:hover b { transform:rotate(45deg); background:#d1ff4d; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+
+  .foot { display:flex; justify-content:space-between; align-items:flex-end; gap:20px; font-size:14px; color:var(--muted); }
+  .foot ul { list-style:none; display:flex; gap:8px; }
+  .foot li { padding:7px 14px; border-radius:999px; border:1px solid rgba(255,255,255,.22); backdrop-filter:blur(8px); color:#fff; }
+  .foot p { text-align:right; line-height:1.5; }
+
+  .rv { opacity:0; transform:translateY(14px); animation:rise 1s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:calc(var(--d,0) * 1ms); }
+  @keyframes rise { to { opacity:1; transform:none; } }
+  @media (prefers-reduced-motion:reduce){ .rv,h1 .row>span{ animation:none; opacity:1; transform:none; } .badge svg{ animation:none; } }
+  @media (max-width:760px){ .badge{ display:none; } .foot{ flex-direction:column; align-items:flex-start; } .foot p{ text-align:left; } .navr .menu{ display:none; } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+
+  <nav class="rv">
+    <a class="logo" href="#">PRISM<sup>®</sup></a>
+    <div class="navr"><a class="menu" href="#"><i></i>Menu</a><a class="talk" href="#">Let's talk</a></div>
+  </nav>
+
+  <div class="center">
+    <small class="rv" style="--d:150">Independent creative studio</small>
+    <h1>
+      <span class="row"><span>We make brands</span></span>
+      <span class="row"><span class="out">impossible</span></span>
+      <span class="row"><span>to ignore.</span></span>
+    </h1>
+    <a class="badge rv" style="--d:700" href="#" aria-label="See our work">
+      <svg viewBox="0 0 130 130" aria-hidden="true"><defs><path id="c" d="M65 65 m-52 0 a52 52 0 1 1 104 0 a52 52 0 1 1 -104 0"/></defs><text><textPath href="#c">See our work • See our work • See our work •</textPath></text></svg>
+      <b>↗</b>
+    </a>
+  </div>
+
+  <div class="foot rv" style="--d:600">
+    <ul><li>Brand</li><li>Motion</li><li>Web</li><li>3D</li></ul>
+    <p>Based in Berlin<br>Working with the bold, worldwide</p>
+  </div>
+</section>
+<script src="bg.js"></script>
+</body>
+</html>

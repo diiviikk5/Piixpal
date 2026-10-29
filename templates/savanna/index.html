@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Savanna — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root { --ink:#fff4e8; --muted:rgba(255,244,232,.78); --sun:#ffd38a; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#2a0a12; color:var(--ink); font-family:Inter,system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+
+  .hero { position:relative; min-height:100vh; min-height:100svh; display:flex; flex-direction:column; align-items:center; text-align:center; isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-2; display:block; }
+  .hero::before { content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
+    background:linear-gradient(180deg,rgba(40,6,20,.62) 0%,rgba(40,6,20,.25) 34%,transparent 52%,transparent 78%,rgba(20,4,8,.55) 100%); }
+
+  nav { width:100%; display:flex; justify-content:space-between; align-items:center; padding:22px clamp(20px,4vw,56px); font-size:14px; }
+  .logo { font-family:"DM Serif Display",serif; font-size:25px; letter-spacing:.01em; }
+  .links { display:flex; gap:28px; color:var(--muted); }
+  .links a:hover { color:var(--ink); }
+  .nb { padding:10px 18px; border-radius:999px; background:rgba(255,244,232,.14); border:1px solid rgba(255,244,232,.3); backdrop-filter:blur(10px); font-weight:500; }
+
+  .copy { margin-top:clamp(10px,5vh,56px); padding:0 20px; }
+  .eyebrow { font-size:12px; letter-spacing:.32em; text-transform:uppercase; color:var(--sun); }
+  h1 { margin-top:16px; font-family:"DM Serif Display",serif; font-weight:400; font-size:clamp(52px,7.6vw,124px); line-height:.92; letter-spacing:-.015em; text-shadow:0 4px 40px rgba(60,10,20,.45); }
+  h1 em { font-style:italic; color:var(--sun); }
+  .sub { margin:18px auto 0; font-size:17px; line-height:1.55; color:var(--muted); max-width:470px; text-shadow:0 2px 20px rgba(60,10,20,.6); }
+
+  /* booking bar sits on the dark ground at the bottom */
+  .sub.low { margin-top:auto; margin-bottom:18px; padding:0 20px; }
+  .book { margin-bottom:clamp(20px,5vh,48px); display:flex; align-items:stretch; gap:6px; padding:6px; border-radius:20px; background:rgba(28,6,12,.55); border:1px solid rgba(255,244,232,.16); backdrop-filter:blur(16px) saturate(130%); -webkit-backdrop-filter:blur(16px) saturate(130%); text-align:left; }
+  .f { padding:10px 20px; border-right:1px solid rgba(255,244,232,.12); min-width:150px; }
+  .f:last-of-type { border-right:0; }
+  .f small { display:block; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,244,232,.55); }
+  .f b { display:block; margin-top:4px; font-weight:500; font-size:15px; }
+  .go { border:0; border-radius:14px; padding:0 26px; font:inherit; font-weight:500; font-size:15px; background:var(--sun); color:#2a0a12; cursor:pointer; transition:transform .25s, box-shadow .25s; }
+  .go:hover { transform:translateY(-1px); box-shadow:0 12px 34px rgba(255,180,90,.45); }
+
+  .rv { opacity:0; transform:translateY(18px); filter:blur(10px); animation:rise 1.4s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:calc(var(--d,0) * 1ms); }
+  @keyframes rise { to { opacity:1; transform:none; filter:blur(0); } }
+  @media (prefers-reduced-motion:reduce){ .rv{ animation:none; opacity:1; transform:none; filter:none; } }
+  @media (max-width:820px){ .links{ display:none; } .sub.low{ margin:auto 20px 12px; padding:12px 16px; border-radius:14px; background:rgba(28,6,12,.55); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); font-size:15px; } .book{ display:grid; grid-template-columns:1fr 1fr; width:calc(100% - 40px); } .f{ min-width:0; padding:8px 14px; border-right:0; } .go{ grid-column:1/-1; padding:14px; } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+
+  <nav class="rv">
+    <a class="logo" href="#">Acacia House</a>
+    <div class="links"><a href="#">Camps</a><a href="#">Safaris</a><a href="#">Conservation</a><a href="#">Journal</a></div>
+    <a class="nb" href="#">Enquire</a>
+  </nav>
+
+  <div class="copy">
+    <p class="eyebrow rv" style="--d:200">Serengeti · Tanzania</p>
+    <h1 class="rv" style="--d:350">Where the day<br>goes to <em>rest.</em></h1>
+  </div>
+
+  <p class="sub low rv" style="--d:650">Six tented suites on the edge of the great migration. Dawn drives, long dinners under the acacias, and nothing else on the schedule.</p>
+  <form class="book rv" style="--d:850" onsubmit="return false">
+    <div class="f"><small>Camp</small><b>Ndutu Plains</b></div>
+    <div class="f"><small>Arrive</small><b>14 Feb</b></div>
+    <div class="f"><small>Nights</small><b>4 nights</b></div>
+    <div class="f"><small>Guests</small><b>2 adults</b></div>
+    <button class="go">Check availability</button>
+  </form>
+</section>
+<script src="bg.js"></script>
+</body>
+</html>

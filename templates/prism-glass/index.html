@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Prism Glass — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root { --ink:#17142a; --muted:rgba(23,20,42,.6); --line:rgba(23,20,42,.12); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#f2f1f8; color:var(--ink); font-family:Inter,system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+
+  .hero { position:relative; min-height:100vh; min-height:100svh; display:flex; flex-direction:column; isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-1; display:block; }
+
+  nav { margin:16px auto 0; width:min(1180px,calc(100% - 32px)); display:flex; justify-content:space-between; align-items:center; padding:10px 10px 10px 20px; border-radius:16px; background:rgba(255,255,255,.55); border:1px solid rgba(255,255,255,.8); backdrop-filter:blur(18px) saturate(150%); -webkit-backdrop-filter:blur(18px) saturate(150%); }
+  .logo { display:flex; align-items:center; gap:8px; font-weight:600; font-size:17px; letter-spacing:-.02em; }
+  .logo i { width:20px; height:20px; border-radius:50%; border:4px solid transparent; background:linear-gradient(#f2f1f8,#f2f1f8) padding-box,linear-gradient(135deg,#ff9a7a,#8f86ff,#5fe0c0) border-box; }
+  .links { display:flex; gap:26px; font-size:14px; color:var(--muted); }
+  .links a:hover { color:var(--ink); }
+  .nb { font-size:14px; font-weight:500; padding:10px 16px; border-radius:10px; background:var(--ink); color:#fff; }
+
+  .copy { margin:auto 0; padding:0 clamp(20px,5vw,80px) 6vh; max-width:min(640px,50vw); }
+  .tag { display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:500; padding:6px 12px; border-radius:999px; background:rgba(255,255,255,.7); border:1px solid var(--line); }
+  .tag b { font-weight:600; background:linear-gradient(90deg,#ff7a5a,#7a6bff); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  h1 { margin-top:22px; font-family:"Instrument Serif",serif; font-weight:400; font-size:clamp(56px,7.4vw,120px); line-height:.92; letter-spacing:-.02em; }
+  h1 em { background:linear-gradient(90deg,#ff7a5a,#8f86ff 55%,#2fbf9c); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .sub { margin-top:20px; font-size:18px; line-height:1.55; color:var(--muted); max-width:440px; }
+  .ctas { margin-top:30px; display:flex; gap:12px; flex-wrap:wrap; }
+  .btn { padding:14px 22px; border-radius:12px; font-weight:600; font-size:15px; transition:transform .25s, box-shadow .25s; }
+  .btn.d { background:var(--ink); color:#fff; } .btn.d:hover { transform:translateY(-2px); box-shadow:0 14px 40px rgba(122,107,255,.35); }
+  .btn.l { background:rgba(255,255,255,.7); border:1px solid var(--line); backdrop-filter:blur(8px); } .btn.l:hover { background:#fff; }
+  .logos { margin-top:40px; display:flex; gap:26px; flex-wrap:wrap; font-weight:600; color:rgba(23,20,42,.38); letter-spacing:-.01em; }
+
+  .rv { opacity:0; transform:translateY(16px); filter:blur(8px); animation:rise 1.1s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:calc(var(--d,0) * 1ms); }
+  @keyframes rise { to { opacity:1; transform:none; filter:blur(0); } }
+  @media (prefers-reduced-motion:reduce){ .rv{ animation:none; opacity:1; transform:none; filter:none; } }
+  @media (max-width:900px){ .links{ display:none; } .copy{ max-width:none; margin-top:auto; background:linear-gradient(transparent,rgba(242,241,248,.92) 20%); padding-top:60px; } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+
+  <nav class="rv">
+    <a class="logo" href="#"><i></i>Lucid</a>
+    <div class="links"><a href="#">Product</a><a href="#">Templates</a><a href="#">Community</a><a href="#">Pricing</a></div>
+    <a class="nb" href="#">Open Lucid</a>
+  </nav>
+
+  <div class="copy">
+    <span class="tag rv" style="--d:150"><b>New</b> Real-time 3D in the browser</span>
+    <h1 class="rv" style="--d:300">Design in <em>three</em> dimensions.</h1>
+    <p class="sub rv" style="--d:450">Lucid is the collaborative canvas for 3D. Shape, light and animate together, then ship it straight to the web as a few kilobytes of code.</p>
+    <div class="ctas rv" style="--d:600"><a class="btn d" href="#">Start designing free</a><a class="btn l" href="#">Watch the keynote</a></div>
+    <div class="logos rv" style="--d:800"><span>Lumen</span><span>Halcyon</span><span>Vertex</span><span>Orbital</span></div>
+  </div>
+</section>
+<script src="bg.js"></script>
+</body>
+</html>

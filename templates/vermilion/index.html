@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Vermilion — a record in five rooms</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+<style>
+  :root { --ink:#f6e9e2; --muted:rgba(246,233,226,.6); --red:#ff2a1a; --ease:cubic-bezier(.16,1,.3,1); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html.lenis, html.lenis body { height:auto; }
+  .lenis.lenis-smooth { scroll-behavior:auto !important; }
+  body { background:#0c0101; color:var(--ink); font-family:Inter,system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; cursor:none; }
+  a, button { color:inherit; text-decoration:none; cursor:none; }
+  canvas[data-bg] { position:fixed; inset:0; width:100%; height:100%; z-index:0; display:block; }
+
+  /* one tall scroll track; every room is 180vh of scroll, the last one holds */
+  .track { position:relative; z-index:1; }
+  .room { height:180vh; }
+  .room:last-child { height:140vh; }
+
+  /* fixed chrome */
+  nav { position:fixed; top:0; left:0; right:0; z-index:5; display:flex; justify-content:space-between; align-items:center; padding:26px clamp(20px,4vw,56px); font-size:12px; letter-spacing:.18em; text-transform:uppercase; mix-blend-mode:difference; }
+  .logo { font-family:"Bodoni Moda",serif; font-style:italic; font-size:22px; letter-spacing:.02em; text-transform:none; }
+  .links { display:flex; gap:30px; }
+  .rail { position:fixed; left:clamp(20px,4vw,56px); top:50%; transform:translateY(-50%); z-index:5; display:flex; flex-direction:column; gap:14px; font:400 11px/1 "JetBrains Mono",monospace; letter-spacing:.1em; }
+  .rail span { display:flex; align-items:center; gap:10px; color:rgba(246,233,226,.35); transition:color .6s var(--ease); }
+  .rail span::before { content:""; width:14px; height:1px; background:currentColor; transition:width .6s var(--ease); }
+  .rail span.on { color:var(--ink); } .rail span.on::before { width:34px; background:var(--red); }
+  .meter { position:fixed; right:clamp(20px,4vw,56px); bottom:30px; z-index:5; font:400 11px/1 "JetBrains Mono",monospace; letter-spacing:.12em; color:var(--muted); display:flex; align-items:center; gap:14px; }
+  .meter i { display:block; width:120px; height:1px; background:rgba(246,233,226,.2); position:relative; overflow:hidden; }
+  .meter i b { position:absolute; inset:0; background:var(--red); transform-origin:left; transform:scaleX(0); }
+
+  /* chapter copy: fixed layers, scrubbed in/out by scroll */
+  .ch { position:fixed; inset:0; z-index:3; pointer-events:none; display:flex; flex-direction:column; justify-content:center; padding:0 clamp(20px,9vw,150px); }
+  .ch.right { align-items:flex-end; text-align:right; }
+  .ch.center { align-items:center; text-align:center; }
+  .eyebrow { font:400 12px/1 "JetBrains Mono",monospace; letter-spacing:.24em; text-transform:uppercase; color:var(--muted); overflow:hidden; }
+  .eyebrow span { display:inline-block; }
+  .ch h2 { margin-top:18px; font-family:"Bodoni Moda",serif; font-weight:400; font-size:clamp(54px,9vw,156px); line-height:.9; letter-spacing:-.03em; }
+  .ch h2 em { font-style:italic; color:#ffb4a6; }
+  .ch h2 .ln { display:block; overflow:hidden; padding-bottom:.06em; }
+  .ch h2 .ch-l { display:inline-block; will-change:transform; }
+  .ch p.s { margin-top:24px; font-size:16px; line-height:1.65; color:var(--muted); max-width:380px; }
+  .hero h2 { font-size:clamp(70px,15vw,260px); letter-spacing:-.05em; font-style:italic; }
+  .ch.low { justify-content:flex-end; padding-bottom:12vh; }
+  .ch.low h2 { text-shadow:0 10px 60px rgba(0,0,0,.6); }
+  /* the ossuary wall is bright red: that room's type turns to ink */
+  .ch.top { justify-content:flex-start; padding-top:15vh; }
+  .ch h2.one { font-size:clamp(46px,6.4vw,112px); }
+  .ch.top p.s { margin-top:12px; }
+  .ch.ink { color:#1c0303; } .ch.ink .eyebrow, .ch.ink p.s { color:rgba(28,3,3,.72); } .ch.ink h2 em { color:#4a0606; }
+  .ctas { margin-top:34px; display:flex; gap:12px; pointer-events:auto; }
+  .btn { padding:16px 28px; border-radius:999px; font-size:13px; letter-spacing:.14em; text-transform:uppercase; transition:background .4s var(--ease), color .4s var(--ease); display:inline-block; }
+  .btn.p { background:var(--ink); color:#1a0202; } .btn.p:hover { background:var(--red); color:var(--ink); }
+  .btn.g { border:1px solid rgba(246,233,226,.3); } .btn.g:hover { border-color:var(--ink); }
+  .hint { position:fixed; left:50%; bottom:30px; transform:translateX(-50%); z-index:5; font:400 11px/1 "JetBrains Mono",monospace; letter-spacing:.24em; text-transform:uppercase; color:var(--muted); display:flex; flex-direction:column; align-items:center; gap:12px; }
+  .hint i { width:1px; height:40px; background:linear-gradient(var(--ink),transparent); animation:drip 1.8s var(--ease) infinite; transform-origin:top; }
+  @keyframes drip { 0% { transform:scaleY(0); } 60% { transform:scaleY(1); } 100% { transform:scaleY(1); opacity:0; } }
+
+  /* preloader: a counter that becomes the curtain */
+  .pre { position:fixed; inset:0; z-index:20; background:#0c0101; display:flex; align-items:flex-end; justify-content:space-between; padding:clamp(20px,4vw,56px); }
+  .pre .n { font-family:"Bodoni Moda",serif; font-size:clamp(90px,18vw,300px); line-height:.8; letter-spacing:-.05em; font-variant-numeric:tabular-nums; }
+  .pre small { font:400 11px/1.6 "JetBrains Mono",monospace; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); text-align:right; }
+
+  /* cursor */
+  .cur { position:fixed; left:0; top:0; z-index:30; width:34px; height:34px; margin:-17px 0 0 -17px; border:1px solid rgba(246,233,226,.7); border-radius:50%; pointer-events:none; transition:width .4s var(--ease), height .4s var(--ease), margin .4s var(--ease), background .4s var(--ease); mix-blend-mode:difference; }
+  .cur.big { width:84px; height:84px; margin:-42px 0 0 -42px; background:#fff; }
+  .dot { position:fixed; left:0; top:0; z-index:30; width:4px; height:4px; margin:-2px 0 0 -2px; background:var(--red); border-radius:50%; pointer-events:none; }
+
+  @media (max-width:760px){ .links,.rail{ display:none; } .ch{ padding:0 24px; } .ch.right{ align-items:flex-start; text-align:left; } body,a,button{ cursor:auto; } .cur,.dot{ display:none; } }
+  @media (prefers-reduced-motion:reduce){ .hint i{ animation:none; } }
+</style>
+</head>
+<body>
+<canvas data-bg aria-hidden="true"></canvas>
+
+<div class="pre" id="pre"><div class="n" id="pn">000</div><small>Vermilion<br>loading five rooms</small></div>
+<div class="cur" id="cur"></div><div class="dot" id="dot"></div>
+
+<nav>
+  <a class="logo" href="#">Vermilion</a>
+  <div class="links"><a href="#">Record</a><a href="#">Tour</a><a href="#">Store</a></div>
+  <a href="#" data-mag>Pre-save</a>
+</nav>
+<div class="rail" id="rail"><span class="on">I · Crown</span><span>II · Descent</span><span>III · Hall</span><span>IV · Ossuary</span><span>V · Court</span></div>
+<div class="meter"><span id="mi">01 / 05</span><i><b id="mb"></b></i></div>
+<div class="hint" id="hint">Scroll to descend<i></i></div>
+
+<section class="ch hero center low" data-room="0">
+  <p class="eyebrow"><span>A record in five rooms · out 13.03</span></p>
+  <h2><span class="ln">Vermilion</span></h2>
+  <p class="s" style="margin-left:auto;margin-right:auto">Twelve songs written in the dark and mixed in red. Walk through it before you hear it.</p>
+</section>
+<section class="ch right" data-room="1">
+  <p class="eyebrow"><span>Room II — The Descent</span></p>
+  <h2><span class="ln">Fall</span><span class="ln"><em>inward.</em></span></h2>
+  <p class="s">The first side never resolves. It just keeps turning, a little tighter each time.</p>
+</section>
+<section class="ch" data-room="2">
+  <p class="eyebrow"><span>Room III — The Hall</span></p>
+  <h2><span class="ln">Every door</span><span class="ln">opens <em>to red.</em></span></h2>
+  <p class="s">Recorded in one long corridor of a cathedral that was never finished. You can hear the stone.</p>
+</section>
+<section class="ch ink top right" data-room="3">
+  <p class="eyebrow"><span>Room IV — The Ossuary</span></p>
+  <h2 class="one"><span class="ln">What we <em>keep.</em></span></h2>
+  <p class="s">The quietest songs on the record.</p>
+</section>
+<section class="ch center low" data-room="4">
+  <p class="eyebrow"><span>Room V — The Court</span></p>
+  <h2><span class="ln">Take your</span><span class="ln"><em>seat.</em></span></h2>
+  <p class="s" style="margin-left:auto;margin-right:auto">Vermilion is out 13 March on vinyl and everywhere else. The tour opens in the same room.</p>
+  <div class="ctas" style="justify-content:center"><a class="btn p" href="#" data-mag>Pre-save the record</a><a class="btn g" href="#" data-mag>Tour dates</a></div>
+</section>
+
+<main class="track"><div class="room"></div><div class="room"></div><div class="room"></div><div class="room"></div><div class="room"></div></main>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="bg.js"></script>
+<script>
+(() => {
+  gsap.registerPlugin(ScrollTrigger);
+  const canvas = document.querySelector('canvas[data-bg]');
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const auto = navigator.webdriver || /[?&]preview/.test(location.search);   // screenshots & gallery previews skip the intro
+  window.VERM = { p: 0, v: 0 };
+
+  // split every headline line into letters (masked by the line)
+  document.querySelectorAll('.ch h2 .ln').forEach(ln => {
+    const walk = node => [...node.childNodes].forEach(n => {
+      if (n.nodeType === 3) { const f = document.createDocumentFragment(); [...n.textContent].forEach(ch => { const s = document.createElement('span'); s.className = 'ch-l'; s.textContent = ch === ' ' ? ' ' : ch; f.appendChild(s); }); n.replaceWith(f); }
+      else walk(n);
+    });
+    walk(ln);
+  });
+
+  // one scroll source: Lenis → ScrollTrigger + the shader
+  const lenis = new Lenis({ lerp: still ? 1 : .085, wheelMultiplier: .9 });
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add(t => lenis.raf(t * 1000)); gsap.ticker.lagSmoothing(0);
+  const roomH = () => innerHeight * 1.8;
+  const rail = [...document.querySelectorAll('#rail span')], mi = document.getElementById('mi'), mb = document.getElementById('mb'), hint = document.getElementById('hint');
+  let last = -1;
+  gsap.ticker.add(() => {
+    const y = lenis.scroll, p = Math.min(4, y / roomH());
+    VERM.p = p; VERM.v = gsap.utils.clamp(-1, 1, lenis.velocity / 60);
+    const i = Math.min(4, Math.round(p - .2 < 0 ? 0 : Math.floor(p + .28)));
+    if (i !== last) { rail.forEach((s, k) => s.classList.toggle('on', k === i)); mi.textContent = `0${i + 1} / 05`; last = i; }
+    mb.style.transform = `scaleX(${p / 4})`;
+    hint.style.opacity = Math.max(0, 1 - y / 200);
+  });
+
+  // chapter copy: each room's text arrives as the room settles and leaves before its transition
+  document.querySelectorAll('.ch').forEach(ch => {
+    const r = +ch.dataset.room, letters = ch.querySelectorAll('.ch-l'), rest = ch.querySelectorAll('.eyebrow span, .s, .ctas');
+    gsap.set(letters, { yPercent: 110 }); gsap.set(rest, { opacity: 0, y: 20 });
+    const tl = gsap.timeline({ paused: true });
+    tl.to(letters, { yPercent: 0, duration: .5, ease: 'expo.out', stagger: .018 }, 0)
+      .to(rest, { opacity: 1, y: 0, duration: .5, ease: 'expo.out', stagger: .06 }, .12);
+    if (r < 4) tl.to(letters, { yPercent: -110, duration: .4, ease: 'power3.in', stagger: .01 }, 1.2).to(rest, { opacity: 0, y: -20, duration: .3, ease: 'power3.in' }, 1.2);
+    tl.totalDuration(r < 4 ? 1.6 : 1);
+    // scrub over the room's scroll range (rooms after the first enter during the previous transition's tail)
+    ScrollTrigger.create({
+      trigger: '.track', start: () => (r === 0 ? -roomH() * .3 : (r - .12) * roomH()), end: () => (r + (r < 4 ? .7 : .4)) * roomH(),
+      scrub: .6, onUpdate: s => tl.progress(s.progress)
+    });
+  });
+
+  // preloader: counts with the real texture loading, then the curtain lifts as the first room's title rises
+  const pre = document.getElementById('pre'), pn = document.getElementById('pn');
+  if (auto) { pre.remove(); lenis.scrollTo(0, { immediate: true }); }
+  else {
+    lenis.stop();
+    const st = { v: 0 }, target = () => (canvas.loaded ? canvas.loaded() : 1) * 100;
+    const tick = () => { st.v += (target() - st.v) * .08 + .4; pn.textContent = String(Math.min(100, Math.floor(st.v))).padStart(3, '0');
+      if (st.v < 100) requestAnimationFrame(tick);
+      else gsap.timeline({ onComplete: () => { pre.remove(); lenis.start(); } })
+        .to(pn, { yPercent: -100, opacity: 0, duration: .6, ease: 'power3.in' })
+        .to(pre, { clipPath: 'inset(0 0 100% 0)', duration: 1.1, ease: 'expo.inOut' }, '-=.2'); };
+    tick();
+  }
+
+  // cursor + magnetic buttons
+  const cur = document.getElementById('cur'), dot = document.getElementById('dot');
+  let cx = innerWidth / 2, cy = innerHeight / 2, dx = cx, dy = cy;
+  addEventListener('pointermove', e => { dx = e.clientX; dy = e.clientY; dot.style.transform = `translate(${dx}px,${dy}px)`; });
+  gsap.ticker.add(() => { cx += (dx - cx) * .16; cy += (dy - cy) * .16; cur.style.transform = `translate(${cx}px,${cy}px)`; });
+  document.querySelectorAll('[data-mag]').forEach(el => {
+    el.addEventListener('pointerenter', () => cur.classList.add('big'));
+    el.addEventListener('pointerleave', () => { cur.classList.remove('big'); gsap.to(el, { x: 0, y: 0, duration: .6, ease: 'elastic.out(1,.4)' }); });
+    el.addEventListener('pointermove', e => { const b = el.getBoundingClientRect(); gsap.to(el, { x: (e.clientX - b.left - b.width / 2) * .3, y: (e.clientY - b.top - b.height / 2) * .4, duration: .4, ease: 'power3.out' }); });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Beam — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root { --fg:#f5eeee; --muted:rgba(245,238,238,.55); --red:#ff2a1f; --line:rgba(255,42,31,.28); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#000; color:var(--fg); font-family:Inter,system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+
+  .hero { position:relative; height:100vh; height:100svh; min-height:620px; isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-1; display:block; }
+  .hud { font-family:"Chakra Petch",monospace; font-size:12px; letter-spacing:.16em; text-transform:uppercase; }
+
+  nav { position:absolute; inset:0 0 auto; display:flex; justify-content:space-between; align-items:center; padding:24px clamp(20px,4vw,52px); }
+  .logo { font-family:"Chakra Petch",sans-serif; font-weight:600; font-size:18px; letter-spacing:.3em; }
+  .logo b { color:var(--red); }
+  .links { display:flex; gap:30px; color:var(--muted); }
+  .links a:hover { color:var(--fg); }
+
+  .readout { position:absolute; left:clamp(20px,4vw,52px); top:96px; color:var(--muted); display:grid; gap:6px; }
+  .bars { display:inline-flex; gap:3px; vertical-align:middle; margin:0 8px; }
+  .bars i { width:5px; height:12px; background:var(--red); animation:bar 1.6s infinite; }
+  .bars i:nth-child(2){ animation-delay:.15s; } .bars i:nth-child(3){ animation-delay:.3s; } .bars i:nth-child(4){ animation-delay:.45s; } .bars i:nth-child(5){ animation-delay:.6s; opacity:.25; }
+  @keyframes bar { 50% { opacity:.35; } }
+
+  /* headline splits around the beam */
+  .split { position:absolute; left:0; right:0; top:40%; transform:translateY(-50%); display:grid; grid-template-columns:1fr 6vw 1fr; align-items:center; font-family:"Chakra Petch",sans-serif; font-weight:500; font-size:clamp(38px,6.6vw,108px); line-height:1; letter-spacing:-.03em; text-transform:uppercase; }
+  .split .l { text-align:right; }
+  .split span { display:block; }
+  .split .l span { animation:fromL 1.4s cubic-bezier(.2,.8,.2,1) both; }
+  .split .r span { animation:fromR 1.4s cubic-bezier(.2,.8,.2,1) both; color:var(--red); text-shadow:0 0 30px rgba(255,42,31,.45); }
+  @keyframes fromL { from { opacity:0; transform:translateX(-60px); filter:blur(10px); } }
+  @keyframes fromR { from { opacity:0; transform:translateX(60px); filter:blur(10px); } }
+
+  .bottom { position:absolute; left:0; right:0; bottom:30px; display:flex; justify-content:space-between; align-items:flex-end; gap:24px; padding:0 clamp(20px,4vw,52px); }
+  .bottom p { max-width:330px; font-size:15px; line-height:1.6; color:var(--muted); }
+  .cta { display:inline-flex; align-items:center; gap:14px; font-family:"Chakra Petch",sans-serif; font-size:14px; letter-spacing:.18em; text-transform:uppercase; padding:16px 24px; border:1px solid var(--line); background:rgba(255,42,31,.06); clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px)); transition:background .3s, color .3s; }
+  .cta:hover { background:var(--red); color:#000; }
+
+  .rv { opacity:0; animation:fade 1.4s ease forwards; animation-delay:calc(var(--d,0) * 1ms); }
+  @keyframes fade { to { opacity:1; } }
+  @media (prefers-reduced-motion:reduce){ .rv,.split span{ animation:none!important; opacity:1; } .bars i{ animation:none; } }
+  @media (max-width:760px){ .links{ display:none; } .readout{ display:none; } .split{ grid-template-columns:1fr 14vw 1fr; } .bottom{ flex-direction:column; align-items:flex-start; bottom:auto; top:58%; } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg data-focus=".5,.5" aria-hidden="true"></canvas>
+
+  <nav class="rv">
+    <a class="logo" href="#">SIGN<b>/</b>AL</a>
+    <div class="links hud"><a href="#">How it works</a><a href="#">Security</a><a href="#">Pricing</a></div>
+  </nav>
+
+  <div class="readout hud rv" style="--d:400">
+    <span>Signal<span class="bars"><i></i><i></i><i></i><i></i><i></i></span><b id="pct">98%</b></span>
+    <span>Noise filtered: <b id="nf">14,203</b></span>
+  </div>
+
+  <h1 class="split">
+    <span class="l"><span style="animation-delay:.3s">Cut</span><span style="animation-delay:.45s">through</span></span>
+    <span></span>
+    <span class="r"><span style="animation-delay:.6s">the</span><span style="animation-delay:.75s">noise.</span></span>
+  </h1>
+
+  <div class="bottom">
+    <p class="rv" style="--d:1100">Signal reads every message, ticket and alert, then shows you the three that actually need you today.</p>
+    <a class="cta rv" style="--d:1300" href="#">Get early access →</a>
+  </div>
+</section>
+<script src="bg.js"></script>
+<script>
+  // live-ish readouts
+  const pct = document.getElementById('pct'), nf = document.getElementById('nf'); let n = 14203;
+  setInterval(() => { pct.textContent = (96 + Math.random() * 3.9).toFixed(0) + '%'; n += Math.floor(Math.random() * 9); nf.textContent = n.toLocaleString(); }, 900);
+</script>
+</body>
+</html>

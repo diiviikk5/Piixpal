@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Reed Crimson — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;1,6..96,400;1,6..96,500&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root { --fg:#fff1ec; --muted:rgba(255,241,236,.68); --line:rgba(255,241,236,.22); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#3a0403; color:var(--fg); font-family:Inter,system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+
+  .hero { position:relative; min-height:100vh; min-height:100svh; display:flex; flex-direction:column; isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-2; display:block; }
+  .hero::after { content:""; position:absolute; inset:0; z-index:-1; background:radial-gradient(70% 60% at 50% 50%,rgba(0,0,0,.35),transparent 70%); pointer-events:none; }
+
+  nav { display:flex; justify-content:space-between; align-items:center; padding:24px clamp(20px,4vw,52px); font-size:13px; letter-spacing:.18em; text-transform:uppercase; }
+  .mark { font-family:"Bodoni Moda",serif; font-size:22px; letter-spacing:.04em; text-transform:none; font-style:italic; }
+  .links { display:flex; gap:30px; color:var(--muted); }
+  .links a:hover { color:var(--fg); }
+
+  .stage { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:0 20px; }
+  .out { display:inline-flex; align-items:center; gap:12px; font-size:12px; letter-spacing:.32em; text-transform:uppercase; color:var(--muted); }
+  .eq { display:inline-flex; align-items:flex-end; gap:2px; height:14px; }
+  .eq i { width:3px; background:var(--fg); animation:eq 1s ease-in-out infinite; }
+  .eq i:nth-child(1){ height:40%; animation-delay:-.2s; } .eq i:nth-child(2){ height:90%; animation-delay:-.5s; } .eq i:nth-child(3){ height:60%; animation-delay:-.1s; } .eq i:nth-child(4){ height:80%; animation-delay:-.7s; }
+  @keyframes eq { 50% { height:20%; } }
+  h1 { margin-top:18px; font-family:"Bodoni Moda",serif; font-weight:500; font-style:italic; font-variation-settings:"opsz" 40; font-size:clamp(64px,13vw,220px); line-height:.85; letter-spacing:-.04em; text-shadow:0 20px 80px rgba(0,0,0,.5); }
+  h1 span { display:block; font-style:normal; font-weight:700; font-size:.32em; letter-spacing:.3em; margin-top:.2em; padding-left:.3em; }
+  .listen { margin-top:38px; display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+  .listen a { display:inline-flex; align-items:center; gap:10px; padding:13px 22px; border-radius:999px; border:1px solid var(--line); background:rgba(20,0,0,.25); backdrop-filter:blur(10px); font-size:14px; font-weight:500; transition:background .3s, color .3s, border-color .3s; }
+  .listen a:hover { background:var(--fg); color:#5a0605; border-color:var(--fg); }
+  .listen a.main { background:var(--fg); color:#5a0605; border-color:var(--fg); }
+  .listen a.main:hover { background:#fff; }
+  .listen svg { width:16px; height:16px; }
+
+  .tour { display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--line); }
+  .tour a { padding:18px clamp(14px,2vw,28px); display:flex; justify-content:space-between; align-items:baseline; gap:12px; font-size:13px; color:var(--muted); transition:background .3s, color .3s; }
+  .tour a + a { border-left:1px solid var(--line); }
+  .tour a:hover { background:rgba(255,241,236,.06); color:var(--fg); }
+  .tour b { font-family:"Bodoni Moda",serif; font-weight:400; font-size:20px; color:var(--fg); }
+  .tour em { font-style:normal; font-size:11px; letter-spacing:.16em; text-transform:uppercase; }
+
+  .rv { opacity:0; transform:translateY(16px); filter:blur(10px); animation:rise 1.3s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:calc(var(--d,0) * 1ms); }
+  @keyframes rise { to { opacity:1; transform:none; filter:blur(0); } }
+  @media (prefers-reduced-motion:reduce){ .rv{ animation:none; opacity:1; transform:none; filter:none; } .eq i{ animation:none; } }
+  @media (max-width:760px){ .links{ display:none; } .tour{ grid-template-columns:1fr 1fr; } .tour a:nth-child(3){ border-left:0; } .tour a:nth-child(n+3){ border-top:1px solid var(--line); } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+
+  <nav class="rv">
+    <a class="mark" href="#">Mara Vell</a>
+    <div class="links"><a href="#">Music</a><a href="#">Tour</a><a href="#">Store</a><a href="#">Journal</a></div>
+  </nav>
+
+  <div class="stage">
+    <span class="out rv" style="--d:200"><span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>The new album — out now</span>
+    <h1 class="rv" style="--d:400">Velvet<span>HOURS</span></h1>
+    <div class="listen rv" style="--d:700">
+      <a class="main" href="#"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Listen now</a>
+      <a href="#">Spotify</a><a href="#">Apple Music</a><a href="#">Vinyl</a>
+    </div>
+  </div>
+
+  <div class="tour rv" style="--d:1000">
+    <a href="#"><span><b>Mar 02</b></span><em>London</em></a>
+    <a href="#"><span><b>Mar 09</b></span><em>Berlin</em></a>
+    <a href="#"><span><b>Mar 16</b></span><em>Lisbon</em></a>
+    <a href="#"><span><b>Mar 23</b></span><em>New York</em></a>
+  </div>
+</section>
+<script src="bg.js"></script>
+</body>
+</html>

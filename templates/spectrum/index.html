@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Spectrum — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Gloock&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root { --fg:#fff8f2; --muted:rgba(255,248,242,.75); --line:rgba(255,248,242,.22); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#120b14; color:var(--fg); font-family:Manrope,system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+
+  .hero { position:relative; min-height:100vh; min-height:100svh; display:flex; flex-direction:column; isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-1; display:block; }
+
+  nav { display:flex; justify-content:space-between; align-items:center; padding:24px clamp(20px,4vw,56px); }
+  .logo { font-family:Gloock,serif; font-size:24px; }
+  .links { display:flex; gap:28px; font-size:15px; font-weight:500; color:var(--muted); }
+  .links a:hover { color:var(--fg); }
+
+  main { flex:1; display:grid; grid-template-columns:1.15fr .85fr; align-items:center; gap:40px; padding:0 clamp(20px,4vw,56px) 6vh; }
+  .issue { font-size:13px; font-weight:700; letter-spacing:.16em; text-transform:uppercase; color:#2a0c1c; background:rgba(255,248,242,.85); padding:6px 12px; border-radius:999px; }
+  h1 { margin-top:22px; font-family:Gloock,serif; font-weight:400; font-size:clamp(52px,7.2vw,116px); line-height:.95; letter-spacing:-.02em; text-shadow:0 8px 50px rgba(80,10,40,.35); }
+  .sub { margin-top:20px; font-size:18px; line-height:1.55; color:var(--muted); max-width:470px; }
+  form { margin-top:30px; display:flex; gap:6px; max-width:460px; padding:6px; border-radius:16px; background:rgba(18,11,20,.45); border:1px solid var(--line); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); }
+  form input { flex:1; min-width:0; background:none; border:0; outline:0; color:var(--fg); font:inherit; font-size:15px; padding:0 14px; }
+  form input::placeholder { color:rgba(255,248,242,.5); }
+  form button { font:inherit; font-weight:700; font-size:15px; padding:13px 20px; border:0; border-radius:11px; background:var(--fg); color:#2a0c1c; cursor:pointer; transition:transform .2s; }
+  form button:hover { transform:scale(1.03); }
+  .proof { margin-top:16px; font-size:14px; color:var(--muted); }
+  .proof b { color:var(--fg); }
+
+  .cards { display:grid; gap:14px; justify-self:end; width:min(380px,100%); }
+  .card { display:block; padding:18px 20px; border-radius:18px; background:rgba(255,248,242,.06); border:1px solid rgba(255,248,242,.12); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); transition:transform .4s cubic-bezier(.2,.7,.2,1), background .3s; }
+  .card:hover { transform:translateX(-6px); background:rgba(255,248,242,.1); }
+  .card small { font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+  .card h3 { margin-top:6px; font-family:Gloock,serif; font-weight:400; font-size:22px; line-height:1.2; }
+  .card p { margin-top:6px; font-size:14px; color:var(--muted); }
+  .card:nth-child(2){ margin-left:24px; } .card:nth-child(3){ margin-left:48px; }
+
+  .rv { opacity:0; transform:translateY(16px); filter:blur(8px); animation:rise 1.1s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:calc(var(--d,0) * 1ms); }
+  @keyframes rise { to { opacity:1; transform:none; filter:blur(0); } }
+  @media (prefers-reduced-motion:reduce){ .rv{ animation:none; opacity:1; transform:none; filter:none; } }
+  @media (max-width:900px){ .links{ display:none; } main{ grid-template-columns:1fr; } .cards{ justify-self:start; } .card:nth-child(n){ margin-left:0; } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+
+  <nav class="rv">
+    <a class="logo" href="#">Full Spectrum</a>
+    <div class="links"><a href="#">Archive</a><a href="#">About</a><a href="#">Sponsor</a></div>
+  </nav>
+
+  <main>
+    <div>
+      <span class="issue rv" style="--d:150">Issue #128 out Sunday</span>
+      <h1 class="rv" style="--d:300">One email. Every colour of the week.</h1>
+      <p class="sub rv" style="--d:450">The best of design, AI and indie building, distilled into a five-minute Sunday read. No hot takes, just good stuff.</p>
+      <form class="rv" style="--d:600" onsubmit="event.preventDefault(); this.querySelector('button').textContent='Subscribed ✓'">
+        <input type="email" placeholder="you@domain.com" aria-label="Email address" />
+        <button type="submit">Subscribe</button>
+      </form>
+      <p class="proof rv" style="--d:700">Join <b>48,210</b> readers from Lumen, Orbital and Halcyon.</p>
+    </div>
+    <div class="cards">
+      <a class="card rv" style="--d:700" href="#"><small>#127 · 6 min</small><h3>The quiet return of skeuomorphism</h3><p>Why depth is back, and how to use it well.</p></a>
+      <a class="card rv" style="--d:820" href="#"><small>#126 · 4 min</small><h3>Shipping an AI feature in a weekend</h3><p>A teardown of three hackathon winners.</p></a>
+      <a class="card rv" style="--d:940" href="#"><small>#125 · 5 min</small><h3>Colour systems that scale</h3><p>From one brand hue to a full palette.</p></a>
+    </div>
+  </main>
+</section>
+<script src="bg.js"></script>
+</body>
+</html>

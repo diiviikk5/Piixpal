@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Static — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Instrument+Sans:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  :root { --fg:#fff5ea; --muted:rgba(255,245,234,.75); --line:rgba(255,245,234,.25); --ink:#1a0d16; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#0e1a1c; color:var(--fg); font-family:"Instrument Sans",system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+  button { font:inherit; cursor:pointer; }
+  .mono { font-family:"Space Mono",monospace; font-size:12px; letter-spacing:.06em; text-transform:uppercase; }
+
+  .hero { position:relative; min-height:100vh; min-height:100svh; display:flex; flex-direction:column; padding:22px clamp(20px,4vw,56px) 30px; isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-1; display:block; }
+
+  nav { display:flex; justify-content:space-between; align-items:center; }
+  .logo { font-family:"Archivo Black",sans-serif; font-size:20px; letter-spacing:-.02em; display:flex; align-items:center; gap:8px; }
+  .logo i { width:10px; height:10px; border-radius:50%; background:#ff3b2f; box-shadow:0 0 0 4px rgba(255,59,47,.25); animation:pulse 1.6s infinite; }
+  @keyframes pulse { 50% { box-shadow:0 0 0 9px rgba(255,59,47,0); } }
+  .links { display:flex; gap:26px; }
+  .links a { opacity:.8; } .links a:hover { opacity:1; }
+
+  .title { margin-top:auto; }
+  .title small { display:block; margin-bottom:10px; }
+  h1 { font-family:"Archivo Black",sans-serif; font-weight:400; font-size:clamp(84px,19vw,300px); line-height:.78; letter-spacing:-.05em; text-transform:uppercase; mix-blend-mode:overlay; color:#fff; }
+
+  .row { margin-top:28px; display:grid; grid-template-columns:minmax(280px,560px) 1fr; gap:24px; align-items:end; }
+  .player { display:flex; align-items:center; gap:16px; padding:12px 16px 12px 12px; border-radius:18px; background:rgba(26,13,22,.55); border:1px solid var(--line); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); }
+  .play { flex:none; width:52px; height:52px; border-radius:50%; border:0; background:var(--fg); color:var(--ink); display:grid; place-items:center; transition:transform .2s; }
+  .play:hover { transform:scale(1.06); }
+  .play svg { width:18px; height:18px; margin-left:2px; }
+  .ep { flex:1; min-width:0; }
+  .ep b { display:block; font-weight:600; font-size:15px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .wave { margin-top:8px; display:flex; align-items:center; gap:2px; height:26px; }
+  .wave i { flex:1; border-radius:2px; background:rgba(255,245,234,.35); }
+  .wave i.on { background:var(--fg); }
+  .player.playing .wave i { animation:wv .9s ease-in-out infinite alternate; }
+  @keyframes wv { to { transform:scaleY(.35); } }
+  .time { font-family:"Space Mono",monospace; font-size:12px; color:var(--muted); }
+  .listen { justify-self:end; display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
+  .listen a { padding:10px 16px; border-radius:999px; border:1px solid var(--line); background:rgba(26,13,22,.3); backdrop-filter:blur(10px); font-weight:500; font-size:14px; transition:background .25s, color .25s; }
+  .listen a:hover { background:var(--fg); color:var(--ink); }
+
+  .rv { opacity:0; transform:translateY(16px); animation:rise 1s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:calc(var(--d,0) * 1ms); }
+  @keyframes rise { to { opacity:1; transform:none; } }
+  @media (prefers-reduced-motion:reduce){ .rv{ animation:none; opacity:1; transform:none; } .logo i,.wave i{ animation:none!important; } }
+  @media (max-width:820px){ .links{ display:none; } .row{ grid-template-columns:1fr; } .listen{ justify-self:start; justify-content:flex-start; } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+
+  <nav class="rv mono">
+    <a class="logo" href="#"><i></i>STATIC</a>
+    <div class="links"><a href="#">Episodes</a><a href="#">Guests</a><a href="#">Newsletter</a><a href="#">Sponsor</a></div>
+  </nav>
+
+  <div class="title">
+    <small class="mono rv" style="--d:150">A podcast about building in public · Ep. 84</small>
+    <h1 class="rv" style="--d:250">Static</h1>
+  </div>
+
+  <div class="row">
+    <div class="player rv" style="--d:500" id="player">
+      <button class="play" type="button" id="pp" aria-label="Play episode"><svg viewBox="0 0 14 14" fill="currentColor"><path d="M2 1l11 6-11 6z"/></svg></button>
+      <div class="ep"><b>Ep. 84 — Shipping a startup in 48 hours, with Rin Sato</b><div class="wave" id="wave"></div></div>
+      <span class="time" id="tm">00:00 / 52:14</span>
+    </div>
+    <div class="listen rv" style="--d:650"><a href="#">Spotify</a><a href="#">Apple Podcasts</a><a href="#">YouTube</a><a href="#">RSS</a></div>
+  </div>
+</section>
+<script src="bg.js"></script>
+<script>
+  // waveform + fake playback
+  const wave = document.getElementById('wave'), N = 56;
+  wave.innerHTML = Array.from({ length: N }, (_, i) => `<i style="height:${20 + Math.abs(Math.sin(i * .7) * 60 + Math.sin(i * 2.3) * 20)}%;animation-delay:${-(i % 7) * .12}s"></i>`).join('');
+  const bars = [...wave.children], player = document.getElementById('player'), tm = document.getElementById('tm'), pp = document.getElementById('pp');
+  let playing = false, s = 0, timer;
+  const fmt = n => `${String(n / 60 | 0).padStart(2, '0')}:${String(n % 60).padStart(2, '0')}`;
+  pp.onclick = () => {
+    playing = !playing; player.classList.toggle('playing', playing);
+    pp.innerHTML = playing ? '<svg viewBox="0 0 14 14" fill="currentColor"><path d="M3 1h3v12H3zM8 1h3v12H8z"/></svg>' : '<svg viewBox="0 0 14 14" fill="currentColor"><path d="M2 1l11 6-11 6z"/></svg>';
+    clearInterval(timer);
+    if (playing) timer = setInterval(() => { s++; tm.textContent = `${fmt(s)} / 52:14`; bars.forEach((b, i) => b.classList.toggle('on', i < (s / 3134) * N)); }, 1000);
+  };
+</script>
+</body>
+</html>

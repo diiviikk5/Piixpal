@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Desert Dragon — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Crimson+Pro:ital,wght@0,400;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root { --fg:#fff3e2; --muted:rgba(255,243,226,.7); --gold:#ffb44d; --line:rgba(255,180,77,.32); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#1a0a05; color:var(--fg); font-family:Inter,system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+
+  .hero { position:relative; height:100vh; height:100svh; min-height:680px; isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-2; display:block; }
+  .hero::after { content:""; position:absolute; inset:0; z-index:-1; background:linear-gradient(0deg,rgba(14,5,2,.85),rgba(14,5,2,.35) 32%,transparent 48%),linear-gradient(180deg,rgba(14,5,2,.45),transparent 14%); pointer-events:none; }
+
+  nav { position:absolute; inset:0 0 auto; display:flex; justify-content:space-between; align-items:center; padding:22px clamp(20px,4vw,52px); }
+  .logo { font-family:Cinzel,serif; font-weight:700; font-size:20px; letter-spacing:.16em; display:flex; align-items:center; gap:10px; }
+  .logo svg { width:26px; height:26px; color:var(--gold); }
+  .links { display:flex; gap:28px; font-size:14px; color:var(--muted); }
+  .links a:hover { color:var(--fg); }
+  .nr { display:flex; gap:10px; font-size:14px; font-weight:500; }
+  .nr a { padding:9px 16px; border-radius:8px; }
+  .nr .s { border:1px solid var(--line); backdrop-filter:blur(8px); } .nr .p { background:var(--gold); color:#2a1204; }
+
+  .copy { position:absolute; left:0; right:0; bottom:clamp(28px,6vh,60px); display:flex; flex-direction:column; align-items:center; text-align:center; padding:0 20px; }
+  .kicker { font-family:"Crimson Pro",serif; font-style:italic; font-size:21px; color:var(--gold); text-shadow:0 1px 10px rgba(0,0,0,.8); }
+  h1 { margin-top:6px; font-family:Cinzel,serif; font-weight:700; font-size:clamp(32px,3.9vw,60px); line-height:1.05; letter-spacing:.03em; text-shadow:0 6px 40px rgba(0,0,0,.6); }
+  .sub { margin-top:14px; max-width:560px; font-size:17px; line-height:1.55; color:var(--muted); }
+  .ctas { margin-top:24px; display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
+  .btn { padding:15px 26px; border-radius:10px; font-weight:600; font-size:15px; transition:transform .25s, box-shadow .25s, background .25s; }
+  .btn.p { background:var(--gold); color:#2a1204; } .btn.p:hover { transform:translateY(-2px); box-shadow:0 14px 40px rgba(255,180,77,.4); }
+  .btn.s { border:1px solid var(--line); background:rgba(20,8,3,.4); backdrop-filter:blur(10px); } .btn.s:hover { background:rgba(255,180,77,.12); }
+  .feats { margin-top:26px; display:flex; gap:clamp(16px,3vw,40px); flex-wrap:wrap; justify-content:center; font-size:13px; color:var(--muted); }
+  .feats span { display:flex; align-items:center; gap:8px; }
+  .feats i { font-style:normal; color:var(--gold); }
+
+  /* live dice roll */
+  .roll { position:absolute; right:clamp(20px,4vw,52px); bottom:clamp(28px,6vh,60px); width:200px; padding:14px; border-radius:14px; border:1px solid var(--line); background:rgba(20,8,3,.5); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); font-size:12px; color:var(--muted); }
+  .roll b { display:flex; align-items:center; justify-content:space-between; margin-top:6px; color:var(--fg); font-size:13px; font-weight:600; }
+  .die { width:46px; height:46px; display:grid; place-items:center; font-family:Cinzel,serif; font-weight:700; font-size:20px; color:#2a1204; background:var(--gold); clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%); }
+  .die.spin { animation:spin .7s cubic-bezier(.2,.7,.2,1); }
+  @keyframes spin { from { transform:rotate(-360deg) scale(.6); } }
+  .crit { color:var(--gold); }
+
+  .rv { opacity:0; transform:translateY(16px); filter:blur(10px); animation:rise 1.5s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:calc(var(--d,0) * 1ms); }
+  @keyframes rise { to { opacity:1; transform:none; filter:blur(0); } }
+  @media (prefers-reduced-motion:reduce){ .rv{ animation:none; opacity:1; transform:none; filter:none; } .die.spin{ animation:none; } }
+  @media (max-width:980px){ .links,.roll{ display:none; } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg data-focus=".5,.45" aria-hidden="true"></canvas>
+
+  <nav class="rv">
+    <a class="logo" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2 3 7v10l9 5 9-5V7z"/><path d="M12 2v20M3 7l9 5 9-5"/></svg>WYRMHOLD</a>
+    <div class="links"><a href="#">Features</a><a href="#">Campaigns</a><a href="#">Marketplace</a><a href="#">Pricing</a></div>
+    <div class="nr"><a class="s" href="#">Sign in</a><a class="p" href="#">Start free</a></div>
+  </nav>
+
+  <div class="copy">
+    <span class="kicker rv" style="--d:500">For game masters and their parties</span>
+    <h1 class="rv" style="--d:700">Run campaigns worth remembering.</h1>
+    <p class="sub rv" style="--d:900">Maps, initiative, dice and lore in one living table. Play in person or online — the dragon waits either way.</p>
+    <div class="ctas rv" style="--d:1100"><a class="btn p" href="#">Create your campaign</a><a class="btn s" href="#">▶ See a session</a></div>
+    <div class="feats rv" style="--d:1300"><span><i>◆</i>Dynamic lighting & fog of war</span><span><i>◆</i>3D dice, synced</span><span><i>◆</i>5e, PF2e & homebrew</span></div>
+  </div>
+
+  <div class="roll rv" style="--d:1500" aria-hidden="true">
+    Initiative · Round 3
+    <b><span>Kael rolls d20</span><span class="die spin" id="die">17</span></b>
+    <span id="res">Hits the wyrm for 14</span>
+  </div>
+</section>
+<script src="bg.js"></script>
+<script>
+  // a d20 that rolls every few seconds
+  const die = document.getElementById('die'), res = document.getElementById('res');
+  const names = ['Kael', 'Mira', 'Rin', 'Odo'];
+  setInterval(() => {
+    const v = 1 + Math.floor(Math.random() * 20), who = names[Math.floor(Math.random() * names.length)];
+    die.classList.remove('spin'); void die.offsetWidth; die.classList.add('spin'); die.textContent = v;
+    die.previousElementSibling.textContent = who + ' rolls d20';
+    res.innerHTML = v === 20 ? '<span class="crit">Critical hit!</span>' : v >= 12 ? `Hits the wyrm for ${4 + Math.floor(Math.random() * 14)}` : 'The wyrm dodges';
+  }, 3200);
+</script>
+</body>
+</html>

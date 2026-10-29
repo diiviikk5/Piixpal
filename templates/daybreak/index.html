@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Daybreak — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root { --fg:#fff6ea; --muted:rgba(255,246,234,.6); --line:rgba(255,246,234,.14); --sun:#ffb21e; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#121010; color:var(--fg); font-family:"Space Grotesk",system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+
+  .hero { position:relative; min-height:100vh; min-height:100svh; display:flex; flex-direction:column; isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-1; display:block; }
+
+  nav { display:flex; align-items:center; justify-content:space-between; padding:24px clamp(20px,4vw,48px); }
+  .logo { display:flex; align-items:center; gap:10px; font-weight:700; font-size:18px; letter-spacing:-.02em; }
+  .logo svg { width:26px; height:26px; }
+  .soc { display:flex; gap:18px; font-size:14px; color:var(--muted); }
+  .soc a:hover { color:var(--fg); }
+
+  .content { display:flex; flex-direction:column; align-items:center; text-align:center; padding:8vh 20px 0; }
+  .soon { font-size:12px; font-weight:500; letter-spacing:.32em; text-transform:uppercase; color:var(--sun); }
+  h1 { margin-top:22px; font-weight:600; font-size:clamp(46px,7.6vw,116px); line-height:.94; letter-spacing:-.05em; max-width:11ch; }
+  h1 span { display:inline-block; }
+  .sub { margin-top:22px; max-width:470px; font-size:18px; line-height:1.55; color:var(--muted); }
+
+  form { margin-top:36px; display:flex; gap:6px; padding:6px; width:min(460px,100%); border-radius:16px; border:1px solid var(--line); background:rgba(18,16,16,.55); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); transition:border-color .3s; }
+  form:focus-within { border-color:rgba(255,178,30,.55); }
+  form input { flex:1; min-width:0; background:none; border:0; outline:0; color:var(--fg); font:inherit; font-size:15px; padding:0 14px; }
+  form input::placeholder { color:rgba(255,246,234,.4); }
+  form button { font:inherit; font-weight:600; font-size:15px; padding:13px 20px; border:0; border-radius:11px; background:var(--sun); color:#1d1205; cursor:pointer; transition:transform .2s, background .2s; white-space:nowrap; }
+  form button:hover { background:#ffc44d; transform:scale(1.02); }
+  form.done { border-color:rgba(126,224,168,.5); }
+  .msg { min-height:20px; margin-top:12px; font-size:14px; color:#9fe8be; }
+
+  .people { margin-top:22px; display:flex; align-items:center; gap:12px; font-size:14px; color:rgba(255,246,234,.85); text-shadow:0 1px 14px rgba(40,10,0,.5); }
+  .people .stack { display:flex; }
+  .people .stack i { width:28px; height:28px; border-radius:50%; border:2px solid #1a1513; margin-left:-8px; }
+  .people .stack i:first-child { margin-left:0; }
+  .people b { color:var(--fg); font-weight:600; font-variant-numeric:tabular-nums; }
+
+  .rv { opacity:0; transform:translateY(18px); filter:blur(10px); animation:rise 1.2s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:calc(var(--d,0) * 1ms); }
+  @keyframes rise { to { opacity:1; transform:none; filter:blur(0); } }
+  @media (prefers-reduced-motion:reduce){ .rv{ animation:none; opacity:1; transform:none; filter:none; } }
+  @media (max-width:560px){ .soc{ display:none; } form{ flex-direction:column; } form input{ padding:12px 14px; } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+
+  <nav class="rv">
+    <a class="logo" href="#"><svg viewBox="0 0 26 26" fill="none"><path d="M3 18a10 10 0 0 1 20 0" stroke="#ffb21e" stroke-width="2.4" stroke-linecap="round"/><path d="M1 22h24" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>Daybreak</a>
+    <div class="soc"><a href="#">X / Twitter</a><a href="#">Discord</a><a href="#">GitHub</a></div>
+  </nav>
+
+  <div class="content">
+    <span class="soon rv" style="--d:150">Launching soon</span>
+    <h1 class="rv" style="--d:300">Something new is about to rise.</h1>
+    <p class="sub rv" style="--d:450">A calmer way to plan your mornings, built in a weekend and polished for you. Join the waitlist and be first through the door.</p>
+    <form class="rv" style="--d:600" id="wl" novalidate>
+      <input type="email" placeholder="you@domain.com" aria-label="Email address" required />
+      <button type="submit">Join waitlist</button>
+    </form>
+    <p class="msg" id="msg" role="status"></p>
+    <div class="people rv" style="--d:750">
+      <span class="stack"><i style="background:linear-gradient(135deg,#ffb21e,#b0490a)"></i><i style="background:linear-gradient(135deg,#f6d7a7,#c9733c)"></i><i style="background:linear-gradient(135deg,#ff8a3d,#6b1d0b)"></i><i style="background:linear-gradient(135deg,#ffe3a1,#ff9f0a)"></i></span>
+      <span><b id="n">2,431</b> early risers waiting</span>
+    </div>
+  </div>
+</section>
+<script src="bg.js"></script>
+<script>
+  // Waitlist stub: validate + optimistic success. Wire the fetch() to your backend / form service.
+  const form = document.getElementById('wl'), msg = document.getElementById('msg'), n = document.getElementById('n');
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const email = form.querySelector('input');
+    if (!/^\S+@\S+\.\S+$/.test(email.value)) { msg.style.color = '#ffb4a1'; msg.textContent = 'That email looks off. Try again?'; email.focus(); return; }
+    form.classList.add('done'); msg.style.color = ''; msg.textContent = "You're on the list. See you at sunrise ☀";
+    n.textContent = (parseInt(n.textContent.replace(/,/g, '')) + 1).toLocaleString();
+    email.value = '';
+  });
+</script>
+</body>
+</html>

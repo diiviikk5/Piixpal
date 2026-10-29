@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Canyon Magenta — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,400;0,500;0,600;0,800;1,500&display=swap" rel="stylesheet" />
+<style>
+  :root { --fg:#fff3fa; --muted:rgba(255,243,250,.7); --line:rgba(255,243,250,.18); --pink:#ff5fae; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#2a0420; color:var(--fg); font-family:Figtree,system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+
+  .hero { position:relative; min-height:100vh; min-height:100svh; display:flex; flex-direction:column; isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-1; display:block; }
+
+  nav { display:flex; justify-content:space-between; align-items:center; padding:22px clamp(20px,4vw,56px); }
+  .logo { display:flex; align-items:center; gap:10px; font-weight:800; font-size:20px; letter-spacing:-.02em; }
+  .logo i { width:30px; height:30px; border-radius:50%; background:radial-gradient(circle at 35% 30%,#ffd1ea,#ff5fae 45%,#8a0a5a); box-shadow:0 0 24px rgba(255,95,174,.6); }
+  .links { display:flex; gap:28px; font-size:15px; color:var(--muted); }
+  .links a:hover { color:var(--fg); }
+  .try { font-weight:600; font-size:15px; padding:10px 18px; border-radius:999px; background:var(--fg); color:#4a0636; }
+
+  main { flex:1; display:grid; grid-template-columns:1fr 1fr; align-items:center; gap:40px; padding:0 clamp(20px,4vw,56px) 5vh; }
+  .eyebrow { font-size:14px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--pink); }
+  h1 { margin-top:16px; font-weight:800; font-size:clamp(48px,6.4vw,100px); line-height:.95; letter-spacing:-.045em; }
+  h1 em { font-weight:500; }
+  .sub { margin-top:20px; font-size:18px; line-height:1.55; color:var(--muted); max-width:460px; }
+  .ctas { margin-top:30px; display:flex; gap:12px; flex-wrap:wrap; }
+  .btn { padding:15px 26px; border-radius:999px; font-weight:600; font-size:16px; transition:transform .25s, box-shadow .25s, background .25s; }
+  .btn.p { background:var(--pink); color:#fff; box-shadow:0 10px 40px rgba(255,95,174,.45); }
+  .btn.p:hover { transform:translateY(-2px); box-shadow:0 16px 50px rgba(255,95,174,.6); }
+  .btn.g { border:1px solid var(--line); backdrop-filter:blur(10px); }
+  .btn.g:hover { background:rgba(255,255,255,.1); }
+
+  /* chat */
+  .chat { justify-self:end; width:min(400px,100%); padding:18px; border-radius:28px; background:rgba(40,4,30,.45); border:1px solid var(--line); backdrop-filter:blur(26px) saturate(150%); -webkit-backdrop-filter:blur(26px) saturate(150%); box-shadow:0 40px 100px rgba(20,0,14,.5); }
+  .who { display:flex; align-items:center; gap:10px; padding-bottom:14px; border-bottom:1px solid var(--line); font-weight:600; }
+  .who i { width:34px; height:34px; border-radius:50%; background:radial-gradient(circle at 35% 30%,#ffd1ea,#ff5fae 45%,#8a0a5a); }
+  .who small { display:block; font-weight:400; font-size:12px; color:#9ff0b8; }
+  .msgs { display:flex; flex-direction:column; gap:10px; padding-top:14px; min-height:270px; }
+  .m { max-width:82%; padding:11px 14px; border-radius:18px; font-size:15px; line-height:1.4; opacity:0; transform:translateY(8px) scale(.97); transition:opacity .4s, transform .4s cubic-bezier(.2,.8,.2,1.1); }
+  .m.show { opacity:1; transform:none; }
+  .m.me { align-self:flex-end; background:var(--pink); color:#fff; border-bottom-right-radius:6px; }
+  .m.ai { align-self:flex-start; background:rgba(255,255,255,.1); border-bottom-left-radius:6px; }
+  .typing { display:inline-flex; gap:4px; }
+  .typing i { width:6px; height:6px; border-radius:50%; background:var(--muted); animation:bob 1s infinite; }
+  .typing i:nth-child(2){ animation-delay:.15s; } .typing i:nth-child(3){ animation-delay:.3s; }
+  @keyframes bob { 50% { transform:translateY(-4px); opacity:.5; } }
+
+  .rv { opacity:0; transform:translateY(16px); filter:blur(8px); animation:rise 1.1s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:calc(var(--d,0) * 1ms); }
+  @keyframes rise { to { opacity:1; transform:none; filter:blur(0); } }
+  @media (prefers-reduced-motion:reduce){ .rv{ animation:none; opacity:1; transform:none; filter:none; } .m{ transition:none; } }
+  @media (max-width:900px){ .links{ display:none; } main{ grid-template-columns:1fr; } .chat{ justify-self:start; } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+
+  <nav class="rv">
+    <a class="logo" href="#"><i></i>mira</a>
+    <div class="links"><a href="#">How it works</a><a href="#">Privacy</a><a href="#">Stories</a></div>
+    <a class="try" href="#">Talk to Mira</a>
+  </nav>
+
+  <main>
+    <div>
+      <span class="eyebrow rv" style="--d:150">Your AI companion</span>
+      <h1 class="rv" style="--d:300">Someone to think out loud <em>with.</em></h1>
+      <p class="sub rv" style="--d:450">Mira remembers what matters to you, helps you untangle the hard days and celebrates the good ones. Private by default, always awake.</p>
+      <div class="ctas rv" style="--d:600"><a class="btn p" href="#">Start a conversation</a><a class="btn g" href="#">How Mira remembers</a></div>
+    </div>
+    <div class="chat rv" style="--d:700" aria-hidden="true">
+      <div class="who"><i></i><div>Mira<small>● online</small></div></div>
+      <div class="msgs" id="msgs"></div>
+    </div>
+  </main>
+</section>
+<script src="bg.js"></script>
+<script>
+  // a small scripted conversation, looping
+  const script = [
+    ['me', "I can't focus today. Big demo tomorrow 😬"],
+    ['ai', "You've prepped for this all week. Want to do a 5-minute run-through together?"],
+    ['me', 'yes please'],
+    ['ai', "Great. Start with your opening line — I'll time you ✦"],
+  ];
+  const box = document.getElementById('msgs');
+  const run = async () => {
+    box.innerHTML = '';
+    for (const [who, text] of script) {
+      if (who === 'ai') {
+        const t = document.createElement('div'); t.className = 'm ai show'; t.innerHTML = '<span class="typing"><i></i><i></i><i></i></span>';
+        box.append(t); await new Promise(r => setTimeout(r, 1200)); t.remove();
+      }
+      const m = document.createElement('div'); m.className = 'm ' + who; m.textContent = text; box.append(m);
+      requestAnimationFrame(() => requestAnimationFrame(() => m.classList.add('show')));
+      await new Promise(r => setTimeout(r, who === 'me' ? 900 : 1600));
+    }
+    setTimeout(run, 4000);
+  };
+  setTimeout(run, 1200);
+</script>
+</body>
+</html>

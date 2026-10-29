@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Meadow — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@500;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root { --fg:#ffffff; --ink:#173042; --muted:rgba(255,255,255,.85); --leaf:#8fe388; --sun:#ffb347; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#2a4a5e; color:var(--fg); font-family:Nunito,system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+  .px { font-family:"Press Start 2P",monospace; }
+
+  .hero { position:relative; min-height:100vh; min-height:100svh; display:flex; flex-direction:column; isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-1; display:block; }
+
+  nav { display:flex; justify-content:space-between; align-items:center; padding:22px clamp(20px,4vw,56px); }
+  .logo { font-size:15px; letter-spacing:.04em; display:flex; align-items:center; gap:10px; text-shadow:2px 2px 0 var(--ink); }
+  .logo i { width:16px; height:16px; background:var(--sun); box-shadow:2px 2px 0 var(--ink); }
+  .links { display:flex; gap:26px; font-weight:700; font-size:15px; }
+  .links a { opacity:.9; } .links a:hover { opacity:1; }
+
+  .copy { padding:6vh clamp(20px,4vw,56px) 0; max-width:720px; }
+  .ver { font-size:11px; color:var(--ink); background:var(--leaf); padding:7px 10px; box-shadow:3px 3px 0 var(--ink); }
+  h1 { margin-top:22px; font-weight:800; font-size:clamp(42px,5.8vw,92px); line-height:.95; letter-spacing:-.04em; text-shadow:0 4px 30px rgba(10,40,60,.35); }
+  .sub { margin-top:18px; font-size:17px; font-weight:700; line-height:1.5; max-width:440px; padding:12px 14px; background:#fdf6e3; color:var(--ink); border:3px solid var(--ink); box-shadow:4px 4px 0 rgba(23,48,66,.6); }
+  .ctas { margin-top:26px; display:flex; gap:14px; flex-wrap:wrap; }
+  .btn { padding:16px 20px 14px; font-size:12px; line-height:1; transition:transform .1s, box-shadow .1s; }
+  .btn.p { background:var(--sun); color:var(--ink); box-shadow:4px 4px 0 var(--ink); }
+  .btn.s { background:#fff; color:var(--ink); box-shadow:4px 4px 0 var(--ink); }
+  .btn:hover { transform:translate(-2px,-2px); box-shadow:6px 6px 0 var(--ink); }
+  .btn:active { transform:translate(2px,2px); box-shadow:2px 2px 0 var(--ink); }
+
+  /* quest card */
+  .quest { position:absolute; right:clamp(20px,4vw,56px); top:22%; width:280px; padding:16px; background:#fdf6e3; color:var(--ink); border:3px solid var(--ink); box-shadow:6px 6px 0 rgba(23,48,66,.6); }
+  .quest h4 { font-size:11px; line-height:1.4; }
+  .quest ul { list-style:none; margin-top:12px; display:grid; gap:10px; font-weight:700; font-size:15px; }
+  .quest li { display:flex; align-items:center; gap:10px; }
+  .quest li i { width:14px; height:14px; border:3px solid var(--ink); flex:none; }
+  .quest li.done i { background:var(--leaf); }
+  .quest li.done span { text-decoration:line-through; opacity:.6; }
+  .xp { margin-top:14px; height:12px; border:3px solid var(--ink); background:#fff; }
+  .xp i { display:block; height:100%; width:0; background:var(--sun); animation:xp 2.4s 1.2s steps(12) forwards; }
+  @keyframes xp { to { width:66%; } }
+  .float { animation:bob 3s steps(4) infinite; }
+  @keyframes bob { 50% { transform:translateY(-6px); } }
+
+  .rv { opacity:0; animation:pop .6s steps(4) forwards; animation-delay:calc(var(--d,0) * 1ms); }
+  @keyframes pop { 0% { opacity:0; transform:translateY(12px); } 100% { opacity:1; transform:none; } }
+  @media (prefers-reduced-motion:reduce){ .rv,.xp i,.float{ animation:none; opacity:1; transform:none; } .xp i{ width:66%; } }
+  @media (max-width:900px){ .links{ display:none; } .quest{ display:none; } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+
+  <nav class="rv">
+    <a class="logo px" href="#"><i></i>WILDFLOWER</a>
+    <div class="links"><a href="#">About</a><a href="#">Devlog</a><a href="#">Discord</a><a href="#">Press</a></div>
+  </nav>
+
+  <div class="copy">
+    <span class="ver px rv" style="--d:200">DEMO v0.9 OUT NOW</span>
+    <h1 class="rv" style="--d:400">A cozy game about tending a meadow.</h1>
+    <p class="sub rv" style="--d:600">Plant wildflowers, befriend the bees, and fix up the old handheld you found in the grass. No timers. No losing. Just sunshine.</p>
+    <div class="ctas rv" style="--d:800"><a class="btn p px" href="#">WISHLIST ON STEAM</a><a class="btn s px" href="#">PLAY DEMO</a></div>
+  </div>
+
+  <div class="quest rv" style="--d:1000" aria-hidden="true">
+    <div class="float">
+      <h4 class="px">TODAY'S QUESTS</h4>
+      <ul>
+        <li class="done"><i></i><span>Water the poppies</span></li>
+        <li class="done"><i></i><span>Find the lost console</span></li>
+        <li><i></i><span>Beat the high score</span></li>
+      </ul>
+      <div class="xp"><i></i></div>
+    </div>
+  </div>
+</section>
+<script src="bg.js"></script>
+</body>
+</html>

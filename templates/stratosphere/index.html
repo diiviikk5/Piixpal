@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Stratosphere — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Inter:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root { --fg:#eef4ff; --muted:rgba(238,244,255,.6); --line:rgba(238,244,255,.16); --dawn:#ffb36b; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#020611; color:var(--fg); font-family:Inter,system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+  .mono { font-family:"IBM Plex Mono",monospace; font-size:12px; letter-spacing:.06em; text-transform:uppercase; }
+
+  .hero { position:relative; min-height:100vh; min-height:100svh; display:flex; flex-direction:column; isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-1; display:block; }
+
+  nav { display:flex; justify-content:space-between; align-items:center; padding:24px clamp(20px,4vw,56px); }
+  .logo { font-family:Syncopate,sans-serif; font-weight:700; font-size:16px; letter-spacing:.3em; }
+  .links { display:flex; gap:32px; color:var(--muted); }
+  .links a:hover { color:var(--fg); }
+  .live { display:flex; align-items:center; gap:8px; padding:8px 14px; border:1px solid var(--line); border-radius:999px; }
+  .live i { width:7px; height:7px; border-radius:50%; background:#ff4d4d; animation:blink 1.4s infinite; }
+  @keyframes blink { 50% { opacity:.2; } }
+
+  .center { text-align:center; padding:9vh 20px 0; }
+  .mission { color:var(--dawn); }
+  h1 { margin-top:20px; font-family:Syncopate,sans-serif; font-weight:700; font-size:clamp(34px,6.4vw,104px); line-height:1.02; letter-spacing:.04em; text-transform:uppercase; }
+  h1 span { display:block; font-weight:400; font-size:.24em; letter-spacing:.42em; color:var(--muted); margin-top:1em; padding-left:.42em; }
+  .clock { margin-top:40px; display:inline-flex; gap:clamp(14px,3vw,40px); align-items:flex-end; }
+  .clock div { text-align:center; }
+  .clock b { display:block; font-family:"IBM Plex Mono",monospace; font-weight:500; font-size:clamp(32px,4.6vw,64px); letter-spacing:-.02em; font-variant-numeric:tabular-nums; line-height:1; }
+  .clock small { display:block; margin-top:8px; }
+  .clock .sep { font-family:"IBM Plex Mono",monospace; font-size:clamp(28px,4vw,56px); color:var(--muted); padding-bottom:22px; }
+  .ctas { margin-top:40px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .btn { padding:14px 26px; border-radius:4px; font-size:14px; font-weight:500; letter-spacing:.04em; transition:background .3s, color .3s, transform .3s; }
+  .btn.solid { background:var(--fg); color:#020611; }
+  .btn.solid:hover { background:var(--dawn); transform:translateY(-1px); }
+  .btn.line { border:1px solid var(--line); backdrop-filter:blur(8px); }
+  .btn.line:hover { background:rgba(238,244,255,.1); }
+
+  .telemetry { margin-top:auto; display:grid; grid-template-columns:repeat(4,1fr); border-top:1px solid var(--line); }
+  .telemetry div { padding:16px clamp(16px,2.4vw,32px); color:#3b2a1c; }
+  .telemetry div + div { border-left:1px solid rgba(60,40,20,.15); }
+  .telemetry b { display:block; font-family:"IBM Plex Mono",monospace; font-weight:500; font-size:20px; color:#2a1b10; font-variant-numeric:tabular-nums; margin-top:4px; }
+
+  .rv { opacity:0; transform:translateY(14px); filter:blur(8px); animation:rise 1.2s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:calc(var(--d,0) * 1ms); }
+  @keyframes rise { to { opacity:1; transform:none; filter:blur(0); } }
+  @media (prefers-reduced-motion:reduce){ .rv{ animation:none; opacity:1; transform:none; filter:none; } .live i{ animation:none; } }
+  @media (max-width:820px){ .links{ display:none; } .telemetry{ grid-template-columns:1fr 1fr; } .telemetry div:nth-child(3){ border-left:0; } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+
+  <nav class="rv">
+    <a class="logo" href="#">HALCYON</a>
+    <div class="links mono"><a href="#">Missions</a><a href="#">Vehicles</a><a href="#">Rideshare</a><a href="#">Careers</a></div>
+    <span class="live mono"><i></i>Webcast live</span>
+  </nav>
+
+  <div class="center">
+    <span class="mission mono rv" style="--d:150">Mission Stratos-1 · Low Earth Orbit</span>
+    <h1 class="rv" style="--d:300">Next stop: orbit<span>Launch window opens at dawn</span></h1>
+    <div class="clock rv" style="--d:500" aria-label="Countdown to launch">
+      <div><b id="h">00</b><small class="mono">Hours</small></div><span class="sep">:</span>
+      <div><b id="m">00</b><small class="mono">Min</small></div><span class="sep">:</span>
+      <div><b id="s">00</b><small class="mono">Sec</small></div>
+    </div>
+    <div class="ctas rv" style="--d:650"><a class="btn solid" href="#">Watch the launch</a><a class="btn line" href="#">Mission brief</a></div>
+  </div>
+
+  <div class="telemetry mono rv" style="--d:850">
+    <div>Vehicle<b>Halcyon IV</b></div>
+    <div>Payload<b>32 sats</b></div>
+    <div>Target alt.<b id="alt">550 km</b></div>
+    <div>Weather go<b>98%</b></div>
+  </div>
+</section>
+<script src="bg.js"></script>
+<script>
+  // T-minus clock to a launch 5h 12m 40s after first load
+  const end = Date.now() + ((5 * 60 + 12) * 60 + 40) * 1000, p = n => String(n).padStart(2, '0');
+  const H = document.getElementById('h'), M = document.getElementById('m'), S = document.getElementById('s');
+  const tick = () => { const s = Math.max(0, (end - Date.now()) / 1000 | 0); H.textContent = p(s / 3600 | 0); M.textContent = p((s % 3600) / 60 | 0); S.textContent = p(s % 60); };
+  tick(); setInterval(tick, 1000);
+</script>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ash King — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=EB+Garamond:ital,wght@0,500;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root { --fg:#f4f4f2; --muted:rgba(244,244,242,.66); --line:rgba(244,244,242,.22); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#151515; color:var(--fg); font-family:Inter,system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+
+  .hero { position:relative; height:100vh; height:100svh; min-height:660px; isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-2; display:block; }
+  .hero::after { content:""; position:absolute; inset:0; z-index:-1; background:linear-gradient(0deg,rgba(8,8,8,.8),transparent 42%),linear-gradient(180deg,rgba(8,8,8,.5),transparent 18%); pointer-events:none; }
+
+  nav { position:absolute; inset:0 0 auto; display:flex; justify-content:space-between; align-items:center; padding:22px clamp(20px,4vw,52px); }
+  .logo { font-family:UnifrakturMaguntia,serif; font-size:30px; }
+  .links { display:flex; gap:28px; font-size:14px; color:var(--muted); }
+  .links a:hover { color:var(--fg); }
+  .nb { font-size:14px; font-weight:600; padding:10px 18px; border-radius:4px; background:var(--fg); color:#111; }
+
+  .copy { position:absolute; left:clamp(20px,4vw,52px); bottom:clamp(28px,6vh,56px); max-width:520px; }
+  .copy small { font-family:"EB Garamond",serif; font-style:italic; font-size:20px; color:var(--muted); }
+  h1 { margin-top:6px; font-family:UnifrakturMaguntia,serif; font-weight:400; font-size:clamp(54px,6.6vw,104px); line-height:.95; text-shadow:0 6px 40px rgba(0,0,0,.7); }
+  .copy p { margin-top:14px; font-size:17px; line-height:1.55; color:var(--muted); }
+  .ctas { margin-top:24px; display:flex; gap:12px; flex-wrap:wrap; }
+  .btn { padding:15px 26px; border-radius:4px; font-weight:600; font-size:15px; transition:transform .25s, background .25s; }
+  .btn.w { background:var(--fg); color:#111; } .btn.w:hover { transform:translateY(-2px); }
+  .btn.g { border:1px solid var(--line); background:rgba(10,10,10,.4); backdrop-filter:blur(8px); } .btn.g:hover { background:rgba(255,255,255,.1); }
+  .online { margin-top:18px; font-size:13px; color:var(--muted); display:flex; align-items:center; gap:8px; }
+  .online i { width:7px; height:7px; border-radius:50%; background:#8be08b; box-shadow:0 0 8px #8be08b; }
+
+  /* live mini board */
+  .board-card { position:absolute; right:clamp(20px,4vw,52px); bottom:clamp(28px,6vh,56px); width:250px; padding:14px; border:1px solid var(--line); border-radius:6px; background:rgba(12,12,12,.6); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); }
+  .pl { display:flex; justify-content:space-between; font-size:12px; color:var(--muted); }
+  .pl b { color:var(--fg); font-weight:500; }
+  .board { margin:10px 0; display:grid; grid-template-columns:repeat(8,1fr); aspect-ratio:1; border:1px solid var(--line); }
+  .board div { display:grid; place-items:center; font-size:19px; line-height:1; }
+  .board div.l { background:#cfcfcb; } .board div.d { background:#5a5a58; }
+  .board div.hl { box-shadow:inset 0 0 0 100px rgba(255,214,90,.35); }
+  .board span { font-family:'Segoe UI Symbol','DejaVu Sans',sans-serif; }
+  .board .w { color:#fafafa; text-shadow:0 0 1px #000,0 0 1px #000,0 1px 2px rgba(0,0,0,.6); } .board .b { color:#151515; }
+  .mv { font-size:12px; color:var(--muted); text-align:center; font-family:"EB Garamond",serif; font-style:italic; }
+
+  .rv { opacity:0; transform:translateY(14px); filter:blur(8px); animation:rise 1.5s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:calc(var(--d,0) * 1ms); }
+  @keyframes rise { to { opacity:1; transform:none; filter:blur(0); } }
+  @media (prefers-reduced-motion:reduce){ .rv{ animation:none; opacity:1; transform:none; filter:none; } }
+  @media (max-width:900px){ .links,.board-card{ display:none; } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+
+  <nav class="rv">
+    <a class="logo" href="#">Regicide</a>
+    <div class="links"><a href="#">Play</a><a href="#">Puzzles</a><a href="#">Learn</a><a href="#">Tournaments</a></div>
+    <a class="nb" href="#">Play now</a>
+  </nav>
+
+  <div class="copy">
+    <small class="rv" style="--d:300">Online chess for those who play to win</small>
+    <h1 class="rv" style="--d:500">Every king falls.</h1>
+    <p class="rv" style="--d:800">Rated games in seconds, puzzles that adapt to you, and an engine that explains every blunder in plain words.</p>
+    <div class="ctas rv" style="--d:1000"><a class="btn w" href="#">Play a rated game</a><a class="btn g" href="#">Daily puzzle</a></div>
+    <div class="online rv" style="--d:1200"><i></i><span id="on">48,213</span> playing now</div>
+  </div>
+
+  <div class="board-card rv" style="--d:1300" aria-hidden="true">
+    <div class="pl"><span><b>Duke &amp; Count</b> (2200)</span><span>0:58</span></div>
+    <div class="board" id="board"></div>
+    <div class="pl"><span><b>Morphy</b> (2690)</span><span>1:42</span></div>
+    <p class="mv" id="mv">The Opera Game, 1858</p>
+  </div>
+</section>
+<script src="bg.js"></script>
+<script>
+  // Morphy's Opera Game, played out move by move on the mini board
+  const P = { K:'♚', Q:'♛', R:'♜', B:'♝', N:'♞', P:'♟︎', k:'♚', q:'♛', r:'♜', b:'♝', n:'♞', p:'♟︎' };   // solid glyphs, coloured by side
+  const start = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
+  const moves = ['e2e4','e7e5','g1f3','d7d6','d2d4','c8g4','d4e5','g4f3','d1f3','d6e5','f1c4','g8f6','f3b3','d8e7','b1c3','c7c6','c1g5','b7b5','c3b5','c6b5','c4b5','b8d7','e1c1','a8d8','d1d7','d8d7','h1d1','e7e6','b5d7','f6d7','b3b8','d7b8','d1d8'];
+  const sans = ['1.e4','e5','2.Nf3','d6','3.d4','Bg4','4.dxe5','Bxf3','5.Qxf3','dxe5','6.Bc4','Nf6','7.Qb3','Qe7','8.Nc3','c6','9.Bg5','b5','10.Nxb5','cxb5','11.Bxb5+','Nbd7','12.O-O-O','Rd8','13.Rxd7','Rxd7','14.Rd1','Qe6','15.Bxd7+','Nxd7','16.Qb8+','Nxb8','17.Rd8#'];
+  let B, i = 0, last = [];
+  const reset = () => { B = start.split('/').map(r => [...r.replace(/\d/g, n => '.'.repeat(n))]); i = 0; last = []; };
+  const sq = s => [8 - +s[1], s.charCodeAt(0) - 97];
+  const el = document.getElementById('board'), mv = document.getElementById('mv');
+  const draw = () => {
+    el.innerHTML = B.map((row, r) => row.map((c, f) => {
+      const hl = last.some(([a, b]) => a === r && b === f) ? ' hl' : '';
+      return `<div class="${(r + f) % 2 ? 'd' : 'l'}${hl}"><span class="${c === c.toUpperCase() ? 'w' : 'b'}">${c === '.' ? '' : P[c]}</span></div>`;
+    }).join('')).join('');
+  };
+  const step = () => {
+    if (i >= moves.length) { mv.textContent = '1–0 · Morphy wins'; setTimeout(() => { reset(); mv.textContent = 'The Opera Game, 1858'; draw(); }, 3500); return; }
+    const m = moves[i], [r1, f1] = sq(m.slice(0, 2)), [r2, f2] = sq(m.slice(2, 4));
+    B[r2][f2] = B[r1][f1]; B[r1][f1] = '.';
+    if (m === 'e1c1') { B[7][3] = 'R'; B[7][0] = '.'; }          // castling queenside
+    last = [[r1, f1], [r2, f2]]; mv.textContent = sans[i]; i++; draw();
+  };
+  reset(); draw(); setInterval(step, 1400);
+  let n = 48213; setInterval(() => { n += Math.round((Math.random() - .45) * 40); document.getElementById('on').textContent = n.toLocaleString(); }, 2000);
+</script>
+</body>
+</html>

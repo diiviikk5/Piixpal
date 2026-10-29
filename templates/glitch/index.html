@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Glitch — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root { --ink:#1d2433; --muted:rgba(29,36,51,.65); --hot:#ff3d7f; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#c9cfd3; color:var(--ink); font-family:"IBM Plex Mono",monospace; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+
+  .hero { position:relative; height:100vh; height:100svh; min-height:640px; isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-1; display:block; }
+
+  nav { position:absolute; inset:0 0 auto; display:flex; justify-content:space-between; align-items:center; padding:22px clamp(20px,3vw,44px); font-size:12px; letter-spacing:.1em; text-transform:uppercase; }
+  .logo { font-family:Anton,sans-serif; font-size:22px; letter-spacing:.04em; }
+  .links { display:flex; gap:24px; }
+  .links a { opacity:.75; } .links a:hover { opacity:1; }
+
+  .title { position:absolute; left:clamp(20px,3vw,44px); top:16%; }
+  .title small { font-size:12px; letter-spacing:.14em; text-transform:uppercase; }
+  h1 { margin-top:8px; font-family:Anton,sans-serif; font-weight:400; font-size:clamp(64px,9vw,150px); line-height:.86; letter-spacing:.01em; text-transform:uppercase; }
+  h1 .g { position:relative; display:inline-block; }
+  h1 .g::before, h1 .g::after { content:attr(data-t); position:absolute; inset:0; }
+  h1 .g::before { color:var(--hot); transform:translate(3px,0); clip-path:inset(0 0 62% 0); animation:gl 3.7s steps(1) infinite; }
+  h1 .g::after { color:#26c6ff; transform:translate(-3px,0); clip-path:inset(58% 0 0 0); animation:gl 3.7s steps(1) infinite .1s; }
+  @keyframes gl { 0%,3%,100% { opacity:0; } 1% { opacity:1; transform:translate(6px,-1px); } 2% { opacity:1; transform:translate(-5px,1px); } }
+
+  .info { position:absolute; right:clamp(20px,3vw,44px); bottom:30px; width:min(330px,40vw); font-size:13px; line-height:1.6; }
+  .info dl { display:grid; grid-template-columns:auto 1fr; gap:6px 16px; padding:14px 0; border-top:2px solid var(--ink); border-bottom:2px solid var(--ink); }
+  .info dt { color:var(--muted); text-transform:uppercase; font-size:11px; letter-spacing:.1em; padding-top:2px; }
+  .info dd { font-weight:500; }
+  .ticket { margin-top:14px; display:flex; justify-content:space-between; align-items:center; padding:14px 18px; background:var(--ink); color:#eef1f4; font-weight:500; text-transform:uppercase; letter-spacing:.1em; font-size:13px; transition:background .2s; }
+  .ticket:hover { background:var(--hot); }
+
+  .artists { position:absolute; left:clamp(20px,3vw,44px); bottom:30px; font-size:12px; line-height:1.9; text-transform:uppercase; letter-spacing:.08em; }
+  .artists b { display:block; color:var(--hot); }
+
+  .rv { opacity:0; animation:on .5s steps(3) forwards; animation-delay:calc(var(--d,0) * 1ms); }
+  @keyframes on { 0% { opacity:0; } 50% { opacity:.6; } 66% { opacity:.2; } 100% { opacity:1; } }
+  @media (prefers-reduced-motion:reduce){ .rv{ animation:none; opacity:1; } h1 .g::before,h1 .g::after{ animation:none; opacity:0; } }
+  @media (max-width:820px){ .links,.artists{ display:none; } .info{ left:20px; right:20px; width:auto; } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+
+  <nav class="rv">
+    <a class="logo" href="#">N/ULL GALLERY</a>
+    <div class="links"><a href="#">Exhibitions</a><a href="#">Artists</a><a href="#">Visit</a><a href="#">Shop</a></div>
+  </nav>
+
+  <div class="title rv" style="--d:200">
+    <small>Exhibition 07 —</small>
+    <h1><span class="g" data-t="Signal">Signal</span><br><span class="g" data-t="Lost">Lost</span></h1>
+  </div>
+
+  <div class="artists rv" style="--d:600"><b>Featuring</b>Mara Vell<br>Kai Okafor<br>Rin Sato<br>+ 12 more</div>
+
+  <div class="info rv" style="--d:400">
+    <dl>
+      <dt>Dates</dt><dd>Nov 14 — Jan 30</dd>
+      <dt>Where</dt><dd>N/ULL, Hall B, Berlin</dd>
+      <dt>Hours</dt><dd>Wed–Sun, 12–22h</dd>
+    </dl>
+    <a class="ticket" href="#"><span>Get tickets</span><span>€14 →</span></a>
+  </div>
+</section>
+<script src="bg.js"></script>
+</body>
+</html>

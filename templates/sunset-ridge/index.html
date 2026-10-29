@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sunset Ridge — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root { --fg:#f6ece4; --muted:rgba(246,236,228,.6); --sun:#ff8a4a; --line:rgba(246,236,228,.16); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#121214; color:var(--fg); font-family:Inter,system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+
+  .hero { position:relative; height:100vh; height:100svh; min-height:640px; isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-1; display:block; }
+
+  nav { position:absolute; inset:0 0 auto; display:flex; justify-content:space-between; align-items:center; padding:24px clamp(20px,4vw,52px); font-size:13px; letter-spacing:.2em; text-transform:uppercase; }
+  .mark { font-family:Cinzel,serif; font-weight:700; letter-spacing:.24em; font-size:15px; }
+  .links { display:flex; gap:30px; color:var(--muted); }
+  .links a:hover { color:var(--fg); }
+  .wish { padding:9px 16px; border:1px solid var(--line); border-radius:2px; transition:background .3s; }
+  .wish:hover { background:rgba(246,236,228,.1); }
+
+  .bottom { position:absolute; left:0; right:0; bottom:0; padding:0 clamp(20px,4vw,52px) 40px; display:grid; grid-template-columns:1fr auto; align-items:end; gap:30px; }
+  .studio { font-size:12px; letter-spacing:.3em; text-transform:uppercase; color:var(--sun); }
+  h1 { margin-top:12px; font-family:Cinzel,serif; font-weight:500; font-size:clamp(50px,8vw,128px); line-height:.95; letter-spacing:.06em; text-shadow:0 10px 60px rgba(0,0,0,.6); }
+  .sub { margin-top:16px; font-size:17px; line-height:1.6; color:var(--muted); max-width:460px; }
+  .ctas { margin-top:26px; display:flex; gap:12px; flex-wrap:wrap; }
+  .buy { padding:15px 28px; background:var(--sun); color:#1a0c06; font-weight:600; font-size:14px; letter-spacing:.12em; text-transform:uppercase; transition:filter .25s, transform .25s; }
+  .buy:hover { filter:brightness(1.1); transform:translateY(-2px); }
+  .trailer { display:inline-flex; align-items:center; gap:10px; padding:15px 24px; border:1px solid var(--line); font-size:14px; letter-spacing:.12em; text-transform:uppercase; backdrop-filter:blur(8px); transition:background .25s; }
+  .trailer:hover { background:rgba(246,236,228,.1); }
+
+  .meta { text-align:right; font-size:13px; color:var(--muted); line-height:1.9; }
+  .meta b { color:var(--fg); font-weight:500; }
+  .stars { color:var(--sun); letter-spacing:3px; }
+
+  .rv { opacity:0; transform:translateY(16px); filter:blur(8px); animation:rise 1.6s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:calc(var(--d,0) * 1ms); }
+  @keyframes rise { to { opacity:1; transform:none; filter:blur(0); } }
+  @media (prefers-reduced-motion:reduce){ .rv{ animation:none; opacity:1; transform:none; filter:none; } }
+  @media (max-width:820px){ .links{ display:none; } .bottom{ grid-template-columns:1fr; } .meta{ text-align:left; } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+
+  <nav class="rv">
+    <a class="mark" href="#">Lantern Works</a>
+    <div class="links"><a href="#">The game</a><a href="#">World</a><a href="#">Press kit</a><a href="#">Devlog</a></div>
+    <a class="wish" href="#">Wishlist</a>
+  </nav>
+
+  <div class="bottom">
+    <div>
+      <span class="studio rv" style="--d:400">An open-world journey · Out now</span>
+      <h1 class="rv" style="--d:600">Ember<br>Peaks</h1>
+      <p class="sub rv" style="--d:900">Climb a mountain range that's always at dusk. Every ridge you cross, the sun sinks a little lower. Reach the summit before night falls for good.</p>
+      <div class="ctas rv" style="--d:1100"><a class="buy" href="#">Buy on Steam</a><a class="trailer" href="#">▶ Trailer</a></div>
+    </div>
+    <div class="meta rv" style="--d:1300">
+      <div class="stars">★★★★★</div>
+      <div><b>Overwhelmingly Positive</b></div>
+      <div>PC · Mac · Steam Deck verified</div>
+    </div>
+  </div>
+</section>
+<script src="bg.js"></script>
+</body>
+</html>

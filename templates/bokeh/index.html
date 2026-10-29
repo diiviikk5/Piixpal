@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Bokeh — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root { --fg:#f4f4f5; --muted:rgba(244,244,245,.6); --line:rgba(255,255,255,.12); --glass:rgba(255,255,255,.06); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#1d1c21; color:var(--fg); font-family:Inter,system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+  button { font:inherit; color:inherit; background:none; border:0; cursor:pointer; }
+
+  .hero { position:relative; min-height:100vh; min-height:100svh; display:flex; flex-direction:column; isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-1; display:block; }
+
+  nav { display:flex; align-items:center; justify-content:space-between; padding:20px clamp(20px,4vw,48px); }
+  .logo { font-family:"Bricolage Grotesque",sans-serif; font-weight:700; font-size:22px; letter-spacing:-.03em; display:flex; align-items:center; gap:8px; }
+  .logo b { width:22px; height:22px; border-radius:50%; background:radial-gradient(circle at 35% 35%,#7ff0ff,#16b4c6 45%,#0b4f5a); box-shadow:0 0 20px rgba(22,180,198,.6); }
+  .links { display:flex; gap:28px; font-size:14px; color:var(--muted); }
+  .links a:hover { color:var(--fg); }
+  .right { display:flex; gap:16px; align-items:center; font-size:14px; }
+  .chip-btn { padding:9px 16px; border-radius:10px; background:var(--fg); color:#18181b; font-weight:500; transition:opacity .2s; }
+  .chip-btn:hover { opacity:.88; }
+
+  .content { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:0 20px 8vh; }
+  .tag { display:inline-flex; align-items:center; gap:8px; font-size:13px; padding:6px 14px; border-radius:999px; border:1px solid var(--line); background:var(--glass); backdrop-filter:blur(12px); color:var(--muted); }
+  .tag span { color:#7ff0ff; }
+  h1 { margin-top:24px; font-family:"Bricolage Grotesque",sans-serif; font-weight:600; font-size:clamp(44px,7.4vw,108px); line-height:.98; letter-spacing:-.045em; }
+  h1 em { font-style:normal; background:linear-gradient(100deg,#7ff0ff 10%,#f0a79f 60%,#e985c8); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .sub { margin-top:20px; font-size:18px; line-height:1.55; color:var(--muted); max-width:520px; }
+
+  .prompt { margin-top:40px; width:min(680px,100%); padding:10px 10px 10px 20px; display:flex; align-items:center; gap:12px; border-radius:20px; border:1px solid var(--line); background:rgba(30,29,36,.45); backdrop-filter:blur(24px) saturate(140%); -webkit-backdrop-filter:blur(24px) saturate(140%); box-shadow:0 30px 80px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.08); transition:border-color .3s, box-shadow .3s; }
+  .prompt:focus-within { border-color:rgba(127,240,255,.45); box-shadow:0 30px 80px rgba(0,0,0,.35), 0 0 0 4px rgba(127,240,255,.08); }
+  .prompt svg { width:20px; height:20px; flex:none; opacity:.6; }
+  .prompt input { flex:1; min-width:0; background:none; border:0; outline:0; color:var(--fg); font:inherit; font-size:16px; padding:12px 0; }
+  .prompt input::placeholder { color:rgba(244,244,245,.45); }
+  .prompt .icon { width:40px; height:40px; border-radius:12px; display:grid; place-items:center; color:var(--muted); transition:background .2s, color .2s; }
+  .prompt .icon:hover { background:rgba(255,255,255,.08); color:var(--fg); }
+  .prompt .send { width:44px; height:44px; border-radius:14px; display:grid; place-items:center; background:var(--fg); color:#18181b; transition:transform .2s; }
+  .prompt .send:hover { transform:scale(1.06); }
+  .prompt .send svg, .prompt .icon svg { opacity:1; }
+
+  .chips { margin-top:16px; display:flex; gap:8px; flex-wrap:wrap; justify-content:center; }
+  .chips button { font-size:13px; padding:8px 14px; border-radius:999px; border:1px solid var(--line); background:var(--glass); color:var(--muted); transition:color .2s, border-color .2s, background .2s; }
+  .chips button:hover { color:var(--fg); border-color:rgba(255,255,255,.25); background:rgba(255,255,255,.1); }
+  .note { margin-top:28px; font-size:13px; color:rgba(244,244,245,.45); }
+
+  .rv { opacity:0; transform:translateY(16px) scale(.98); filter:blur(10px); animation:rise 1.1s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:calc(var(--d,0) * 1ms); }
+  @keyframes rise { to { opacity:1; transform:none; filter:blur(0); } }
+  @media (prefers-reduced-motion:reduce){ .rv{ animation:none; opacity:1; transform:none; filter:none; } }
+  @media (max-width:760px){ .links{ display:none; } .prompt .icon{ display:none; } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+
+  <nav class="rv">
+    <a class="logo" href="#"><b></b>lens</a>
+    <div class="links"><a href="#">Features</a><a href="#">Use cases</a><a href="#">API</a><a href="#">Pricing</a></div>
+    <div class="right"><a href="#">Log in</a><a class="chip-btn" href="#">Try free</a></div>
+  </nav>
+
+  <div class="content">
+    <span class="tag rv" style="--d:100"><span>✦</span> Introducing Lens 2 — multimodal search</span>
+    <h1 class="rv" style="--d:250">Ask anything.<br><em>See</em> it clearly.</h1>
+    <p class="sub rv" style="--d:400">Search across your docs, screenshots and recordings in plain language. Answers come back sharp, sourced and in focus.</p>
+
+    <form class="prompt rv" style="--d:550" onsubmit="event.preventDefault()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="text" aria-label="Ask Lens" autocomplete="off" />
+      <button class="icon" type="button" aria-label="Attach"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21 11-8.5 8.5a5 5 0 0 1-7-7L14 4a3.5 3.5 0 0 1 5 5l-8.5 8.5a2 2 0 0 1-3-3L15 7"/></svg></button>
+      <button class="icon" type="button" aria-label="Voice"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></button>
+      <button class="send" type="submit" aria-label="Send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+    </form>
+    <div class="chips rv" style="--d:700">
+      <button type="button">Summarize last week's standups</button>
+      <button type="button">Find the pricing slide</button>
+      <button type="button">What did Maya decide on auth?</button>
+    </div>
+    <p class="note rv" style="--d:850">Free for hackers · No card required</p>
+  </div>
+</section>
+<script src="bg.js"></script>
+<script>
+// Typewriter placeholder that pauses while the user is typing
+(() => {
+  const q = document.getElementById('q');
+  const lines = ['Where did we land on the launch date?', 'Show me every screenshot with a red error toast', 'Explain the onboarding flow like I\'m new here', 'Which customers asked for SSO?'];
+  let li = 0, ci = 0, dir = 1;
+  const tick = () => {
+    if (document.activeElement === q || q.value) { q.placeholder = 'Ask anything…'; return setTimeout(tick, 600); }
+    const s = lines[li];
+    ci += dir;
+    q.placeholder = s.slice(0, ci) + (dir > 0 ? '▍' : '');
+    if (ci >= s.length) { dir = -1; return setTimeout(tick, 1800); }
+    if (ci <= 0) { dir = 1; li = (li + 1) % lines.length; }
+    setTimeout(tick, dir > 0 ? 45 + Math.random() * 50 : 18);
+  };
+  setTimeout(tick, 1200);
+  document.querySelectorAll('.chips button').forEach(b => b.onclick = () => { q.value = b.textContent; q.focus(); });
+})();
+</script>
+</body>
+</html>

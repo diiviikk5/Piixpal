@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Event Horizon — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+<style>
+  :root { --fg:#f6f1ea; --muted:rgba(246,241,234,.58); --line:rgba(246,241,234,.14); --amber:#ffb36b; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#000; color:var(--fg); font-family:"Inter Tight",system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+  .mono { font-family:"JetBrains Mono",monospace; font-size:12px; letter-spacing:.04em; }
+
+  .hero { position:relative; min-height:100vh; min-height:100svh; display:flex; flex-direction:column; isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-2; display:block; }
+  .hero::after { content:""; position:absolute; inset:0; z-index:-1; background:linear-gradient(90deg,rgba(0,0,0,.72),rgba(0,0,0,.35) 32%,transparent 50%); pointer-events:none; }
+
+  nav { display:flex; justify-content:space-between; align-items:center; padding:22px clamp(20px,4vw,56px); }
+  .logo { display:flex; align-items:center; gap:10px; font-weight:600; font-size:17px; letter-spacing:.02em; }
+  .logo i { width:20px; height:20px; border-radius:50%; background:#000; box-shadow:0 0 0 2px var(--amber), 0 0 16px rgba(255,179,107,.6); }
+  .links { display:flex; gap:28px; font-size:14px; color:var(--muted); }
+  .links a:hover { color:var(--fg); }
+  .nb { font-size:14px; font-weight:500; padding:9px 16px; border-radius:999px; border:1px solid var(--line); backdrop-filter:blur(8px); }
+
+  .copy { margin:auto 0; padding:0 clamp(20px,4vw,56px) 8vh; max-width:min(560px,44vw); }
+  .eyebrow { display:inline-flex; align-items:center; gap:8px; color:var(--amber); }
+  .eyebrow::before { content:""; width:24px; height:1px; background:currentColor; }
+  h1 { margin-top:20px; font-weight:300; font-size:clamp(48px,6.2vw,100px); line-height:.95; letter-spacing:-.05em; }
+  h1 b { font-weight:500; }
+  .sub { margin-top:20px; font-size:17px; line-height:1.6; color:var(--muted); max-width:420px; }
+  .ctas { margin-top:30px; display:flex; gap:12px; flex-wrap:wrap; }
+  .btn { padding:14px 24px; border-radius:999px; font-weight:500; font-size:15px; transition:transform .25s, box-shadow .25s, background .25s; }
+  .btn.p { background:var(--fg); color:#000; } .btn.p:hover { transform:translateY(-2px); box-shadow:0 0 0 6px rgba(255,179,107,.18); }
+  .btn.s { border:1px solid var(--line); } .btn.s:hover { background:rgba(255,255,255,.06); }
+
+  .foot { display:flex; justify-content:space-between; gap:20px; padding:0 clamp(20px,4vw,56px) 26px; color:var(--muted); }
+  .foot b { color:var(--fg); font-weight:400; }
+
+  .rv { opacity:0; transform:translateY(16px); filter:blur(10px); animation:rise 1.4s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:calc(var(--d,0) * 1ms); }
+  @keyframes rise { to { opacity:1; transform:none; filter:blur(0); } }
+  @media (prefers-reduced-motion:reduce){ .rv{ animation:none; opacity:1; transform:none; filter:none; } }
+  @media (max-width:900px){ .links{ display:none; } .copy{ max-width:none; margin:auto 0 0; background:linear-gradient(transparent,rgba(0,0,0,.85) 25%); padding-top:80px; } .foot{ display:none; } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+
+  <nav class="rv">
+    <a class="logo" href="#"><i></i>SINGULAR</a>
+    <div class="links"><a href="#">Platform</a><a href="#">Connectors</a><a href="#">Customers</a><a href="#">Docs</a></div>
+    <a class="nb" href="#">Book a demo</a>
+  </nav>
+
+  <div class="copy">
+    <span class="eyebrow mono rv" style="--d:300">One source of truth</span>
+    <h1 class="rv" style="--d:500">Everything <b>falls into place.</b></h1>
+    <p class="sub rv" style="--d:700">Singular pulls every table, event and document your company produces into one place, then answers questions about all of it, instantly.</p>
+    <div class="ctas rv" style="--d:900"><a class="btn p" href="#">Start for free</a><a class="btn s" href="#">See how it works</a></div>
+  </div>
+
+  <div class="foot mono rv" style="--d:1200">
+    <span><b>400+</b> connectors</span><span><b>12 PB</b> under management</span><span><b>SOC 2</b> · HIPAA · GDPR</span>
+  </div>
+</section>
+<script src="bg.js"></script>
+</body>
+</html>

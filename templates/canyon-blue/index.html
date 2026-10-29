@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Canyon Blue — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root { --fg:#fff; --ink:#0f1a4a; --muted:rgba(255,255,255,.78); --line:rgba(255,255,255,.28); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#1a2a8a; color:var(--fg); font-family:Onest,system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+  button, input { font:inherit; }
+
+  .hero { position:relative; min-height:100vh; min-height:100svh; display:grid; grid-template-columns:1fr minmax(360px,440px); align-items:center; gap:40px; padding:24px clamp(20px,5vw,80px); isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-1; display:block; }
+
+  .left { align-self:stretch; display:flex; flex-direction:column; }
+  .logo { display:flex; align-items:center; gap:10px; font-weight:700; font-size:20px; }
+  .logo i { width:26px; height:26px; border-radius:8px; background:#fff; color:#3a52e8; display:grid; place-items:center; font-style:normal; font-size:14px; font-weight:800; }
+  .pitch { margin:auto 0; padding-bottom:6vh; }
+  h1 { font-weight:700; font-size:clamp(44px,5.6vw,88px); line-height:.98; letter-spacing:-.045em; max-width:12ch; text-shadow:0 4px 30px rgba(10,20,80,.5); }
+  .pitch p { margin-top:18px; font-size:18px; line-height:1.55; color:var(--muted); max-width:440px; }
+  .quote { margin-top:36px; display:flex; gap:14px; align-items:center; max-width:440px; }
+  .quote i { width:44px; height:44px; border-radius:50%; flex:none; background:linear-gradient(135deg,#c7d3ff,#3a52e8); border:2px solid rgba(255,255,255,.6); }
+  .quote p { margin:0; font-size:15px; color:#fff; }
+  .quote small { display:block; color:var(--muted); font-size:13px; margin-top:2px; }
+
+  /* auth card */
+  .card { padding:30px; border-radius:24px; background:rgba(255,255,255,.94); color:var(--ink); box-shadow:0 40px 120px rgba(8,16,70,.45); }
+  .card h2 { font-weight:700; font-size:26px; letter-spacing:-.03em; }
+  .card .alt { margin-top:6px; font-size:14px; color:rgba(15,26,74,.6); }
+  .card .alt a { color:#3a52e8; font-weight:600; }
+  .oauth { margin-top:22px; display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .oauth button { display:flex; align-items:center; justify-content:center; gap:8px; padding:11px; border-radius:12px; border:1px solid rgba(15,26,74,.14); background:#fff; font-weight:600; font-size:14px; color:var(--ink); cursor:pointer; transition:background .2s, border-color .2s; }
+  .oauth button:hover { background:#f3f5ff; border-color:rgba(58,82,232,.4); }
+  .oauth svg { width:18px; height:18px; }
+  .or { display:flex; align-items:center; gap:12px; margin:20px 0; font-size:12px; color:rgba(15,26,74,.45); text-transform:uppercase; letter-spacing:.1em; }
+  .or::before, .or::after { content:""; flex:1; height:1px; background:rgba(15,26,74,.12); }
+  .card label { display:block; font-size:13px; font-weight:600; margin:14px 0 6px; }
+  .card input { width:100%; padding:13px 14px; border-radius:12px; border:1px solid rgba(15,26,74,.16); outline:0; font-size:15px; color:var(--ink); transition:border-color .2s, box-shadow .2s; }
+  .card input:focus { border-color:#3a52e8; box-shadow:0 0 0 4px rgba(58,82,232,.15); }
+  .submit { margin-top:20px; width:100%; padding:14px; border:0; border-radius:12px; background:#3a52e8; color:#fff; font-weight:600; font-size:16px; cursor:pointer; transition:background .2s, transform .2s; }
+  .submit:hover { background:#2c43d6; transform:translateY(-1px); }
+  .terms { margin-top:14px; font-size:12px; color:rgba(15,26,74,.5); text-align:center; }
+
+  .rv { opacity:0; transform:translateY(16px); filter:blur(8px); animation:rise 1.1s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:calc(var(--d,0) * 1ms); }
+  @keyframes rise { to { opacity:1; transform:none; filter:blur(0); } }
+  @media (prefers-reduced-motion:reduce){ .rv{ animation:none; opacity:1; transform:none; filter:none; } }
+  @media (max-width:900px){ .hero{ grid-template-columns:1fr; } .pitch{ padding:40px 0 10px; } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+
+  <div class="left">
+    <a class="logo rv" href="#"><i>O</i>Outpost</a>
+    <div class="pitch">
+      <h1 class="rv" style="--d:150">Ship your idea before the weekend ends.</h1>
+      <p class="rv" style="--d:300">Auth, database, storage and hosting in one place. Sign up, paste your keys and spend your 48 hours on the fun part.</p>
+      <div class="quote rv" style="--d:450"><i></i><p>"We went from blank repo to winning demo in 31 hours."<small>Rin Sato · 1st place, Ignite Lisbon</small></p></div>
+    </div>
+  </div>
+
+  <form class="card rv" style="--d:400" onsubmit="event.preventDefault(); this.querySelector('.submit').textContent='Check your inbox ✓'">
+    <h2>Create your account</h2>
+    <p class="alt">Already building? <a href="#">Log in</a></p>
+    <div class="oauth">
+      <button type="button"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.2.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg>GitHub</button>
+      <button type="button"><svg viewBox="0 0 24 24"><path fill="#4285F4" d="M23 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h6.2a5.3 5.3 0 0 1-2.3 3.5v2.9h3.7c2.2-2 3.4-5 3.4-8.5z"/><path fill="#34A853" d="M12 23.5c3.1 0 5.7-1 7.6-2.8l-3.7-2.9c-1 .7-2.3 1.1-3.9 1.1-3 0-5.5-2-6.4-4.7H1.8v3A11.5 11.5 0 0 0 12 23.5z"/><path fill="#FBBC05" d="M5.6 14.2a6.9 6.9 0 0 1 0-4.4v-3H1.8a11.5 11.5 0 0 0 0 10.4z"/><path fill="#EA4335" d="M12 5.1c1.7 0 3.2.6 4.4 1.7l3.3-3.3A11.5 11.5 0 0 0 1.8 6.8l3.8 3C6.5 7.1 9 5.1 12 5.1z"/></svg>Google</button>
+    </div>
+    <div class="or">or</div>
+    <label for="em">Work email</label><input id="em" type="email" placeholder="you@team.dev" />
+    <label for="pw">Password</label><input id="pw" type="password" placeholder="At least 8 characters" />
+    <button class="submit" type="submit">Create account</button>
+    <p class="terms">Free for hackathons · no card required</p>
+  </form>
+</section>
+<script src="bg.js"></script>
+</body>
+</html>

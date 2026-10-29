@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pixel Sword — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Silkscreen&family=VT323&display=swap" rel="stylesheet" />
+<style>
+  :root { --fg:#f2ffe0; --lime:#c8ff4d; --ink:#0b2016; --line:#0b2016; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#123826; color:var(--fg); font-family:VT323,monospace; -webkit-font-smoothing:none; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+  .ps { font-family:"Press Start 2P",monospace; }
+
+  .hero { position:relative; height:100vh; height:100svh; min-height:640px; isolation:isolate; overflow:hidden; image-rendering:pixelated; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-2; display:block; }
+  .hero::after { content:""; position:absolute; inset:0; z-index:-1; background:linear-gradient(180deg,rgba(6,20,12,.6),transparent 22%,transparent 72%,rgba(6,20,12,.75)); pointer-events:none; }
+
+  nav { position:absolute; inset:0 0 auto; display:flex; justify-content:space-between; align-items:center; padding:20px clamp(20px,4vw,48px); }
+  .logo { font-family:Silkscreen,monospace; font-size:22px; display:flex; align-items:center; gap:10px; text-shadow:3px 3px 0 var(--ink); }
+  .logo i { width:16px; height:16px; background:var(--lime); box-shadow:3px 3px 0 var(--ink); }
+  .links { display:flex; gap:24px; font-size:22px; }
+  .links a:hover { color:var(--lime); }
+
+  .panel { position:absolute; left:clamp(20px,4vw,48px); top:50%; transform:translateY(-50%); width:min(420px,40vw); }
+  .tag { display:inline-block; font-size:10px; padding:8px 10px; background:var(--lime); color:var(--ink); box-shadow:4px 4px 0 var(--ink); }
+  h1 { margin-top:20px; font-size:clamp(26px,3vw,46px); line-height:1.25; text-shadow:4px 4px 0 var(--ink); }
+  h1 span { color:var(--lime); }
+  .sub { margin-top:16px; font-size:24px; line-height:1.15; text-shadow:2px 2px 0 var(--ink); }
+
+  .clock { margin-top:22px; display:flex; gap:10px; }
+  .clock div { background:rgba(11,32,22,.85); border:3px solid var(--lime); padding:8px 10px; text-align:center; min-width:62px; }
+  .clock b { display:block; font-family:"Press Start 2P",monospace; font-size:18px; color:var(--lime); }
+  .clock small { font-size:16px; }
+  .ctas { margin-top:22px; display:flex; gap:12px; flex-wrap:wrap; }
+  .btn { padding:14px 16px 12px; font-size:11px; transition:transform .08s, box-shadow .08s; }
+  .btn.p { background:var(--lime); color:var(--ink); box-shadow:5px 5px 0 var(--ink); }
+  .btn.s { background:var(--fg); color:var(--ink); box-shadow:5px 5px 0 var(--ink); }
+  .btn:hover { transform:translate(-2px,-2px); box-shadow:7px 7px 0 var(--ink); }
+  .btn:active { transform:translate(3px,3px); box-shadow:2px 2px 0 var(--ink); }
+
+  .stats { position:absolute; right:clamp(20px,4vw,48px); bottom:26px; display:flex; gap:10px; font-size:22px; }
+  .stats div { background:rgba(11,32,22,.85); border:3px solid var(--fg); padding:6px 12px; }
+  .stats b { color:var(--lime); font-weight:400; }
+
+  .rv { opacity:0; animation:pop .5s steps(4) forwards; animation-delay:calc(var(--d,0) * 1ms); }
+  @keyframes pop { 0% { opacity:0; transform:translateY(12px); } 100% { opacity:1; transform:none; } }
+  @media (prefers-reduced-motion:reduce){ .rv{ animation:none; opacity:1; } }
+  @media (max-width:900px){ .links{ display:none; } .panel{ width:auto; right:20px; top:auto; bottom:90px; transform:none; } .stats{ display:none; } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+
+  <nav class="rv">
+    <a class="logo" href="#"><i></i>GLADEJAM</a>
+    <div class="links"><a href="#">Rules</a><a href="#">Prizes</a><a href="#">Games</a><a href="#">Discord</a></div>
+  </nav>
+
+  <div class="panel">
+    <span class="tag ps rv" style="--d:200">48H PIXEL GAME JAM</span>
+    <h1 class="ps rv" style="--d:400">Pull the <span>sword.</span> Make a game.</h1>
+    <p class="sub rv" style="--d:600">Solo or teams of 4. Any engine. One secret theme, revealed when the clock hits zero.</p>
+    <div class="clock rv" style="--d:800" aria-label="Theme reveal countdown">
+      <div><b id="d">00</b><small>DAYS</small></div><div><b id="h">00</b><small>HRS</small></div><div><b id="m">00</b><small>MIN</small></div><div><b id="s">00</b><small>SEC</small></div>
+    </div>
+    <div class="ctas rv" style="--d:1000"><a class="btn p ps" href="#">JOIN JAM ▶</a><a class="btn s ps" href="#">PAST GAMES</a></div>
+  </div>
+
+  <div class="stats rv" style="--d:1200"><div>JAMMERS <b id="j">3,412</b></div><div>PRIZES <b>$12K</b></div></div>
+</section>
+<script src="bg.js"></script>
+<script>
+  const end = Date.now() + ((6 * 24 + 7) * 60 + 42) * 60e3, p = n => String(n).padStart(2, '0');
+  const tick = () => { const s = Math.max(0, (end - Date.now()) / 1000 | 0); d.textContent = p(s / 86400 | 0); h.textContent = p((s % 86400) / 3600 | 0); m.textContent = p((s % 3600) / 60 | 0); document.getElementById('s').textContent = p(s % 60); };
+  tick(); setInterval(tick, 1000);
+  let n = 3412; setInterval(() => { if (Math.random() < .4) j.textContent = (++n).toLocaleString(); }, 1800);
+</script>
+</body>
+</html>

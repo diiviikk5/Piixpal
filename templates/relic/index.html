@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Relic — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+<style>
+  :root { --ink:#ede9e0; --muted:rgba(237,233,224,.55); --line:rgba(237,233,224,.16); --ease:cubic-bezier(.16,1,.3,1); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#000; color:var(--ink); font-family:"Cormorant Garamond",serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+  canvas[data-bg] { position:fixed; inset:0; width:100%; height:100%; z-index:0; display:block; }
+
+  .hero { position:relative; z-index:1; min-height:100vh; min-height:100svh; display:flex; flex-direction:column; }
+  .hero::before { content:""; position:absolute; inset:0; z-index:-1; pointer-events:none; background:linear-gradient(90deg,rgba(0,0,0,.85) 0%,rgba(0,0,0,.6) 32%,transparent 52%); }
+  nav { display:flex; justify-content:space-between; align-items:center; padding:26px clamp(20px,4vw,56px); font:400 12px/1 "JetBrains Mono",monospace; letter-spacing:.16em; text-transform:uppercase; }
+  .logo { font-family:UnifrakturMaguntia,serif; font-size:30px; letter-spacing:0; text-transform:none; }
+  .links { display:flex; gap:30px; color:var(--muted); }
+  .links a:hover { color:var(--ink); }
+  .nb { border:1px solid var(--line); padding:10px 16px; transition:border-color .4s; } .nb:hover { border-color:var(--ink); }
+
+  .copy { margin:auto 0; padding:0 clamp(20px,6vw,96px) 40px; max-width:700px; }
+  .eyebrow { font:400 12px/1 "JetBrains Mono",monospace; letter-spacing:.24em; text-transform:uppercase; color:var(--muted); }
+  h1 { margin-top:20px; font-family:UnifrakturMaguntia,serif; font-weight:400; font-size:clamp(56px,7.4vw,124px); line-height:.9; }
+  h1 .ln { display:block; overflow:hidden; padding-bottom:.08em; }
+  h1 .ln > span { display:inline-block; transform:translateY(110%); }
+  h1 em { font-family:"Cormorant Garamond",serif; font-style:italic; font-size:.62em; letter-spacing:-.01em; vertical-align:.12em; }
+  .sub { margin-top:22px; font-size:22px; line-height:1.45; color:var(--muted); max-width:430px; }
+  .ctas { margin-top:30px; display:flex; gap:14px; flex-wrap:wrap; font:400 12px/1 "JetBrains Mono",monospace; letter-spacing:.16em; text-transform:uppercase; }
+  .btn { padding:17px 26px; transition:background .4s var(--ease), color .4s var(--ease), border-color .4s; }
+  .btn.p { background:var(--ink); color:#000; } .btn.p:hover { background:#fff; }
+  .btn.g { border:1px solid var(--line); } .btn.g:hover { border-color:var(--ink); }
+  .fade { opacity:0; transform:translateY(16px); }
+  .foot { position:absolute; left:clamp(20px,6vw,96px); right:clamp(20px,4vw,56px); bottom:28px; display:flex; justify-content:space-between; font:400 11px/1 "JetBrains Mono",monospace; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
+
+  /* scrolling on breaks the relic back into shards */
+  .after { position:relative; z-index:1; min-height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; padding:0 24px; }
+  .after p { font-size:clamp(34px,4.6vw,72px); line-height:1.08; max-width:900px; font-style:italic; }
+  .after p b { font-family:UnifrakturMaguntia,serif; font-style:normal; font-weight:400; }
+
+  @media (max-width:760px){ .links,.foot{ display:none; } .hero::before{ background:rgba(0,0,0,.66); } }
+</style>
+</head>
+<body>
+<canvas data-bg aria-hidden="true"></canvas>
+
+<section class="hero">
+  <nav>
+    <a class="logo" href="#">Memento</a>
+    <div class="links"><a href="#">Flash</a><a href="#">Artists</a><a href="#">Aftercare</a></div>
+    <a class="nb" href="#">Book</a>
+  </nav>
+  <div class="copy">
+    <p class="eyebrow fade">Blackwork · fine line · since 2014</p>
+    <h1><span class="ln"><span>Memento</span></span><span class="ln"><span><em>wear what</em> endures.</span></span></h1>
+    <p class="sub fade">A by-appointment tattoo studio for engraved, etched and woodcut work. Every piece is drawn by hand for one person and never repeated.</p>
+    <div class="ctas fade"><a class="btn p" href="#">Request a booking</a><a class="btn g" href="#">See the flash</a></div>
+  </div>
+  <div class="foot fade"><span>Books open · March</span><span>Scroll ↓</span></div>
+</section>
+<section class="after"><p>Every line is <b>cut</b> by hand, one shard of a story at a time.</p></section>
+
+<script src="bg.js"></script>
+<script>
+(() => {
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const instant = still || navigator.webdriver || /[?&]preview/.test(location.search);
+  // the relic assembles on arrival, then scrolling scatters it again
+  window.RELIC = { a: instant ? 1 : 0 };
+  const t0 = performance.now(), DUR = 4200, ease = x => 1 - Math.pow(1 - x, 3);
+  let intro = instant ? 1 : 0;
+  const tick = now => {
+    intro = Math.min(1, (now - t0) / DUR);
+    const sc = Math.min(1, scrollY / (innerHeight * .9));
+    RELIC.a = (instant ? 1 : ease(intro)) * (1 - sc * .85);
+    if (!instant) requestAnimationFrame(tick); else { RELIC.a = 1 - sc * .85; requestAnimationFrame(tick); }
+  };
+  requestAnimationFrame(tick);
+  // type arrives as the skull locks together
+  const lines = document.querySelectorAll('h1 .ln > span'), fades = document.querySelectorAll('.fade');
+  const show = (el, d) => setTimeout(() => { el.style.transition = 'transform 1.2s cubic-bezier(.16,1,.3,1), opacity 1.2s cubic-bezier(.16,1,.3,1)'; el.style.transform = 'none'; el.style.opacity = 1; }, instant ? 0 : d);
+  lines.forEach((l, i) => show(l, 1400 + i * 160));
+  fades.forEach((f, i) => show(f, 1900 + i * 140));
+})();
+</script>
+</body>
+</html>

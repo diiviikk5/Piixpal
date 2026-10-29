@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cloudline — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root { --ink:#2a2338; --muted:rgba(42,35,56,.62); --line:rgba(42,35,56,.14); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#d9b4ae; color:var(--ink); font-family:Inter,system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+  button { font:inherit; color:inherit; cursor:pointer; }
+
+  .hero { position:relative; min-height:100vh; min-height:100svh; display:flex; flex-direction:column; align-items:center; text-align:center; isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-1; display:block; }
+
+  nav { width:100%; display:flex; justify-content:space-between; align-items:center; padding:22px clamp(20px,4vw,56px); font-size:14px; }
+  .logo { font-family:Newsreader,serif; font-size:24px; font-style:italic; }
+  .links { display:flex; gap:28px; color:var(--muted); }
+  .links a:hover { color:var(--ink); }
+  .nb { padding:9px 16px; border-radius:999px; background:rgba(255,255,255,.55); border:1px solid rgba(255,255,255,.8); backdrop-filter:blur(10px); font-weight:500; }
+
+  .copy { margin-top:clamp(20px,6vh,70px); padding:0 20px; }
+  h1 { font-family:Newsreader,serif; font-weight:300; font-size:clamp(50px,7vw,112px); line-height:.95; letter-spacing:-.025em; }
+  h1 em { font-style:italic; }
+  .sub { margin:18px auto 0; font-size:17px; line-height:1.55; color:var(--muted); max-width:440px; }
+  .ctas { margin-top:26px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .btn { padding:14px 24px; border-radius:999px; font-weight:500; font-size:15px; transition:transform .25s, box-shadow .25s, background .25s; }
+  .btn.d { background:var(--ink); color:#fff; } .btn.d:hover { transform:translateY(-2px); box-shadow:0 14px 40px rgba(42,35,56,.25); }
+  .btn.l { background:rgba(255,255,255,.5); backdrop-filter:blur(8px); } .btn.l:hover { background:rgba(255,255,255,.75); }
+
+  /* a page floating on the clouds, writing itself */
+  .page { margin-top:auto; margin-bottom:-40px; width:min(620px,calc(100% - 40px)); padding:30px 36px 70px; border-radius:16px 16px 0 0; background:rgba(255,253,250,.82); backdrop-filter:blur(20px) saturate(120%); -webkit-backdrop-filter:blur(20px) saturate(120%); box-shadow:0 -20px 80px rgba(80,50,70,.18); text-align:left; }
+  .page small { font-size:12px; color:var(--muted); display:flex; justify-content:space-between; }
+  .page h2 { margin-top:14px; font-family:Newsreader,serif; font-weight:400; font-size:28px; }
+  .page p { margin-top:10px; font-family:Newsreader,serif; font-size:19px; line-height:1.6; color:#3d3550; min-height:3.2em; }
+  .caret { display:inline-block; width:2px; height:1.05em; background:#7d6bd6; vertical-align:-2px; animation:blink 1s steps(2) infinite; }
+  @keyframes blink { 50% { opacity:0; } }
+
+  .rv { opacity:0; transform:translateY(16px); filter:blur(10px); animation:rise 1.4s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:calc(var(--d,0) * 1ms); }
+  @keyframes rise { to { opacity:1; transform:none; filter:blur(0); } }
+  @media (prefers-reduced-motion:reduce){ .rv{ animation:none; opacity:1; transform:none; filter:none; } .caret{ animation:none; } }
+  @media (max-width:760px){ .links{ display:none; } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+
+  <nav class="rv">
+    <a class="logo" href="#">Altitude</a>
+    <div class="links"><a href="#">Features</a><a href="#">Focus mode</a><a href="#">Publishing</a><a href="#">Pricing</a></div>
+    <a class="nb" href="#">Download</a>
+  </nav>
+
+  <div class="copy">
+    <h1 class="rv" style="--d:300">Write <em>above</em> the noise.</h1>
+    <p class="sub rv" style="--d:500">A quiet place for long-form thinking. No feeds, no pings, no clutter. Just you, the page, and a lot of sky.</p>
+    <div class="ctas rv" style="--d:700"><a class="btn d" href="#">Start writing — free</a><a class="btn l" href="#">See focus mode</a></div>
+  </div>
+
+  <div class="page rv" style="--d:1000" aria-hidden="true">
+    <small><span>Draft · Essays</span><span id="wc">0 words</span></small>
+    <h2>On flying</h2>
+    <p><span id="txt"></span><span class="caret"></span></p>
+  </div>
+</section>
+<script src="bg.js"></script>
+<script>
+  // the page types itself, slowly, like someone thinking
+  const s = 'The first time I flew above the clouds, I understood that the weather is only a ceiling. Above it, it is always morning.';
+  const el = document.getElementById('txt'), wc = document.getElementById('wc');
+  let i = 0;
+  const step = () => {
+    i++; el.textContent = s.slice(0, i);
+    wc.textContent = s.slice(0, i).trim().split(/\s+/).filter(Boolean).length + ' words';
+    if (i < s.length) setTimeout(step, s[i - 1] === ',' || s[i - 1] === '.' ? 420 : 38 + Math.random() * 60);
+    else setTimeout(() => { i = 0; step(); }, 5000);
+  };
+  setTimeout(step, 1800);
+</script>
+</body>
+</html>

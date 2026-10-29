@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Signal — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root { --ink:#f1f2f6; --muted:rgba(241,242,246,.55); --line:rgba(241,242,246,.12); --c:#3fd9ff; --mg:#ff4fbf; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#000; color:var(--ink); font-family:Archivo,system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+
+  .hero { position:relative; min-height:100vh; min-height:100svh; display:flex; flex-direction:column; isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-1; display:block; }
+
+  nav { display:flex; justify-content:space-between; align-items:center; padding:24px clamp(20px,4vw,56px); font-family:"JetBrains Mono",monospace; font-size:12px; letter-spacing:.06em; text-transform:uppercase; }
+  .logo { font-family:Archivo,sans-serif; font-weight:800; font-size:18px; letter-spacing:-.02em; text-transform:none; display:flex; align-items:center; gap:10px; }
+  .logo i { width:12px; height:12px; background:linear-gradient(135deg,var(--c),var(--mg)); }
+  .links { display:flex; gap:30px; color:var(--muted); }
+  .links a:hover { color:var(--ink); }
+  .nb { border:1px solid var(--line); padding:9px 14px; } .nb:hover { border-color:var(--ink); }
+
+  .copy { margin:auto 0; padding:0 clamp(20px,6vw,96px) 40px; max-width:760px; }
+  .tag { font-family:"JetBrains Mono",monospace; font-size:12px; color:var(--muted); letter-spacing:.04em; }
+  .tag b { color:var(--c); font-weight:500; }
+  .tag .cur { display:inline-block; width:8px; height:14px; background:var(--c); vertical-align:-2px; margin-left:4px; animation:blink 1s steps(2) infinite; }
+  @keyframes blink { 50% { opacity:0; } }
+  h1 { margin-top:22px; font-weight:800; font-size:clamp(56px,8.4vw,140px); line-height:.86; letter-spacing:-.05em; text-transform:uppercase; }
+  h1 span { display:block; }
+  h1 .g { color:#6b6d78; }
+  h1 .gl { position:relative; display:inline-block; }
+  h1 .gl::before, h1 .gl::after { content:attr(data-t); position:absolute; inset:0; mix-blend-mode:screen; opacity:0; }
+  h1 .gl::before { color:var(--c); animation:gA 3.2s steps(1) infinite; }
+  h1 .gl::after { color:var(--mg); animation:gB 3.2s steps(1) infinite; }
+  @keyframes gA { 0%,86%,100% { opacity:0; transform:none; clip-path:none; } 88% { opacity:.9; transform:translate(-6px,0); clip-path:inset(10% 0 55% 0); } 91% { opacity:.9; transform:translate(4px,0); clip-path:inset(60% 0 8% 0); } }
+  @keyframes gB { 0%,86%,100% { opacity:0; transform:none; clip-path:none; } 89% { opacity:.9; transform:translate(6px,0); clip-path:inset(35% 0 30% 0); } 92% { opacity:.9; transform:translate(-3px,0); clip-path:inset(5% 0 75% 0); } }
+  .sub { margin-top:24px; font-size:17px; line-height:1.6; color:var(--muted); max-width:420px; }
+  .ctas { margin-top:30px; display:flex; gap:12px; flex-wrap:wrap; }
+  .btn { padding:15px 24px; font-weight:500; font-size:15px; transition:transform .25s, box-shadow .25s, background .25s; }
+  .btn.p { background:var(--ink); color:#000; } .btn.p:hover { transform:translateY(-2px); box-shadow:6px 6px 0 var(--mg),-6px -6px 0 var(--c); }
+  .btn.g { border:1px solid var(--line); } .btn.g:hover { border-color:var(--ink); }
+  .meta { position:absolute; right:clamp(20px,4vw,56px); bottom:30px; font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--muted); text-align:right; line-height:1.8; letter-spacing:.04em; }
+
+  .rv { opacity:0; transform:translateY(18px); filter:blur(10px); animation:rise 1.4s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:calc(var(--d,0) * 1ms); }
+  @keyframes rise { to { opacity:1; transform:none; filter:blur(0); } }
+  @media (prefers-reduced-motion:reduce){ .rv{ animation:none; opacity:1; transform:none; filter:none; } h1 .gl::before,h1 .gl::after,.tag .cur{ animation:none; } }
+  @media (max-width:760px){ .links,.meta{ display:none; } .hero::before{ content:""; position:absolute; inset:0; z-index:-1; background:rgba(0,0,0,.5); } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+
+  <nav class="rv">
+    <a class="logo" href="#"><i></i>Likeness</a>
+    <div class="links"><a href="#">Avatars</a><a href="#">Voice</a><a href="#">API</a><a href="#">Pricing</a></div>
+    <a class="nb" href="#">Sign in</a>
+  </nav>
+
+  <div class="copy">
+    <p class="tag rv" style="--d:200">&gt; render --subject <b>you</b> --frames ∞<span class="cur"></span></p>
+    <h1 class="rv" style="--d:350"><span>One face.</span><span class="g">Every</span><span class="gl" data-t="screen.">screen.</span></h1>
+    <p class="sub rv" style="--d:550">Record two minutes. Get a digital twin that presents, explains and sells for you, in 40 languages, without ever looking rendered.</p>
+    <div class="ctas rv" style="--d:750"><a class="btn p" href="#">Make my twin</a><a class="btn g" href="#">Watch a demo</a></div>
+  </div>
+
+  <div class="meta rv" style="--d:1100" aria-hidden="true">SUBJECT_0042 · 98.7% LIKENESS<br>STREAM 4K · 60 FPS · LIVE</div>
+</section>
+<script src="bg.js"></script>
+</body>
+</html>

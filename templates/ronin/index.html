@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ronin — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Noto+Serif+JP:wght@500;900&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+<style>
+  :root { --ink:#f2f4f8; --muted:rgba(242,244,248,.66); --line:rgba(242,244,248,.2); --red:#ff2e3d; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#003f79; color:var(--ink); font-family:"JetBrains Mono",monospace; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+  .hero { position:relative; min-height:100vh; min-height:100svh; display:flex; flex-direction:column; isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-2; display:block; }
+  nav { display:flex; justify-content:space-between; align-items:center; padding:24px clamp(20px,4vw,56px); font-size:12px; letter-spacing:.14em; text-transform:uppercase; max-width:62%; }
+  .logo { font-family:Anton,sans-serif; font-size:24px; letter-spacing:.06em; }
+  .logo b { color:var(--red); font-weight:400; }
+  .links { display:flex; gap:28px; color:var(--muted); } .links a:hover { color:var(--ink); }
+  .copy { margin:auto 0; padding:0 clamp(20px,6vw,96px) 40px; max-width:62%; position:relative; }
+  .kanji { position:absolute; left:clamp(20px,6vw,96px); top:-70px; font-family:"Noto Serif JP",serif; font-weight:900; font-size:clamp(120px,15vw,250px); line-height:1; color:rgba(255,46,61,.16); z-index:-1; writing-mode:vertical-rl; letter-spacing:-.04em; }
+  .eyebrow { font-size:12px; letter-spacing:.24em; text-transform:uppercase; color:var(--red); }
+  h1 { margin-top:16px; font-family:Anton,sans-serif; font-weight:400; font-size:clamp(64px,9.5vw,168px); line-height:.86; text-transform:uppercase; letter-spacing:.005em; }
+  h1 span { -webkit-text-stroke:2px var(--ink); color:transparent; }
+  .sub { margin-top:22px; font-size:14px; line-height:1.75; color:var(--muted); max-width:420px; }
+  .ctas { margin-top:28px; display:flex; gap:12px; flex-wrap:wrap; font-size:12px; letter-spacing:.14em; text-transform:uppercase; }
+  .btn { padding:16px 24px; transition:background .3s, color .3s, transform .3s; }
+  .btn.p { background:var(--red); color:#fff; } .btn.p:hover { background:#fff; color:var(--red); transform:translateY(-2px); }
+  .btn.g { border:1px solid var(--line); } .btn.g:hover { border-color:var(--ink); }
+  .meta { margin-top:34px; display:flex; gap:34px; font-size:11px; color:var(--muted); letter-spacing:.1em; text-transform:uppercase; }
+  .meta b { display:block; font-family:Anton,sans-serif; font-weight:400; font-size:28px; color:var(--ink); letter-spacing:.02em; margin-bottom:4px; }
+  .rv { opacity:0; transform:translateX(-24px); animation:slash .9s cubic-bezier(.16,1,.3,1) forwards; animation-delay:calc(var(--d,0)*1ms); }
+  @keyframes slash { to { opacity:1; transform:none; } }
+  @media (prefers-reduced-motion:reduce){ .rv{ animation:none; opacity:1; transform:none; } }
+  @media (max-width:860px){ nav,.copy{ max-width:none; } .links{ display:none; } .copy{ margin-top:auto; margin-bottom:0; padding-bottom:30px; } .hero::before{ content:""; position:absolute; inset:0; z-index:-1; background:linear-gradient(180deg,transparent 30%,rgba(0,40,80,.92) 62%); } .meta{ display:none; } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+  <nav class="rv"><a class="logo" href="#">RON<b>/</b>IN</a><div class="links"><a href="#">Chapters</a><a href="#">Artist</a><a href="#">Prints</a></div><a href="#">Read ch.1</a></nav>
+  <div class="copy">
+    <div class="kanji" aria-hidden="true">浪人</div>
+    <p class="eyebrow rv" style="--d:150">A graphic novel in nine cuts</p>
+    <h1 class="rv" style="--d:300">No master.<br><span>No mercy.</span></h1>
+    <p class="sub rv" style="--d:500">An engraved, hand-inked epic about a swordsman whose blade remembers every name it ever cut. New chapter every full moon.</p>
+    <div class="ctas rv" style="--d:650"><a class="btn p" href="#">Read chapter one</a><a class="btn g" href="#">Buy the print</a></div>
+    <div class="meta rv" style="--d:800"><div><b>09</b>chapters</div><div><b>312</b>ink pages</div><div><b>1/1</b>blade</div></div>
+  </div>
+</section>
+<script src="bg.js"></script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Aurora — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;1,6..96,400&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root { --fg:#effff8; --muted:rgba(239,255,248,.7); --line:rgba(239,255,248,.18); --green:#5cffb0; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#06141a; color:var(--fg); font-family:Manrope,system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+
+  .hero { position:relative; min-height:100vh; min-height:100svh; display:flex; flex-direction:column; isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-1; display:block; }
+
+  nav { display:flex; justify-content:space-between; align-items:center; padding:24px clamp(20px,4vw,56px); font-size:14px; }
+  .logo { font-family:"Bodoni Moda",serif; font-style:italic; font-size:26px; }
+  .links { display:flex; gap:30px; color:var(--muted); }
+  .links a:hover { color:var(--fg); }
+  .book { padding:10px 18px; border-radius:999px; border:1px solid var(--line); backdrop-filter:blur(10px); font-weight:600; }
+
+  .copy { text-align:center; padding:4vh 20px 0; }
+  .kicker { font-size:13px; font-weight:600; letter-spacing:.24em; text-transform:uppercase; color:var(--green); text-shadow:0 0 20px rgba(92,255,176,.5); }
+  h1 { margin-top:16px; font-family:"Bodoni Moda",serif; font-weight:400; font-size:clamp(52px,8vw,128px); line-height:.95; letter-spacing:-.02em; text-shadow:0 10px 60px rgba(0,10,20,.6); }
+  h1 em { font-style:italic; }
+
+  .bar { margin-top:auto; padding:0 clamp(20px,4vw,56px) 30px; display:grid; grid-template-columns:auto 1fr auto; gap:20px; align-items:end; }
+  .forecast { padding:16px 18px; border-radius:18px; background:rgba(6,20,26,.5); border:1px solid var(--line); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); min-width:260px; }
+  .forecast small { font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--muted); }
+  .kp { margin-top:8px; display:flex; align-items:baseline; gap:10px; }
+  .kp b { font-family:"Bodoni Moda",serif; font-weight:400; font-size:42px; line-height:1; }
+  .kp span { color:var(--green); font-weight:600; font-size:14px; }
+  .meter { margin-top:12px; display:grid; grid-template-columns:repeat(9,1fr); gap:3px; }
+  .meter i { height:6px; border-radius:2px; background:rgba(239,255,248,.15); transition:background .6s; }
+  .meter i.on { background:var(--green); box-shadow:0 0 8px rgba(92,255,176,.6); }
+
+  .trip { justify-self:end; text-align:right; }
+  .trip p { font-size:15px; color:var(--muted); max-width:340px; margin-left:auto; line-height:1.55; }
+  .trip a { display:inline-flex; margin-top:14px; padding:15px 26px; border-radius:999px; background:var(--fg); color:#06141a; font-weight:600; transition:transform .25s, box-shadow .25s; }
+  .trip a:hover { transform:translateY(-2px); box-shadow:0 14px 40px rgba(92,255,176,.35); }
+
+  .rv { opacity:0; transform:translateY(16px); filter:blur(10px); animation:rise 1.4s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:calc(var(--d,0) * 1ms); }
+  @keyframes rise { to { opacity:1; transform:none; filter:blur(0); } }
+  @media (prefers-reduced-motion:reduce){ .rv{ animation:none; opacity:1; transform:none; filter:none; } }
+  @media (max-width:820px){ .links{ display:none; } .bar{ grid-template-columns:1fr; } .trip{ justify-self:start; text-align:left; } .trip p{ margin-left:0; } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+
+  <nav class="rv">
+    <a class="logo" href="#">Nordlys</a>
+    <div class="links"><a href="#">Expeditions</a><a href="#">Lodges</a><a href="#">When to go</a><a href="#">Journal</a></div>
+    <a class="book" href="#">Book a trip</a>
+  </nav>
+
+  <div class="copy">
+    <span class="kicker rv" style="--d:200">Lofoten · Tromsø · Abisko</span>
+    <h1 class="rv" style="--d:400">Chase the <em>light</em><br>at the edge of the world.</h1>
+  </div>
+
+  <div class="bar">
+    <div class="forecast rv" style="--d:800" aria-label="Aurora forecast">
+      <small>Tonight's aurora forecast</small>
+      <div class="kp"><b id="kp">Kp 6</b><span id="lvl">Strong — go now</span></div>
+      <div class="meter" id="meter"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    </div>
+    <span></span>
+    <div class="trip rv" style="--d:1000">
+      <p>Small-group expeditions with photographers who know where the clouds break. Glass-roof lodges, hot tubs under the sky.</p>
+      <a href="#">Find your expedition →</a>
+    </div>
+  </div>
+</section>
+<script src="bg.js"></script>
+<script>
+  // forecast meter drifts between Kp 5–7
+  const bars = [...document.querySelectorAll('#meter i')], kp = document.getElementById('kp'), lvl = document.getElementById('lvl');
+  const set = v => { bars.forEach((b, i) => b.classList.toggle('on', i < v)); kp.textContent = 'Kp ' + v; lvl.textContent = v >= 7 ? 'Severe — look up!' : v >= 6 ? 'Strong — go now' : 'Active — good odds'; };
+  set(6); setInterval(() => set(5 + Math.floor(Math.random() * 3)), 4000);
+</script>
+</body>
+</html>

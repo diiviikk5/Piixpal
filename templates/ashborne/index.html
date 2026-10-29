@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ashborne — a game in four fires</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
+<style>
+  :root { --ink:#fff1e2; --muted:rgba(255,241,226,.66); --fire:#ff8a1f; --ease:cubic-bezier(.16,1,.3,1); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html.lenis, html.lenis body { height:auto; }
+  .lenis.lenis-smooth { scroll-behavior:auto !important; }
+  body { background:#0a0302; color:var(--ink); font-family:Inter,system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; cursor:none; }
+  a { color:inherit; text-decoration:none; cursor:none; }
+  canvas[data-bg] { position:fixed; inset:0; width:100%; height:100%; z-index:0; display:block; }
+  .track { position:relative; z-index:1; }
+  .room { height:200vh; } .room:last-child { height:140vh; }
+
+  nav { position:fixed; top:0; left:0; right:0; z-index:5; display:flex; justify-content:space-between; align-items:center; padding:26px clamp(20px,4vw,56px); font:400 12px/1 "JetBrains Mono",monospace; letter-spacing:.18em; text-transform:uppercase; text-shadow:0 1px 12px rgba(0,0,0,.5); }
+  .logo { font-family:Cinzel,serif; font-weight:900; font-size:18px; letter-spacing:.32em; }
+  .links { display:flex; gap:30px; }
+  .rail { position:fixed; right:clamp(20px,4vw,56px); top:50%; transform:translateY(-50%); z-index:5; display:flex; flex-direction:column; gap:16px; align-items:flex-end; font:400 11px/1 "JetBrains Mono",monospace; letter-spacing:.12em; }
+  .rail span { display:flex; align-items:center; gap:10px; color:rgba(255,241,226,.35); transition:color .6s var(--ease); text-shadow:0 1px 10px rgba(0,0,0,.6); }
+  .rail span::after { content:""; width:14px; height:1px; background:currentColor; transition:width .6s var(--ease); }
+  .rail span.on { color:var(--ink); } .rail span.on::after { width:34px; background:var(--fire); }
+
+  .ch { position:fixed; inset:0; z-index:3; pointer-events:none; display:flex; flex-direction:column; justify-content:center; padding:0 clamp(20px,8vw,140px); }
+  .ch.low { justify-content:flex-end; padding-bottom:13vh; }
+  .ch.center { align-items:center; text-align:center; }
+  .eyebrow { font:400 12px/1 "JetBrains Mono",monospace; letter-spacing:.3em; text-transform:uppercase; color:var(--fire); text-shadow:0 1px 14px rgba(0,0,0,.7); }
+  .ch h2 { margin-top:18px; font-family:Cinzel,serif; font-weight:700; font-size:clamp(46px,7.6vw,132px); line-height:.92; letter-spacing:.02em; text-shadow:0 8px 60px rgba(0,0,0,.55); }
+  .ch h2 .ln { display:block; overflow:hidden; padding-bottom:.06em; }
+  .ch h2 .ch-l { display:inline-block; will-change:transform; }
+  .ch p.s { margin-top:22px; font-size:16px; line-height:1.65; color:var(--muted); max-width:380px; text-shadow:0 1px 18px rgba(0,0,0,.8); }
+  .hero h2 { font-size:clamp(64px,12vw,210px); font-weight:900; letter-spacing:.06em; }
+  .ctas { margin-top:30px; display:flex; gap:12px; pointer-events:auto; flex-wrap:wrap; justify-content:center; }
+  .btn { padding:17px 30px; font:400 12px/1 "JetBrains Mono",monospace; letter-spacing:.2em; text-transform:uppercase; display:inline-block; transition:background .4s var(--ease), color .4s var(--ease); }
+  .btn.p { background:var(--ink); color:#2a0a02; clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%); } .btn.p:hover { background:var(--fire); }
+  .btn.g { border:1px solid rgba(255,241,226,.4); background:rgba(10,3,2,.3); } .btn.g:hover { border-color:var(--ink); }
+  .hint { position:fixed; left:50%; bottom:28px; transform:translateX(-50%); z-index:5; font:400 11px/1 "JetBrains Mono",monospace; letter-spacing:.24em; text-transform:uppercase; color:var(--muted); display:flex; flex-direction:column; align-items:center; gap:12px; }
+  .hint i { width:1px; height:40px; background:linear-gradient(var(--fire),transparent); animation:drip 1.8s var(--ease) infinite; transform-origin:top; }
+  @keyframes drip { 0% { transform:scaleY(0); } 60% { transform:scaleY(1); } 100% { transform:scaleY(1); opacity:0; } }
+  .pre { position:fixed; inset:0; z-index:20; background:#0a0302; display:flex; align-items:flex-end; justify-content:space-between; padding:clamp(20px,4vw,56px); }
+  .pre .n { font-family:Cinzel,serif; font-weight:900; font-size:clamp(90px,18vw,300px); line-height:.8; color:var(--fire); font-variant-numeric:tabular-nums; }
+  .pre small { font:400 11px/1.6 "JetBrains Mono",monospace; letter-spacing:.2em; text-transform:uppercase; color:var(--muted); text-align:right; }
+  .cur { position:fixed; left:0; top:0; z-index:30; width:34px; height:34px; margin:-17px 0 0 -17px; border:1px solid rgba(255,190,120,.8); border-radius:50%; pointer-events:none; transition:width .4s var(--ease), height .4s var(--ease), margin .4s var(--ease), background .4s var(--ease); }
+  .cur.big { width:84px; height:84px; margin:-42px 0 0 -42px; background:rgba(255,138,31,.25); }
+  @media (max-width:1100px){ .rail{ display:none; } }
+  .ch.hero.low { padding-bottom:20vh; }
+  @media (max-width:760px){ .links,.rail{ display:none; } .ch{ padding:0 24px; } body,a{ cursor:auto; } .cur{ display:none; } }
+  @media (prefers-reduced-motion:reduce){ .hint i{ animation:none; } }
+</style>
+</head>
+<body>
+<canvas data-bg aria-hidden="true"></canvas>
+<div class="pre" id="pre"><div class="n" id="pn">000</div><small>Ashborne<br>kindling four fires</small></div>
+<div class="cur" id="cur"></div>
+
+<nav><a class="logo" href="#">Ashborne</a><div class="links"><a href="#">World</a><a href="#">Media</a><a href="#">Press</a></div><a href="#" data-mag>Wishlist</a></nav>
+<div class="rail" id="rail"><span class="on">I · The Watcher</span><span>II · The Walker</span><span>III · The Burning Sky</span><span>IV · The Last One</span></div>
+<div class="hint" id="hint">Scroll to meet its eye<i></i></div>
+
+<section class="ch hero center low" data-room="0">
+  <p class="eyebrow">A game in four fires · 2027</p>
+  <h2><span class="ln">Ashborne</span></h2>
+  <p class="s">Something old has opened one eye. Look into it.</p>
+</section>
+<section class="ch" data-room="1">
+  <p class="eyebrow">Fire I — The Walker</p>
+  <h2><span class="ln">Carry the</span><span class="ln">flame forward.</span></h2>
+  <p class="s">Every step you take sets the world alight behind you. Nothing you burn grows back.</p>
+</section>
+<section class="ch low" data-room="2">
+  <p class="eyebrow">Fire II — The Burning Sky</p>
+  <h2><span class="ln">Above the</span><span class="ln">smoke, a sun.</span></h2>
+  <p class="s">Climb past the clouds that never cool, toward the one light that isn't fire.</p>
+</section>
+<section class="ch center low" data-room="3">
+  <p class="eyebrow">Fire III — The Last One</p>
+  <h2><span class="ln">Walk into it.</span></h2>
+  <div class="ctas"><a class="btn p" href="#" data-mag>Wishlist on Steam</a><a class="btn g" href="#" data-mag>Watch the trailer</a></div>
+</section>
+
+<main class="track"><div class="room"></div><div class="room"></div><div class="room"></div><div class="room"></div></main>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="bg.js"></script>
+<script>
+(() => {
+  gsap.registerPlugin(ScrollTrigger);
+  const canvas = document.querySelector('canvas[data-bg]');
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const auto = navigator.webdriver || /[?&]preview/.test(location.search);
+  window.EMBER = { p: 0 };
+  document.querySelectorAll('.ch h2 .ln').forEach(ln => {
+    const f = document.createDocumentFragment();
+    [...ln.textContent].forEach(ch => { const s = document.createElement('span'); s.className = 'ch-l'; s.textContent = ch === ' ' ? ' ' : ch; if (ch === ' ') s.style.width = '.3em'; f.appendChild(s); });
+    ln.textContent = ''; ln.appendChild(f);
+  });
+  const lenis = new Lenis({ lerp: still ? 1 : .08, wheelMultiplier: .85 });
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add(t => lenis.raf(t * 1000)); gsap.ticker.lagSmoothing(0);
+  const roomH = () => innerHeight * 2;
+  const rail = [...document.querySelectorAll('#rail span')], hint = document.getElementById('hint');
+  let last = -1;
+  gsap.ticker.add(() => {
+    const y = lenis.scroll, p = Math.min(3, y / roomH());
+    EMBER.p = p;
+    const i = Math.min(3, Math.floor(p + .2));
+    if (i !== last) { rail.forEach((s, k) => s.classList.toggle('on', k === i)); last = i; }
+    hint.style.opacity = Math.max(0, 1 - y / 200);
+  });
+  // each room's words rise in as it settles and leave before its dive begins (dives take the second half of a room)
+  document.querySelectorAll('.ch').forEach(ch => {
+    const r = +ch.dataset.room, letters = ch.querySelectorAll('.ch-l'), rest = ch.querySelectorAll('.eyebrow, .s, .ctas');
+    gsap.set(letters, { yPercent: 110 }); gsap.set(rest, { opacity: 0, y: 20 });
+    const tl = gsap.timeline({ paused: true });
+    tl.to(letters, { yPercent: 0, duration: .5, ease: 'expo.out', stagger: .02 }, 0)
+      .to(rest, { opacity: 1, y: 0, duration: .5, ease: 'expo.out', stagger: .06 }, .12);
+    if (r < 3) tl.to(letters, { yPercent: -110, duration: .4, ease: 'power3.in', stagger: .01 }, 1.2).to(rest, { opacity: 0, y: -20, duration: .3, ease: 'power3.in' }, 1.2);
+    tl.totalDuration(r < 3 ? 1.6 : 1);
+    ScrollTrigger.create({ trigger: '.track', start: () => (r === 0 ? -roomH() * .3 : (r - .02) * roomH()), end: () => (r + (r < 3 ? .5 : .35)) * roomH(), scrub: .6, onUpdate: s => tl.progress(s.progress) });
+  });
+  const pre = document.getElementById('pre'), pn = document.getElementById('pn');
+  if (auto) { pre.remove(); lenis.scrollTo(0, { immediate: true }); }
+  else {
+    lenis.stop();
+    const st = { v: 0 }, target = () => (canvas.loaded ? canvas.loaded() : 1) * 100;
+    const tick = () => { st.v += (target() - st.v) * .08 + .4; pn.textContent = String(Math.min(100, Math.floor(st.v))).padStart(3, '0');
+      if (st.v < 100) requestAnimationFrame(tick);
+      else gsap.timeline({ onComplete: () => { pre.remove(); lenis.start(); } })
+        .to(pn, { yPercent: -100, opacity: 0, duration: .6, ease: 'power3.in' })
+        .to(pre, { clipPath: 'inset(0 0 100% 0)', duration: 1.1, ease: 'expo.inOut' }, '-=.2'); };
+    tick();
+  }
+  const cur = document.getElementById('cur'); let cx = innerWidth / 2, cy = innerHeight / 2, dx = cx, dy = cy;
+  addEventListener('pointermove', e => { dx = e.clientX; dy = e.clientY; });
+  gsap.ticker.add(() => { cx += (dx - cx) * .16; cy += (dy - cy) * .16; cur.style.transform = `translate(${cx}px,${cy}px)`; });
+  document.querySelectorAll('[data-mag]').forEach(el => {
+    el.addEventListener('pointerenter', () => cur.classList.add('big'));
+    el.addEventListener('pointerleave', () => { cur.classList.remove('big'); gsap.to(el, { x: 0, y: 0, duration: .6, ease: 'elastic.out(1,.4)' }); });
+    el.addEventListener('pointermove', e => { const b = el.getBoundingClientRect(); gsap.to(el, { x: (e.clientX - b.left - b.width / 2) * .3, y: (e.clientY - b.top - b.height / 2) * .4, duration: .4, ease: 'power3.out' }); });
+  });
+})();
+</script>
+</body>
+</html>

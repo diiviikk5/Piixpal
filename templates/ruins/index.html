@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ruins — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Marcellus+SC&family=Cormorant+Garamond:ital,wght@0,500;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root { --fg:#fff9ef; --muted:rgba(255,249,239,.82); --gold:#f2c879; --deep:#2b1d1a; --line:rgba(242,200,121,.45); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#3a2a2a; color:var(--fg); font-family:Inter,system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+
+  .hero { position:relative; min-height:100vh; min-height:100svh; display:flex; flex-direction:column; align-items:center; text-align:center; isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-2; display:block; }
+  .hero::after { content:""; position:absolute; inset:0; z-index:-1; background:linear-gradient(180deg,rgba(30,20,30,.35),transparent 35%,transparent 70%,rgba(30,18,14,.55)); pointer-events:none; }
+
+  nav { width:100%; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; padding:22px clamp(20px,4vw,56px); font-family:"Marcellus SC",serif; font-size:15px; letter-spacing:.12em; }
+  nav .l, nav .r { display:flex; gap:28px; }
+  nav .r { justify-self:end; }
+  nav a { opacity:.85; text-shadow:0 1px 10px rgba(0,0,0,.4); } nav a:hover { opacity:1; color:var(--gold); }
+  .crest { width:44px; height:44px; display:grid; place-items:center; border:1px solid var(--line); transform:rotate(45deg); }
+  .crest span { transform:rotate(-45deg); font-size:18px; color:var(--gold); }
+
+  .copy { margin-top:clamp(10px,4vh,40px); padding:0 20px; }
+  .copy small { font-family:"Cormorant Garamond",serif; font-style:italic; font-weight:500; font-size:clamp(20px,1.9vw,27px); color:#ffe0a3; text-shadow:0 1px 3px rgba(60,25,10,.8), 0 2px 18px rgba(60,30,10,.7); }
+  h1 { margin-top:6px; font-family:"Marcellus SC",serif; font-weight:400; font-size:clamp(56px,9.4vw,156px); line-height:.9; letter-spacing:.06em; text-shadow:0 6px 40px rgba(60,30,20,.55), 0 0 2px rgba(60,30,20,.5); }
+  .copy p { margin:14px auto 0; max-width:520px; font-size:17px; line-height:1.6; color:var(--muted); text-shadow:0 1px 14px rgba(40,20,20,.7); }
+
+  .ctas { margin-top:26px; display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+  .play { position:relative; padding:16px 40px; font-family:"Marcellus SC",serif; font-size:18px; letter-spacing:.14em; color:var(--deep); background:linear-gradient(180deg,#ffe2a6,#e6b25e); clip-path:polygon(12px 0,calc(100% - 12px) 0,100% 50%,calc(100% - 12px) 100%,12px 100%,0 50%); transition:filter .3s, transform .3s; }
+  .play:hover { filter:brightness(1.08); transform:translateY(-2px); }
+  .trailer { display:inline-flex; align-items:center; gap:10px; padding:16px 26px; font-family:"Marcellus SC",serif; font-size:16px; letter-spacing:.12em; border:1px solid var(--line); background:rgba(40,25,25,.35); backdrop-filter:blur(8px); transition:background .3s; }
+  .trailer:hover { background:rgba(242,200,121,.15); }
+
+  .rewards { margin-top:auto; margin-bottom:28px; display:flex; align-items:center; gap:clamp(12px,3vw,28px); padding:14px 22px; border:1px solid var(--line); background:rgba(30,20,22,.5); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); }
+  .rewards .lbl { font-family:"Marcellus SC",serif; font-size:13px; letter-spacing:.12em; color:var(--gold); text-align:left; }
+  .rewards .lbl b { display:block; font-family:Inter,sans-serif; font-weight:600; color:var(--fg); font-size:20px; letter-spacing:0; font-variant-numeric:tabular-nums; }
+  .tiers { display:flex; gap:10px; }
+  .tier { width:54px; text-align:center; font-size:11px; color:var(--muted); }
+  .tier i { display:grid; place-items:center; width:46px; height:46px; margin:0 auto 4px; border:1px solid var(--line); transform:rotate(45deg); font-style:normal; }
+  .tier i span { transform:rotate(-45deg); font-size:18px; }
+  .tier.on i { background:rgba(242,200,121,.25); border-color:var(--gold); box-shadow:0 0 18px rgba(242,200,121,.4); }
+  .bar { width:160px; height:6px; background:rgba(255,255,255,.15); }
+  .bar i { display:block; height:100%; width:0; background:linear-gradient(90deg,#e6b25e,#ffe2a6); animation:fill 2.4s 1.4s cubic-bezier(.2,.7,.2,1) forwards; }
+  @keyframes fill { to { width:72%; } }
+
+  .rv { opacity:0; transform:translateY(18px); filter:blur(10px); animation:rise 1.6s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:calc(var(--d,0) * 1ms); }
+  @keyframes rise { to { opacity:1; transform:none; filter:blur(0); } }
+  @media (prefers-reduced-motion:reduce){ .rv,.bar i{ animation:none; opacity:1; transform:none; filter:none; } .bar i{ width:72%; } }
+  @media (max-width:900px){ nav .l,nav .r{ display:none; } nav{ grid-template-columns:1fr; justify-items:center; } .tiers,.bar{ display:none; } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+
+  <nav class="rv">
+    <div class="l"><a href="#">World</a><a href="#">Classes</a><a href="#">Lore</a></div>
+    <a class="crest" href="#" aria-label="Aetherfall"><span>✦</span></a>
+    <div class="r"><a href="#">News</a><a href="#">Media</a><a href="#">Sign in</a></div>
+  </nav>
+
+  <div class="copy">
+    <small class="rv" style="--d:300">The sky kingdoms await</small>
+    <h1 class="rv" style="--d:500">Aetherfall</h1>
+    <p class="rv" style="--d:800">An open-world fantasy RPG above the clouds. Rebuild the fallen cities, tame the winds, and find what drowned the world below.</p>
+    <div class="ctas rv" style="--d:1000"><a class="play" href="#">Pre-register</a><a class="trailer" href="#">▶ Cinematic trailer</a></div>
+  </div>
+
+  <div class="rewards rv" style="--d:1300">
+    <div class="lbl">Pre-registrations<b id="n">1,824,301</b></div>
+    <div class="bar"><i></i></div>
+    <div class="tiers">
+      <div class="tier on"><i><span>🪶</span></i>500K</div>
+      <div class="tier on"><i><span>🗡</span></i>1M</div>
+      <div class="tier"><i><span>🐉</span></i>2M</div>
+    </div>
+  </div>
+</section>
+<script src="bg.js"></script>
+<script>
+  let n = 1824301; const el = document.getElementById('n');
+  setInterval(() => { n += Math.floor(Math.random() * 7); el.textContent = n.toLocaleString(); }, 800);
+</script>
+</body>
+</html>

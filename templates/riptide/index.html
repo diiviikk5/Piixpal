@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Riptide — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root { --fg:#eef2ff; --muted:rgba(238,242,255,.6); --line:rgba(238,242,255,.12); --blue:#4d7cff; --ok:#43e0a0; --bad:#ff5a6e; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#05070f; color:var(--fg); font-family:Geist,system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+  .mono { font-family:"Geist Mono",monospace; }
+
+  .hero { position:relative; min-height:100vh; min-height:100svh; display:flex; flex-direction:column; isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-1; display:block; }
+
+  nav { display:flex; justify-content:space-between; align-items:center; padding:22px clamp(20px,4vw,56px); }
+  .logo { display:flex; align-items:center; gap:10px; font-weight:700; font-size:18px; }
+  .logo svg { width:24px; height:24px; color:var(--blue); }
+  .links { display:flex; gap:28px; font-size:14px; color:var(--muted); }
+  .links a:hover { color:var(--fg); }
+  .nr { display:flex; gap:10px; font-size:14px; font-weight:500; }
+  .nr a { padding:9px 16px; border-radius:8px; }
+  .nr .s { border:1px solid var(--line); } .nr .p { background:var(--fg); color:#05070f; }
+
+  main { flex:1; display:grid; grid-template-columns:1.1fr .9fr; align-items:center; gap:48px; padding:0 clamp(20px,4vw,56px) 6vh; }
+  .badge { display:inline-flex; align-items:center; gap:8px; font-size:13px; padding:6px 12px; border-radius:999px; border:1px solid var(--line); background:rgba(77,124,255,.08); color:var(--muted); }
+  .badge b { color:var(--ok); font-weight:500; }
+  h1 { margin-top:22px; font-weight:600; font-size:clamp(46px,6vw,96px); line-height:.98; letter-spacing:-.05em; }
+  h1 span { color:var(--muted); }
+  .sub { margin-top:20px; font-size:18px; line-height:1.55; color:var(--muted); max-width:470px; }
+  .ctas { margin-top:30px; display:flex; gap:12px; flex-wrap:wrap; }
+  .btn { padding:14px 22px; border-radius:10px; font-weight:600; font-size:15px; transition:transform .25s, box-shadow .25s, background .25s; }
+  .btn.p { background:var(--blue); color:#fff; } .btn.p:hover { transform:translateY(-2px); box-shadow:0 14px 40px rgba(77,124,255,.45); }
+  .btn.s { border:1px solid var(--line); } .btn.s:hover { background:rgba(255,255,255,.06); }
+  .logos { margin-top:36px; display:flex; gap:26px; flex-wrap:wrap; font-weight:600; color:rgba(238,242,255,.4); letter-spacing:-.01em; }
+
+  /* live threat feed */
+  .feed { border-radius:18px; overflow:hidden; background:rgba(8,12,28,.6); border:1px solid var(--line); backdrop-filter:blur(18px); -webkit-backdrop-filter:blur(18px); box-shadow:0 40px 100px rgba(0,0,0,.45); }
+  .fh { display:flex; justify-content:space-between; align-items:center; padding:14px 16px; border-bottom:1px solid var(--line); font-size:13px; }
+  .fh b { display:flex; align-items:center; gap:8px; font-weight:600; }
+  .fh b i { width:8px; height:8px; border-radius:50%; background:var(--ok); box-shadow:0 0 10px var(--ok); animation:blink 1.5s infinite; }
+  @keyframes blink { 50% { opacity:.3; } }
+  .fh span { color:var(--muted); }
+  .rows { height:300px; overflow:hidden; position:relative; }
+  .rows::after { content:""; position:absolute; inset:auto 0 0; height:60px; background:linear-gradient(transparent,rgba(8,12,28,.95)); }
+  .ev { display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:center; padding:11px 16px; border-bottom:1px solid rgba(238,242,255,.06); font-size:13px; animation:in .5s cubic-bezier(.2,.8,.2,1); }
+  @keyframes in { from { opacity:0; transform:translateY(-10px); background:rgba(77,124,255,.12); } }
+  .ev .tag { font-size:11px; padding:3px 8px; border-radius:6px; }
+  .ev .tag.blk { background:rgba(255,90,110,.15); color:var(--bad); } .ev .tag.ok { background:rgba(67,224,160,.12); color:var(--ok); }
+  .ev .what { color:var(--fg); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .ev .what small { color:var(--muted); margin-left:6px; }
+  .ev .t { color:var(--muted); font-size:12px; }
+  .ff { display:flex; justify-content:space-between; padding:12px 16px; font-size:12px; color:var(--muted); border-top:1px solid var(--line); }
+  .ff b { color:var(--fg); font-weight:500; }
+
+  .rv { opacity:0; transform:translateY(16px); filter:blur(8px); animation:rise 1.1s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:calc(var(--d,0) * 1ms); }
+  @keyframes rise { to { opacity:1; transform:none; filter:blur(0); } }
+  @media (prefers-reduced-motion:reduce){ .rv,.ev{ animation:none; opacity:1; transform:none; filter:none; } .fh b i{ animation:none; } }
+  @media (max-width:900px){ .links{ display:none; } main{ grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+
+  <nav class="rv">
+    <a class="logo" href="#"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2 4 5v6c0 5 3.4 9.3 8 11 4.6-1.7 8-6 8-11V5z"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg>Riptide</a>
+    <div class="links"><a href="#">Platform</a><a href="#">Threat intel</a><a href="#">Customers</a><a href="#">Docs</a></div>
+    <div class="nr"><a class="s" href="#">Contact sales</a><a class="p" href="#">Get started</a></div>
+  </nav>
+
+  <main>
+    <div>
+      <span class="badge rv" style="--d:150"><b>●</b> 0 breaches across 4,200 teams</span>
+      <h1 class="rv" style="--d:300">Pull threats under <span>before they surface.</span></h1>
+      <p class="sub rv" style="--d:450">Riptide watches every login, token and API call in real time, and blocks the bad ones in under 40ms. No rules to write.</p>
+      <div class="ctas rv" style="--d:600"><a class="btn p" href="#">Start free trial</a><a class="btn s" href="#">See a live attack →</a></div>
+      <div class="logos rv" style="--d:750"><span>Lumen</span><span>Halcyon</span><span>Vertex</span><span>Orbital</span><span>Kinfolk</span></div>
+    </div>
+    <div class="feed rv" style="--d:600" aria-hidden="true">
+      <div class="fh"><b><i></i>Live threat feed</b><span class="mono">eu-west · prod</span></div>
+      <div class="rows mono" id="rows"></div>
+      <div class="ff mono"><span>Blocked today <b id="bl">1,284</b></span><span>p50 <b>31ms</b></span></div>
+    </div>
+  </main>
+</section>
+<script src="bg.js"></script>
+<script>
+  const events = [
+    ['blk', 'Credential stuffing', '185.220.x.x'], ['ok', 'Login verified', 'maya@acme'], ['blk', 'Token replay', 'api/v2/pay'],
+    ['blk', 'Impossible travel', 'SG → BR 3m'], ['ok', 'MFA passed', 'rin@acme'], ['blk', 'SQL injection', '/search?q='],
+    ['ok', 'Key rotated', 'svc-billing'], ['blk', 'Bot signup burst', '412 req/s'],
+  ];
+  const rows = document.getElementById('rows'), bl = document.getElementById('bl'); let i = 0, n = 1284;
+  const add = () => {
+    const [k, what, sub] = events[i++ % events.length];
+    const d = document.createElement('div'); d.className = 'ev';
+    d.innerHTML = `<span class="tag ${k}">${k === 'blk' ? 'BLOCKED' : 'ALLOWED'}</span><span class="what">${what}<small>${sub}</small></span><span class="t">now</span>`;
+    rows.prepend(d); if (rows.children.length > 9) rows.lastChild.remove();
+    [...rows.children].forEach((r, j) => { if (j) r.querySelector('.t').textContent = j * 2 + 's'; });
+    if (k === 'blk') bl.textContent = (++n).toLocaleString();
+  };
+  for (let j = 0; j < 7; j++) add();
+  setInterval(add, 1700);
+</script>
+</body>
+</html>

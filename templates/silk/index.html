@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Silk — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root { --ink:#1b2230; --muted:rgba(27,34,48,.62); --line:rgba(27,34,48,.14); --glow:#ff8a2a; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#c9d0d8; color:var(--ink); font-family:"Albert Sans",system-ui,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+
+  .hero { position:relative; min-height:100vh; min-height:100svh; display:flex; flex-direction:column; align-items:center; isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-2; display:block; }
+  .hero::before { content:""; position:absolute; inset:0 0 auto; height:46%; z-index:-1; background:linear-gradient(180deg,rgba(214,220,227,.85),rgba(214,220,227,0)); pointer-events:none; }
+
+  nav { width:100%; display:flex; justify-content:space-between; align-items:center; padding:22px clamp(20px,4vw,56px); }
+  .logo { display:flex; align-items:center; gap:10px; font-weight:700; font-size:19px; letter-spacing:-.02em; }
+  .logo i { width:22px; height:22px; border-radius:7px; background:radial-gradient(circle at 70% 70%,#ffb06a,#ff8a2a 30%,#e9edf1 70%); box-shadow:inset 0 0 0 1px rgba(27,34,48,.12); }
+  .links { display:flex; gap:4px; padding:4px; border-radius:999px; background:rgba(255,255,255,.5); border:1px solid rgba(255,255,255,.7); backdrop-filter:blur(14px); font-size:14px; }
+  .links a { padding:8px 16px; border-radius:999px; color:var(--muted); transition:background .25s,color .25s; }
+  .links a:hover { background:#fff; color:var(--ink); }
+  .pre { font-size:14px; font-weight:600; padding:10px 18px; border-radius:999px; background:var(--ink); color:#fff; transition:transform .25s; }
+  .pre:hover { transform:translateY(-1px); }
+
+  .copy { margin-top:clamp(16px,5vh,56px); text-align:center; padding:0 20px; }
+  .tag { display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:500; color:var(--muted); }
+  .tag i { width:6px; height:6px; border-radius:50%; background:var(--glow); box-shadow:0 0 12px var(--glow); }
+  h1 { margin-top:14px; font-weight:300; font-size:clamp(44px,6.2vw,96px); line-height:.98; letter-spacing:-.045em; }
+  h1 b { font-weight:600; }
+  .ctas { margin-top:26px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  .btn { display:inline-flex; align-items:center; gap:10px; padding:14px 24px; border-radius:999px; font-weight:600; font-size:15px; transition:transform .25s, box-shadow .25s, background .25s; }
+  .btn.dark { background:var(--ink); color:#fff; }
+  .btn.dark:hover { transform:translateY(-2px); box-shadow:0 14px 40px rgba(255,138,42,.35); }
+  .btn.light { background:rgba(255,255,255,.65); border:1px solid rgba(255,255,255,.8); backdrop-filter:blur(10px); }
+  .btn.light:hover { background:#fff; }
+  .btn.light b { width:22px; height:22px; border-radius:50%; display:grid; place-items:center; background:var(--ink); color:#fff; font-size:9px; }
+
+  .spec { position:absolute; bottom:28px; left:0; right:0; display:flex; justify-content:center; gap:clamp(18px,4vw,56px); font-size:13px; color:rgba(255,255,255,.92); text-shadow:0 1px 10px rgba(40,30,20,.35); }
+  .spec span b { font-weight:600; }
+
+  .rv { opacity:0; transform:translateY(-12px); filter:blur(8px); animation:rise 1.2s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:calc(var(--d,0) * 1ms); }
+  @keyframes rise { to { opacity:1; transform:none; filter:blur(0); } }
+  @media (prefers-reduced-motion:reduce){ .rv{ animation:none; opacity:1; transform:none; filter:none; } }
+  @media (max-width:820px){ .links{ display:none; } .spec{ flex-wrap:wrap; padding:0 20px; } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+
+  <nav class="rv">
+    <a class="logo" href="#"><i></i>Fold OS</a>
+    <div class="links"><a href="#">Overview</a><a href="#">Design</a><a href="#">Privacy</a><a href="#">Specs</a></div>
+    <a class="pre" href="#">Pre-order</a>
+  </nav>
+
+  <div class="copy">
+    <span class="tag rv" style="--d:150"><i></i>Keynote — live now</span>
+    <h1 class="rv" style="--d:300">Software that feels <b>soft.</b></h1>
+    <div class="ctas rv" style="--d:450">
+      <a class="btn dark" href="#">Join the beta</a>
+      <a class="btn light" href="#"><b>▶</b>Watch the film</a>
+    </div>
+  </div>
+
+  <div class="spec rv" style="--d:700"><span><b>0.2s</b> wake</span><span><b>On-device</b> AI</span><span><b>40h</b> battery</span><span><b>Fold-aware</b> layouts</span></div>
+</section>
+<script src="bg.js"></script>
+</body>
+</html>

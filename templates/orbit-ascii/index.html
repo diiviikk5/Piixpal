@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Orbit ASCII — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<style>
+  :root { --ink:#ecebe6; --muted:rgba(236,235,230,.5); --line:rgba(236,235,230,.14); --hot:#ff9a4d; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:#030304; color:var(--ink); font-family:"JetBrains Mono",monospace; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+  .hero { position:relative; min-height:100vh; min-height:100svh; display:flex; flex-direction:column; isolation:isolate; overflow:hidden; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-2; display:block; }
+  .hero::after { content:""; position:absolute; inset:0; z-index:-1; pointer-events:none; background:linear-gradient(90deg,rgba(3,3,4,.9) 0%,rgba(3,3,4,.7) 30%,transparent 50%); }
+  nav { display:flex; justify-content:space-between; align-items:center; padding:24px clamp(20px,4vw,56px); font-size:12px; letter-spacing:.06em; }
+  .logo { font-weight:700; font-size:15px; } .logo b { color:var(--hot); }
+  .links { display:flex; gap:28px; color:var(--muted); } .links a:hover { color:var(--ink); }
+  .nb { border:1px solid var(--line); padding:9px 14px; } .nb:hover { border-color:var(--ink); }
+  .copy { margin:auto 0; padding:0 clamp(20px,6vw,96px) 40px; max-width:640px; }
+  .tag { font-size:12px; color:var(--muted); } .tag b { color:var(--hot); font-weight:500; }
+  h1 { margin-top:18px; font-weight:700; font-size:clamp(36px,4.1vw,64px); line-height:1.02; letter-spacing:-.04em; }
+  h1 span { color:var(--muted); font-weight:400; }
+  .sub { margin-top:20px; font-size:14px; line-height:1.75; color:var(--muted); max-width:440px; }
+  .term { margin-top:28px; width:min(460px,100%); border:1px solid var(--line); background:rgba(3,3,4,.72); backdrop-filter:blur(6px); font-size:13px; }
+  .term .bar { padding:8px 12px; border-bottom:1px solid var(--line); color:var(--muted); font-size:11px; display:flex; justify-content:space-between; }
+  .term pre { padding:14px 14px 16px; line-height:1.7; min-height:136px; white-space:pre-wrap; }
+  .term .ok { color:#9fe870; } .term .hl { color:var(--hot); }
+  .cur { display:inline-block; width:8px; height:15px; background:var(--ink); vertical-align:-2px; animation:bl 1s steps(2) infinite; }
+  @keyframes bl { 50% { opacity:0; } }
+  .ctas { margin-top:22px; display:flex; gap:10px; flex-wrap:wrap; font-size:13px; }
+  .btn { padding:13px 18px; } .btn.p { background:var(--ink); color:#030304; } .btn.p:hover { background:var(--hot); }
+  .btn.g { border:1px solid var(--line); } .btn.g:hover { border-color:var(--ink); }
+  .rv { opacity:0; animation:in .9s steps(6) forwards; animation-delay:calc(var(--d,0)*1ms); }
+  @keyframes in { to { opacity:1; } }
+  @media (prefers-reduced-motion:reduce){ .rv{ animation:none; opacity:1; } .cur{ animation:none; } }
+  @media (max-width:760px){ .links{ display:none; } .hero::after{ background:rgba(3,3,4,.6); } }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+  <nav class="rv">
+    <a class="logo" href="#">saturn<b>_</b>ci</a>
+    <div class="links"><a href="#">docs</a><a href="#">pricing</a><a href="#">changelog</a><a href="#">status</a></div>
+    <a class="nb" href="#">$ login</a>
+  </nav>
+  <div class="copy">
+    <p class="tag rv" style="--d:150">// v4.0 — <b>builds in orbit</b></p>
+    <h1 class="rv" style="--d:300">CI that never<br>lands. <span>Ever.</span></h1>
+    <p class="sub rv" style="--d:450">Every push builds, tests and deploys on a ring of warm runners circling your repo. No cold starts, no queue, no yaml archaeology.</p>
+    <div class="term rv" style="--d:600" aria-hidden="true"><div class="bar"><span>~/app</span><span>zsh</span></div><pre id="tx"></pre></div>
+    <div class="ctas rv" style="--d:750"><a class="btn p" href="#">npx saturn init</a><a class="btn g" href="#">read the docs →</a></div>
+  </div>
+</section>
+<script src="bg.js"></script>
+<script>
+  // the terminal types a real-looking deploy, then loops
+  const lines = [['$ ', 'git push origin main', ''], ['', '→ runner r-07 picked up in 41ms', ''], ['', '✓ install   1.2s', 'ok'], ['', '✓ test      4.8s  (312 passed)', 'ok'], ['', '✓ deploy    2.1s', 'ok'], ['', '↗ live at app.saturn.run', 'hl']];
+  const el = document.getElementById('tx'); let L = 0, C = 0, html = '';
+  const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  const fast = navigator.webdriver || matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const step = () => {
+    if (L >= lines.length) { el.innerHTML = html + '<span class="cur"></span>'; setTimeout(() => { L = 0; C = 0; html = ''; step(); }, 4200); return; }
+    const [pre, txt, cls] = lines[L];
+    if (fast) { lines.forEach(([p, t, c]) => html += esc(p) + (c ? `<span class="${c}">${esc(t)}</span>` : esc(t)) + '\n'); L = lines.length; return step(); }
+    C++;
+    const cur = esc(pre) + (cls ? `<span class="${cls}">${esc(txt.slice(0, C))}</span>` : esc(txt.slice(0, C)));
+    el.innerHTML = html + cur + '<span class="cur"></span>';
+    if (C >= txt.length) { html += cur + '\n'; L++; C = 0; setTimeout(step, L === 1 ? 500 : 260); }
+    else setTimeout(step, L === 0 ? 55 : 8);
+  };
+  setTimeout(step, 900);
+</script>
+</body>
+</html>
