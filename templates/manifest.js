@@ -1,6 +1,8 @@
 // Every template registers itself here. The gallery (templates/index.html) reads this list.
 // poster: CSS background shown before the live preview loads.
 window.TEMPLATES = [
+  { slug:'visor', name:'Visor', tags:['image','scroll','gsap','experience','3d','dark'], poster:'radial-gradient(30% 6% at 60% 46%,#ff3b30,transparent),#050304' },
+  { slug:'bitcloud', name:'Bitcloud', tags:['pixel','dither','interactive','light','saas'], poster:'#1a1f3b' },
   { slug:'afterglow', name:'Afterglow', tags:['image','scroll','gsap','experience','fire','pixel'], poster:'url(afterglow/sunset.webp) center/cover' },
   { slug:'flameblade', name:'Emberblade', tags:['image','fire','anime','gaming','interactive','dark'], poster:'radial-gradient(40% 50% at 70% 55%,#ff7a1a,#5a0d04 55%,#070304)' },
   { slug:'vermilion', name:'Vermilion', tags:['webgl','scroll','gsap','experience','dark'], poster:'url(vermilion/c1_s.jpg) center/cover' },

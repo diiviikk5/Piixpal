@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Visor — hero</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+<style>
+  :root { --ink:#fff1f0; --muted:rgba(255,226,224,.7); --line:rgba(255,120,110,.25); --glow:#ff3b30; --red:#ff3b30; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html { background:#050304; }
+  body { color:var(--ink); font-family:Inter,system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+  a { color:inherit; text-decoration:none; }
+  [data-bg] { position:fixed; inset:0; width:100%; height:100%; z-index:-2; display:block; }
+  .shade { position:fixed; inset:0; z-index:-1; pointer-events:none; background:radial-gradient(120% 80% at 50% 50%,transparent 40%,rgba(5,6,10,.45)); }
+  nav { position:fixed; top:0; left:0; right:0; z-index:5; display:flex; justify-content:space-between; align-items:center; padding:22px clamp(20px,4vw,56px); font-size:13px; }
+  .logo { font-family:Unbounded,sans-serif; font-weight:800; font-size:20px; letter-spacing:.12em; }
+  .logo i { font-style:normal; color:var(--glow); text-shadow:0 0 18px var(--glow); }
+  .links { display:flex; gap:28px; color:var(--muted); } .links a:hover { color:var(--ink); }
+  .live { display:flex; align-items:center; gap:9px; padding:9px 14px; border:1px solid var(--line); border-radius:999px; background:rgba(10,10,14,.35); backdrop-filter:blur(10px); font-family:"JetBrains Mono",monospace; font-size:11px; letter-spacing:.06em; }
+  .live b { width:7px; height:7px; border-radius:50%; background:var(--red); box-shadow:0 0 10px var(--red); animation:beat 1.4s ease-in-out infinite; }
+  @keyframes beat { 50% { opacity:.35; } }
+  .track { height:620vh; }
+  .ch { position:fixed; inset:0; display:grid; place-content:center; justify-items:center; text-align:center; padding:0 24px; pointer-events:none; z-index:2; }
+  .ch.on { pointer-events:auto; }
+  .ch.end { place-content:end center; padding-bottom:max(14vh,96px); }
+  .eyebrow { font-family:"JetBrains Mono",monospace; font-size:12px; letter-spacing:.3em; text-transform:uppercase; color:var(--glow); }
+  h2 { margin-top:18px; font-family:Unbounded,sans-serif; font-weight:800; font-size:clamp(44px,7.4vw,124px); line-height:.95; letter-spacing:-.03em; text-transform:uppercase; text-shadow:0 2px 40px rgba(0,0,0,.35); }
+  h2 em { font-style:normal; color:var(--glow); text-shadow:0 0 24px rgba(255,59,48,.55),0 0 2px rgba(255,120,110,.8); }
+  h2 .w { display:inline-block; }
+  .s { margin-top:22px; max-width:440px; font-size:16px; line-height:1.6; color:var(--muted); text-shadow:0 1px 16px rgba(0,0,0,.5); }
+  .ctas { margin-top:30px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap; }
+  .btn { display:inline-flex; align-items:center; gap:10px; padding:15px 24px; border-radius:999px; font-weight:600; font-size:14px; transition:transform .35s cubic-bezier(.2,.9,.2,1),box-shadow .35s,background .3s; }
+  .btn.p { background:var(--red); color:#fff; } .btn.p:hover { transform:translateY(-2px); box-shadow:0 14px 40px -8px rgba(255,59,48,.9); }
+  .btn.g { border:1px solid var(--line); background:rgba(10,10,14,.3); backdrop-filter:blur(10px); } .btn.g:hover { border-color:var(--ink); }
+  .hint { position:fixed; left:50%; bottom:28px; transform:translateX(-50%); z-index:3; display:grid; justify-items:center; gap:10px; font-family:"JetBrains Mono",monospace; font-size:10px; letter-spacing:.24em; text-transform:uppercase; color:var(--muted); }
+  .hint i { width:1px; height:42px; background:linear-gradient(var(--ink),transparent); animation:drip 1.8s cubic-bezier(.6,0,.2,1) infinite; transform-origin:top; }
+  @keyframes drip { 0%{transform:scaleY(0)} 50%{transform:scaleY(1)} 100%{transform:scaleY(1);opacity:0} }
+  .rail { position:fixed; right:clamp(16px,2.5vw,32px); top:50%; transform:translateY(-50%); z-index:3; width:2px; height:160px; background:var(--line); border-radius:2px; overflow:hidden; }
+  .rail i { position:absolute; inset:0; background:var(--glow); transform-origin:top; transform:scaleY(0); }
+  .steps { position:fixed; left:clamp(20px,4vw,56px); bottom:28px; z-index:3; font-family:"JetBrains Mono",monospace; font-size:11px; color:var(--muted); letter-spacing:.08em; }
+  @media (max-width:760px){ .links{ display:none; } .rail{ display:none; } }
+  @media (prefers-reduced-motion:reduce){ .hint i{ animation:none; } }
+</style>
+</head>
+<body>
+<canvas data-bg aria-hidden="true"></canvas>
+<div class="shade"></div>
+<nav><a class="logo" href="#">OPT<i>I</i>C</a><div class="links"><a href="#">Product</a><a href="#">Research</a><a href="#">Pricing</a></div><span class="live"><b></b> tracking 1,204 sessions</span></nav>
+
+<section class="ch" data-at="-.15,.18">
+  <p class="eyebrow">Eye-tracking for product teams</p>
+  <h2>See what<br><em>they see.</em></h2>
+  <p class="s">Optic follows every glance on your site, so you know what people read, skip and never notice.</p>
+</section>
+<section class="ch" data-at=".22,.5">
+  <p class="eyebrow">01 · Gaze capture</p>
+  <h2>One line<br>of <em>light.</em></h2>
+  <p class="s">A webcam and one script. No hardware, no lab, accurate to a single word on the page.</p>
+</section>
+<section class="ch" data-at=".6,.84">
+  <p class="eyebrow">02 · Heatmaps in 3D</p>
+  <h2>Step<br><em>through.</em></h2>
+  <p class="s">Walk the attention map of every page like a landscape, live, as visitors look around.</p>
+</section>
+<section class="ch end" data-at=".88,1.01">
+  <p class="eyebrow">Free for 14 days</p>
+  <h2>OPT<em>I</em>C</h2>
+  <div class="ctas"><a class="btn p" href="#">Start tracking</a><a class="btn g" href="#">Book a demo</a></div>
+</section>
+
+<div class="track" aria-hidden="true"></div>
+<div class="hint" id="hint"><span>Scroll to look closer</span><i></i></div>
+<div class="rail" aria-hidden="true"><i id="rail"></i></div>
+<div class="steps" id="steps">01 / 04</div>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script src="bg.js"></script>
+<script>
+(() => {
+  const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const preview = navigator.webdriver || /[?&]preview/.test(location.search);   // gallery cards: play the journey by itself
+  window.VISOR = { p: 0 };
+
+  /* each headline word rises out of a blur; each chapter is a little timeline we scrub with progress */
+  const chapters = [...document.querySelectorAll('.ch')].map(ch => {
+    const [a, b] = ch.dataset.at.split(',').map(Number);
+    ch.querySelectorAll('h2').forEach(h => { h.innerHTML = h.innerHTML.split(/(<br>|<em>|<\/em>)/).map(part => /^<\/?(br|em)>$/.test(part) ? part : part.split(' ').map(w => w ? `<span class="w">${w}</span>` : '').join(' ')).join(''); });
+    const words = ch.querySelectorAll('.w'), rest = ch.querySelectorAll('.eyebrow, .s, .ctas');
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo(words, { yPercent: 60, opacity: 0, filter: 'blur(14px)' }, { yPercent: 0, opacity: 1, filter: 'blur(0px)', duration: .45, stagger: .05, ease: 'power3.out' }, 0)
+      .fromTo(rest, { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: .4, stagger: .06, ease: 'power3.out' }, .12);
+    if (b < 1) tl.to(words, { yPercent: -50, opacity: 0, filter: 'blur(14px)', duration: .35, stagger: .03, ease: 'power3.in' }, .78).to(rest, { opacity: 0, y: -14, duration: .3 }, .78);
+    tl.totalDuration(1);
+    return { ch, a, b, tl };
+  });
+
+  const rail = document.getElementById('rail'), steps = document.getElementById('steps'), hint = document.getElementById('hint');
+  let p = 0;
+  const show = () => {
+    VISOR.p = p;
+    chapters.forEach(({ ch, a, b, tl }, i) => {
+      const k = (p - a) / (b - a);
+      tl.progress(Math.max(0, Math.min(1, k)));
+      ch.classList.toggle('on', k > 0 && k < 1);
+    });
+    rail.style.transform = `scaleY(${p})`;
+    const n = p < .2 ? 1 : p < .56 ? 2 : p < .86 ? 3 : 4;
+    steps.textContent = `0${n} / 04`;
+    hint.style.opacity = Math.max(0, 1 - p * 14);
+  };
+
+  if (preview) {
+    document.querySelector('.track').style.height = '100vh';
+    const t0 = performance.now();
+    gsap.ticker.add(() => { p = Math.min(1, ((performance.now() - t0) / 1000 % 12) / 10); show(); });
+    return;
+  }
+  /* one scroll source: Lenis feeds the shader and the copy */
+  const lenis = new Lenis({ lerp: still ? 1 : .07, wheelMultiplier: .85 });
+  gsap.ticker.add(t => lenis.raf(t * 1000)); gsap.ticker.lagSmoothing(0);
+  gsap.ticker.add(() => { p = lenis.limit ? Math.min(1, lenis.scroll / lenis.limit) : 0; show(); });
+  show();
+})();
+</script>
+</body>
+</html>
