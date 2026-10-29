@@ -1,8 +1,8 @@
 /* Emberblade — motion background (your image, set alight)
  * Usage: <canvas data-bg></canvas> inside any positioned container, then <script src="bg.js"></script>.
  * Keep scene.webp next to this file. Serve over http(s): browsers block textures from file://.
- * The portrait arrives upright and turns into landscape (data-intro="off" skips that), then its
- * flames writhe and run along the blade. Move to fan them; click to send a burst of fire.
+ * The portrait is shown on its side, as a landscape. Its flames writhe and run along the blade.
+ * Move to fan them; click to send a burst of fire.
  */
 (() => {
   const base = (document.currentScript && document.currentScript.src || location.href).replace(/[^/]*$/, '');
@@ -19,7 +19,6 @@
   addEventListener('pagehide', () => { const x = gl.getExtension('WEBGL_lose_context'); if (x) x.loseContext(); });
 
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const skipIntro = still || canvas.dataset.intro === 'off' || navigator.webdriver || /[?&]preview/.test(location.search);
 
   const vert = `#version 300 es
 in vec2 p; void main(){ gl_Position = vec4(p, 0., 1.); }`;
@@ -185,7 +184,6 @@ void main(){
 
   let start = performance.now(), last = performance.now(), visible = true, raf = 0;
   new IntersectionObserver(es => { visible = es[0].isIntersecting; if (visible && !raf) raf = requestAnimationFrame(frame); }).observe(canvas);
-  const ease = u => u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
   function frame(now) {
     raf = 0;
     if (!visible) return;
@@ -194,12 +192,10 @@ void main(){
     if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
     if (ready) {
       const el = (now - start) / 1000;
-      /* hold the portrait a beat, then turn it */
-      const spin = skipIntro ? 0 : 1 - ease(Math.min(1, Math.max(0, (el - .5) / 1.5)));
       sx += (mx - sx) * Math.min(1, dt * 5); sy += (my - sy) * Math.min(1, dt * 5);
       heat *= Math.pow(.25, dt); bt += dt;
       gl.viewport(0, 0, w, h);
-      gl.uniform2f(uR, w, h); gl.uniform1f(uT, still ? 6 : el + 3); gl.uniform1f(uSpin, spin);
+      gl.uniform2f(uR, w, h); gl.uniform1f(uT, still ? 6 : el + 3); gl.uniform1f(uSpin, 0);
       gl.uniform2f(uM, sx, sy); gl.uniform1f(uHeat, heat); gl.uniform3f(uBurst, bx, by, bt); gl.uniform1f(uLA, LA);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
       if (still) return;
