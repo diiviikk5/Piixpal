@@ -254,6 +254,7 @@ export const navBar = (key, pre = '', ui = '../ui/') => `<header class="nav" id=
       <a href="${pre}install.html"${key === 'install' ? ' aria-current="page"' : ''}>Install</a>
       <a href="${pre}make.html"${key === 'make' ? ' aria-current="page"' : ''}>Maker</a>
       <a href="${pre}builder.html"${key === 'builder' ? ' aria-current="page"' : ''}>Builder</a>
+      <a href="/stage/">Stage<b class="new">new</b></a>
     </nav>
     <div class="theme" role="group" aria-label="Theme">
       <button type="button" data-theme-set="white" title="White" aria-label="White theme"><svg viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M3 0h2v1H3zM3 7h2v1H3zM0 3h1v2H0zM7 3h1v2H7zM2 2h4v4H2z"/></svg></button>

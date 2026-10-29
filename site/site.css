@@ -82,6 +82,7 @@ code,kbd,pre{font-family:var(--f-mono)}
 .links{display:flex;gap:4px;margin-left:auto}
 .links a{position:relative;text-decoration:none;font-weight:550;font-size:15.5px;padding:8px 12px;border-radius:9px;color:var(--ink-2);transition:background-color .2s,color .2s}
 .links a:hover{background:var(--paper-2);color:var(--ink)}
+.links .new{position:relative;top:-7px;margin-left:3px;padding:2px 4px;border-radius:4px;background:var(--lime);color:#17121f;font:400 8px/1 var(--f-pix);letter-spacing:.04em;text-transform:uppercase}
 .nav .btn{margin-left:4px}
 .stars{font:600 12.5px/1 var(--f-mono);padding:3px 6px;border-radius:6px;background:color-mix(in oklab,var(--paper) 16%,transparent)}
 @media (max-width:820px){.links{display:none}.nav .btn{margin-left:auto}}
