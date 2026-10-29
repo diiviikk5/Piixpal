@@ -405,3 +405,8 @@ code,kbd,pre{font-family:var(--f-mono)}
 @media (max-width:1560px){.nav .btn-heart span{display:none}.nav .btn-heart{padding:0 12px}.links a{padding:8px 8px}}
 @media (max-width:1360px){.links a{padding:8px 6px;font-size:15px}}
 @media (max-width:1100px){.links a{padding:8px 5px;font-size:14px}}
+
+/* Keep the landing page sponsor action next to the logo, with its label visible. */
+.nav .home-sponsor{flex:none}
+.nav .home-sponsor span{display:inline}
+@media (max-width:520px){.nav .home-sponsor{font-size:14px;gap:6px;width:auto;padding:0 10px}}
