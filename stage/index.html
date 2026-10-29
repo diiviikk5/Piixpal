@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Piixpal Stage · make little plays with your pals</title>
+<meta name="description" content="Puppeteer pixel pals with your mouse, give them lines and entrances, and play the scene on your website when someone signs up, gets lost or scrolls by. Or export it as a video.">
+<meta name="theme-color" content="#0b0a10">
+<meta property="og:title" content="Piixpal Stage">
+<meta property="og:description" content="Make little plays with pixel pals. Play them on your site, or export a video.">
+<link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@400;600;700&family=Silkscreen&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../site/stage.css">
+<!-- Vercel Web Analytics: cookieless page views -->
+<script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<!-- Microsoft Clarity: heatmaps and session recordings -->
+<script>(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","z45d6i2fi1");</script>
+</head>
+<body>
+<div class="app" id="app">
+
+  <header class="top">
+    <a class="brand" href="../" title="Piixpal home">
+      <svg viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true"><rect width="16" height="16" rx="3" fill="#c6f432"/><path fill="#0b0a10" d="M4 5h2v2H4zM10 5h2v2h-2zM5 10h6v1H5z"/></svg>
+      <span>Stage</span><b class="beta">beta</b>
+    </a>
+    <input class="title" id="title" value="Untitled scene" aria-label="Scene title" spellcheck="false" maxlength="60">
+    <div class="top-mid">
+      <button class="tb" id="b-templates" type="button"><i class="ic ic-grid"></i>Templates</button>
+      <span class="sep"></span>
+      <button class="tb icon" id="b-undo" type="button" title="Undo (Ctrl+Z)" aria-label="Undo"><i class="ic ic-undo"></i></button>
+      <button class="tb icon" id="b-redo" type="button" title="Redo (Ctrl+Shift+Z)" aria-label="Redo"><i class="ic ic-redo"></i></button>
+      <button class="tb icon" id="b-help" type="button" title="Shortcuts (?)" aria-label="Keyboard shortcuts"><i class="ic ic-key"></i></button>
+    </div>
+    <div class="top-end">
+      <span class="saved" id="saved" aria-live="polite">Saved</span>
+      <button class="tb" id="b-share" type="button"><i class="ic ic-link"></i>Share</button>
+      <button class="tb primary" id="b-export" type="button"><i class="ic ic-up"></i>Export</button>
+    </div>
+  </header>
+
+  <aside class="side cast" aria-label="Cast">
+    <div class="ph"><h2>Cast</h2><span class="hint">drag onto the stage</span></div>
+    <label class="search"><i class="ic ic-search"></i><input id="cast-q" type="search" placeholder="Find a pal" autocomplete="off" spellcheck="false"></label>
+    <div class="grid" id="cast-grid" role="list"></div>
+    <form class="maker" id="maker-form">
+      <span class="lbl">Your own pal</span>
+      <div class="row"><input id="maker-code" placeholder="Pal Maker link or code" autocomplete="off" spellcheck="false"><button class="tb" type="submit">Add</button></div>
+      <a class="sub" href="../components/make.html" target="_blank" rel="noopener">Make one in the Pal Maker ↗</a>
+    </form>
+  </aside>
+
+  <main class="center">
+    <div class="viewport" id="viewport">
+      <div class="frame" id="frame">
+        <canvas id="stage" aria-label="Stage"></canvas>
+        <div class="empty" id="empty">
+          <div class="empty-card">
+            <p class="kick">Your stage is empty</p>
+            <ol>
+              <li><b>Drag a pal</b> from the cast onto the stage.</li>
+              <li>Press <kbd>R</kbd> and <b>drag it around</b>: you're recording.</li>
+              <li>Add lines and emotes, then <b>Export</b> it to your site.</li>
+            </ol>
+            <button class="tb primary" type="button" id="b-empty-tpl">Or start from a template</button>
+          </div>
+        </div>
+        <div class="hud" id="hud" aria-live="polite"></div>
+      </div>
+    </div>
+    <div class="transport">
+      <div class="tp-l">
+        <button class="tb icon" id="b-start" type="button" title="Back to start (Home)" aria-label="Back to start"><i class="ic ic-first"></i></button>
+        <button class="tb icon play" id="b-play" type="button" title="Play (Space)" aria-label="Play"><i class="ic ic-play"></i></button>
+        <button class="tb rec" id="b-rec" type="button" title="Record the selected pal (R)"><span class="dot"></span><span class="rec-l">Record</span></button>
+      </div>
+      <div class="clock"><span id="clock-t">00:00.00</span><span class="slash">/</span><span id="clock-len">00:06.00</span></div>
+      <div class="tp-r">
+        <button class="tog" id="b-loop" type="button" aria-pressed="true" title="Loop playback (L)">Loop</button>
+        <button class="tog" id="b-snap" type="button" aria-pressed="true" title="Snap cues to a 0.05s grid">Snap</button>
+        <button class="tog" id="b-guides" type="button" aria-pressed="true" title="Ground line and paths (G)">Guides</button>
+      </div>
+    </div>
+  </main>
+
+  <aside class="side insp" aria-label="Inspector" id="insp"></aside>
+
+  <section class="tl" aria-label="Timeline">
+    <div class="tl-bar">
+      <h2>Timeline</h2>
+      <div class="fx-add">
+        <span class="lbl">Scene effect at playhead</span>
+        <button class="chipbtn" type="button" data-fx="confetti">Confetti</button>
+        <button class="chipbtn" type="button" data-fx="shake">Shake</button>
+        <button class="chipbtn" type="button" data-fx="flash">Flash</button>
+      </div>
+      <label class="zoom"><i class="ic ic-zoom"></i><input id="zoom" type="range" min="30" max="400" value="110" aria-label="Timeline zoom"></label>
+    </div>
+    <div class="tl-body" id="tl-body">
+      <div class="tl-gutter" id="tl-gutter"></div>
+      <div class="tl-scroll" id="tl-scroll">
+        <div class="tl-inner" id="tl-inner">
+          <div class="ruler" id="ruler"></div>
+          <div class="lanes" id="lanes"></div>
+          <div class="ph-line" id="playhead"><i></i></div>
+          <div class="end" id="end-handle" title="Drag to change the scene length"><i></i></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="modal" id="modal" hidden>
+  <div class="scrim" data-close></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="modal-h">
+    <button class="x" type="button" data-close aria-label="Close">✕</button>
+    <div id="modal-body"></div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="narrow" id="narrow">
+  <p class="kick">Stage needs room</p>
+  <p>It's an editor with a timeline, so it wants a laptop or bigger screen.</p>
+  <button class="tb primary" type="button" id="b-narrow">Open it anyway</button>
+</div>
+
+<script src="../piixpal.js"></script>
+<script src="../site/stage.js"></script>
+</body>
+</html>
