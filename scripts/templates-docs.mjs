@@ -41,8 +41,8 @@ ${navBar('templates', '../components/', '../ui/')}
     <div class="wrap">
       <span class="eyebrow" style="--accent:var(--violet)">Templates · ${count} heroes</span>
       <h1 id="tg-title" class="tg-h1"><span class="tg-sr">Landing heroes that actually move.</span>
-        <piix-type text="Landing heroes" rows="20" depth="1" gap=".1" shade="#c6f432" fit aria-hidden="true"></piix-type>
-        <piix-type text="that actually move." rows="14" depth="1" gap=".1" shade="#ff6b4a" fit aria-hidden="true" class="tg-l2"></piix-type>
+        <piix-type text="Landing heroes" rows="20" depth="0" gap=".1" fit aria-hidden="true"></piix-type>
+        <piix-type text="that actually move." rows="14" depth="0" gap=".1" fit aria-hidden="true" class="tg-l2"></piix-type>
       </h1>
       <p class="tg-lead">Live WebGL shaders, scroll-driven worlds and ASCII simulations, each dressed for a real product. No build, no install: hit <b>Copy hero</b>, paste it into an <code>index.html</code>, change the words, ship. Or take just the moving background, in two lines.</p>
       <div class="tg-bar">
