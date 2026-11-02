@@ -13,7 +13,7 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "dev": "node scripts/serve.mjs",
-    "docs": "node scripts/docs.mjs && node scripts/ui-docs.mjs && node scripts/templates-docs.mjs && node scripts/gitpal-docs.mjs",
+    "docs": "node scripts/docs.mjs && node scripts/ui-docs.mjs && node scripts/templates-docs.mjs",
     "registry": "node scripts/registry.mjs"
   },
   "keywords": [
@@ -42,14 +42,7 @@
   },
   "homepage": "https://piixpal.vercel.app",
   "devDependencies": {
-    "@fontsource/caveat": "^5.3.0",
-    "@fontsource/instrument-serif": "^5.3.0",
-    "@fontsource/jetbrains-mono": "^5.3.0",
-    "@fontsource/pixelify-sans": "^5.3.0",
-    "@fontsource/space-grotesk": "^5.3.0",
-    "@fontsource/unbounded": "^5.3.0",
-    "esbuild": "^0.25.12",
-    "opentype.js": "^2.0.0"
+    "esbuild": "^0.25.12"
   },
   "module": "piixpal.js",
   "unpkg": "piixpal.min.js",
@@ -82,8 +75,8 @@
   ],
   "peerDependencies": {
     "react": ">=17",
-    "svelte": ">=3",
-    "vue": ">=3"
+    "vue": ">=3",
+    "svelte": ">=3"
   },
   "peerDependenciesMeta": {
     "react": {

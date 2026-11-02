@@ -83,10 +83,6 @@
   ],
   "rewrites": [
     {
-      "source": "/gp/:c",
-      "destination": "/api/gp?c=:c"
-    },
-    {
       "source": "/readme",
       "destination": "/api/readme"
     },
