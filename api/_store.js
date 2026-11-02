@@ -31,4 +31,4 @@ const load = async id => (enabled() && isId(id) ? cmd(['GET', 'pal:' + id]) : nu
 /* a pals= entry, a make= value or a /p/ path: a code as it is, or an id looked up */
 const resolve = async ref => (isCode(ref) ? ref : isId(ref) ? load(ref).catch(() => null) : null);
 
-module.exports = { enabled, save, load, resolve, idOf, isId, isCode };
+module.exports = { enabled, save, load, resolve, idOf, isId, isCode, cmd };

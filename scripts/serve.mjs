@@ -19,6 +19,7 @@ const types = {
 createServer(async (req, res) => {
   let p = decodeURIComponent(new URL(req.url, 'http://x').pathname);
   if (p === '/readme') return api('readme')(req, res);
+  if (p.startsWith('/gp/')) { const u = new URL(req.url, 'http://x'); u.searchParams.set('c', p.slice(4)); req.url = '/api/gp' + u.search; return api('gp')(req, res); }
   if (p.startsWith('/p/')) { req.url = '/api/p?ref=' + encodeURIComponent(p.slice(3)); return api('p')(req, res); }
   const fn = /^\/api\/([a-z]+)$/.exec(p);
   if (fn) { try { return await api(fn[1])(req, res); } catch (e) { res.writeHead(404).end(String(e.message)); return; } }

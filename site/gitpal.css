@@ -1,0 +1,65 @@
+/* Gitpal: README components. The page wears the site's clothes; the previews wear GitHub's. */
+.gp-head{padding:clamp(48px,7vw,96px) 0 26px}
+.gp-head h1{margin:18px 0 0;font:400 clamp(56px,9vw,132px)/.9 "Instrument Serif",serif;letter-spacing:-.03em}
+.gp-head h1 em{font-style:italic;color:#3fb950}
+.gp-lead{margin:22px 0 0;max-width:62ch;color:var(--ink-2);font-size:clamp(16px,1.4vw,19px);line-height:1.55;text-wrap:pretty}
+.gp-me{display:flex;flex-wrap:wrap;gap:14px;margin-top:30px;padding:16px;border:2px solid var(--ink);border-radius:16px;background:var(--card);box-shadow:0 4px 0 var(--ink);max-width:880px}
+.gp-me label{display:grid;gap:6px;flex:1 1 200px}
+.gp-me label>span:first-child,.gp-fields label>span:first-child{font:400 10.5px/1 var(--f-pix);letter-spacing:.05em;text-transform:uppercase;color:var(--muted)}
+.gp-me input,.gp-fields input:not([type=range]):not([type=color]),.gp-fields select{height:40px;padding:0 12px;border:2px solid var(--line-2);border-radius:10px;background:var(--paper);color:var(--ink);font:500 14.5px/1 var(--f-mono);outline:none;width:100%;transition:border-color .15s}
+.gp-me input:focus,.gp-fields input:focus,.gp-fields select:focus{border-color:var(--ink)}
+.gp-seg{display:inline-flex;height:40px;padding:3px;border:2px solid var(--line-2);border-radius:10px;gap:3px}
+.gp-seg button{flex:1;border:0;border-radius:7px;background:transparent;color:var(--ink-2);font:600 13.5px/1 var(--f-sans);cursor:pointer;padding:0 14px}
+.gp-seg button[aria-pressed=true]{background:var(--ink);color:var(--paper)}
+
+.gp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,540px),1fr));gap:26px;padding-top:24px;padding-bottom:30px}
+.gp-card{display:flex;flex-direction:column;gap:14px;padding:22px;border:2px solid var(--ink);border-radius:var(--r-lg);background:var(--card);box-shadow:0 4px 0 var(--ink);min-width:0;scroll-margin-top:90px}
+.gp-card header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.gp-card h2{margin:0;font:740 24px/1.1 var(--f-sans);letter-spacing:-.02em}
+.gp-tag{font:400 10.5px/1 var(--f-pix);text-transform:uppercase;letter-spacing:.05em;padding:6px 8px;border:2px solid var(--ink);border-radius:7px;background:var(--lime);color:#17121f}
+.gp-card>p{margin:0;color:var(--ink-2);font-size:15px;line-height:1.55}
+/* the preview sits on GitHub's own colours, so you see what your profile will */
+.gp-stage{display:grid;place-items:center;min-height:180px;padding:22px;border-radius:12px;border:1px solid #30363d;background:#0d1117;overflow:hidden}
+.gp-stage.light{background:#fff;border-color:#d0d7de}
+.gp-stage img{max-width:100%;height:auto;display:block}
+.gp-fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.gp-fields label{display:grid;gap:6px;align-content:start}
+.gp-fields label.wide{grid-column:1/-1}
+.gp-fields input[type=range]{width:100%;accent-color:var(--ink);height:40px}
+.gp-col{display:flex;height:40px;border:2px solid var(--line-2);border-radius:10px;padding:4px;background:var(--paper)}
+.gp-col input{flex:1;border:0;padding:0;background:none;cursor:pointer;width:100%;height:100%}
+.gp-code{position:relative;border-radius:12px;background:var(--code);color:#e6edf3;overflow:hidden}
+.gp-code pre{margin:0;padding:14px 16px 58px;font:500 12px/1.6 var(--f-mono);white-space:pre-wrap;word-break:break-all;max-height:170px;overflow:auto}
+.gp-acts{position:absolute;left:12px;right:12px;bottom:10px;display:flex;justify-content:flex-end;gap:8px}
+.gp-acts .btn{height:34px;font-size:13px}
+.btn.ok{--bg:var(--lime);--fg:#17121f}
+
+.gp-tray{position:fixed;right:20px;bottom:20px;z-index:45;width:min(320px,calc(100vw - 40px))}
+.gp-tray-in{padding:16px;border:2px solid var(--ink);border-radius:16px;background:var(--card);box-shadow:0 6px 0 var(--ink),0 20px 40px -20px rgba(0,0,0,.4)}
+.gp-tray-h{display:flex;justify-content:space-between;align-items:baseline}
+.gp-tray-h b{font:740 17px/1 var(--f-sans)}
+.gp-tray-h span{font:500 12px/1 var(--f-mono);color:var(--muted)}
+.gp-tray ol{margin:12px 0;padding:0;list-style:none;display:grid;gap:6px;max-height:220px;overflow:auto}
+.gp-tray li{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;border-radius:9px;background:var(--paper-2);font:600 14px/1 var(--f-sans)}
+.gp-mv{display:flex;gap:4px}
+.gp-mv button{width:26px;height:26px;border:0;border-radius:7px;background:transparent;color:var(--ink-2);cursor:pointer}
+.gp-mv button:hover:not(:disabled){background:var(--paper-3);color:var(--ink)}
+.gp-mv button:disabled{opacity:.3}
+.gp-tray-a{display:flex;gap:8px}.gp-tray-a .btn{flex:1;justify-content:center}
+
+.gp-how{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;padding-top:50px;padding-bottom:120px}
+.gp-how>div{padding:24px;border:2px solid var(--ink);border-radius:var(--r-lg);background:var(--card);box-shadow:0 4px 0 var(--ink)}
+.gp-how b{display:grid;place-items:center;width:34px;height:34px;border:2px solid var(--ink);border-radius:9px;background:#3fb950;color:#fff;font:400 14px/1 var(--f-pix)}
+.gp-how h3{margin:14px 0 6px;font:740 21px/1.15 var(--f-sans)}
+.gp-how p{margin:0;color:var(--ink-2);font-size:15px;line-height:1.55}
+@media (max-width:860px){.gp-how{grid-template-columns:minmax(0,1fr)}}
+
+.gp-modal{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:24px}
+.gp-modal[hidden]{display:none}
+.gp-scrim{position:absolute;inset:0;background:rgba(1,4,9,.7);backdrop-filter:blur(4px)}
+.gp-sheet{position:relative;width:min(920px,100%);max-height:calc(100dvh - 48px);display:flex;flex-direction:column;border-radius:12px;border:1px solid #30363d;overflow:hidden;background:#0d1117}
+.gp-sheet-h{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid #30363d;background:#161b22;color:#e6edf3;font:600 14px/1 var(--f-mono)}
+.gp-x{border:0;background:transparent;color:#7d8590;font-size:16px;cursor:pointer}
+.gp-readme{overflow:auto;padding:32px;text-align:center}
+.gp-readme.light{background:#fff}
+.gp-readme img{max-width:100%}
