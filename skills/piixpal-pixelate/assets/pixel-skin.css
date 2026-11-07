@@ -1,0 +1,89 @@
+/* Piixpal pixel skin — turns an existing site pixel without rebuilding it.
+ * https://piixpal.dvkk.dev · MIT
+ *
+ * Opt in on <html>:
+ *   <html data-pixel="soft">   type, focus, selection, links, dividers, images: the light touch
+ *   <html data-pixel="full">   soft + buttons, inputs, cards and badges drawn as pixel objects
+ *
+ * Or use the classes anywhere, with or without data-pixel:
+ *   .px-btn  .px-card  .px-badge  .px-input  .px-divider  .px-label  .px-crisp  .px-dither
+ *
+ * Everything reads from these variables; set them to the site's own colours (see the skill). */
+:root {
+  --px: 4px;                  /* one pixel of chrome */
+  --px-ink: #17121f;          /* outlines and hard shadows */
+  --px-paper: #ffffff;        /* surface of cards, inputs */
+  --px-accent: #c6f432;       /* one accent: buttons, focus, the highlighted word */
+  --px-accent-ink: #17121f;   /* text on the accent */
+  --px-soft: #f3eee3;         /* quiet fills: badges, code */
+  --px-font: "Pixelify Sans", ui-monospace, monospace;  /* pixel lettering for headings */
+  --px-label-font: "Silkscreen", ui-monospace, monospace; /* small caps-style labels, badges, buttons */
+}
+
+/* ---------- the shape: notched corners and a hard shadow, no blur, no rounding ---------- */
+.px-notch,
+[data-pixel="full"] :is(button, .btn, .button, [role="button"], input[type="submit"], input[type="button"]),
+.px-btn, .px-card, .px-input, .px-badge {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow:
+    0 calc(var(--px) * -1) 0 0 var(--px-ink),
+    0 var(--px) 0 0 var(--px-ink),
+    calc(var(--px) * -1) 0 0 0 var(--px-ink),
+    var(--px) 0 0 0 var(--px-ink) !important;
+}
+
+/* ---------- buttons: sink into their shadow when pressed ---------- */
+[data-pixel="full"] :is(button, .btn, .button, [role="button"], input[type="submit"], input[type="button"]),
+.px-btn {
+  position: relative;
+  filter: drop-shadow(var(--px) var(--px) 0 var(--px-ink));
+  transition: transform .08s steps(2), filter .08s steps(2);
+  cursor: pointer;
+}
+.px-btn { display: inline-flex; align-items: center; gap: .6em; padding: .8em 1.4em; background: var(--px-accent); color: var(--px-accent-ink); font: 400 .9rem/1 var(--px-label-font); text-transform: uppercase; letter-spacing: .04em; text-decoration: none; }
+[data-pixel="full"] :is(button, .btn, .button, [role="button"], input[type="submit"], input[type="button"]):hover,
+.px-btn:hover { transform: translate(calc(var(--px) * -.5), calc(var(--px) * -.5)); filter: drop-shadow(calc(var(--px) * 1.5) calc(var(--px) * 1.5) 0 var(--px-ink)); }
+[data-pixel="full"] :is(button, .btn, .button, [role="button"], input[type="submit"], input[type="button"]):active,
+.px-btn:active { transform: translate(var(--px), var(--px)); filter: drop-shadow(0 0 0 var(--px-ink)); }
+
+/* ---------- cards ---------- */
+.px-card { background: var(--px-paper); padding: calc(var(--px) * 6); filter: drop-shadow(calc(var(--px) * 2) calc(var(--px) * 2) 0 var(--px-ink)); }
+
+/* ---------- inputs ---------- */
+[data-pixel="full"] :is(input:not([type="checkbox"], [type="radio"], [type="range"], [type="submit"], [type="button"], [type="color"], [type="file"]), select, textarea),
+.px-input {
+  border: 0 !important; border-radius: 0 !important; background: var(--px-paper); outline: none;
+  box-shadow: inset 0 0 0 var(--px) var(--px-ink), inset var(--px) var(--px) 0 var(--px) color-mix(in srgb, var(--px-ink) 12%, transparent) !important;
+}
+[data-pixel="full"] :is(input, select, textarea):focus,
+.px-input:focus { box-shadow: inset 0 0 0 var(--px) var(--px-ink), 0 0 0 var(--px) var(--px-accent) !important; }
+
+/* ---------- badges and labels: the pixel font, small ---------- */
+.px-badge { display: inline-block; padding: .35em .7em; background: var(--px-soft); color: var(--px-ink); font: 400 .72rem/1 var(--px-label-font); text-transform: uppercase; letter-spacing: .06em; }
+.px-label { font: 400 .78rem/1.2 var(--px-label-font); text-transform: uppercase; letter-spacing: .08em; }
+
+/* ---------- type: pixel lettering for headings, never for paragraphs ---------- */
+[data-pixel] :is(h1, h2, .px-heading) { font-family: var(--px-font); font-weight: 600; letter-spacing: -.01em; line-height: 1.05; -webkit-font-smoothing: none; font-smooth: never; }
+[data-pixel] :is(h3, h4) { letter-spacing: .01em; }
+
+/* ---------- focus, selection, links, caret ---------- */
+[data-pixel] :focus-visible { outline: var(--px) solid var(--px-accent); outline-offset: var(--px); }
+[data-pixel] ::selection { background: var(--px-accent); color: var(--px-accent-ink); }
+[data-pixel] a:not([class]) { text-decoration: none; background-image: linear-gradient(currentColor, currentColor); background-size: 100% 2px; background-position: 0 100%; background-repeat: no-repeat; }
+[data-pixel] a:not([class]):hover { background-color: var(--px-accent); color: var(--px-accent-ink); }
+[data-pixel] { caret-color: var(--px-accent); }
+
+/* ---------- dividers and dithering ---------- */
+[data-pixel] hr, .px-divider { height: calc(var(--px) * 2); border: 0; background:
+  repeating-linear-gradient(90deg, var(--px-ink) 0 var(--px), transparent var(--px) calc(var(--px) * 2)); opacity: .7; }
+.px-dither { background-image: conic-gradient(var(--px-ink) 25%, transparent 0 50%, var(--px-ink) 0 75%, transparent 0); background-size: calc(var(--px) * 2) calc(var(--px) * 2); }
+
+/* ---------- crisp pixel art: icons, sprites, small images ---------- */
+.px-crisp, [data-pixel] img[src$=".gif"], [data-pixel] img[width][width^="1"], [data-pixel] canvas { image-rendering: pixelated; image-rendering: crisp-edges; }
+
+/* ---------- scrollbar ---------- */
+[data-pixel] { scrollbar-color: var(--px-ink) var(--px-soft); }
+
+/* ---------- respect people who want less motion ---------- */
+@media (prefers-reduced-motion: reduce) { [data-pixel] *, .px-btn { transition: none !important; } }
