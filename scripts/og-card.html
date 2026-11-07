@@ -1,0 +1,43 @@
+<!doctype html>
+<!-- The 1200x630 social card. scripts/og.mjs screenshots this once per page: og-card.html#k=KICKER&t=TITLE&s=SUB&p=sprite,sprite,sprite&c=ink|lime|paper -->
+<html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Silkscreen&display=block" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0}
+  html,body{width:1200px;height:630px;overflow:hidden}
+  body{--bg:#f3eee3;--fg:#17121f;--ac:#c6f432;--dim:#17121f99;background:var(--bg);color:var(--fg);font-family:'Bricolage Grotesque',sans-serif;position:relative}
+  body.ink{--bg:#17121f;--fg:#f3eee3;--dim:#f3eee399}
+  body.lime{--bg:#c6f432;--ac:#17121f;--dim:#17121fb0}
+  .dots{position:absolute;inset:0;background-image:radial-gradient(color-mix(in srgb,var(--fg) 16%,transparent) 1.6px,transparent 1.8px);background-size:24px 24px;mask:linear-gradient(100deg,#000 30%,transparent 85%)}
+  .frame{position:absolute;inset:28px;border:4px solid var(--fg);box-shadow:10px 10px 0 var(--fg)}
+  .logo{position:absolute;left:72px;top:68px;display:flex;align-items:center;gap:14px;font:800 34px/1 'Bricolage Grotesque';letter-spacing:-.02em}
+  .logo svg{width:44px;height:44px}
+  .kick{position:absolute;left:72px;top:170px;font:400 22px/1 Silkscreen,monospace;letter-spacing:.06em;text-transform:uppercase;background:var(--ac);color:var(--bg);padding:10px 14px}
+  body:not(.ink) .kick{color:#17121f}
+  body.lime .kick{color:#c6f432}
+  h1{position:absolute;left:72px;top:226px;width:700px;font:800 84px/.94 'Bricolage Grotesque';letter-spacing:-.045em;text-wrap:balance}
+  h1.m{font-size:70px}h1.s{font-size:58px}
+  .sub{position:absolute;left:72px;bottom:74px;width:690px;font:500 25px/1.3 'Bricolage Grotesque';color:var(--dim)}
+  .url{position:absolute;right:72px;bottom:74px;font:400 18px/1 Silkscreen,monospace;letter-spacing:.04em}
+  .pals{position:absolute;right:66px;top:76px;width:330px;height:420px;display:grid;grid-template-columns:1fr 1fr;align-items:center;justify-items:center;gap:6px}
+  .pals piix-sprite:nth-child(1){grid-column:1/3}
+</style></head>
+<body>
+<div class="dots"></div><div class="frame"></div>
+<div class="logo"><svg viewBox="0 0 16 16" shape-rendering="crispEdges"><rect width="16" height="16" rx="3" fill="#17121f"/><path fill="#c6f432" d="M4 4h8v1h1v6h-1v1H4v-1H3V5h1z"/><path fill="#17121f" d="M5 6h2v2H5zM9 6h2v2H9zM6 9h4v1H6z"/><path fill="#fff" d="M5 6h1v1H5zM9 6h1v1H9z"/></svg>piixpal</div>
+<div class="kick" id="k"></div>
+<h1 id="t"></h1>
+<p class="sub" id="s"></p>
+<div class="url">piixpal.dvkk.dev</div>
+<div class="pals" id="p"></div>
+<script>
+  const q = new URLSearchParams(location.hash.slice(1));
+  document.body.className = q.get('c') || '';
+  k.textContent = q.get('k') || 'Free UI components';
+  const T = q.get('t') || 'Piixpal'; t.textContent = T;
+  t.className = T.length > 34 ? 's' : T.length > 20 ? 'm' : '';
+  s.textContent = q.get('s') || 'Free, open source. HTML, React, Vue, shadcn.';
+  (q.get('p') || 'gloop,robo,ufo').split(',').forEach((n, i) => { const e = document.createElement('piix-sprite'); e.setAttribute('name', n); e.setAttribute('size', i ? 150 : 200); p.appendChild(e); });
+</script>
+<script src="../piixpal.min.js"></script>
+</body></html>

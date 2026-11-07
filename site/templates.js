@@ -73,6 +73,8 @@
     if (b.dataset.copy === 'hero') {
       text = await (await fetch(`${slug}/index.html`)).text();
       text = text.replace('<script src="bg.js"></script>', `<script src="${src}"></script>`);
+      /* the gallery's search metadata is ours, not part of the template */
+      text = text.replace(/\n?<!-- seo:start -->[\s\S]*?<!-- seo:end -->/, '').replace(/<title data-orig="([^"]*)">[^<]*<\/title>/, '<title>$1</title>');
     } else {
       text = `<!-- motion background: put your content inside the section -->
 <section style="position:relative;min-height:100vh;isolation:isolate">

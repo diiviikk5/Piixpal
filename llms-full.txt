@@ -1,0 +1,431 @@
+# Piixpal
+
+> 300+ free, open-source (MIT) animated UI components and templates for websites: pixel characters that live on the page, WebGL shader backgrounds, animated hero sections, 74 landing-page hero templates, ASCII animations, buttons, cards, text effects and form controls. Standard web components with zero dependencies: plain HTML, React, Next.js, Vue, Svelte, Astro, shadcn.
+
+## Install (pick one)
+- Script tag: <script src="https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js"></script>, then use any tag below anywhere.
+- One component only: <script src="https://cdn.jsdelivr.net/npm/piixpal@0.4/dist/c/NAME.min.js"></script>
+- npm: npm install piixpal. React: import { PiixPal } from "piixpal/react"; <PiixPal pal="bitbug" />. Vue: app.use(Piixpal) from "piixpal/vue".
+- shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/NAME.json, then import { Name } from "@/components/piixpal/NAME". Index: https://piixpal.dvkk.dev/r/registry.json
+- Hero templates: each is one self-contained HTML file at https://piixpal.dvkk.dev/templates/SLUG/ (view source, copy, edit the words).
+- No markup: <script src="…/piixpal.min.js" data-pals="bitbug@h1, boing@footer"></script>
+
+## Rules
+- Components are browser-only custom elements; in Next.js use them from client components (the React wrappers and shadcn files already are).
+- A pal lives on the element it is placed inside (or on="css selector"). It never blocks clicks; box="selector" keeps it inside one element.
+- Everything decorative is aria-hidden and honours prefers-reduced-motion. Animated components pause off-screen.
+- Licence: MIT. No account, no key, free for commercial use.
+
+## Docs
+- [UI components](https://piixpal.dvkk.dev/ui/): 125 animated components (backgrounds, heroes, shaders, buttons, text, forms…)
+- [Hero templates](https://piixpal.dvkk.dev/templates/): 74 full landing-page heroes
+- [Pixel characters](https://piixpal.dvkk.dev/components/): pals, sprites, superpowers, 3D
+- [Install](https://piixpal.dvkk.dev/components/install): every way to add Piixpal
+- [FAQ](https://piixpal.dvkk.dev/faq)
+- [Full list for agents](https://piixpal.dvkk.dev/llms-full.txt)
+- [Source](https://github.com/diiviikk5/Piixpal)
+
+## UI components (125), by section
+
+### Scenes
+- [Sakura grove](https://piixpal.dvkk.dev/ui/sakura): A cherry tree in full bloom over a misty forest, with a lantern and a bench. Tag: <piix-scene>. File: dist/c/scene.min.js
+- [Alpine hills](https://piixpal.dvkk.dev/ui/alps): Snow peaks behind rolling green hills, pines and valley mist. Tag: <piix-scene>. File: dist/c/scene.min.js
+- [Sunset lake](https://piixpal.dvkk.dev/ui/lake): A flat-colour sunset over a lake, with a boat drifting across. Tag: <piix-scene>. File: dist/c/scene.min.js
+- [Galaxy](https://piixpal.dvkk.dev/ui/galaxy): A spiral galaxy with planets in orbit; the pointer tilts it. Tag: <piix-scene>. File: dist/c/scene.min.js
+- [Riso rays](https://piixpal.dvkk.dev/ui/riso-rays): A two-ink riso print: light bursting from the horizon under a crescent moon. Tag: <piix-scene>. File: dist/c/scene.min.js
+- [Riso vortex](https://piixpal.dvkk.dev/ui/riso-vortex): A two-ink riso print of the sky swirling round a lone street lamp. Tag: <piix-scene>. File: dist/c/scene.min.js
+- [Train window](https://piixpal.dvkk.dev/ui/train-window): A train window with the countryside rushing past. Tag: <piix-scene>. File: dist/c/scene.min.js
+- [Poppy field](https://piixpal.dvkk.dev/ui/poppies): A stormy sky over a field of red poppies blowing in the wind. Tag: <piix-scene>. File: dist/c/scene.min.js
+- [Castle](https://piixpal.dvkk.dev/ui/castle): A pixel castle on a hill at night, windows flickering and a flag waving. Tag: <piix-scene>. File: dist/c/scene.min.js
+- [Anime vista](https://piixpal.dvkk.dev/ui/vista): A summer sky with towering clouds, a snowy peak and grass in the breeze. Tag: <piix-scene>. File: dist/c/scene.min.js
+
+### Layouts
+- [Horizon band](https://piixpal.dvkk.dev/ui/horizon-band): A clean page with a landscape rising along the bottom of the hero. Tag: <piix-scene>. File: dist/c/scene.min.js
+- [Window](https://piixpal.dvkk.dev/ui/window): A train window onto the countryside, set into a normal page. Tag: <piix-scene>. File: dist/c/scene.min.js
+- [Split hero](https://piixpal.dvkk.dev/ui/split-hero): Copy on one side, a framed scene on the other. Tag: <piix-scene>. File: dist/c/scene.min.js
+- [Fade into page](https://piixpal.dvkk.dev/ui/fade-into-page): A scene that dissolves into the content below it. Tag: <piix-scene>. File: dist/c/scene.min.js
+- [Scene cards](https://piixpal.dvkk.dev/ui/scene-cards): Cards with a little living scene as their header. Tag: <piix-scene>. File: dist/c/scene.min.js
+- [Riso editorial](https://piixpal.dvkk.dev/ui/riso-editorial): A two-ink print look for a magazine or a portfolio. Tag: <piix-scene>. File: dist/c/scene.min.js
+
+### Hero sections
+- [Laser hero](https://piixpal.dvkk.dev/ui/hero-laser): Lasers strike a rocky peak; the headline sits in the haze above. Tag: <piix-fx>. File: dist/c/fx.min.js
+- [Disc hero](https://piixpal.dvkk.dev/ui/hero-disc): A spinning rainbow disc beside the title, for music and launches. Tag: <piix-fx>. File: dist/c/fx.min.js
+- [Flame hero](https://piixpal.dvkk.dev/ui/hero-flame): Soft fire rising behind a big serif statement. Tag: <piix-fx>. File: dist/c/fx.min.js
+- [Glass keycap hero](https://piixpal.dvkk.dev/ui/hero-keycap): A glass keycap splitting light, with the title set huge on black. Tag: <piix-fx>. File: dist/c/fx.min.js
+- [Podium hero](https://piixpal.dvkk.dev/ui/hero-podium): A stone slab in a spotlight, with thin wide-spaced type above. Tag: <piix-fx>. File: dist/c/fx.min.js
+- [Orb hero](https://piixpal.dvkk.dev/ui/hero-orb): A breathing orb with an input underneath: an AI product hero. Tag: <piix-fx>. File: dist/c/fx.min.js
+- [Ink hero](https://piixpal.dvkk.dev/ui/hero-ink): Marbled red ink behind editorial serif type. Tag: <piix-fx>. File: dist/c/fx.min.js
+- [Frosted portrait hero](https://piixpal.dvkk.dev/ui/hero-portrait): A photo behind hammered glass with a clear window, beside the title. Tag: <piix-image-fx>. File: dist/c/image-fx.min.js
+- [Statue image hero](https://piixpal.dvkk.dev/ui/hero-image-statue): The dotted marble statue, alive: it breathes in depth and its highlights glow. Tag: <piix-hero>. File: dist/c/hero.min.js
+- [Cat image hero](https://piixpal.dvkk.dev/ui/hero-image-cat): The dotted cat, alive: it breathes, glows and drifts in depth. Tag: <piix-hero>. File: dist/c/hero.min.js
+- [Laser image hero](https://piixpal.dvkk.dev/ui/hero-image-beam): Your still of lasers on rock, alive: the beams flicker and bloom, heat rises off the peak. Tag: <piix-hero>. File: dist/c/hero.min.js
+- [Disc image hero](https://piixpal.dvkk.dev/ui/hero-image-disc): A product shot of a disc, alive: the rainbow blooms and breathes, the whole shot drifts in depth. Tag: <piix-hero>. File: dist/c/hero.min.js
+- [Fire image hero](https://piixpal.dvkk.dev/ui/hero-image-flame): A photo of fire, alive: the flames flicker, heat haze ripples above them. Tag: <piix-hero>. File: dist/c/hero.min.js
+- [Glass image hero](https://piixpal.dvkk.dev/ui/hero-image-glass): A glass object on black, alive: its colours glow and pulse, the light sweeps across. Tag: <piix-hero>. File: dist/c/hero.min.js
+- [Spotlight image hero](https://piixpal.dvkk.dev/ui/hero-image-podium): A product on a spotlit stone, alive: the camera breathes slowly, grain and light drift. Tag: <piix-hero>. File: dist/c/hero.min.js
+- [Ink image hero](https://piixpal.dvkk.dev/ui/hero-image-ink): An abstract artwork, alive: depth parallax under the pointer, glowing highlights. Tag: <piix-hero>. File: dist/c/hero.min.js
+- [Dot statue hero](https://piixpal.dvkk.dev/ui/hero-dots-statue): A marble statue in white dots that shimmer, scan and scatter. Tag: <piix-image-fx>. File: dist/c/image-fx.min.js
+- [Dot art hero](https://piixpal.dvkk.dev/ui/hero-dots-cat): A dotted portrait that shimmers, scans and scatters from the pointer. Tag: <piix-image-fx>. File: dist/c/image-fx.min.js
+
+### 3D & Shaders
+- [Laser peak](https://piixpal.dvkk.dev/ui/fx-beam): A bundle of laser lines striking a rocky peak in a red haze. Tag: <piix-fx>. File: dist/c/fx.min.js
+- [Disc](https://piixpal.dvkk.dev/ui/fx-disc): A spinning disc with a diffraction rainbow sweeping across it. Tag: <piix-fx>. File: dist/c/fx.min.js
+- [Flame](https://piixpal.dvkk.dev/ui/fx-flame): Soft, wispy fire rising out of the dark, with drifting sparks. Tag: <piix-fx>. File: dist/c/fx.min.js
+- [Liquid chrome](https://piixpal.dvkk.dev/ui/fx-blob): A raymarched blob of liquid metal that morphs, with a droplet that follows the pointer. Tag: <piix-fx>. File: dist/c/fx.min.js
+- [Glass keycap](https://piixpal.dvkk.dev/ui/fx-glass): A solid-glass keycap, turning in the dark, splitting light into colour. Tag: <piix-fx>. File: dist/c/fx.min.js
+- [Stone podium](https://piixpal.dvkk.dev/ui/fx-podium): A slab of rough stone floating in a single spotlight, a stage for your product. Tag: <piix-fx>. File: dist/c/fx.min.js
+- [Marbled ink](https://piixpal.dvkk.dev/ui/fx-ink): Red ink flowing over black, marbled with cream and gold. Tag: <piix-fx>. File: dist/c/fx.min.js
+- [Aura](https://piixpal.dvkk.dev/ui/fx-aura): Grainy, blurred bands of colour drifting like a long exposure. Tag: <piix-fx>. File: dist/c/fx.min.js
+- [Reeded glass](https://piixpal.dvkk.dev/ui/fx-reeded): Light seen through fluted glass: glowing vertical reeds. Tag: <piix-fx>. File: dist/c/fx.min.js
+- [Orb](https://piixpal.dvkk.dev/ui/fx-orb): A glowing sphere of moving light: the look of an AI that is listening. Tag: <piix-fx>. File: dist/c/fx.min.js
+- [Silk](https://piixpal.dvkk.dev/ui/fx-silk): Satin folds that flow and catch the light. Tag: <piix-fx>. File: dist/c/fx.min.js
+- [Morphing shape](https://piixpal.dvkk.dev/ui/fx-morph): A 3D shape that melts from sphere to box to torus to octahedron. Tag: <piix-fx>. File: dist/c/fx.min.js
+- [Mountain flight](https://piixpal.dvkk.dev/ui/fx-terrain): A flight over endless mountains at sunset, with fog. Tag: <piix-fx>. File: dist/c/fx.min.js
+- [Neon tunnel](https://piixpal.dvkk.dev/ui/fx-tunnel): An endless neon wormhole that steers with the pointer. Tag: <piix-fx>. File: dist/c/fx.min.js
+- [Line waves](https://piixpal.dvkk.dev/ui/fx-waves): Dozens of glowing lines forming a living landscape. Tag: <piix-fx>. File: dist/c/fx.min.js
+- [Clouds](https://piixpal.dvkk.dev/ui/fx-clouds): Layers of sunset clouds drifting past the sun. Tag: <piix-fx>. File: dist/c/fx.min.js
+- [Caustics](https://piixpal.dvkk.dev/ui/fx-caustics): Light dancing on the bottom of a swimming pool. Tag: <piix-fx>. File: dist/c/fx.min.js
+- [Mesh gradient](https://piixpal.dvkk.dev/ui/fx-gradient): A smooth, grainy mesh gradient, the clean way. Tag: <piix-fx>. File: dist/c/fx.min.js
+- [Particle swarm](https://piixpal.dvkk.dev/ui/fx-swarm): Hundreds of points of light orbiting in 3D. Tag: <piix-fx>. File: dist/c/fx.min.js
+
+### Image effects
+- [Liquid image](https://piixpal.dvkk.dev/ui/image-liquid): The picture turns to liquid and bulges toward the pointer. Tag: <piix-image-fx>. File: dist/c/image-fx.min.js
+- [Colour split](https://piixpal.dvkk.dev/ui/image-rgb): Move fast and the picture splits into red, green and blue. Tag: <piix-image-fx>. File: dist/c/image-fx.min.js
+- [Image morph](https://piixpal.dvkk.dev/ui/image-morph): One picture melts into another through a glowing edge. Tag: <piix-image-fx>. File: dist/c/image-fx.min.js
+- [Ripple](https://piixpal.dvkk.dev/ui/image-ripple): Water ripples spread from the pointer. Tag: <piix-image-fx>. File: dist/c/image-fx.min.js
+- [Light streak](https://piixpal.dvkk.dev/ui/image-streak): The picture smears into long streaks of light, like a long exposure. Tag: <piix-image-fx>. File: dist/c/image-fx.min.js
+- [Dot art](https://piixpal.dvkk.dev/ui/image-dots): Any picture as one-colour dot art that shimmers, scans and scatters. Tag: <piix-image-fx>. File: dist/c/image-fx.min.js
+- [Alive](https://piixpal.dvkk.dev/ui/image-alive): Your picture, exactly as it is, brought to life: depth, glow, haze and light. Tag: <piix-image-fx>. File: dist/c/image-fx.min.js
+- [Frosted window](https://piixpal.dvkk.dev/ui/image-frosted): The picture behind hammered glass, with a clear window that follows the pointer. Tag: <piix-image-fx>. File: dist/c/image-fx.min.js
+- [Code portrait](https://piixpal.dvkk.dev/ui/image-code): The picture rebuilt from rows of glitching glyphs. Tag: <piix-image-fx>. File: dist/c/image-fx.min.js
+- [Zoom blur](https://piixpal.dvkk.dev/ui/image-zoom): A radial zoom blur that rushes toward the pointer. Tag: <piix-image-fx>. File: dist/c/image-fx.min.js
+
+### Backgrounds
+- [Mesh gradient](https://piixpal.dvkk.dev/ui/mesh-gradient): Soft colour blobs that drift into each other, the classic SaaS gradient, rebuilt out of pixels. Tag: <piix-shader>. File: dist/c/shader.min.js
+- [Marble warp](https://piixpal.dvkk.dev/ui/warp): Domain-warped noise that folds over itself like marbled paper. Tag: <piix-shader>. File: dist/c/shader.min.js
+- [Aurora](https://piixpal.dvkk.dev/ui/aurora): Curtains of light rippling over a night sky. Tag: <piix-shader>. File: dist/c/shader.min.js
+- [Crystal cells](https://piixpal.dvkk.dev/ui/crystal): Glowing crystal cells whose edges catch the light. Tag: <piix-shader>. File: dist/c/shader.min.js
+- [Liquid metal](https://piixpal.dvkk.dev/ui/liquid-metal): A chrome surface that ripples like mercury. Tag: <piix-shader>. File: dist/c/shader.min.js
+- [Synthwave horizon](https://piixpal.dvkk.dev/ui/horizon): A sun setting behind a grid that scrolls toward you forever. Tag: <piix-shader>. File: dist/c/shader.min.js
+- [Nebula](https://piixpal.dvkk.dev/ui/nebula): Deep-space gas clouds with stars twinkling through. Tag: <piix-shader>. File: dist/c/shader.min.js
+- [Topographic](https://piixpal.dvkk.dev/ui/topographic): Contour lines like a living map. Tag: <piix-shader>. File: dist/c/shader.min.js
+- [Dot matrix](https://piixpal.dvkk.dev/ui/dot-matrix): A field of dots that ripples out from the pointer. Tag: <piix-shader>. File: dist/c/shader.min.js
+- [Fire](https://piixpal.dvkk.dev/ui/fire): Pixel flames licking up from the bottom. Tag: <piix-shader>. File: dist/c/shader.min.js
+
+### ASCII
+- [Glow horizon](https://piixpal.dvkk.dev/ui/ascii-glow): A pale world rising from below, its atmosphere burning blue and thinning into noise. Tag: <piix-ascii>. File: dist/c/ascii.min.js
+- [Liquid flow](https://piixpal.dvkk.dev/ui/ascii-flow): A slow, domain-warped gradient that pours through the characters. Tag: <piix-ascii>. File: dist/c/ascii.min.js
+- [Aurora](https://piixpal.dvkk.dev/ui/ascii-aurora): Curtains of light rippling over a starry sky. Tag: <piix-ascii>. File: dist/c/ascii.min.js
+- [Moonlit ocean](https://piixpal.dvkk.dev/ui/ascii-ocean): Swells rolling toward you under a full moon, and its road across the water. Tag: <piix-ascii>. File: dist/c/ascii.min.js
+- [Mountain flight](https://piixpal.dvkk.dev/ui/ascii-terrain): Fly low over a ridged mountain range toward a setting sun. Tag: <piix-ascii>. File: dist/c/ascii.min.js
+- [Spiral galaxy](https://piixpal.dvkk.dev/ui/ascii-galaxy): A spiral galaxy turning slowly, dust lanes and all. Tag: <piix-ascii>. File: dist/c/ascii.min.js
+- [Planet](https://piixpal.dvkk.dev/ui/ascii-planet): A planet turning in space: continents, cloud and a lit atmosphere. Tag: <piix-ascii>. File: dist/c/ascii.min.js
+- [Night city](https://piixpal.dvkk.dev/ui/ascii-city): Three layers of skyline sliding past, windows switching on and off. Tag: <piix-ascii>. File: dist/c/ascii.min.js
+- [Warp tunnel](https://piixpal.dvkk.dev/ui/ascii-tunnel): Down an endless tunnel of light. Tag: <piix-ascii>. File: dist/c/ascii.min.js
+- [Digital rain](https://piixpal.dvkk.dev/ui/ascii-rain): Columns of characters falling, each at its own speed. Tag: <piix-ascii>. File: dist/c/ascii.min.js
+- [Storm](https://piixpal.dvkk.dev/ui/ascii-storm): Storm clouds rolling by, lit from inside by lightning. Tag: <piix-ascii>. File: dist/c/ascii.min.js
+- [Dunes](https://piixpal.dvkk.dev/ui/ascii-dunes): Desert dunes under a low sun, the air shimmering with heat. Tag: <piix-ascii>. File: dist/c/ascii.min.js
+
+### Sections
+- [Hero](https://piixpal.dvkk.dev/ui/hero): A whole hero section on a GPU pixel background that dissolves in. Tag: <piix-hero>. File: dist/c/hero.min.js
+- [Divider](https://piixpal.dvkk.dev/ui/divider): A moving pixel edge between two sections, instead of a hard line. Tag: <piix-divider>. File: dist/c/divider.min.js
+- [Marquee](https://piixpal.dvkk.dev/ui/marquee): An endless row of logos whose ends dissolve into dithered pixels. Tag: <piix-marquee>. File: dist/c/marquee.min.js
+
+### Buttons
+- [Glow button](https://piixpal.dvkk.dev/ui/glow-button): A button with light chasing round its pixel border. Tag: <piix-glow-button>. File: dist/c/glow-button.min.js
+- [Pixel button](https://piixpal.dvkk.dev/ui/button): A chunky pixel button that presses down into its shadow, with a pal on top. Tag: <piix-button>. File: dist/c/button.min.js
+
+### Cards
+- [Glow card](https://piixpal.dvkk.dev/ui/glow-card): A card lit from inside, with light running round its border. Tag: <piix-glow-card>. File: dist/c/glow-card.min.js
+
+### Text
+- [Shine text](https://piixpal.dvkk.dev/ui/shine-text): A dithered band of colour that sweeps across the words. Tag: <piix-text>. File: dist/c/text.min.js
+- [Reveal text](https://piixpal.dvkk.dev/ui/reveal-text): Words that resolve out of a mosaic when they scroll into view. Tag: <piix-text>. File: dist/c/text.min.js
+- [Glitch text](https://piixpal.dvkk.dev/ui/glitch-text): Colour split and slipping rows, in bursts. Tag: <piix-text>. File: dist/c/text.min.js
+- [Wave text](https://piixpal.dvkk.dev/ui/wave-text): Letters that ripple like a flag. Tag: <piix-text>. File: dist/c/text.min.js
+- [Melt text](https://piixpal.dvkk.dev/ui/melt-text): Letters that drip and melt down the page. Tag: <piix-text>. File: dist/c/text.min.js
+- [Scan text](https://piixpal.dvkk.dev/ui/scan-text): A scanline that sweeps down, lighting the letters as it passes. Tag: <piix-text>. File: dist/c/text.min.js
+- [Counter](https://piixpal.dvkk.dev/ui/counter): A big number that counts up in pixel type when it scrolls into view. Tag: <piix-stat>. File: dist/c/stat.min.js
+- [Keycap](https://piixpal.dvkk.dev/ui/keycap): Pixel keycaps that press down when you press the real key. Tag: <piix-kbd>. File: dist/c/kbd.min.js
+
+### Media
+- [Pixel image](https://piixpal.dvkk.dev/ui/pixel-image): Any picture, dithered, mosaicked or halftoned on the GPU, with a lens. Tag: <piix-pixel-image>. File: dist/c/pixel-image.min.js
+
+### Forms
+- [Input](https://piixpal.dvkk.dev/ui/input): A text field whose pixel border lights up as you type. Tag: <piix-input>. File: dist/c/input.min.js
+- [Checkbox](https://piixpal.dvkk.dev/ui/checkbox): A pixel checkbox whose tick draws itself in, block by block. Tag: <piix-checkbox>. File: dist/c/checkbox.min.js
+- [Toggle](https://piixpal.dvkk.dev/ui/toggle): A pixel switch: a pal walks across to flip it. Tag: <piix-toggle>. File: dist/c/toggle.min.js
+- [Slider](https://piixpal.dvkk.dev/ui/slider): A range input whose track is lit on the GPU. Tag: <piix-slider>. File: dist/c/slider.min.js
+
+### Navigation
+- [Tabs](https://piixpal.dvkk.dev/ui/tabs): Tabs whose highlight slides across with a dithered pixel trail. Tag: <piix-tabs>. File: dist/c/tabs.min.js
+
+### Overlays
+- [Dialog](https://piixpal.dvkk.dev/ui/dialog): A modal that dissolves in, pixel by pixel, in any look. Tag: <piix-dialog>. File: dist/c/dialog.min.js
+- [Toast](https://piixpal.dvkk.dev/ui/toast): Notifications with a pixel fuse that burns down while they are up. Tag: <piix-toaster>. File: dist/c/toast.min.js
+- [Tooltip](https://piixpal.dvkk.dev/ui/tooltip): A pixel speech bubble that types its words out. Tag: <piix-tooltip>. File: dist/c/tooltip.min.js
+
+### Feedback
+- [Loader](https://piixpal.dvkk.dev/ui/loader): Little pixel spinners drawn on the GPU. Tag: <piix-loader>. File: dist/c/loader.min.js
+- [Progress](https://piixpal.dvkk.dev/ui/progress): A segmented progress bar with a pal running along the front. Tag: <piix-progress>. File: dist/c/progress.min.js
+
+### Data
+- [Chart](https://piixpal.dvkk.dev/ui/chart): Small dithered area, line and bar charts, drawn on the GPU. Tag: <piix-chart>. File: dist/c/chart.min.js
+- [Flap board](https://piixpal.dvkk.dev/ui/flap-board): A split-flap board, like a station departures sign. It can count down too. Tag: <piix-flap>. File: dist/c/flap.min.js
+
+### Motion
+- [Reveal](https://piixpal.dvkk.dev/ui/reveal): Content that dissolves in, pixel by pixel, when it scrolls into view. Tag: <piix-reveal>. File: dist/c/reveal.min.js
+- [Cursor trail](https://piixpal.dvkk.dev/ui/cursor): A pixel comet, or a soft glow, that follows the pointer across the page. Tag: <piix-cursor>. File: dist/c/cursor.min.js
+
+### Physics & time
+- [Sand](https://piixpal.dvkk.dev/ui/sand): Your text crumbles into sand, piles up, and flows back into words. Tag: <piix-sand>. File: dist/c/sand.min.js
+- [Quake](https://piixpal.dvkk.dev/ui/quake): One press and the page falls down. Throw the pieces, then put it all back. Tag: <piix-quake>. File: dist/c/quake.min.js
+- [Liquid](https://piixpal.dvkk.dev/ui/liquid): Your section half full of pixel water, and the things in it float. Tag: <piix-liquid>. File: dist/c/liquid.min.js
+- [Rewind](https://piixpal.dvkk.dev/ui/rewind): A VCR for any part of your page. Everything that changes in it can be rewound. Tag: <piix-rewind>. File: dist/c/rewind.min.js
+
+### Games & sound
+- [Breakout](https://piixpal.dvkk.dev/ui/breakout): Your words are the bricks. Press play and the text becomes a level. Tag: <piix-breakout>. File: dist/c/breakout.min.js
+- [RPG dialogue](https://piixpal.dvkk.dev/ui/rpg-box): A JRPG dialogue box: a pal talks, the words type out, you pick an answer. Tag: <piix-rpg-box>. File: dist/c/rpg-box.min.js
+- [Handheld](https://piixpal.dvkk.dev/ui/handheld): A pocket game console, and anything you put inside plays on its screen. Tag: <piix-handheld>. File: dist/c/handheld.min.js
+- [Chiptune](https://piixpal.dvkk.dev/ui/chiptune): 8-bit sounds for your whole page, from one tag. No audio files. Tag: <piix-chiptune>. File: dist/c/chiptune.min.js
+
+### Delight
+- [Scratch card](https://piixpal.dvkk.dev/ui/scratch): A scratch-off card: pixel foil over your content. Scratch it away. Tag: <piix-scratch>. File: dist/c/scratch.min.js
+- [Zipper](https://piixpal.dvkk.dev/ui/zipper): A zipped-up panel of pixel fabric over your content. Pull it open. Tag: <piix-zipper>. File: dist/c/zipper.min.js
+- [Receipt printer](https://piixpal.dvkk.dev/ui/receipt): A little thermal printer that prints your content, line by line. Tag: <piix-receipt>. File: dist/c/receipt.min.js
+
+## Hero templates (74)
+- [Visor](https://piixpal.dvkk.dev/templates/visor/): image, scroll-driven, GSAP scroll, 3D hero. Background only: https://piixpal.dvkk.dev/templates/visor/bg.js
+- [Bitcloud](https://piixpal.dvkk.dev/templates/bitcloud/): pixel art, dithered, interactive hero. Background only: https://piixpal.dvkk.dev/templates/bitcloud/bg.js
+- [Afterglow](https://piixpal.dvkk.dev/templates/afterglow/): image, scroll-driven, GSAP scroll, pixel art hero. Background only: https://piixpal.dvkk.dev/templates/afterglow/bg.js
+- [Emberblade](https://piixpal.dvkk.dev/templates/flameblade/): image, interactive hero. Background only: https://piixpal.dvkk.dev/templates/flameblade/bg.js
+- [Vermilion](https://piixpal.dvkk.dev/templates/vermilion/): WebGL, scroll-driven, GSAP scroll hero. Background only: https://piixpal.dvkk.dev/templates/vermilion/bg.js
+- [Relic](https://piixpal.dvkk.dev/templates/relic/): WebGL, scroll-driven hero. Background only: https://piixpal.dvkk.dev/templates/relic/bg.js
+- [Starmind](https://piixpal.dvkk.dev/templates/starmind/): image, particles hero. Background only: https://piixpal.dvkk.dev/templates/starmind/bg.js
+- [Sentinel](https://piixpal.dvkk.dev/templates/sentinel/): image hero. Background only: https://piixpal.dvkk.dev/templates/sentinel/bg.js
+- [Savanna](https://piixpal.dvkk.dev/templates/savanna/): image hero. Background only: https://piixpal.dvkk.dev/templates/savanna/bg.js
+- [Signal](https://piixpal.dvkk.dev/templates/signal/): WebGL hero. Background only: https://piixpal.dvkk.dev/templates/signal/bg.js
+- [Fold](https://piixpal.dvkk.dev/templates/fold/): WebGL hero. Background only: https://piixpal.dvkk.dev/templates/fold/bg.js
+- [Furnace](https://piixpal.dvkk.dev/templates/furnace/): WebGL hero. Background only: https://piixpal.dvkk.dev/templates/furnace/bg.js
+- [Currents](https://piixpal.dvkk.dev/templates/currents/): WebGL, 3D hero. Background only: https://piixpal.dvkk.dev/templates/currents/bg.js
+- [Ashborne](https://piixpal.dvkk.dev/templates/ashborne/): WebGL, scroll-driven, GSAP scroll hero. Background only: https://piixpal.dvkk.dev/templates/ashborne/bg.js
+- [Ronin](https://piixpal.dvkk.dev/templates/ronin/): image hero. Background only: https://piixpal.dvkk.dev/templates/ronin/bg.js
+- [Respite](https://piixpal.dvkk.dev/templates/respite/): image hero. Background only: https://piixpal.dvkk.dev/templates/respite/bg.js
+- [Vapor](https://piixpal.dvkk.dev/templates/vapor/): ASCII, interactive hero. Background only: https://piixpal.dvkk.dev/templates/vapor/bg.js
+- [Orbit ASCII](https://piixpal.dvkk.dev/templates/orbit-ascii/): ASCII, 3D hero. Background only: https://piixpal.dvkk.dev/templates/orbit-ascii/bg.js
+- [Halftone](https://piixpal.dvkk.dev/templates/halftone/): ASCII hero. Background only: https://piixpal.dvkk.dev/templates/halftone/bg.js
+- [Cloudline](https://piixpal.dvkk.dev/templates/cloudline/): WebGL, 3D hero. Background only: https://piixpal.dvkk.dev/templates/cloudline/bg.js
+- [Seascape](https://piixpal.dvkk.dev/templates/seascape/): WebGL, 3D hero. Background only: https://piixpal.dvkk.dev/templates/seascape/bg.js
+- [Event Horizon](https://piixpal.dvkk.dev/templates/event-horizon/): WebGL, 3D hero. Background only: https://piixpal.dvkk.dev/templates/event-horizon/bg.js
+- [Prism Glass](https://piixpal.dvkk.dev/templates/prism-glass/): WebGL, 3D hero. Background only: https://piixpal.dvkk.dev/templates/prism-glass/bg.js
+- [Orbit](https://piixpal.dvkk.dev/templates/orbit-globe/): WebGL, 3D hero. Background only: https://piixpal.dvkk.dev/templates/orbit-globe/bg.js
+- [Mercury](https://piixpal.dvkk.dev/templates/mercury/): WebGL, 3D hero. Background only: https://piixpal.dvkk.dev/templates/mercury/bg.js
+- [Ash King](https://piixpal.dvkk.dev/templates/ash-king/): image hero. Background only: https://piixpal.dvkk.dev/templates/ash-king/bg.js
+- [Pixel Sword](https://piixpal.dvkk.dev/templates/pixel-sword/): image, pixel art hero. Background only: https://piixpal.dvkk.dev/templates/pixel-sword/bg.js
+- [Smoke Dragon](https://piixpal.dvkk.dev/templates/smoke-dragon/): image hero. Background only: https://piixpal.dvkk.dev/templates/smoke-dragon/bg.js
+- [Ink Dragon](https://piixpal.dvkk.dev/templates/ink-dragon/): image hero. Background only: https://piixpal.dvkk.dev/templates/ink-dragon/bg.js
+- [Desert Dragon](https://piixpal.dvkk.dev/templates/desert-dragon/): image hero. Background only: https://piixpal.dvkk.dev/templates/desert-dragon/bg.js
+- [Red Dragon](https://piixpal.dvkk.dev/templates/red-dragon/): image hero. Background only: https://piixpal.dvkk.dev/templates/red-dragon/bg.js
+- [Ruins](https://piixpal.dvkk.dev/templates/ruins/): image hero. Background only: https://piixpal.dvkk.dev/templates/ruins/bg.js
+- [Glitch](https://piixpal.dvkk.dev/templates/glitch/): image hero. Background only: https://piixpal.dvkk.dev/templates/glitch/bg.js
+- [Ukiyo](https://piixpal.dvkk.dev/templates/ukiyo/): image hero. Background only: https://piixpal.dvkk.dev/templates/ukiyo/bg.js
+- [Pocket](https://piixpal.dvkk.dev/templates/pocket/): image hero. Background only: https://piixpal.dvkk.dev/templates/pocket/bg.js
+- [Meadow](https://piixpal.dvkk.dev/templates/meadow/): image, pixel art hero. Background only: https://piixpal.dvkk.dev/templates/meadow/bg.js
+- [Grotto](https://piixpal.dvkk.dev/templates/grotto/): image hero. Background only: https://piixpal.dvkk.dev/templates/grotto/bg.js
+- [Stipple](https://piixpal.dvkk.dev/templates/stipple/): image, dithered hero. Background only: https://piixpal.dvkk.dev/templates/stipple/bg.js
+- [Aurora](https://piixpal.dvkk.dev/templates/aurora/): image hero. Background only: https://piixpal.dvkk.dev/templates/aurora/bg.js
+- [Sunset Ridge](https://piixpal.dvkk.dev/templates/sunset-ridge/): image hero. Background only: https://piixpal.dvkk.dev/templates/sunset-ridge/bg.js
+- [Twilight](https://piixpal.dvkk.dev/templates/twilight/): image hero. Background only: https://piixpal.dvkk.dev/templates/twilight/bg.js
+- [Evergreen](https://piixpal.dvkk.dev/templates/evergreen/): image hero. Background only: https://piixpal.dvkk.dev/templates/evergreen/bg.js
+- [Riptide](https://piixpal.dvkk.dev/templates/riptide/): image hero. Background only: https://piixpal.dvkk.dev/templates/riptide/bg.js
+- [Sandstorm](https://piixpal.dvkk.dev/templates/sandstorm/): image hero. Background only: https://piixpal.dvkk.dev/templates/sandstorm/bg.js
+- [Tidewave](https://piixpal.dvkk.dev/templates/tidewave/): image hero. Background only: https://piixpal.dvkk.dev/templates/tidewave/bg.js
+- [Static](https://piixpal.dvkk.dev/templates/static/): image hero. Background only: https://piixpal.dvkk.dev/templates/static/bg.js
+- [Fuji](https://piixpal.dvkk.dev/templates/fuji/): image hero. Background only: https://piixpal.dvkk.dev/templates/fuji/bg.js
+- [Canyon Blue](https://piixpal.dvkk.dev/templates/canyon-blue/): image hero. Background only: https://piixpal.dvkk.dev/templates/canyon-blue/bg.js
+- [Canyon Magenta](https://piixpal.dvkk.dev/templates/canyon-magenta/): image hero. Background only: https://piixpal.dvkk.dev/templates/canyon-magenta/bg.js
+- [Canyon Violet](https://piixpal.dvkk.dev/templates/canyon-violet/): image hero. Background only: https://piixpal.dvkk.dev/templates/canyon-violet/bg.js
+- [Thermal](https://piixpal.dvkk.dev/templates/thermal/): image hero. Background only: https://piixpal.dvkk.dev/templates/thermal/bg.js
+- [Spectrum](https://piixpal.dvkk.dev/templates/spectrum/): image hero. Background only: https://piixpal.dvkk.dev/templates/spectrum/bg.js
+- [Stratosphere](https://piixpal.dvkk.dev/templates/stratosphere/): image hero. Background only: https://piixpal.dvkk.dev/templates/stratosphere/bg.js
+- [Silk](https://piixpal.dvkk.dev/templates/silk/): image hero. Background only: https://piixpal.dvkk.dev/templates/silk/bg.js
+- [Redwood](https://piixpal.dvkk.dev/templates/redwood/): image hero. Background only: https://piixpal.dvkk.dev/templates/redwood/bg.js
+- [Reed Flame](https://piixpal.dvkk.dev/templates/reed-flame/): image hero. Background only: https://piixpal.dvkk.dev/templates/reed-flame/bg.js
+- [Reed Spectrum](https://piixpal.dvkk.dev/templates/reed-spectrum/): image hero. Background only: https://piixpal.dvkk.dev/templates/reed-spectrum/bg.js
+- [Reed Ember](https://piixpal.dvkk.dev/templates/reed-ember/): image hero. Background only: https://piixpal.dvkk.dev/templates/reed-ember/bg.js
+- [Reed Crimson](https://piixpal.dvkk.dev/templates/reed-crimson/): image hero. Background only: https://piixpal.dvkk.dev/templates/reed-crimson/bg.js
+- [Reed Rose](https://piixpal.dvkk.dev/templates/reed-rose/): WebGL hero. Background only: https://piixpal.dvkk.dev/templates/reed-rose/bg.js
+- [Fluted](https://piixpal.dvkk.dev/templates/fluted/): WebGL, interactive hero. Background only: https://piixpal.dvkk.dev/templates/fluted/bg.js
+- [Beam](https://piixpal.dvkk.dev/templates/beam/): WebGL hero. Background only: https://piixpal.dvkk.dev/templates/beam/bg.js
+- [Solstice](https://piixpal.dvkk.dev/templates/solstice/): WebGL hero. Background only: https://piixpal.dvkk.dev/templates/solstice/bg.js
+- [Aura](https://piixpal.dvkk.dev/templates/aura/): WebGL hero. Background only: https://piixpal.dvkk.dev/templates/aura/bg.js
+- [Dusk](https://piixpal.dvkk.dev/templates/dusk/): WebGL hero. Background only: https://piixpal.dvkk.dev/templates/dusk/bg.js
+- [Abyss](https://piixpal.dvkk.dev/templates/abyss/): WebGL hero. Background only: https://piixpal.dvkk.dev/templates/abyss/bg.js
+- [Daybreak](https://piixpal.dvkk.dev/templates/daybreak/): WebGL hero. Background only: https://piixpal.dvkk.dev/templates/daybreak/bg.js
+- [Nimbus](https://piixpal.dvkk.dev/templates/nimbus/): WebGL hero. Background only: https://piixpal.dvkk.dev/templates/nimbus/bg.js
+- [Prism](https://piixpal.dvkk.dev/templates/prism/): WebGL hero. Background only: https://piixpal.dvkk.dev/templates/prism/bg.js
+- [Bokeh](https://piixpal.dvkk.dev/templates/bokeh/): WebGL hero. Background only: https://piixpal.dvkk.dev/templates/bokeh/bg.js
+- [Ember](https://piixpal.dvkk.dev/templates/ember/): WebGL hero. Background only: https://piixpal.dvkk.dev/templates/ember/bg.js
+- [Eclipse](https://piixpal.dvkk.dev/templates/eclipse/): WebGL hero. Background only: https://piixpal.dvkk.dev/templates/eclipse/bg.js
+- [Ultraviolet](https://piixpal.dvkk.dev/templates/ultraviolet/): WebGL hero. Background only: https://piixpal.dvkk.dev/templates/ultraviolet/bg.js
+- [Aurora Horizon](https://piixpal.dvkk.dev/templates/aurora-horizon/): WebGL hero. Background only: https://piixpal.dvkk.dev/templates/aurora-horizon/bg.js
+
+## Characters and superpowers (121)
+- [Bitbug](https://piixpal.dvkk.dev/r/bitbug.json): A lime beetle that crawls along the real outline of your letters.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/bitbug.json
+- [Boing](https://piixpal.dvkk.dev/r/boing.json): A jelly drop that bounces on your footer and lands with a splat.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/boing.json
+- [Moss](https://piixpal.dvkk.dev/r/moss.json): A mushroom that sits on your text reading its book, ignoring you (mostly).  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/moss.json
+- [Lurk](https://piixpal.dvkk.dev/r/lurk.json): A shy creature that peeks over the edge of your cards.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/lurk.json
+- [Thread](https://piixpal.dvkk.dev/r/thread.json): A spider that dangles from your nav on a long thread.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/thread.json
+- [Pip](https://piixpal.dvkk.dev/r/pip.json): A round bird that hops between your buttons and perches on them.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/pip.json
+- [Bumble](https://piixpal.dvkk.dev/r/bumble.json): A fuzzy bee that buzzes about your element.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/bumble.json
+- [Shel](https://piixpal.dvkk.dev/r/shel.json): A snail that creeps along your text, leaving a shiny trail.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/shel.json
+- [Gecko](https://piixpal.dvkk.dev/r/gecko.json): A gecko that climbs up and around the sides of your cards.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/gecko.json
+- [Mole](https://piixpal.dvkk.dev/r/mole.json): Whack-a-mole: it pops out of your element, you bop it.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/mole.json
+- [Balloon](https://piixpal.dvkk.dev/r/balloon.json): A balloon with a face, tied to your element, bobbing in the breeze.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/balloon.json
+- [Para](https://piixpal.dvkk.dev/r/para.json): A parachutist who drops onto your section when it scrolls into view.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/para.json
+- [Roomba](https://piixpal.dvkk.dev/r/roomba.json): A robot vacuum that sweeps along your footer, very seriously.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/roomba.json
+- [Kitty](https://piixpal.dvkk.dev/r/kitty.json): A black cat that lounges on your element and swats at the cursor.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/kitty.json
+- [Hiss](https://piixpal.dvkk.dev/r/hiss.json): A snake that slithers along your headings.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/hiss.json
+- [Pinch](https://piixpal.dvkk.dev/r/pinch.json): A crab that walks sideways along your text.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/pinch.json
+- [Shibe](https://piixpal.dvkk.dev/r/shibe.json): A shiba that lounges on your text, tail wagging.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/shibe.json
+- [Capy](https://piixpal.dvkk.dev/r/capy.json): A capybara with a yuzu on its head, completely unbothered.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/capy.json
+- [Peeper](https://piixpal.dvkk.dev/r/peeper.json): Guards your inputs: follows the caret, covers its eyes for passwords.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/peeper.json
+- [Scrolly](https://piixpal.dvkk.dev/r/scrolly.json): A little runner on a reading-progress bar.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/scrolly.json
+- [Echo](https://piixpal.dvkk.dev/r/echo.json): A copycat cursor that replays your moves half a second late.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/echo.json
+- [Snip](https://piixpal.dvkk.dev/r/snip.json): A highlighter that hops to whatever text you select.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/snip.json
+- [Beep](https://piixpal.dvkk.dev/r/beep.json): A robot that panics when someone ticks “I’m not a robot”.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/beep.json
+- [Router](https://piixpal.dvkk.dev/r/router.json): A Wi-Fi router whose signal bars follow your cursor.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/router.json
+- [Termi](https://piixpal.dvkk.dev/r/termi.json): A tiny terminal that types out your lines, one character at a time.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/termi.json
+- [Frog](https://piixpal.dvkk.dev/r/frog.json): A frog that snaps its tongue at your cursor.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/frog.json
+- [Penguin](https://piixpal.dvkk.dev/r/penguin.json): A penguin that belly-slides along your element.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/penguin.json
+- [Rocket](https://piixpal.dvkk.dev/r/rocket.json): Sits on your Deploy button. Click it: countdown, lift-off, landing.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/rocket.json
+- [Ball](https://piixpal.dvkk.dev/r/ball.json): A beach ball you can throw around your page.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/ball.json
+- [Duck](https://piixpal.dvkk.dev/r/duck.json): A rubber duck you can throw. It squeaks when it lands.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/duck.json
+- [Dice](https://piixpal.dvkk.dev/r/dice.json): Throw it and it lands on a random face.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/dice.json
+- [Pebble](https://piixpal.dvkk.dev/r/pebble.json): A heavy rock that lands with a thud every pal hears.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/pebble.json
+- [Cube](https://piixpal.dvkk.dev/r/cube.json): A jelly cube that bounces high and wobbles.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/cube.json
+- [Can](https://piixpal.dvkk.dev/r/can.json): A soda can that rolls off the edge of everything.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/can.json
+- [Ducks](https://piixpal.dvkk.dev/r/ducks.json): A mother duck and her ducklings.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/ducks.json
+- [Ants](https://piixpal.dvkk.dev/r/ants.json): A marching line of ants, some carrying crumbs.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/ants.json
+- [Fish](https://piixpal.dvkk.dev/r/fish.json): A school of fish that swims inside any box and flees your cursor.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/fish.json
+- [Sparrows](https://piixpal.dvkk.dev/r/sparrows.json): Birds on a wire that scatter when you get close.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/sparrows.json
+- [Choir](https://piixpal.dvkk.dev/r/choir.json): A choir who sway and sing in perfect time from a shared score.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/choir.json
+- [Fireflies](https://piixpal.dvkk.dev/r/fireflies.json): Soft blinking lights drifting around an element.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/fireflies.json
+- [Sheep](https://piixpal.dvkk.dev/r/sheep.json): Sheep trot along and jump the fence one at a time, forever.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/sheep.json
+- [Bees](https://piixpal.dvkk.dev/r/bees.json): Worker bees buzzing round their hive.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/bees.json
+- [Bulb](https://piixpal.dvkk.dev/r/bulb.json): A pull-chain light switch for dark mode.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/bulb.json
+- [Pix](https://piixpal.dvkk.dev/r/pix.json): A tiny hero that lets visitors play your page as a platformer.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/pix.json
+- [Weather](https://piixpal.dvkk.dev/r/weather.json): Snow that settles on your letters, plus rain, leaves and petals.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/weather.json
+- [Pidge](https://piixpal.dvkk.dev/r/pidge.json): Toast notifications, delivered by pigeon.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/pidge.json
+- [Plane](https://piixpal.dvkk.dev/r/plane.json): A plane that tows your announcement banner across the page.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/plane.json
+- [Fetch](https://piixpal.dvkk.dev/r/fetch.json): A dog that runs off on every fetch() and brings back the response.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/fetch.json
+- [Scout](https://piixpal.dvkk.dev/r/scout.json): Onboarding tours, guided by a tiny explorer.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/scout.json
+- [Drone](https://piixpal.dvkk.dev/r/drone.json): Flies the product picture into your cart when someone adds to cart.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/drone.json
+- [Crumb](https://piixpal.dvkk.dev/r/crumb.json): A mouse that eats your cookie banner when someone accepts or rejects.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/crumb.json
+- [Polly](https://piixpal.dvkk.dev/r/polly.json): Reads your page aloud, hopping along each word as it is spoken.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/polly.json
+- [Gist](https://piixpal.dvkk.dev/r/gist.json): An owl that sums up your article in a few key points.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/gist.json
+- [Tabby](https://piixpal.dvkk.dev/r/tabby.json): A cat that lives in your browser tab’s icon and naps while you’re away.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/tabby.json
+- [Sprout](https://piixpal.dvkk.dev/r/sprout.json): A focus-timer plant that pops out into its own always-on-top window.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/sprout.json
+- [Nomad](https://piixpal.dvkk.dev/r/nomad.json): A little traveller who walks between your browser windows.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/nomad.json
+- [Hatch](https://piixpal.dvkk.dev/r/hatch.json): Every visitor hatches their own one-of-a-kind pet.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/hatch.json
+- [Avatar](https://piixpal.dvkk.dev/r/avatar.json): A unique animated pixel avatar for any name.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/avatar.json
+- [Gem](https://piixpal.dvkk.dev/r/gem.json): A treasure hunt across your whole site.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/gem.json
+- [Stickers](https://piixpal.dvkk.dev/r/stickers.json): A sheet of stickers visitors peel off and stick anywhere on your page.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/stickers.json
+- [Buff](https://piixpal.dvkk.dev/r/buff.json): A password-strength meter that lifts heavier as the password gets stronger.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/buff.json
+- [Meh](https://piixpal.dvkk.dev/r/meh.json): A face that rides your rating slider, from furious to delighted.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/meh.json
+- [Squish](https://piixpal.dvkk.dev/r/squish.json): A marshmallow that gets squashed as the text nears its limit.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/squish.json
+- [Gulp](https://piixpal.dvkk.dev/r/gulp.json): A pelican that gulps down files dropped on your drop zone.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/gulp.json
+- [Plug](https://piixpal.dvkk.dev/r/plug.json): Shows up when the connection drops, plugs back in when it returns.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/plug.json
+- [Voxel](https://piixpal.dvkk.dev/r/voxel.json): Any pal as a 3D toy you can spin, in eight looks from glossy to ASCII.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/voxel.json
+- [Card](https://piixpal.dvkk.dev/r/card.json): A holographic trading card for any pal, with the pal standing in 3D.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/card.json
+- [Planet](https://piixpal.dvkk.dev/r/planet.json): A tiny voxel world with pals walking round it.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/planet.json
+- [Globe](https://piixpal.dvkk.dev/r/globe.json): A pal in a snow globe. Shake it.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/globe.json
+- [Holo](https://piixpal.dvkk.dev/r/holo.json): A pal projected as a flickering hologram.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/holo.json
+- [Room](https://piixpal.dvkk.dev/r/room.json): A little isometric voxel diorama with a pal living in it.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/room.json
+- [Alien](https://piixpal.dvkk.dev/r/alien.json): A tiny visitor with three eyes and one antenna. Has questions about your CSS.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/alien.json
+- [Avocado](https://piixpal.dvkk.dev/r/avocado.json): Half an avocado, proudly showing off its pit. Ripe for exactly one day.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/avocado.json
+- [Battery](https://piixpal.dvkk.dev/r/battery.json): A battery that is always charging and always at one percent. Brave.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/battery.json
+- [Astronaut](https://piixpal.dvkk.dev/r/astronaut.json): A tiny astronaut floating in place. Eyes glow behind the visor.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/astronaut.json
+- [Bolt](https://piixpal.dvkk.dev/r/bolt.json): A chunky robot whose face is a little screen. Its eyes glow.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/bolt.json
+- [Brain](https://piixpal.dvkk.dev/r/brain.json): A very big brain, thinking very hard. Sparks race along its folds.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/brain.json
+- [Crt](https://piixpal.dvkk.dev/r/crt.json): A beige monitor from the old internet. Its face glows on the screen.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/crt.json
+- [Elephant](https://piixpal.dvkk.dev/r/elephant.json): A baby elephant with big ears and a trunk that never sits still.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/elephant.json
+- [Flick](https://piixpal.dvkk.dev/r/flick.json): A little flame with big feelings. Never, ever stands still.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/flick.json
+- [Fluff](https://piixpal.dvkk.dev/r/fluff.json): A sheep made almost entirely of cloud. Trots in place, very proudly.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/fluff.json
+- [Gloop](https://piixpal.dvkk.dev/r/gloop.json): A slow, happy blob that drips a little. Mostly harmless.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/gloop.json
+- [Gpu](https://piixpal.dvkk.dev/r/gpu.json): A graphics card whose two fans are its eyes. RGB strip included, obviously.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/gpu.json
+- [Hops](https://piixpal.dvkk.dev/r/hops.json): Long ears, short attention span. One ear never quite stays up.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/hops.json
+- [Inky](https://piixpal.dvkk.dev/r/inky.json): A small squid with five wiggly arms and one very big question.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/inky.json
+- [Keycap](https://piixpal.dvkk.dev/r/keycap.json): A chunky mechanical keycap. Thocky. Click it for a satisfying press.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/keycap.json
+- [Llama](https://piixpal.dvkk.dev/r/llama.json): A fluffy llama with a long neck and a calm, knowing look.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/llama.json
+- [Mumu](https://piixpal.dvkk.dev/r/mumu.json): A round little bear who would like a snack, please. Ears wiggle.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/mumu.json
+- [Server](https://piixpal.dvkk.dev/r/server.json): A server rack keeping your site alive. Its drive lights never stop.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/server.json
+- [Spud](https://piixpal.dvkk.dev/r/spud.json): A lumpy potato with a tiny sprout and a lot of potential.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/spud.json
+- [Tofu](https://piixpal.dvkk.dev/r/tofu.json): A block of tofu on two stubby legs, marching on the spot. Firm but fair.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/tofu.json
+- [Unicorn](https://piixpal.dvkk.dev/r/unicorn.json): The startup kind. A golden horn, a rainbow mane, a billion-dollar smile.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/unicorn.json
+- [Whale](https://piixpal.dvkk.dev/r/whale.json): A friendly whale who surfaces now and then for a little spout.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/whale.json
+- [Boba](https://piixpal.dvkk.dev/r/boba.json): A cup of milk tea with a straw and a lot of pearls. Chewy personality.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/boba.json
+- [Cactus](https://piixpal.dvkk.dev/r/cactus.json): A potted cactus who blooms when it is in a good mood. Do not hug.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/cactus.json
+- [Candle](https://piixpal.dvkk.dev/r/candle.json): A little candle with a flame that never sits still.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/candle.json
+- [Cherries](https://piixpal.dvkk.dev/r/cherries.json): Two cherries on one stem. Inseparable. Four eyes, one opinion.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/cherries.json
+- [Cloud](https://piixpal.dvkk.dev/r/cloud.json): A little cloud with a light, cheerful drizzle.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/cloud.json
+- [Coffee](https://piixpal.dvkk.dev/r/coffee.json): A mug of coffee, steaming gently, quietly judging your sleep schedule.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/coffee.json
+- [Cookie](https://piixpal.dvkk.dev/r/cookie.json): A chocolate chip cookie with one bite missing. It knows who did it.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/cookie.json
+- [Donut](https://piixpal.dvkk.dev/r/donut.json): A strawberry donut with sprinkles. Has a hole in its life and is fine with it.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/donut.json
+- [Dragon](https://piixpal.dvkk.dev/r/dragon.json): A pocket dragon. Flaps its little wings. Breathes a little fire now and then.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/dragon.json
+- [Egg](https://piixpal.dvkk.dev/r/egg.json): An egg with a crack and a lot of questions.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/egg.json
+- [Floppy](https://piixpal.dvkk.dev/r/floppy.json): A floppy disk who remembers when 1.44 MB was a lot. Also, the save icon.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/floppy.json
+- [Heart](https://piixpal.dvkk.dev/r/heart.json): A like button with feelings. Beats steadily, blushes easily.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/heart.json
+- [Inbox](https://piixpal.dvkk.dev/r/inbox.json): An envelope with a notification badge it cannot stop checking.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/inbox.json
+- [Loaf](https://piixpal.dvkk.dev/r/loaf.json): A ginger cat in its most efficient shape. Ears twitch when you are not looking.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/loaf.json
+- [Mochi](https://piixpal.dvkk.dev/r/mochi.json): A soft pink rice cake. Squishy, blushy, easily delighted.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/mochi.json
+- [Modem](https://piixpal.dvkk.dev/r/modem.json): A dial-up modem. Its lights blink in a pattern only it understands.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/modem.json
+- [Onigiri](https://piixpal.dvkk.dev/r/onigiri.json): A rice ball in a seaweed jacket. Calm, round-ish, triangular.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/onigiri.json
+- [Prompty](https://piixpal.dvkk.dev/r/prompty.json): A chat bubble who is always just about to reply. Thinking… thinking…  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/prompty.json
+- [Pudding](https://piixpal.dvkk.dev/r/pudding.json): A caramel pudding on a plate. Cannot stop jiggling.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/pudding.json
+- [Robo](https://piixpal.dvkk.dev/r/robo.json): A tiny robot head. The antenna light means it is thinking. It is always thinking.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/robo.json
+- [Star](https://piixpal.dvkk.dev/r/star.json): A little star who twinkles on purpose. Main-character energy.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/star.json
+- [Sushi](https://piixpal.dvkk.dev/r/sushi.json): A piece of salmon nigiri wearing its fish like a very good blanket.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/sushi.json
+- [Toast](https://piixpal.dvkk.dev/r/toast.json): A slice of toast with a pat of butter slowly giving up.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/toast.json
+- [Token](https://piixpal.dvkk.dev/r/token.json): A little gold token that spins. Every model wants it. Context is everything.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/token.json
+- [Ufo](https://piixpal.dvkk.dev/r/ufo.json): A very small visitor. Came in peace, stayed for the cursor.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/ufo.json
+- [Wizard](https://piixpal.dvkk.dev/r/wizard.json): A very small wizard whose hat does most of the work. Sparkles on request.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/wizard.json
+- [Crowd](https://piixpal.dvkk.dev/r/crowd.json): Hundreds of tiny agents on one canvas: they wander, swarm your cursor, or spell a word.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/crowd.json
+- [PixelType](https://piixpal.dvkk.dev/r/pixel-type.json): Any font as chunky extruded pixel blocks that pals can walk on.  shadcn: npx shadcn@latest add https://piixpal.dvkk.dev/r/pixel-type.json
+
+## FAQ
+### What is Piixpal?
+Piixpal is a free, open-source (MIT) library of 300+ animated UI components and templates for websites: pixel characters ("pals") that live on your page, WebGL shader backgrounds, animated hero sections, 74 landing-page hero templates, ASCII animations, buttons, cards, text effects and form controls. Every piece is a standard web component, so it works in plain HTML, React, Next.js, Vue, Svelte and Astro.
+
+### Is Piixpal free for commercial use?
+Yes. Everything is MIT-licensed: use it in personal, client and commercial projects, no attribution required, no account and no paid tier.
+
+### How do I add Piixpal to my website?
+Add one script tag, <script src="https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js"></script>, then use any tag, for example <h1>Hello <piix-pal pal="bitbug"></piix-pal></h1>. To load only what you use, include a single file from /dist/c/NAME.min.js instead. With a bundler: npm install piixpal.
+
+### Does Piixpal work with React and Next.js?
+Yes. Import the wrappers (import { PiixPal } from "piixpal/react") or add components with the shadcn CLI. They are client components, so in the Next.js App Router use them from a client component. Vue has a plugin (app.use(Piixpal) from "piixpal/vue"), and Svelte and Astro can use the plain tags.
+
+### Can I install Piixpal components with shadcn?
+Yes. Every component is in a shadcn registry: npx shadcn@latest add https://piixpal.dvkk.dev/r/NAME.json, then import it from @/components/piixpal/NAME. The full index is at https://piixpal.dvkk.dev/r/registry.json.
+
+### Where can I find free animated hero section templates?
+Piixpal Templates has 74 free landing-page heroes that actually move: live WebGL shaders, GSAP scroll-driven scenes, fire, particles and ASCII worlds. Each one is a single HTML file with no build step: copy it, change the words and ship. Browse them at https://piixpal.dvkk.dev/templates/.
+
+### How do I add an animated shader background to a landing page?
+Pick a background on https://piixpal.dvkk.dev/ui/ (aurora, silk, clouds, caustics, mesh gradients and more), add the script tag and place the element behind your content, for example <piix-fx kind="silk"></piix-fx>. Colours come from ten palettes or your own list of hex colours.
+
+### What are pixel pals?
+Pals are small animated pixel characters that live on the real elements of your page: a beetle that crawls along the outline of your heading, a bird that perches on your buttons, a cat that naps on a paragraph, a jelly that bounces on your footer. They never block clicks, they are hidden from screen readers, and they stop moving for people who prefer reduced motion.
+
+### Will animated components slow my site down?
+The animated components pause when they are off-screen, so a page full of them only pays for what is visible. Load only the files you use from /dist/c/, and keep the heavier WebGL backgrounds for pages where motion is the point. Everything honours prefers-reduced-motion.
+
+### Are Piixpal components accessible?
+Decorative pieces (pals, sprites, backgrounds) are aria-hidden and never take focus or block clicks. Interactive components such as buttons, toggles, tabs, sliders and dialogs use native elements with keyboard support, and every component documents its accessibility notes on its page.
+
+### Can an AI coding agent use Piixpal?
+Yes. https://piixpal.dvkk.dev/llms.txt lists every component with its tag and install command, and the piixpal-pixelate agent skill (in the GitHub repo under skills/) turns any existing site into a tasteful pixel-art version of itself in Claude Code, Cursor or Codex.
+
+### Can I make my own pixel character?
+Yes. The Pal Maker at https://piixpal.dvkk.dev/components/make turns a doodle, a photo, a logo or an emoji into a pal you can share as a link or one tag.

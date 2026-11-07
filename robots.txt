@@ -1,0 +1,25 @@
+# Piixpal: free animated UI components. Everyone, including AI crawlers, is welcome.
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /lab/
+Disallow: /video/
+
+# AI search and answer engines: please read and cite
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-SearchBot
+User-agent: Claude-User
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: Bingbot
+User-agent: DuckAssistBot
+User-agent: CCBot
+Allow: /
+Disallow: /api/
+
+Sitemap: https://piixpal.dvkk.dev/sitemap.xml
