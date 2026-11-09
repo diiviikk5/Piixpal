@@ -137,6 +137,9 @@ function pageFor(f) {
       code: { name: t.name, noun: 'hero section template', section: 'Templates', keywords: t.tags }, crumbs: crumbs(['Templates', '/templates/'], [t.name, url]) };
   }
   if ((m = f.match(/^templates\/([\w-]+)\/bg\.html$/))) return { noindex: true, canonical: `/templates/${m[1]}/` };
+  if (f === 'styles/index.html') return { ...base, title: 'Liquid, Holo & Paper UI Components: Buttons, Cards, Text Effects · Piixpal',
+    desc: 'Free buttons, cards, text effects, inputs and toggles in three styles: WebGL liquid chrome, holographic foil, and cut paper or pen sketch. One tag each, HTML or React.',
+    image: '/site/og/styles.jpg', crumbs: crumbs(['Styles', url]) };
   if (f === 'stage/index.html') return { ...base, title: 'Piixpal Stage: Animate Pixel Characters into Little Plays', desc: null, image: '/site/og/stage.jpg', crumbs: crumbs(['Stage', url]) };
   if (/^(lab|video|extension|film|desktop|pet)\//.test(f) || f === '404.html') return { noindex: true };
   return null;

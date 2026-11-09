@@ -22,7 +22,7 @@ const read = f => `/* ---- ${f.split(sep).join('/')} ---- */\n` + readFileSync(j
 
 /* listed on every call, so a long-running dev server picks up new files */
 const CORE_LIST = () => ['core.js', 'icons.js', 'ui.js', 'text.js', 'drag.js', 'maker.js', 'rig.js', ...dir('elements'), 'boot.js'].filter(f => existsSync(join(src, f)));
-const COMPONENT_LIST = () => [...dir('behaviors'), ...dir('pals'), ...dir('sprites'), ...dir('powers'), ...dir('studio'), ...dir('kit'), ...dir('gl')];
+const COMPONENT_LIST = () => [...dir('behaviors'), ...dir('pals'), ...dir('sprites'), ...dir('powers'), ...dir('studio'), ...dir('kit'), ...dir('gl'), ...dir('styles')];
 
 /* everything the core declares at the top level becomes part of the shared toolkit */
 const coreNames = () => {
@@ -106,10 +106,10 @@ export function components() {
   const behaviorFile = {};
   for (const f of dir('behaviors')) for (const m of readFileSync(join(src, f), 'utf8').matchAll(/defineBehavior\('(\w+)'/g)) behaviorFile[m[1]] = f;
   const out = {};
-  for (const f of [...dir('pals'), ...dir('sprites'), ...dir('powers'), ...dir('studio'), ...dir('kit'), ...dir('gl')]) {
+  for (const f of [...dir('pals'), ...dir('sprites'), ...dir('powers'), ...dir('studio'), ...dir('kit'), ...dir('gl'), ...dir('styles')]) {
     const text = readFileSync(join(src, f), 'utf8');
     const needs = [...new Set([...text.matchAll(/does: '(\w+)'/g)].map(m => behaviorFile[m[1]]).filter(Boolean))];
-    const power = f.startsWith('powers'), studio = f.startsWith('studio'), kit = f.startsWith('kit'), glc = f.startsWith('gl');
+    const power = f.startsWith('powers'), studio = f.startsWith('studio'), kit = f.startsWith('kit') || f.startsWith('styles'), glc = f.startsWith('gl');
     /* names starting with _ are crew-only (coins, balloons…): they ship inside their pal's file */
     for (const m of text.matchAll(/define(Sprite|Figure)\('([\w-]+)'/g)) if (m[2][0] !== '_') out[m[2]] = { kind: power ? 'power' : m[1] === 'Sprite' ? 'pal' : 'sprite', files: [...needs, f] };
     /* elements that aren't pals declare themselves with a "@component name" line */

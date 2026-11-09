@@ -168,5 +168,17 @@
  "tabs": "kit",
  "text": "kit",
  "tooltip": "kit",
- "zipper": "kit"
+ "zipper": "kit",
+ "holo-button": "kit",
+ "holo-card": "kit",
+ "holo-input": "kit",
+ "holo-text": "kit",
+ "liquid-button": "kit",
+ "liquid-card": "kit",
+ "liquid-text": "kit",
+ "liquid-toggle": "kit",
+ "paper-button": "kit",
+ "paper-card": "kit",
+ "paper-sticker": "kit",
+ "paper-text": "kit"
 }

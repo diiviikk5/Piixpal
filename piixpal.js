@@ -20320,5 +20320,895 @@ canvas{position:absolute;left:0;top:0;width:100%;height:100%;image-rendering:pix
 define('piix-zipper', PiixZipperElement);
 ELEMENTS.zipper = 'piix-zipper';
 
+/* ---- styles/holo-button.js ---- */
+/* HOLO BUTTON: a button projected as a hologram.   @component holo-button
+ *
+ *   <piix-holo-button>Engage</piix-holo-button>
+ *   <piix-holo-button hue="300">Connect</piix-holo-button>
+ *
+ * A translucent pane in a foil frame whose rainbow follows the pointer, scanlines drifting through
+ * it, targeting brackets that close in on hover, and a glitch through the label when you press it.
+ * Flickers on when it first scrolls into view. A real button: focus, keyboard, forms.
+ *
+ *   hue       the projection colour, 0-360              default: 190 (cyan)
+ *   size      sm | md | lg                              default: md
+ *   type      button | submit | reset
+ *   href      makes it a link
+ *   disabled */
+
+/* the hologram toolkit the Holo family shares */
+const HOLO_FOIL = 'linear-gradient(115deg,#ff5ec4,#ffd23f 18%,#5cffb0 36%,#3fd0ff 54%,#a26bff 72%,#ff5ec4 90%)';
+const HOLO_SCAN = (a = .14) => `repeating-linear-gradient(0deg,rgba(255,255,255,${a}) 0 1px,transparent 1px 3px)`;
+const holoTrack = (el, box) => {
+  /* the pointer as --mx/--my (0..1) over the element, and --tilt for anyone who wants it */
+  const move = e => { const r = box.getBoundingClientRect(); el.style.setProperty('--mx', ((e.clientX - r.left) / r.width).toFixed(3)); el.style.setProperty('--my', ((e.clientY - r.top) / r.height).toFixed(3)); };
+  box.addEventListener('pointermove', move);
+  box.addEventListener('pointerleave', () => { el.style.setProperty('--mx', .5); el.style.setProperty('--my', .5); });
+};
+const holoOnView = (el, fn) => { const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); fn(); } }, { threshold: .3 }); io.observe(el); };
+const HOLO_CSS = `@keyframes hscan{to{background-position:0 60px}}
+@keyframes hon{0%{opacity:0}10%{opacity:.8}14%{opacity:.1}22%{opacity:.9}26%{opacity:.3}40%,100%{opacity:1}}
+@keyframes hglitch{0%,100%{clip-path:inset(0 0 0 0);transform:none}20%{clip-path:inset(10% 0 60% 0);transform:translateX(-6px)}40%{clip-path:inset(55% 0 20% 0);transform:translateX(5px)}60%{clip-path:inset(30% 0 45% 0);transform:translateX(-3px)}80%{clip-path:inset(75% 0 5% 0);transform:translateX(4px)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}`;
+
+class PiixHoloButtonElement extends HTMLElement {
+  static get formAssociated() { return true; }
+  constructor() { super(); this._int = this.attachInternals ? this.attachInternals() : null; }
+  connectedCallback() {
+    if (this.shadowRoot) return;
+    const h = +this.getAttribute('hue') || 190, href = this.getAttribute('href');
+    const [pad, fs] = { sm: ['11px 20px', 12], lg: ['20px 36px', 17] }[this.getAttribute('size')] || ['15px 28px', 14];
+    const tag = href ? `a href="${href.replace(/"/g, '&quot;')}"` : `button type="button"${this.hasAttribute('disabled') ? ' disabled' : ''}`;
+    this.attachShadow({ mode: 'open' }).innerHTML = `<style>${HOLO_CSS}
+:host{display:inline-block;vertical-align:middle;--mx:.5;--my:.5;--c:hsl(${h} 100% 66%);--c2:hsl(${h} 100% 50% / .14)}
+:host([disabled]){opacity:.4;pointer-events:none}
+.b{all:unset;position:relative;display:block;box-sizing:border-box;padding:${pad};cursor:pointer;opacity:0;
+  font:600 ${fs}px/1 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.16em;text-transform:uppercase;color:#eafcff;
+  text-shadow:0 0 10px var(--c),-1px 0 0 rgba(255,60,200,.55),1px 0 0 rgba(60,220,255,.55);
+  background:linear-gradient(180deg,var(--c2),hsl(${h} 100% 40% / .06)),rgba(6,14,26,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);transition:transform .15s,filter .2s}
+.b.on{animation:hon .7s steps(1) forwards}
+/* the foil frame: a rainbow border lit where the pointer is */
+.b::before{content:"";position:absolute;inset:0;padding:1.5px;background:${HOLO_FOIL};background-size:300% 300%;background-position:calc(var(--mx) * 100%) calc(var(--my) * 100%);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;clip-path:inherit;opacity:.85;pointer-events:none}
+.b::after{content:"";position:absolute;inset:0;background:${HOLO_SCAN()},radial-gradient(120px 60px at calc(var(--mx) * 100%) calc(var(--my) * 100%),hsl(${h} 100% 80% / .35),transparent);animation:hscan 3s linear infinite;pointer-events:none;mix-blend-mode:screen}
+.br{position:absolute;width:10px;height:10px;border:1.5px solid var(--c);transition:transform .25s cubic-bezier(.3,1.6,.5,1);pointer-events:none;filter:drop-shadow(0 0 4px var(--c))}
+.br.a{left:-7px;top:-7px;border-right:0;border-bottom:0}.br.b2{right:-7px;top:-7px;border-left:0;border-bottom:0}.br.c{left:-7px;bottom:-7px;border-right:0;border-top:0}.br.d{right:-7px;bottom:-7px;border-left:0;border-top:0}
+:host(:hover) .br.a{transform:translate(4px,4px)}:host(:hover) .br.b2{transform:translate(-4px,4px)}:host(:hover) .br.c{transform:translate(4px,-4px)}:host(:hover) .br.d{transform:translate(-4px,-4px)}
+:host(:hover) .b{filter:brightness(1.25)}
+.l{position:relative;display:inline-block}
+.b.g .l{animation:hglitch .32s steps(2)}
+.b:active{transform:scale(.97)}
+.b:focus-visible{outline:1.5px dashed var(--c);outline-offset:6px}
+.w{position:relative;display:inline-block}
+</style><span class="w"><${tag} class="b" part="button"><span class="l"><slot></slot></span></${href ? 'a' : 'button'}><i class="br a"></i><i class="br b2"></i><i class="br c"></i><i class="br d"></i></span>`;
+    const b = this.shadowRoot.querySelector('.b');
+    holoTrack(this, b);
+    holoOnView(this, () => b.classList.add('on'));
+    if (reduced()) b.style.opacity = 1;
+    b.addEventListener('click', () => {
+      b.classList.remove('g'); void b.offsetWidth; b.classList.add('g');
+      const form = this._int && this._int.form, t = this.getAttribute('type');
+      if (form && t === 'submit') form.requestSubmit ? form.requestSubmit() : form.submit();
+      if (form && t === 'reset') form.reset();
+    });
+  }
+}
+define('piix-holo-button', PiixHoloButtonElement);
+ELEMENTS['holo-button'] = 'piix-holo-button';
+
+/* ---- styles/holo-card.js ---- */
+/* HOLO CARD: a holographic foil card that tilts under your hand.   @component holo-card  @needs holo-button
+ *
+ *   <piix-holo-card>
+ *     <img src="avatar.png" alt="">
+ *     <h3>Nova</h3><p>Rare · #042</p>
+ *   </piix-holo-card>
+ *
+ * Like a rare trading card: it tilts toward the pointer in 3D, a rainbow foil slides across it at
+ * the angle of the light, sparkles glint in the foil, a glare follows you, and faint scanlines
+ * remind you it's projected. Tap on a phone to wobble it.
+ *
+ *   hue        tint of the card's glass, 0-360            default: 250
+ *   intensity  how strong the foil is, 0-1               default: .7
+ *   static     no tilt */
+class PiixHoloCardElement extends HTMLElement {
+  connectedCallback() {
+    if (this.shadowRoot) return;
+    const h = +this.getAttribute('hue') || 250, k = this.hasAttribute('intensity') ? +this.getAttribute('intensity') : .7;
+    this.attachShadow({ mode: 'open' }).innerHTML = `<style>${HOLO_CSS}
+:host{display:block;perspective:900px;--mx:.5;--my:.5;--rx:0deg;--ry:0deg;--on:0}
+.c{position:relative;border-radius:18px;padding:26px;color:#f4f7ff;overflow:hidden;transform:rotateX(var(--rx)) rotateY(var(--ry));transform-style:preserve-3d;transition:transform .5s cubic-bezier(.2,.9,.3,1),box-shadow .4s;
+  background:linear-gradient(160deg,hsl(${h} 45% 22%),hsl(${h + 40} 50% 12%) 60%,hsl(${h - 30} 40% 16%));
+  box-shadow:0 0 0 1px rgba(255,255,255,.14) inset,0 30px 60px -25px hsl(${h} 80% 20% / .9),0 0 calc(var(--on) * 40px) hsl(${h} 100% 60% / .25)}
+:host(:hover) .c{transition:transform .08s linear,box-shadow .4s}
+/* the foil: a rainbow sliding with the light, burned into the card */
+.f{position:absolute;inset:0;pointer-events:none;mix-blend-mode:color-dodge;opacity:calc(${k} * (.35 + var(--on) * .65));
+  background:repeating-linear-gradient(115deg,#ff5ec4 0%,#ffd23f 7%,#5cffb0 14%,#3fd0ff 21%,#a26bff 28%,#ff5ec4 35%);background-size:280% 280%;
+  background-position:calc(var(--mx) * 100%) calc(var(--my) * 100%);filter:saturate(1.4) brightness(.75)}
+/* glints: a field of tiny sparkles only the foil light catches */
+.s{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;opacity:calc(${k} * var(--on));
+  background:radial-gradient(circle at 20% 30%,#fff 0 1px,transparent 2px) 0 0/37px 41px,radial-gradient(circle at 70% 60%,#fff 0 1px,transparent 1.6px) 0 0/53px 29px;
+  -webkit-mask:radial-gradient(220px 160px at calc(var(--mx) * 100%) calc(var(--my) * 100%),#000,transparent);mask:radial-gradient(220px 160px at calc(var(--mx) * 100%) calc(var(--my) * 100%),#000,transparent)}
+.g{position:absolute;inset:0;pointer-events:none;background:radial-gradient(farthest-corner circle at calc(var(--mx) * 100%) calc(var(--my) * 100%),rgba(255,255,255,calc(.28 * var(--on))),transparent 55%);mix-blend-mode:overlay}
+.l{position:absolute;inset:0;pointer-events:none;background:${HOLO_SCAN(.05)};animation:hscan 4s linear infinite}
+.e{position:absolute;inset:0;border-radius:inherit;padding:1px;pointer-events:none;background:${HOLO_FOIL};background-size:200% 200%;background-position:calc(var(--mx) * 100%) 50%;
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;opacity:.7}
+.in{position:relative;transform:translateZ(30px)}
+::slotted(img){display:block;max-width:100%;border-radius:12px}
+::slotted(h3){margin:.6em 0 .2em}
+</style><div class="c" part="card"><div class="in"><slot></slot></div><i class="f"></i><i class="s"></i><i class="g"></i><i class="l"></i><i class="e"></i></div>`;
+    const c = this.shadowRoot.querySelector('.c');
+    holoTrack(this, c);
+    const tilt = e => {
+      if (this.hasAttribute('static') || reduced()) return;
+      const r = c.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5;
+      this.style.setProperty('--ry', (x * 22).toFixed(2) + 'deg'); this.style.setProperty('--rx', (-y * 18).toFixed(2) + 'deg'); this.style.setProperty('--on', 1);
+    };
+    c.addEventListener('pointermove', tilt);
+    c.addEventListener('pointerleave', () => { this.style.setProperty('--rx', '0deg'); this.style.setProperty('--ry', '0deg'); this.style.setProperty('--on', 0); });
+    /* touch: a short wobble that sweeps the foil */
+    c.addEventListener('pointerdown', e => {
+      if (e.pointerType !== 'touch' || reduced()) return;
+      let t0 = now();
+      const step = () => { const t = (now() - t0) / 1000; if (t > 1.2) { c.dispatchEvent(new Event('pointerleave')); return; }
+        const a = Math.sin(t * 9) * Math.exp(-t * 2.5); this.style.setProperty('--ry', (a * 18).toFixed(2) + 'deg'); this.style.setProperty('--mx', (.5 + a * .5).toFixed(3)); this.style.setProperty('--on', 1); requestAnimationFrame(step); };
+      step();
+    });
+  }
+}
+define('piix-holo-card', PiixHoloCardElement);
+ELEMENTS['holo-card'] = 'piix-holo-card';
+
+/* ---- styles/holo-input.js ---- */
+/* HOLO INPUT: a text field projected like a HUD.   @component holo-input  @needs holo-button
+ *
+ *   <piix-holo-input label="Callsign" name="callsign"></piix-holo-input>
+ *   <piix-holo-input label="Access code" type="password"></piix-holo-input>
+ *
+ * A translucent field with targeting brackets that lock onto it when focused, a scan line sweeping
+ * across, a label that lifts into a readout, and every keystroke blipping a character up out of
+ * the field. A real input underneath: it works with forms, autofill and screen readers.
+ *
+ *   label        the label                               default: Input
+ *   name, type, value, placeholder, required, autocomplete   as on <input>
+ *   hue          projector colour, 0-360                 default: 190 */
+class PiixHoloInputElement extends HTMLElement {
+  static get formAssociated() { return true; }
+  constructor() { super(); this._int = this.attachInternals ? this.attachInternals() : null; }
+  get value() { return this._in ? this._in.value : this.getAttribute('value') || ''; }
+  set value(v) { if (this._in) { this._in.value = v; this._sync(); } else this.setAttribute('value', v); }
+  connectedCallback() {
+    if (this.shadowRoot) return;
+    const h = +this.getAttribute('hue') || 190, a = n => this.hasAttribute(n) ? ` ${n}="${this.getAttribute(n).replace(/"/g, '&quot;')}"` : '';
+    const label = (this.getAttribute('label') || 'Input').replace(/[<>&]/g, '');
+    this.attachShadow({ mode: 'open', delegatesFocus: true }).innerHTML = `<style>${HOLO_CSS}
+:host{display:block;--c:hsl(${h} 100% 66%)}
+@keyframes hsweep{0%{left:-20%}100%{left:110%}}
+@keyframes hblip{0%{opacity:1;transform:translate(-50%,0) scale(1)}100%{opacity:0;transform:translate(-50%,-34px) scale(1.4)}}
+.f{position:relative;padding:24px 16px 10px;background:linear-gradient(180deg,hsl(${h} 100% 50% / .08),hsl(${h} 100% 50% / .02)),rgba(6,14,26,.5);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
+  border-bottom:1.5px solid hsl(${h} 100% 66% / .5);transition:border-color .2s}
+.f::after{content:"";position:absolute;inset:0;background:${HOLO_SCAN(.06)};pointer-events:none}
+label{position:absolute;left:16px;top:17px;font:500 15px/1 "JetBrains Mono",ui-monospace,monospace;color:hsl(${h} 60% 75% / .75);letter-spacing:.06em;transition:transform .2s,font-size .2s,color .2s;transform-origin:0 0;pointer-events:none}
+.f.up label{transform:translateY(-10px) scale(.72);color:var(--c);text-transform:uppercase;letter-spacing:.2em}
+input{all:unset;box-sizing:border-box;width:100%;font:500 17px/1.4 "JetBrains Mono",ui-monospace,monospace;color:#eafcff;caret-color:var(--c);text-shadow:0 0 8px hsl(${h} 100% 60% / .7)}
+.br{position:absolute;width:12px;height:12px;border:1.5px solid var(--c);opacity:0;transition:all .3s cubic-bezier(.3,1.6,.5,1);pointer-events:none;filter:drop-shadow(0 0 4px var(--c))}
+.br.a{left:-14px;top:-14px;border-right:0;border-bottom:0}.br.b{right:-14px;top:-14px;border-left:0;border-bottom:0}.br.c{left:-14px;bottom:-14px;border-right:0;border-top:0}.br.d{right:-14px;bottom:-14px;border-left:0;border-top:0}
+.f:focus-within{border-color:var(--c)}
+.f:focus-within .br{opacity:1}.f:focus-within .br.a{left:-4px;top:-4px}.f:focus-within .br.b{right:-4px;top:-4px}.f:focus-within .br.c{left:-4px;bottom:-4px}.f:focus-within .br.d{right:-4px;bottom:-4px}
+.sw{position:absolute;top:0;bottom:0;width:18%;background:linear-gradient(90deg,transparent,hsl(${h} 100% 75% / .3),transparent);opacity:0;pointer-events:none}
+.f:focus-within .sw{opacity:1;animation:hsweep 1.8s linear infinite}
+.bl{position:absolute;bottom:22px;font:600 14px "JetBrains Mono",monospace;color:var(--c);text-shadow:0 0 8px var(--c);pointer-events:none;animation:hblip .6s ease-out forwards}
+</style><div class="f" part="field"><label for="i">${label}</label><input id="i" part="input"${a('type')}${a('name')}${a('value')}${a('placeholder')}${a('autocomplete')}${this.hasAttribute('required') ? ' required' : ''}><i class="sw"></i><i class="br a"></i><i class="br b"></i><i class="br c"></i><i class="br d"></i></div>`;
+    this._in = this.shadowRoot.querySelector('input'); this._f = this.shadowRoot.querySelector('.f');
+    const meas = document.createElement('canvas').getContext('2d');
+    this._in.addEventListener('input', e => {
+      this._sync();
+      if (reduced() || !e.data) return;
+      /* a blip of the typed character, rising out of the field where the caret is */
+      meas.font = '500 17px "JetBrains Mono",monospace';
+      const ch = this._in.type === 'password' ? '•' : e.data.slice(-1), x = Math.min(this._in.clientWidth, meas.measureText(this._in.type === 'password' ? '•'.repeat(this._in.value.length) : this._in.value).width) + 16 - this._in.scrollLeft;
+      const b = document.createElement('i'); b.className = 'bl'; b.textContent = ch; b.style.left = x + 'px'; this._f.appendChild(b); setTimeout(() => b.remove(), 650);
+    });
+    this._in.addEventListener('focus', () => this._f.classList.add('up'));
+    this._in.addEventListener('blur', () => this._sync());
+    this._in.addEventListener('change', () => this.dispatchEvent(new Event('change', { bubbles: true })));
+    this._sync();
+  }
+  _sync() {
+    this._f.classList.toggle('up', !!this._in.value || this.shadowRoot.activeElement === this._in);
+    if (this._int) { this._int.setFormValue(this._in.value); this._int.setValidity(this._in.validity, this._in.validationMessage, this._in); }
+  }
+}
+define('piix-holo-input', PiixHoloInputElement);
+ELEMENTS['holo-input'] = 'piix-holo-input';
+
+/* ---- styles/holo-text.js ---- */
+/* HOLO TEXT: a headline projected as a hologram.   @component holo-text  @needs holo-button
+ *
+ *   <piix-holo-text>Signal acquired</piix-holo-text>
+ *
+ * The words glow in projector light, split into cyan and magenta ghosts that drift apart and back,
+ * scanlines run through them, the beam fades toward the bottom, and now
+ * and then the projection stutters and slices sideways. Hover to make it glitch on purpose.
+ *
+ *   hue       projector colour, 0-360                    default: 190
+ *   size      font size in px                            default: fits, up to 88
+ *   calm      no stutters, just the glow and scanlines */
+class PiixHoloTextElement extends HTMLElement {
+  connectedCallback() {
+    if (this.shadowRoot) return;
+    const text = this.textContent.trim(), h = +this.getAttribute('hue') || 190, size = +this.getAttribute('size') || 0;
+    const safe = text.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    this.setAttribute('role', 'heading'); this.setAttribute('aria-label', text);
+    this.attachShadow({ mode: 'open' }).innerHTML = `<style>${HOLO_CSS}
+:host{display:block;line-height:1}
+@keyframes hsplit{0%,100%{transform:translate(0,0)}25%{transform:translate(-3px,1px)}50%{transform:translate(2px,-1px)}75%{transform:translate(-1px,0)}}
+.t{position:relative;display:inline-block;padding:.3em .35em;margin:-.3em -.35em;font:800 ${size ? size + 'px' : 'clamp(40px,8vw,88px)'}/1.05 "Bricolage Grotesque",system-ui,sans-serif;letter-spacing:-.02em;
+  color:hsl(${h} 100% 88%);text-shadow:0 0 18px hsl(${h} 100% 60% / .9),0 0 46px hsl(${h} 100% 50% / .5);
+  -webkit-mask:repeating-linear-gradient(0deg,#000 0 2px,rgba(0,0,0,.55) 2px 3px),linear-gradient(180deg,#000 55%,rgba(0,0,0,.35));-webkit-mask-composite:source-in;
+  mask:repeating-linear-gradient(0deg,#000 0 2px,rgba(0,0,0,.55) 2px 3px),linear-gradient(180deg,#000 55%,rgba(0,0,0,.35));mask-composite:intersect}
+.t::before,.t::after{content:attr(data-t);position:absolute;inset:.3em .35em;pointer-events:none;mix-blend-mode:screen}
+.t::before{color:rgba(255,40,200,.7);animation:hsplit 2.6s ease-in-out infinite}
+.t::after{color:rgba(40,230,255,.7);animation:hsplit 3.1s ease-in-out infinite reverse}
+.t.x{animation:hglitch .28s steps(2)}
+:host(:hover) .t{animation:hglitch .4s steps(2) infinite}
+.w{position:relative;display:inline-block;padding:.08em .04em}
+</style><span class="w" aria-hidden="true"><span class="t" data-t="${safe}">${safe}</span></span>`;
+    const t = this.shadowRoot.querySelector('.t');
+    /* the stutter: every few seconds, at an uneven rhythm */
+    if (!this.hasAttribute('calm') && !reduced()) {
+      const go = () => { if (!this.isConnected) return; t.classList.remove('x'); void t.offsetWidth; t.classList.add('x'); this._tm = setTimeout(go, 2200 + Math.random() * 3800); };
+      this._tm = setTimeout(go, 1200 + Math.random() * 2000);
+    }
+  }
+  disconnectedCallback() { clearTimeout(this._tm); }
+}
+define('piix-holo-text', PiixHoloTextElement);
+ELEMENTS['holo-text'] = 'piix-holo-text';
+
+/* ---- styles/liquid-button.js ---- */
+/* LIQUID BUTTON: a button made of liquid that reaches for your cursor.   @component liquid-button
+ *
+ *   <piix-liquid-button>Get started</piix-liquid-button>
+ *   <piix-liquid-button look="ink">Launch</piix-liquid-button>
+ *
+ * Drawn on the GPU as a signed distance field, smooth and full resolution. Its edge breathes;
+ * bring the pointer near and a bead of liquid stretches out of it toward you and joins back when
+ * you leave; click and droplets splash out and fall back in. It is shaded as a real material
+ * (chrome, ink, water or honey) mirroring a studio with a hard horizon line, not a gradient.
+ * A real button: focus, keyboard, forms.
+ *
+ *   look      chrome | ink | water | honey               default: chrome
+ *   colors    floor, horizon, sky (overrides look)
+ *   text      label colour                               default: the look's
+ *   size      sm | md | lg                                default: md
+ *   type      button | submit | reset
+ *   href      makes it a link
+ *   disabled */
+
+/* the liquid toolkit every Liquid component shares: a rounded box, a smooth union, and the shading */
+const LQ_GLSL = `
+uniform vec3 u_c0;uniform vec3 u_c1;uniform vec3 u_c2;
+float sdRB(vec2 p,vec2 b,float r){vec2 q=abs(p)-b+r;return length(max(q,0.))+min(max(q.x,q.y),0.)-r;}
+float smin(float a,float b,float k){float h=clamp(.5+.5*(b-a)/k,0.,1.);return mix(b,a,h)-k*h*(1.-h);}
+/* p in device pixels, d the field there, g its unit gradient, s the device-pixel scale.
+ * Shaded like a real reflective liquid: the surface mirrors a studio, dark floor below a bright
+ * horizon and a softer sky above, so it reads as chrome, ink, water or honey, never as a gradient. */
+vec4 lqShade(vec2 p,float d,vec2 g,float s,float bevelPx,float t){
+  float bev=1.-smoothstep(0.,bevelPx*s,-d);
+  vec3 n=normalize(vec3(g*bev*1.7,1.));
+  vec3 r=reflect(vec3(0.,0.,-1.),n);
+  float y=r.y*.9+.18+.06*sin(p.x/(s*60.)+t*.6)*bev+(noise(p/(s*80.)+t*.15)-.5)*.08;
+  vec3 col=y<0.?mix(u_c0,u_c0*1.6+.03,smoothstep(-.6,0.,y)):mix(u_c1,u_c2,smoothstep(0.,.55,y));
+  col=mix(col,u_c1*1.08+.06,exp(-abs(y)*28.)*.85);
+  vec3 L=normalize(vec3(-.45,.65,.75));
+  col+=pow(max(dot(reflect(-L,n),vec3(0.,0.,1.)),0.),70.)*1.1;
+  col*=1.-.25*pow(bev,4.);
+  return vec4(clamp(col,0.,1.),clamp(.5-d/s,0.,1.));
+}`;
+/* finishes: floor (shadow side), horizon (the bright line), sky (the upper reflection), and the label colour */
+const LQ_LOOKS = {
+  chrome: ['#16181d,#f4f6f9,#9aa3b2', '#111318'],
+  ink: ['#020203,#aeb4bf,#1a1c21', '#f4f6f9'],
+  water: ['#0b3a47,#effcff,#6fc3d6', '#05252e'],
+  honey: ['#3b1a02,#ffe9b0,#d1861a', '#2a1300']
+};
+const lqLook = el => LQ_LOOKS[el.getAttribute('look')] || LQ_LOOKS[el._defLook || 'chrome'];
+const lqColors = el => {
+  const l = (el.getAttribute('colors') || lqLook(el)[0]).split(',').map(s => s.trim());
+  return { u_c0: glRGB(l[0]), u_c1: glRGB(l[1] || l[0]), u_c2: glRGB(l[2] || l[1] || l[0]) };
+};
+/* the pointer in a canvas's own device pixels, y up, as the shader sees it */
+const lqPointer = (cv, dpr) => {
+  const r = cv.getBoundingClientRect();
+  return [(ptr.cx - r.left) * dpr, (r.bottom - ptr.cy) * dpr];
+};
+const LQ_M = 30;   /* the margin round a liquid control, in css px, so splashes have room */
+
+const LQ_BUTTON = LQ_GLSL + `
+uniform vec4 u_dr[6];
+float field(vec2 p){
+  vec2 c=u_res*.5,q=p-c,B=u_k.xy*vec2(1.+.05*u_j.w,1.-.1*u_j.w);float s=u_k.w;
+  float a=atan(q.y,q.x);
+  float d=sdRB(q,B,u_k.z)+(noise(vec2(a*1.7+u_time*.7,u_time*.35))-.5)*s*(2.5+5.*u_j.z);
+  float near=u_j.z;
+  d=smin(d,length(p-u_j.xy)-s*(15.*near-5.),s*(2.+24.*near));
+  for(int i=0;i<6;i++){if(u_dr[i].z>0.)d=smin(d,length(p-u_dr[i].xy)-u_dr[i].z,s*14.);}
+  return d;
+}
+vec4 effect(vec2 uv,vec2 cell){
+  vec2 p=cell+.5;float s=u_k.w,e=1.5*s;
+  float d=field(p);
+  vec2 g=normalize(vec2(field(p+vec2(e,0.))-d,field(p+vec2(0.,e))-d)+1e-5);
+  vec4 c=lqShade(p,d,g,s,11.,u_time);
+  float sh=exp(-max(field(p+vec2(0.,7.*s)),0.)/(7.*s))*.28*(1.-c.a);
+  return vec4(mix(vec3(.05,.03,.1),c.rgb,c.a/max(c.a+sh,1e-4)),max(c.a,sh));
+}`;
+
+class PiixLiquidButtonElement extends GLStage {
+  static get formAssociated() { return true; }
+  static get observedAttributes() { return ['colors', 'look', 'size', 'disabled', 'text']; }
+  constructor() { super(); this._defPx = .5; this._drops = []; this._press = 0; this._near = 0; this._int = this.attachInternals ? this.attachInternals() : null; }
+  _box() { return this._cv; }
+  _hostCss() { return 'display:inline-block;vertical-align:middle;cursor:pointer;-webkit-tap-highlight-color:transparent;'; }
+  _css() {
+    const [pad, fs] = { sm: ['12px 22px', 14], lg: ['22px 40px', 19] }[this.getAttribute('size')] || ['17px 30px', 16];
+    return `canvas{inset:-${LQ_M}px;width:calc(100% + ${LQ_M * 2}px);height:calc(100% + ${LQ_M * 2}px);image-rendering:auto}
+.b{all:unset;position:relative;display:block;box-sizing:border-box;padding:${pad};font:700 ${fs}px/1 "Bricolage Grotesque",system-ui,sans-serif;letter-spacing:.01em;
+  color:${this.getAttribute('text') || lqLook(this)[1]};text-shadow:0 1px 0 rgba(255,255,255,.25);transition:transform .2s cubic-bezier(.3,1.6,.5,1);cursor:inherit}
+.b:focus-visible{outline:2px solid currentColor;outline-offset:6px;border-radius:999px}
+:host(:active) .b{transform:scale(.97)}
+:host([disabled]){opacity:.45;cursor:not-allowed;filter:grayscale(.8)}`;
+  }
+  _html() {
+    const href = this.getAttribute('href');
+    return `<canvas aria-hidden="true"></canvas>${href ? `<a class="b" part="button" href="${href.replace(/"/g, '&quot;')}"><slot></slot></a>` : `<button class="b" part="button" type="button"${this.hasAttribute('disabled') ? ' disabled' : ''}><slot></slot></button>`}`;
+  }
+  _setup() {
+    this._cols = lqColors(this);
+    const b = this.shadowRoot.querySelector('.b');
+    b.addEventListener('pointerdown', () => { this._down = true; });
+    addEventListener('pointerup', () => { this._down = false; });
+    b.addEventListener('click', e => {
+      if (this.hasAttribute('disabled')) return;
+      const dpr = Math.min(devicePixelRatio || 1, 2), r = this._cv.getBoundingClientRect();
+      const x = ((e.clientX || r.left + r.width / 2) - r.left) * dpr, y = (r.bottom - (e.clientY || r.top + r.height / 2)) * dpr;
+      for (let i = 0; i < 5; i++) { const a = Math.random() * Math.PI * 2, v = (120 + Math.random() * 160) * dpr; this._drops.push({ x, y, vx: Math.cos(a) * v, vy: Math.abs(Math.sin(a)) * v * .8 + 60 * dpr, r: (5 + Math.random() * 5) * dpr }); }
+      this._drops = this._drops.slice(-6);
+      const form = this._int && this._int.form, t = this.getAttribute('type');
+      if (form && t === 'submit') form.requestSubmit ? form.requestSubmit() : form.submit();
+      if (form && t === 'reset') form.reset();
+    });
+  }
+  _shader() { return LQ_BUTTON; }
+  _uniforms(T, dt) {
+    const dpr = Math.min(devicePixelRatio || 1, 2), m = lqPointer(this._cv, dpr), W = this._W, H = this._H, M = LQ_M * dpr;
+    const hw = W / 2 - M, hh = H / 2 - M;
+    /* how near the pointer is to the edge: within 70 px the liquid reaches for it */
+    const qx = Math.max(Math.abs(m[0] - W / 2) - hw, 0), qy = Math.max(Math.abs(m[1] - H / 2) - hh, 0), dist = Math.hypot(qx, qy) / dpr;
+    this._near = lerp(this._near, ptr.seen && dist < 70 && !this.hasAttribute('disabled') ? 1 - dist / 70 : 0, Math.min(1, dt * 8));
+    this._press = lerp(this._press, this._down && this._hov > .5 ? 1 : 0, Math.min(1, dt * 14));
+    /* the bead sits where the pointer is, but never further out than the margin */
+    const bx = clamp(m[0], 8 * dpr, W - 8 * dpr), by = clamp(m[1], 8 * dpr, H - 8 * dpr);
+    const dr = new Float32Array(24);
+    this._drops.forEach(d => { d.vy -= 520 * dpr * dt; d.x += d.vx * dt; d.y += d.vy * dt; d.vx *= .97; d.r -= 9 * dpr * dt; });
+    this._drops = this._drops.filter(d => d.r > .5);
+    this._drops.forEach((d, i) => dr.set([d.x, d.y, d.r, 0], i * 4));
+    return { ...this._cols, u_k: [hw, hh, Math.min(hh, 999), dpr], u_j: [bx, by, this._near, this._press], u_dr: dr };
+  }
+}
+define('piix-liquid-button', PiixLiquidButtonElement);
+ELEMENTS['liquid-button'] = 'piix-liquid-button';
+
+/* ---- styles/liquid-card.js ---- */
+/* LIQUID CARD: a card whose surface is liquid metal you can stir.   @component liquid-card  @needs liquid-button
+ *
+ *   <piix-liquid-card>
+ *     <h3>Pro plan</h3>
+ *     <p>Everything, forever.</p>
+ *   </piix-liquid-card>
+ *
+ * The face is a glossy liquid surface on the GPU: slow currents roll across it, the pointer drags
+ * a wake through it, and a click drops a ring that spreads to the edges. The outline breathes a
+ * little, like a drop holding its shape. Your content sits on top.
+ *
+ *   look      chrome | ink | water | honey               default: ink
+ *   colors    floor, horizon, sky (overrides look)
+ *   tone      dark | light (text colour on top)          default: dark (white text)
+ *   radius    corner radius, px                          default: 26 */
+const LQ_CARD = LQ_GLSL + `
+float height(vec2 p,float s){
+  vec2 q=p/(s*420.);
+  float h=fbm(q+vec2(u_time*.05,u_time*.035))*.9+noise(q*2.1-vec2(u_time*.08,0.))*.25;
+  vec2 m=u_j.xy;float dm=length(p-m)/s;
+  h+=u_j.z*.3*exp(-dm/90.)*sin(dm*.06-u_time*4.);
+  if(u_j.w<3.){float r=u_j.w*420.,dc=length(p-u_k.xy)/s;h+=.35*exp(-abs(dc-r)/24.)*sin((dc-r)*.12)*(1.-u_j.w/3.);}
+  return h;
+}
+vec4 effect(vec2 uv,vec2 cell){
+  vec2 p=cell+.5,c=u_res*.5;float s=u_k.w,rad=u_k.z;
+  vec2 q=p-c;float a=atan(q.y,q.x);
+  float d=sdRB(q,c-vec2(5.*s),rad)+(noise(vec2(a*2.+u_time*.5,u_time*.25))-.5)*3.*s;
+  if(d>2.*s)return vec4(0.);
+  float e=2.*s,h=height(p,s);
+  vec3 n=normalize(vec3(h-height(p+vec2(e,0.),s),h-height(p+vec2(0.,e),s),.03));
+  float bev=1.-smoothstep(0.,10.*s,-d);
+  n=normalize(n+vec3(normalize(q+1e-4)*bev*1.2,0.));
+  vec3 r=reflect(vec3(0.,0.,-1.),n);
+  float y=r.y*.9+.05;
+  vec3 col=y<0.?mix(u_c0,u_c0*1.6+.03,smoothstep(-.6,0.,y)):mix(u_c0*1.3+.02,u_c2,smoothstep(0.,.7,y));
+  col=mix(col,u_c1,exp(-abs(y)*30.)*.55);
+  vec3 L=normalize(vec3(-.4,.6,.7));
+  col+=pow(max(dot(reflect(-L,n),vec3(0.,0.,1.)),0.),60.)*.9+pow(bev,3.)*.22;
+  return vec4(col,clamp(.5-d/s,0.,1.));
+}`;
+class PiixLiquidCardElement extends GLStage {
+  static get observedAttributes() { return ['look', 'colors', 'tone', 'radius']; }
+  constructor() { super(); this._defLook = 'ink'; this._defPx = 1; this._click = [0, 0, 99]; this._wake = 0; }
+  _hostCss() {
+    const light = this.getAttribute('tone') === 'light';
+    return `display:block;color:${light ? '#17121f' : '#fff'};isolation:isolate;`;
+  }
+  _css() { return `canvas{z-index:-1;image-rendering:auto}.in{position:relative;padding:30px 32px}`; }
+  _html() { return '<canvas aria-hidden="true"></canvas><div class="in" part="body"><slot></slot></div>'; }
+  _setup() {
+    this._cols = lqColors(this);
+    this.addEventListener('pointerdown', e => {
+      const dpr = Math.min(devicePixelRatio || 1, 2), r = this._cv.getBoundingClientRect();
+      this._click = [(e.clientX - r.left) * dpr, (r.bottom - e.clientY) * dpr, now()];
+    });
+  }
+  _shader() { return LQ_CARD; }
+  _uniforms(T, dt) {
+    const dpr = Math.min(devicePixelRatio || 1, 2), m = lqPointer(this._cv, dpr);
+    /* the wake grows with how fast the pointer moves over the card */
+    const sp = Math.min(1, Math.hypot(ptr.vx, ptr.vy) / 1400);
+    this._wake = lerp(this._wake, this._hov * (.35 + sp), Math.min(1, dt * 4));
+    return { ...this._cols, u_k: [this._click[0], this._click[1], (+this.getAttribute('radius') || 26) * dpr, dpr], u_j: [m[0], m[1], this._wake, (now() - this._click[2]) / 1000] };
+  }
+}
+define('piix-liquid-card', PiixLiquidCardElement);
+ELEMENTS['liquid-card'] = 'piix-liquid-card';
+
+/* ---- styles/liquid-text.js ---- */
+/* LIQUID TEXT: words made of liquid that melt into the next word.   @component liquid-text  @needs liquid-button
+ *
+ *   <piix-liquid-text>Fluid</piix-liquid-text>
+ *   <piix-liquid-text words="Design|Build|Ship"></piix-liquid-text>
+ *
+ * The letters are a liquid field on the GPU: their edges ripple, the pointer sends a wave through
+ * them, and with several words each one flows into the next like two drops merging, glossy and
+ * iridescent the whole way. Screen readers get the plain words.
+ *
+ *   words     words to cycle, | between                  default: the text inside
+ *   every     ms per word                                default: 2400
+ *   look      chrome | ink | water | honey               default: chrome
+ *   colors    floor, horizon, sky (overrides look)
+ *   size      font size in px                            default: 96
+ *   font      CSS font family                            default: Bricolage Grotesque */
+const LQ_TEXT = LQ_GLSL + `
+float fld(vec2 uv){
+  vec2 w=vec2(fbm(uv*vec2(3.,1.5)+u_time*.25),fbm(uv*vec2(3.,1.5)-u_time*.2+7.))-.5;
+  vec2 pm=u_j.xy/u_res;float dm=length((uv-pm)*vec2(u_res.x/u_res.y,1.));
+  uv+=w*.018+u_j.z*.012*sin(dm*40.-u_time*7.)*exp(-dm*5.)*normalize(uv-pm+1e-4);
+  vec4 t=texture2D(u_tex,uv);
+  float k=u_k.x;float m=mix(t.r,t.g,smoothstep(0.,1.,k));
+  return m+sin(k*3.1416)*.16;
+}
+vec4 effect(vec2 uv,vec2 cell){
+  float s=u_k.w,f=fld(uv),th=.5;
+  float d=(th-f)*u_k.y;
+  vec2 e=1.5/u_res;
+  vec2 g=normalize(vec2(fld(uv-vec2(e.x,0.))-f,fld(uv-vec2(0.,e.y))-f)+1e-5);
+  return lqShade(cell+.5,d,g,s,6.,u_time);
+}`;
+class PiixLiquidTextElement extends GLStage {
+  static get observedAttributes() { return ['words', 'colors', 'size', 'font']; }
+  constructor() { super(); this._defPx = .5; this._i = 0; this._k = 0; this._tc = document.createElement('canvas'); this._near = 0; }
+  _list() { return (this.getAttribute('words') || this._text || '').split('|').map(s => s.trim()).filter(Boolean); }
+  _hostCss() { const fs = +this.getAttribute('size') || 96; return `display:block;height:${Math.round(fs * 1.3)}px;`; }
+  _css() { return 'canvas{image-rendering:auto}.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}'; }
+  _html() { return `<canvas aria-hidden="true"></canvas><span class="sr" aria-live="polite"></span>`; }
+  _setup() {
+    if (this._text == null) this._text = this.textContent.trim();
+    this._cols = lqColors(this);
+    this._t0w = now(); this._i = 0; this._drawn = -1;
+    this.shadowRoot.querySelector('.sr').textContent = this._list()[0] || '';
+  }
+  _resized() { this._drawn = -1; }
+  /* both words into one texture: the first in red, the next in green, softened so the shader can melt between them */
+  _paint() {
+    const L = this._list(); if (!L.length) return;
+    const a = L[this._i % L.length], b = L[(this._i + 1) % L.length];
+    const W = this._W, H = this._H, sc = 3, w = Math.ceil(W / sc), h = Math.ceil(H / sc), tc = this._tc;
+    tc.width = w; tc.height = h;
+    const g = tc.getContext('2d'), dpr = Math.min(devicePixelRatio || 1, 2), fs = (+this.getAttribute('size') || 96) * dpr / sc;
+    g.clearRect(0, 0, w, h); g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.font = `800 ${fs}px ${this.getAttribute('font') || '"Bricolage Grotesque",system-ui,sans-serif'}`;
+    g.globalCompositeOperation = 'lighter';
+    /* a small box blur by stamping the word around itself */
+    const O = [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1], [1, 1], [-1, -1], [1, -1], [-1, 1]];
+    for (const [col, word] of [['rgba(255,0,0,', a], ['rgba(0,255,0,', b]]) { g.fillStyle = col + (1 / O.length * 1.15) + ')'; for (const [x, y] of O) g.fillText(word, w / 2 + x * 1.1, h / 2 + y * 1.1 + fs * .04); }
+    this._drawn = this._i; this._dirtyTex = true;
+  }
+  _texture() { if (this._drawn !== this._i) this._paint(); const d = this._dirtyTex; this._dirtyTex = false; return { owner: this, src: this._tc, dirty: d }; }
+  _shader() { return LQ_TEXT; }
+  _uniforms(T, dt) {
+    const L = this._list(), every = +this.getAttribute('every') || 2400, el = now() - this._t0w;
+    if (L.length > 1 && !reduced()) {
+      if (el > every) { this._i = (this._i + 1) % L.length; this._t0w = now(); this.shadowRoot.querySelector('.sr').textContent = L[this._i]; }
+      this._k = clamp((el - (every - 750)) / 750, 0, 1);
+    } else this._k = 0;
+    const dpr = Math.min(devicePixelRatio || 1, 2), m = lqPointer(this._cv, dpr);
+    this._near = lerp(this._near, this._hov, Math.min(1, dt * 4));
+    return { ...this._cols, u_k: [this._k, 28 * dpr, 0, dpr], u_j: [m[0], m[1], this._near, 0] };
+  }
+}
+define('piix-liquid-text', PiixLiquidTextElement);
+ELEMENTS['liquid-text'] = 'piix-liquid-text';
+
+/* ---- styles/liquid-toggle.js ---- */
+/* LIQUID TOGGLE: a switch whose knob is a drop of liquid.   @component liquid-toggle  @needs liquid-button
+ *
+ *   <piix-liquid-toggle></piix-liquid-toggle>
+ *   <piix-liquid-toggle checked name="dark" label="Dark mode"></piix-liquid-toggle>
+ *
+ * Flip it and the drop stretches across the track, a tail of liquid trailing behind it before it
+ * snaps back into a bead; the track fills with colour as it lands. A real switch: Space and
+ * Enter flip it, it reports to forms, and it fires "change".
+ *
+ *   checked   on
+ *   name      form field name (sends "on")
+ *   label     accessible name                            default: Toggle
+ *   look      chrome | ink | water | honey               default: chrome
+ *   colors    floor, horizon, sky (overrides look) */
+const LQ_TOGGLE = LQ_GLSL + `
+vec4 effect(vec2 uv,vec2 cell){
+  vec2 p=cell+.5,c=u_res*.5;float s=u_k.w,R=u_k.y;
+  float trk=sdRB(p-c,vec2(u_k.x,R),R);
+  vec2 k=vec2(c.x-u_k.x+R+(u_k.x-R)*2.*u_j.x,c.y),tl=vec2(c.x-u_k.x+R+(u_k.x-R)*2.*u_j.y,c.y);
+  float r=R-3.*s;
+  float kn=smin(length(p-k)-r*(1.+.08*u_j.z),length(p-tl)-r*.55,r*1.3);
+  /* the track: frosted when off, liquid colour when on */
+  vec4 col=vec4(0.);
+  if(trk<1.5*s){
+    vec3 off=vec3(.86,.87,.89),on=mix(u_c0*1.5+.04,u_c0*2.4+.08,uv.y);
+    vec3 tc=mix(off,on*.85,u_j.w);
+    float inner=smoothstep(0.,6.*s,-trk);
+    tc*=.88+.12*inner;
+    col=vec4(tc,clamp(.5-trk/s,0.,1.));
+  }
+  float e=1.5*s;
+  vec2 g=normalize(vec2(smin(length(p+vec2(e,0.)-k)-r,length(p+vec2(e,0.)-tl)-r*.55,r*1.3)-kn,smin(length(p+vec2(0.,e)-k)-r,length(p+vec2(0.,e)-tl)-r*.55,r*1.3)-kn)+1e-5);
+  vec4 b=lqShade(p,kn,g,s,9.,u_time);
+  float sh=exp(-max(length(p+vec2(0.,3.*s)-k)-r,0.)/(4.*s))*.25*(1.-b.a);
+  vec3 under=mix(col.rgb,vec3(.1,.05,.2),sh/(col.a+sh+1e-4));
+  float ua=max(col.a,sh);
+  return vec4(mix(under,b.rgb,b.a),max(ua,b.a));
+}`;
+class PiixLiquidToggleElement extends GLStage {
+  static get formAssociated() { return true; }
+  static get observedAttributes() { return ['look', 'colors', 'checked']; }
+  constructor() { super(); this._defPx = .5; this._x = 0; this._tail = 0; this._v = 0; this._fill = 0; this._int = this.attachInternals ? this.attachInternals() : null; }
+  get checked() { return this.hasAttribute('checked'); }
+  set checked(v) { this.toggleAttribute('checked', !!v); }
+  attributeChangedCallback(n, a, b) { if (n === 'checked') { this._sync(); return; } super.attributeChangedCallback(n, a, b); }
+  _hostCss() { return 'display:inline-block;vertical-align:middle;width:68px;height:38px;cursor:pointer;-webkit-tap-highlight-color:transparent;'; }
+  _css() { return 'canvas{image-rendering:auto}.b{all:unset;position:absolute;inset:0;border-radius:999px;cursor:inherit}.b:focus-visible{outline:2px solid currentColor;outline-offset:3px}'; }
+  _html() { return `<canvas aria-hidden="true"></canvas><button class="b" part="switch" type="button" role="switch" aria-label="${(this.getAttribute('label') || 'Toggle').replace(/"/g, '&quot;')}"></button>`; }
+  _setup() {
+    this._cols = lqColors(this);
+    this._x = this._tail = this._fill = this.checked ? 1 : 0;
+    this.shadowRoot.querySelector('.b').addEventListener('click', () => { this.checked = !this.checked; this.dispatchEvent(new Event('change', { bubbles: true })); });
+    this._sync();
+  }
+  _sync() {
+    const b = this.shadowRoot && this.shadowRoot.querySelector('.b'); if (b) b.setAttribute('aria-checked', String(this.checked));
+    if (this._int) this._int.setFormValue(this.checked ? 'on' : null);
+  }
+  _shader() { return LQ_TOGGLE; }
+  _uniforms(T, dt) {
+    const dpr = Math.min(devicePixelRatio || 1, 2), to = this.checked ? 1 : 0, R = reduced();
+    /* a springy knob, and a tail that follows it lazily: the gap between them is the stretch */
+    if (R) this._x = this._tail = to;
+    else { this._v += (to - this._x) * 260 * dt; this._v *= Math.pow(.0009, dt); this._x += this._v * dt; this._tail = lerp(this._tail, this._x, Math.min(1, dt * 9)); }
+    this._fill = lerp(this._fill, to, Math.min(1, dt * 6));
+    return { ...this._cols, u_k: [this._W / 2 - 1 * dpr, this._H / 2 - 1 * dpr, 0, dpr], u_j: [clamp(this._x, -.05, 1.05), this._tail, this._hov, this._fill] };
+  }
+}
+define('piix-liquid-toggle', PiixLiquidToggleElement);
+ELEMENTS['liquid-toggle'] = 'piix-liquid-toggle';
+
+/* ---- styles/paper-button.js ---- */
+/* PAPER BUTTON: a button cut from layers of paper, or sketched in pen.   @component paper-button
+ *
+ *   <piix-paper-button>Sign up</piix-paper-button>
+ *   <piix-paper-button look="sketch">Read more</piix-paper-button>
+ *
+ * cut: three sheets of coloured card stacked with real gaps between them; hover lifts the top
+ *   sheet and the shadows open up, press squashes them flat. Paper grain on every sheet.
+ * sketch: a hand-drawn outline that "boils" like a cartoon (redrawn a few times a second),
+ *   hatching that scribbles in when you hover, and a wobbly shadow.
+ *
+ *   look      cut | sketch                                default: cut
+ *   colors    three sheets, top first (cut)              default: #ffd8a8,#ff8a5c,#5a3d8a
+ *   ink       line colour (sketch)                       default: #1d1a2b
+ *   size      sm | md | lg                               default: md
+ *   type, href, disabled */
+
+/* the paper toolkit: a grain texture, a seeded random, and a rough hand-drawn rectangle */
+const PAPER_GRAIN = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")`;
+const paperRand = seed => () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+/* a rectangle as a pen would draw it: corners overshoot, edges bow, two passes that don't quite agree */
+const paperRough = (w, h, seed, j = 2.2, passes = 2) => {
+  const r = paperRand(seed), J = () => (r() - .5) * 2 * j;
+  let d = '';
+  for (let p = 0; p < passes; p++) {
+    const pts = [[J() - 2, J()], [w + J(), J()], [w + J(), h + J()], [J(), h + J()], [J() + 3, J() - 1]];
+    d += `M${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`;
+    for (let i = 1; i < pts.length; i++) {
+      const [x0, y0] = pts[i - 1], [x1, y1] = pts[i], mx = (x0 + x1) / 2 + J() * 1.4, my = (y0 + y1) / 2 + J() * 1.4;
+      d += `Q${mx.toFixed(1)} ${my.toFixed(1)} ${x1.toFixed(1)} ${y1.toFixed(1)}`;
+    }
+  }
+  return d;
+};
+/* hatching: parallel strokes at 45°, each a little wobbly, clipped by the caller */
+const paperHatch = (w, h, seed, gap = 7) => {
+  const r = paperRand(seed); let d = '';
+  for (let x = -h; x < w; x += gap) d += `M${(x + (r() - .5) * 2).toFixed(1)} ${(h + 2).toFixed(1)}L${(x + h + (r() - .5) * 3).toFixed(1)} ${(-2 + (r() - .5) * 2).toFixed(1)}`;
+  return d;
+};
+/* redraw something a few times a second while the page is visible: the "line boil" of hand-drawn animation */
+const paperBoil = (el, fn, fps = 7) => {
+  let last = 0, k = 0;
+  const tick = (dt, t) => { if (reduced() || !el.isConnected) return; if (t - last > 1000 / fps) { last = t; fn(++k); } };
+  sub(tick); return () => unsub(tick);
+};
+const PAPER_FONT = '"Patrick Hand","Comic Neue","Segoe Print","Bradley Hand",cursive';
+
+class PiixPaperButtonElement extends HTMLElement {
+  static get formAssociated() { return true; }
+  constructor() { super(); this._int = this.attachInternals ? this.attachInternals() : null; }
+  connectedCallback() {
+    if (this.shadowRoot) { if (this._draw && !this._stop) this._stop = paperBoil(this, this._draw, 6); return; }
+    const sketch = this.getAttribute('look') === 'sketch', href = this.getAttribute('href');
+    const [c0, c1, c2] = (this.getAttribute('colors') || '#ffd8a8,#ff8a5c,#5a3d8a').split(',').map(s => s.trim());
+    const ink = this.getAttribute('ink') || '#1d1a2b';
+    const [pad, fs] = { sm: ['11px 20px', 14], lg: ['20px 36px', 19] }[this.getAttribute('size')] || ['15px 28px', 16];
+    const tag = href ? `a href="${href.replace(/"/g, '&quot;')}"` : `button type="button"${this.hasAttribute('disabled') ? ' disabled' : ''}`;
+    const close = href ? 'a' : 'button';
+    this.attachShadow({ mode: 'open' }).innerHTML = `<style>
+:host{display:inline-block;vertical-align:middle;-webkit-tap-highlight-color:transparent}
+:host([disabled]){opacity:.45;pointer-events:none;filter:grayscale(.8)}
+.b{all:unset;position:relative;display:inline-block;cursor:pointer;box-sizing:border-box}
+.b:focus-visible{outline:2px dashed ${sketch ? ink : c2};outline-offset:8px;border-radius:6px}
+${sketch ? `
+.l{position:relative;display:block;padding:${pad};font:400 ${fs + 3}px/1 ${PAPER_FONT};color:${ink};letter-spacing:.02em;transition:transform .15s}
+svg{position:absolute;inset:-6px;width:calc(100% + 12px);height:calc(100% + 12px);overflow:visible;pointer-events:none}
+.o{fill:none;stroke:${ink};stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.s{fill:none;stroke:${ink};stroke-width:2;opacity:.85}
+.h{fill:none;stroke:${ink};stroke-width:1.4;opacity:.55;stroke-dasharray:600;stroke-dashoffset:600;transition:stroke-dashoffset .5s ease}
+.b:hover .h{stroke-dashoffset:0}
+.b:hover .l{transform:translate(-1px,-2px) rotate(-1deg)}
+.b:active .l{transform:translate(3px,3px)}` : `
+.sh{position:absolute;inset:0;border-radius:10px 12px 9px 11px;background:${c2} ${PAPER_GRAIN};transform:translate(7px,8px) rotate(1.2deg);transition:transform .18s cubic-bezier(.3,1.5,.5,1);box-shadow:0 1px 2px rgba(0,0,0,.25)}
+.m{position:absolute;inset:0;border-radius:11px 9px 12px 10px;background:${c1} ${PAPER_GRAIN};transform:translate(3.5px,4px) rotate(-.8deg);transition:transform .18s cubic-bezier(.3,1.5,.5,1);box-shadow:0 1px 3px rgba(0,0,0,.28)}
+.l{position:relative;display:block;padding:${pad};border-radius:10px 11px 10px 12px;background:${c0} ${PAPER_GRAIN};font:800 ${fs}px/1 "Bricolage Grotesque",system-ui,sans-serif;letter-spacing:.01em;color:${c2};
+  box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 2px 4px rgba(0,0,0,.25);transition:transform .18s cubic-bezier(.3,1.5,.5,1)}
+.b:hover .l{transform:translate(-2px,-3px) rotate(-.6deg)}.b:hover .m{transform:translate(3px,3px) rotate(-1.2deg)}.b:hover .sh{transform:translate(9px,11px) rotate(1.8deg)}
+.b:active .l{transform:translate(4px,5px)}.b:active .m{transform:translate(5px,6px)}.b:active .sh{transform:translate(6px,7px)}`}
+</style><${tag} class="b" part="button">${sketch ? '<svg aria-hidden="true"><path class="s"/><path class="h"/><path class="o"/></svg>' : '<i class="sh"></i><i class="m"></i>'}<span class="l"><slot></slot></span></${close}>`;
+    const b = this.shadowRoot.querySelector('.b');
+    if (sketch) {
+      const draw = k => {
+        const w = b.offsetWidth + 12, h = b.offsetHeight + 12; if (!w) return;
+        const sd = (this._seed || (this._seed = 1 + (Math.random() * 1e6 | 0))) + (k % 3) * 101;
+        const box = paperRough(w - 12, h - 12, sd);
+        this.shadowRoot.querySelector('.o').setAttribute('d', box);
+        this.shadowRoot.querySelector('.s').setAttribute('d', paperRough(w - 12, h - 12, sd + 7, 2.6, 1));
+        this.shadowRoot.querySelector('.h').setAttribute('d', paperHatch(w - 14, h - 14, sd + 3));
+        this.shadowRoot.querySelectorAll('path').forEach(p => p.setAttribute('transform', p.classList.contains('s') ? 'translate(11 11)' : 'translate(6 6)'));
+      };
+      requestAnimationFrame(() => draw(0));
+      new ResizeObserver(() => draw(0)).observe(b);
+      this._draw = draw; this._stop = paperBoil(this, draw, 6);
+    }
+    b.addEventListener('click', () => {
+      const form = this._int && this._int.form, t = this.getAttribute('type');
+      if (form && t === 'submit') form.requestSubmit ? form.requestSubmit() : form.submit();
+      if (form && t === 'reset') form.reset();
+    });
+  }
+  disconnectedCallback() { if (this._stop) this._stop(); this._stop = null; }
+}
+define('piix-paper-button', PiixPaperButtonElement);
+ELEMENTS['paper-button'] = 'piix-paper-button';
+
+/* ---- styles/paper-card.js ---- */
+/* PAPER CARD: a card with a paper-cut scene, or a hand-sketched frame.   @component paper-card  @needs paper-button
+ *
+ *   <piix-paper-card>
+ *     <h3>Weekend retreat</h3>
+ *     <p>Three days in the hills.</p>
+ *   </piix-paper-card>
+ *   <piix-paper-card look="sketch"> ... </piix-paper-card>
+ *
+ * cut: the top of the card is a diorama of cut-paper layers (sky, sun, three ranges of hills),
+ *   each sheet casting a real shadow on the one behind; move the pointer and the layers slide at
+ *   different depths. The body is textured card stock lifted off the page.
+ * sketch: a pen-drawn frame that boils, a cross-hatched shadow, and a doodled corner tape.
+ *
+ *   look      cut | sketch                               default: cut
+ *   scene     hills | sea | city (cut)                   default: hills
+ *   colors    sky, sun, then three layers far to near    default: a warm dusk
+ *   ink       line colour (sketch)                       default: #1d1a2b */
+const PAPER_SCENES = {
+  hills: (w, r) => [0, 1, 2].map(i => { const y = 70 + i * 26, a = 18 - i * 3; let d = `M0 ${y}`; for (let x = 0; x <= w + 40; x += 40) d += ` Q${x + 20} ${y - a - r() * a} ${x + 40} ${y + (r() - .5) * 10}`; return d + ` L${w + 40} 200 L0 200Z`; }),
+  sea: (w, r) => [0, 1, 2].map(i => { const y = 92 + i * 24; let d = `M0 ${y}`; for (let x = 0; x <= w + 40; x += 30) d += ` q7.5 -${7 - i} 15 0 t15 0`; return d + ` L${w + 40} 200 L0 200Z`; }),
+  city: (w, r) => [0, 1, 2].map(i => { let d = `M0 200`, x = 0; while (x < w + 40) { const bw = 18 + r() * 34, bh = 40 + r() * (70 - i * 18) - i * 6; d += ` L${x} ${150 - bh} L${x + bw} ${150 - bh}`; x += bw + 2 + r() * 6; } return d + ` L${x} 200Z`; }).map((d, i) => d.replace(/ L([\d.]+) ([\d.]+)/g, (m, x, y) => ` L${x} ${+y + i * 22}`))
+};
+class PiixPaperCardElement extends HTMLElement {
+  connectedCallback() {
+    if (this.shadowRoot) { if (this._draw && !this._stop) this._stop = paperBoil(this, this._draw, 6); return; }
+    const sketch = this.getAttribute('look') === 'sketch', ink = this.getAttribute('ink') || '#1d1a2b';
+    const cols = (this.getAttribute('colors') || '#ffd9b8,#ff9a62,#e9897e,#b4587a,#4b3268').split(',').map(s => s.trim());
+    this.attachShadow({ mode: 'open' }).innerHTML = `<style>
+:host{display:block;--px:0;--py:0}
+${sketch ? `
+.c{position:relative;padding:30px 30px 28px;color:${ink};font-family:${PAPER_FONT}}
+svg.fr{position:absolute;inset:-8px;width:calc(100% + 16px);height:calc(100% + 16px);overflow:visible;pointer-events:none}
+.o{fill:#fffdf6;stroke:${ink};stroke-width:2.4;stroke-linejoin:round;stroke-linecap:round}
+.h{fill:none;stroke:${ink};stroke-width:1.3;opacity:.5}
+.tp{position:absolute;left:50%;top:-14px;width:96px;height:28px;margin-left:-48px;background:rgba(255,224,120,.75);transform:rotate(-3deg);box-shadow:0 1px 2px rgba(0,0,0,.15)}
+.in{position:relative;font-size:1.12em}
+::slotted(h3){font-family:${PAPER_FONT};font-weight:400;font-size:1.7em;margin:0 0 .3em}` : `
+.c{position:relative;border-radius:16px 18px 15px 17px;background:#fffaf0 ${PAPER_GRAIN};color:#2c2238;box-shadow:0 1px 1px rgba(0,0,0,.12),0 6px 0 -1px #efe4cf,0 7px 2px -1px rgba(0,0,0,.18),0 22px 38px -18px rgba(60,30,40,.45);overflow:hidden;transition:transform .3s}
+:host(:hover) .c{transform:translateY(-3px) rotate(-.3deg)}
+.sc{position:relative;height:170px;background:${cols[0]} ${PAPER_GRAIN};overflow:hidden}
+.sc svg{position:absolute;left:-20px;top:0;width:calc(100% + 40px);height:100%}
+.sun{transform:translate(calc(var(--px) * -6px),calc(var(--py) * -4px));transition:transform .4s cubic-bezier(.2,.9,.3,1)}
+.ly{transition:transform .4s cubic-bezier(.2,.9,.3,1)}
+.ly1{transform:translate(calc(var(--px) * -8px),calc(var(--py) * -3px))}.ly2{transform:translate(calc(var(--px) * -14px),calc(var(--py) * -5px))}.ly3{transform:translate(calc(var(--px) * -22px),calc(var(--py) * -8px))}
+.in{position:relative;padding:22px 26px 26px}
+::slotted(h3){margin:0 0 .35em}`}
+</style><div class="c" part="card">${sketch ? '<svg class="fr" aria-hidden="true"><path class="h"/><path class="o"/></svg><i class="tp"></i>' : `<div class="sc" aria-hidden="true"><svg preserveAspectRatio="none"></svg></div>`}<div class="in"><slot></slot></div></div>`;
+    const c = this.shadowRoot.querySelector('.c');
+    if (sketch) {
+      const draw = k => {
+        const w = c.offsetWidth, h = c.offsetHeight; if (!w) return;
+        const sd = (this._seed || (this._seed = 1 + (Math.random() * 1e6 | 0))) + (k % 3) * 97;
+        this.shadowRoot.querySelector('.o').setAttribute('d', paperRough(w, h, sd, 2.6));
+        /* the shadow: hatching in an L down the right and along the bottom */
+        const r = paperRand(sd + 5); let d = '';
+        for (let y = 14; y < h + 10; y += 7) d += `M${w + 2 + (r() - .5) * 2} ${y}l10 -9`;
+        for (let x = 14; x < w + 12; x += 7) d += `M${x} ${h + 11 + (r() - .5) * 2}l9 -10`;
+        this.shadowRoot.querySelector('.h').setAttribute('d', d);
+        this.shadowRoot.querySelectorAll('path').forEach(p => p.setAttribute('transform', 'translate(8 8)'));
+      };
+      requestAnimationFrame(() => draw(0)); new ResizeObserver(() => draw(0)).observe(c);
+      this._draw = draw; this._stop = paperBoil(this, draw, 6);
+    } else {
+      const svg = this.shadowRoot.querySelector('.sc svg'), r = paperRand(7 + (this.getAttribute('scene') || 'hills').length * 13), W = 480;
+      svg.setAttribute('viewBox', `0 0 ${W} 170`);
+      const layers = (PAPER_SCENES[this.getAttribute('scene')] || PAPER_SCENES.hills)(W, r);
+      const id = 'ps' + (Math.random() * 1e6 | 0);
+      svg.innerHTML = `<defs><filter id="${id}" x="-5%" y="-30%" width="110%" height="160%"><feDropShadow dx="0" dy="-2" stdDeviation="3" flood-color="#2a1530" flood-opacity=".35"/></filter></defs>
+<circle class="sun" cx="${W * .7}" cy="62" r="30" fill="${cols[1]}" filter="url(#${id})"/>
+${layers.map((d, i) => `<path class="ly ly${i + 1}" d="${d}" fill="${cols[2 + i] || cols[cols.length - 1]}" filter="url(#${id})"/>`).join('')}`;
+      c.addEventListener('pointermove', e => { if (reduced()) return; const b = c.getBoundingClientRect(); this.style.setProperty('--px', ((e.clientX - b.left) / b.width - .5).toFixed(3)); this.style.setProperty('--py', ((e.clientY - b.top) / b.height - .5).toFixed(3)); });
+      c.addEventListener('pointerleave', () => { this.style.setProperty('--px', 0); this.style.setProperty('--py', 0); });
+    }
+  }
+  disconnectedCallback() { if (this._stop) this._stop(); this._stop = null; }
+}
+define('piix-paper-card', PiixPaperCardElement);
+ELEMENTS['paper-card'] = 'piix-paper-card';
+
+/* ---- styles/paper-sticker.js ---- */
+/* PAPER STICKER: a die-cut sticker badge that peels when you touch it.   @component paper-sticker  @needs paper-button
+ *
+ *   <piix-paper-sticker>New</piix-paper-sticker>
+ *   <piix-paper-sticker color="#5cffb0" shape="circle">50% off</piix-paper-sticker>
+ *
+ * A vinyl sticker with a thick white die-cut border, stuck on at a jaunty angle. Hover and its
+ * corner lifts and curls back, showing the shiny backing; click and it slaps back down flat.
+ *
+ *   color     sticker colour                             default: #ffd23f
+ *   ink       text colour                                default: #1d1a2b
+ *   shape     pill | circle | star                       default: pill
+ *   tilt      degrees                                    default: -6 */
+class PiixPaperStickerElement extends HTMLElement {
+  connectedCallback() {
+    if (this.shadowRoot) return;
+    const c = this.getAttribute('color') || '#ffd23f', ink = this.getAttribute('ink') || '#1d1a2b', shape = this.getAttribute('shape') || 'pill';
+    const tilt = this.hasAttribute('tilt') ? +this.getAttribute('tilt') : -6;
+    const clip = shape === 'star' ? 'polygon(50% 0,61% 22%,85% 15%,78% 39%,100% 50%,78% 61%,85% 85%,61% 78%,50% 100%,39% 78%,15% 85%,22% 61%,0 50%,22% 39%,15% 15%,39% 22%)' : 'none';
+    this.attachShadow({ mode: 'open' }).innerHTML = `<style>
+:host{display:inline-block;vertical-align:middle;--peel:0}
+.s{position:relative;display:inline-grid;place-items:center;transform:rotate(${tilt}deg);transition:transform .25s cubic-bezier(.3,1.6,.5,1);filter:drop-shadow(0 2px 1px rgba(0,0,0,.18)) drop-shadow(0 6px 10px rgba(0,0,0,.12));cursor:default}
+.f{position:relative;display:grid;box-sizing:border-box;background:#fff;padding:6px;border-radius:${shape === 'pill' ? '999px' : '50%'};
+  clip-path:${shape === 'star' ? clip : 'polygon(0 0,100% 0,100% calc(100% - var(--peel) * 30px),calc(100% - var(--peel) * 30px) 100%,0 100%)'};transition:clip-path .3s cubic-bezier(.3,1.4,.5,1)}
+.i{display:grid;place-items:center;box-sizing:border-box;${shape === 'circle' || shape === 'star' ? 'width:var(--d,104px);height:var(--d,104px);border-radius:50%;text-align:center;' : 'padding:10px 20px;border-radius:999px;'}
+  background:linear-gradient(135deg,rgba(255,255,255,.35),transparent 40%),${c} ${PAPER_GRAIN};color:${ink};
+  font:800 ${shape === 'pill' ? 15 : 17}px/1.05 "Bricolage Grotesque",system-ui,sans-serif;letter-spacing:.02em;text-transform:uppercase;${shape === 'star' ? `clip-path:${clip};` : ''}}
+/* the curl: a triangle of shiny backing where the corner lifted */
+.k{position:absolute;right:0;bottom:0;width:calc(var(--peel) * 30px);height:calc(var(--peel) * 30px);
+  background:linear-gradient(135deg,transparent 49%,#eceff3 50%,#ffffff 62%,#c9ced6 100%);border-radius:0 0 40% 0;box-shadow:-3px -3px 6px rgba(0,0,0,.18);transition:width .3s cubic-bezier(.3,1.4,.5,1),height .3s cubic-bezier(.3,1.4,.5,1);pointer-events:none}
+:host(:hover){--peel:1}
+:host(:hover) .s{transform:rotate(${tilt + 3}deg) translateY(-2px)}
+.s.slap{animation:slap .3s cubic-bezier(.3,1.6,.5,1)}
+@keyframes slap{0%{transform:rotate(${tilt}deg) scale(1.15)}100%{transform:rotate(${tilt}deg) scale(1)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style><span class="s" part="sticker"><span class="f"><span class="i"><slot></slot></span></span>${shape === 'star' ? '' : '<i class="k"></i>'}</span>`;
+    const s = this.shadowRoot.querySelector('.s');
+    s.addEventListener('click', () => { this.style.setProperty('--peel', 0); s.classList.remove('slap'); void s.offsetWidth; s.classList.add('slap'); setTimeout(() => this.style.removeProperty('--peel'), 900); });
+  }
+}
+define('piix-paper-sticker', PiixPaperStickerElement);
+ELEMENTS['paper-sticker'] = 'piix-paper-sticker';
+
+/* ---- styles/paper-text.js ---- */
+/* PAPER TEXT: a headline that draws itself in pen, then becomes cut paper.   @component paper-text  @needs paper-button
+ *
+ *   <piix-paper-text>Hand made</piix-paper-text>
+ *   <piix-paper-text look="sketch" underline>Hello there</piix-paper-text>
+ *
+ * When it scrolls into view the outline of every letter is traced by a pen, then the letters fill
+ * in as stacked sheets of coloured paper, each sheet a step behind the last, and a scribbled line
+ * underlines it. The pen line keeps a gentle boil, like a hand-drawn cartoon.
+ *
+ *   look       cut | sketch (no paper, only the pen)     default: cut
+ *   colors     top sheet, then the sheets below          default: #ffd23f,#ff8a5c,#e2477a,#5a3d8a
+ *   ink        pen colour                                default: #1d1a2b
+ *   size       font size in px                           default: fits, up to 96
+ *   underline  draw a scribbled underline
+ *   font       CSS font family                           default: Bricolage Grotesque (cut), a hand font (sketch) */
+class PiixPaperTextElement extends HTMLElement {
+  connectedCallback() {
+    if (this.shadowRoot) return;
+    const text = this.textContent.trim(), sketch = this.getAttribute('look') === 'sketch', ink = this.getAttribute('ink') || '#1d1a2b';
+    const cols = (this.getAttribute('colors') || '#ffd23f,#ff8a5c,#e2477a,#5a3d8a').split(',').map(s => s.trim());
+    const fs = +this.getAttribute('size') || 96, font = this.getAttribute('font') || (sketch ? PAPER_FONT : '"Bricolage Grotesque",system-ui,sans-serif');
+    const safe = text.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const fid = 'pb' + (Math.random() * 1e6 | 0);
+    this.setAttribute('role', 'heading'); this.setAttribute('aria-label', text);
+    const sheets = sketch ? '' : cols.slice(1).map((c, i) => `<text class="sh" x="${8 + (i + 1) * 4}" y="${fs * .92 + (i + 1) * 4}" fill="${c}" style="transition-delay:${.9 + i * .12}s">${safe}</text>`).reverse().join('');
+    this.attachShadow({ mode: 'open' }).innerHTML = `<style>
+:host{display:block;line-height:0}
+svg{display:block;width:100%;height:auto;overflow:visible}
+text{font:${sketch ? 400 : 800} ${fs}px ${font};letter-spacing:${sketch ? '.01em' : '-.02em'}}
+.pen{fill:none;stroke:${ink};stroke-width:${sketch ? 2.4 : 2};stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:var(--L,2000);stroke-dashoffset:var(--L,2000);transition:stroke-dashoffset 1.3s cubic-bezier(.5,0,.3,1)}
+.top{fill:${sketch ? 'transparent' : cols[0]};opacity:0;transition:opacity .4s .95s}
+.sh{opacity:0;transform:translate(-6px,-6px);transition:opacity .25s,transform .35s cubic-bezier(.3,1.6,.5,1)}
+.ul{fill:none;stroke:${cols[2] || ink};stroke-width:5;stroke-linecap:round;stroke-dasharray:var(--U,2000);stroke-dashoffset:var(--U,2000);transition:stroke-dashoffset .7s 1.3s ease-out}
+.on .pen{stroke-dashoffset:0}.on .top{opacity:1}.on .sh{opacity:1;transform:none}.on .ul{stroke-dashoffset:0}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style><svg aria-hidden="true"><defs><filter id="${fid}"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="1"/><feDisplacementMap in="SourceGraphic" scale="${sketch ? 3.5 : 2.2}"/></filter></defs>
+<g>${sheets}<text class="top" x="8" y="${fs * .92}">${safe}</text></g><g filter="url(#${fid})"><text class="pen" x="8" y="${fs * .92}">${safe}</text>${this.hasAttribute('underline') ? '<path class="ul"/>' : ''}</g></svg>`;
+    const svg = this.shadowRoot.querySelector('svg'), pen = this.shadowRoot.querySelector('.pen'), turb = this.shadowRoot.querySelector('feTurbulence');
+    const fit = () => {
+      let bb; try { bb = pen.getBBox(); } catch (_) { return; }
+      if (!bb.width) return;
+      const extra = sketch ? 0 : (cols.length - 1) * 4;
+      const h = bb.height + extra + (this.hasAttribute('underline') ? fs * .3 : 0) + 16;
+      svg.setAttribute('viewBox', `0 ${bb.y - 6} ${bb.width + extra + 20} ${h}`);
+      /* a pen line long enough for every letter */
+      pen.style.setProperty('--L', Math.ceil((bb.width + bb.height) * text.length * 2.2));
+      const ul = this.shadowRoot.querySelector('.ul');
+      if (ul) { const y = bb.y + bb.height + fs * .12, r = paperRand(text.length * 31 + 7); let d = `M${8 + r() * 6} ${y}`; for (let x = 8; x < bb.width + 8; x += bb.width / 4) d += ` Q${x + bb.width / 8} ${y + (r() - .5) * 14} ${x + bb.width / 4} ${y + (r() - .5) * 6}`; d += ` M${bb.width * .15} ${y + 12} Q${bb.width * .5} ${y + 2} ${bb.width * .9} ${y + 10}`; ul.setAttribute('d', d); ul.style.setProperty('--U', Math.ceil(ul.getTotalLength() + 2)); }
+    };
+    (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => { fit(); requestAnimationFrame(fit); });
+    const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); fit(); requestAnimationFrame(() => svg.classList.add('on')); } }, { threshold: .4 });
+    io.observe(this);
+    if (reduced()) svg.classList.add('on');
+    this._stop = paperBoil(this, k => turb.setAttribute('seed', 1 + k % 3), 6);
+  }
+  disconnectedCallback() { if (this._stop) this._stop(); }
+}
+define('piix-paper-text', PiixPaperTextElement);
+ELEMENTS['paper-text'] = 'piix-paper-text';
+
 K.start(document.currentScript);
 })();
