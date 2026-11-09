@@ -33,7 +33,7 @@ class PiixLiquidTextElement extends GLStage {
   static get observedAttributes() { return ['words', 'colors', 'size', 'font']; }
   constructor() { super(); this._defPx = .5; this._i = 0; this._k = 0; this._tc = document.createElement('canvas'); this._near = 0; }
   _list() { return (this.getAttribute('words') || this._text || '').split('|').map(s => s.trim()).filter(Boolean); }
-  _hostCss() { const fs = +this.getAttribute('size') || 96; return `display:block;height:${Math.round(fs * 1.3)}px;`; }
+  _hostCss() { const fs = +this.getAttribute('size') || 96; return `display:block;width:100%;min-width:min(100%,${Math.round(fs * 4)}px);height:${Math.round(fs * 1.3)}px;`; }
   _css() { return 'canvas{image-rendering:auto}.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}'; }
   _html() { return `<canvas aria-hidden="true"></canvas><span class="sr" aria-live="polite"></span>`; }
   _setup() {

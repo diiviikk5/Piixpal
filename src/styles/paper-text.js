@@ -24,7 +24,7 @@ class PiixPaperTextElement extends HTMLElement {
     this.setAttribute('role', 'heading'); this.setAttribute('aria-label', text);
     const sheets = sketch ? '' : cols.slice(1).map((c, i) => `<text class="sh" x="${8 + (i + 1) * 4}" y="${fs * .92 + (i + 1) * 4}" fill="${c}" style="transition-delay:${.9 + i * .12}s">${safe}</text>`).reverse().join('');
     this.attachShadow({ mode: 'open' }).innerHTML = `<style>
-:host{display:block;line-height:0}
+:host{display:block;width:100%;max-width:${Math.round(fs * Math.max(4, text.length * .62))}px;line-height:0}
 svg{display:block;width:100%;height:auto;overflow:visible}
 text{font:${sketch ? 400 : 800} ${fs}px ${font};letter-spacing:${sketch ? '.01em' : '-.02em'}}
 .pen{fill:none;stroke:${ink};stroke-width:${sketch ? 2.4 : 2};stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:var(--L,2000);stroke-dashoffset:var(--L,2000);transition:stroke-dashoffset 1.3s cubic-bezier(.5,0,.3,1)}
@@ -48,8 +48,11 @@ text{font:${sketch ? 400 : 800} ${fs}px ${font};letter-spacing:${sketch ? '.01em
       if (ul) { const y = bb.y + bb.height + fs * .12, r = paperRand(text.length * 31 + 7); let d = `M${8 + r() * 6} ${y}`; for (let x = 8; x < bb.width + 8; x += bb.width / 4) d += ` Q${x + bb.width / 8} ${y + (r() - .5) * 14} ${x + bb.width / 4} ${y + (r() - .5) * 6}`; d += ` M${bb.width * .15} ${y + 12} Q${bb.width * .5} ${y + 2} ${bb.width * .9} ${y + 10}`; ul.setAttribute('d', d); ul.style.setProperty('--U', Math.ceil(ul.getTotalLength() + 2)); }
     };
     (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => { fit(); requestAnimationFrame(fit); });
-    const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); fit(); requestAnimationFrame(() => svg.classList.add('on')); } }, { threshold: .4 });
+    /* draw when it comes into view; and never stay blank, whatever the observer does */
+    const go = () => { if (svg.classList.contains('on')) return; fit(); requestAnimationFrame(() => svg.classList.add('on')); };
+    const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); go(); } }, { threshold: 0 });
     io.observe(this);
+    setTimeout(go, 2500);
     if (reduced()) svg.classList.add('on');
     this._stop = paperBoil(this, k => turb.setAttribute('seed', 1 + k % 3), 6);
   }

@@ -22,7 +22,7 @@ const holoTrack = (el, box) => {
   box.addEventListener('pointermove', move);
   box.addEventListener('pointerleave', () => { el.style.setProperty('--mx', .5); el.style.setProperty('--my', .5); });
 };
-const holoOnView = (el, fn) => { const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); fn(); } }, { threshold: .3 }); io.observe(el); };
+const holoOnView = (el, fn) => { const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); fn(); } }, { threshold: 0 }); io.observe(el); };
 const HOLO_CSS = `@keyframes hscan{to{background-position:0 60px}}
 @keyframes hon{0%{opacity:0}10%{opacity:.8}14%{opacity:.1}22%{opacity:.9}26%{opacity:.3}40%,100%{opacity:1}}
 @keyframes hglitch{0%,100%{clip-path:inset(0 0 0 0);transform:none}20%{clip-path:inset(10% 0 60% 0);transform:translateX(-6px)}40%{clip-path:inset(55% 0 20% 0);transform:translateX(5px)}60%{clip-path:inset(30% 0 45% 0);transform:translateX(-3px)}80%{clip-path:inset(75% 0 5% 0);transform:translateX(4px)}}
@@ -39,7 +39,7 @@ class PiixHoloButtonElement extends HTMLElement {
     this.attachShadow({ mode: 'open' }).innerHTML = `<style>${HOLO_CSS}
 :host{display:inline-block;vertical-align:middle;--mx:.5;--my:.5;--c:hsl(${h} 100% 66%);--c2:hsl(${h} 100% 50% / .14)}
 :host([disabled]){opacity:.4;pointer-events:none}
-.b{all:unset;position:relative;display:block;box-sizing:border-box;padding:${pad};cursor:pointer;opacity:0;
+.b{all:unset;position:relative;display:block;box-sizing:border-box;padding:${pad};cursor:pointer;
   font:600 ${fs}px/1 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.16em;text-transform:uppercase;color:#eafcff;
   text-shadow:0 0 10px var(--c),-1px 0 0 rgba(255,60,200,.55),1px 0 0 rgba(60,220,255,.55);
   background:linear-gradient(180deg,var(--c2),hsl(${h} 100% 40% / .06)),rgba(6,14,26,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);

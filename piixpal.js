@@ -20345,7 +20345,7 @@ const holoTrack = (el, box) => {
   box.addEventListener('pointermove', move);
   box.addEventListener('pointerleave', () => { el.style.setProperty('--mx', .5); el.style.setProperty('--my', .5); });
 };
-const holoOnView = (el, fn) => { const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); fn(); } }, { threshold: .3 }); io.observe(el); };
+const holoOnView = (el, fn) => { const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); fn(); } }, { threshold: 0 }); io.observe(el); };
 const HOLO_CSS = `@keyframes hscan{to{background-position:0 60px}}
 @keyframes hon{0%{opacity:0}10%{opacity:.8}14%{opacity:.1}22%{opacity:.9}26%{opacity:.3}40%,100%{opacity:1}}
 @keyframes hglitch{0%,100%{clip-path:inset(0 0 0 0);transform:none}20%{clip-path:inset(10% 0 60% 0);transform:translateX(-6px)}40%{clip-path:inset(55% 0 20% 0);transform:translateX(5px)}60%{clip-path:inset(30% 0 45% 0);transform:translateX(-3px)}80%{clip-path:inset(75% 0 5% 0);transform:translateX(4px)}}
@@ -20362,7 +20362,7 @@ class PiixHoloButtonElement extends HTMLElement {
     this.attachShadow({ mode: 'open' }).innerHTML = `<style>${HOLO_CSS}
 :host{display:inline-block;vertical-align:middle;--mx:.5;--my:.5;--c:hsl(${h} 100% 66%);--c2:hsl(${h} 100% 50% / .14)}
 :host([disabled]){opacity:.4;pointer-events:none}
-.b{all:unset;position:relative;display:block;box-sizing:border-box;padding:${pad};cursor:pointer;opacity:0;
+.b{all:unset;position:relative;display:block;box-sizing:border-box;padding:${pad};cursor:pointer;
   font:600 ${fs}px/1 "JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.16em;text-transform:uppercase;color:#eafcff;
   text-shadow:0 0 10px var(--c),-1px 0 0 rgba(255,60,200,.55),1px 0 0 rgba(60,220,255,.55);
   background:linear-gradient(180deg,var(--c2),hsl(${h} 100% 40% / .06)),rgba(6,14,26,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);
@@ -20748,7 +20748,7 @@ class PiixLiquidCardElement extends GLStage {
   constructor() { super(); this._defLook = 'ink'; this._defPx = 1; this._click = [0, 0, 99]; this._wake = 0; }
   _hostCss() {
     const light = this.getAttribute('tone') === 'light';
-    return `display:block;color:${light ? '#17121f' : '#fff'};isolation:isolate;`;
+    return `display:block;width:100%;max-width:520px;color:${light ? '#17121f' : '#fff'};isolation:isolate;`;
   }
   _css() { return `canvas{z-index:-1;image-rendering:auto}.in{position:relative;padding:30px 32px}`; }
   _html() { return '<canvas aria-hidden="true"></canvas><div class="in" part="body"><slot></slot></div>'; }
@@ -20807,7 +20807,7 @@ class PiixLiquidTextElement extends GLStage {
   static get observedAttributes() { return ['words', 'colors', 'size', 'font']; }
   constructor() { super(); this._defPx = .5; this._i = 0; this._k = 0; this._tc = document.createElement('canvas'); this._near = 0; }
   _list() { return (this.getAttribute('words') || this._text || '').split('|').map(s => s.trim()).filter(Boolean); }
-  _hostCss() { const fs = +this.getAttribute('size') || 96; return `display:block;height:${Math.round(fs * 1.3)}px;`; }
+  _hostCss() { const fs = +this.getAttribute('size') || 96; return `display:block;width:100%;min-width:min(100%,${Math.round(fs * 4)}px);height:${Math.round(fs * 1.3)}px;`; }
   _css() { return 'canvas{image-rendering:auto}.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}'; }
   _html() { return `<canvas aria-hidden="true"></canvas><span class="sr" aria-live="polite"></span>`; }
   _setup() {
@@ -21176,7 +21176,7 @@ class PiixPaperTextElement extends HTMLElement {
     this.setAttribute('role', 'heading'); this.setAttribute('aria-label', text);
     const sheets = sketch ? '' : cols.slice(1).map((c, i) => `<text class="sh" x="${8 + (i + 1) * 4}" y="${fs * .92 + (i + 1) * 4}" fill="${c}" style="transition-delay:${.9 + i * .12}s">${safe}</text>`).reverse().join('');
     this.attachShadow({ mode: 'open' }).innerHTML = `<style>
-:host{display:block;line-height:0}
+:host{display:block;width:100%;max-width:${Math.round(fs * Math.max(4, text.length * .62))}px;line-height:0}
 svg{display:block;width:100%;height:auto;overflow:visible}
 text{font:${sketch ? 400 : 800} ${fs}px ${font};letter-spacing:${sketch ? '.01em' : '-.02em'}}
 .pen{fill:none;stroke:${ink};stroke-width:${sketch ? 2.4 : 2};stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:var(--L,2000);stroke-dashoffset:var(--L,2000);transition:stroke-dashoffset 1.3s cubic-bezier(.5,0,.3,1)}
@@ -21200,8 +21200,11 @@ text{font:${sketch ? 400 : 800} ${fs}px ${font};letter-spacing:${sketch ? '.01em
       if (ul) { const y = bb.y + bb.height + fs * .12, r = paperRand(text.length * 31 + 7); let d = `M${8 + r() * 6} ${y}`; for (let x = 8; x < bb.width + 8; x += bb.width / 4) d += ` Q${x + bb.width / 8} ${y + (r() - .5) * 14} ${x + bb.width / 4} ${y + (r() - .5) * 6}`; d += ` M${bb.width * .15} ${y + 12} Q${bb.width * .5} ${y + 2} ${bb.width * .9} ${y + 10}`; ul.setAttribute('d', d); ul.style.setProperty('--U', Math.ceil(ul.getTotalLength() + 2)); }
     };
     (document.fonts ? document.fonts.ready : Promise.resolve()).then(() => { fit(); requestAnimationFrame(fit); });
-    const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); fit(); requestAnimationFrame(() => svg.classList.add('on')); } }, { threshold: .4 });
+    /* draw when it comes into view; and never stay blank, whatever the observer does */
+    const go = () => { if (svg.classList.contains('on')) return; fit(); requestAnimationFrame(() => svg.classList.add('on')); };
+    const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); go(); } }, { threshold: 0 });
     io.observe(this);
+    setTimeout(go, 2500);
     if (reduced()) svg.classList.add('on');
     this._stop = paperBoil(this, k => turb.setAttribute('seed', 1 + k % 3), 6);
   }

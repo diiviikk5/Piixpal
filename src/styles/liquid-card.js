@@ -44,7 +44,7 @@ class PiixLiquidCardElement extends GLStage {
   constructor() { super(); this._defLook = 'ink'; this._defPx = 1; this._click = [0, 0, 99]; this._wake = 0; }
   _hostCss() {
     const light = this.getAttribute('tone') === 'light';
-    return `display:block;color:${light ? '#17121f' : '#fff'};isolation:isolate;`;
+    return `display:block;width:100%;max-width:520px;color:${light ? '#17121f' : '#fff'};isolation:isolate;`;
   }
   _css() { return `canvas{z-index:-1;image-rendering:auto}.in{position:relative;padding:30px 32px}`; }
   _html() { return '<canvas aria-hidden="true"></canvas><div class="in" part="body"><slot></slot></div>'; }
