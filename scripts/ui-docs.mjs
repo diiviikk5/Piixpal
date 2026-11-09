@@ -36,7 +36,7 @@ const sidebar = active => `<aside class="side ui-side" aria-label="Pixel UI">
     <nav class="side-start">${START.map(([s, n]) => `<a href="${href(s)}"${s === active ? ' aria-current="page"' : ''}>${n}</a>`).join('')}</nav>
     ${bySection.map(([sec, list]) => `<details class="sg" open>
       <summary><a href="./#${slug(sec)}">${sec}</a><span class="n">${list.length}</span></summary>
-      ${list.map(u => `<a href="${u.slug}.html"${u.slug === active ? ' aria-current="page"' : ''}>${esc(u.name)}</a>`).join('')}
+      ${list.map(u => `<a href="${u.slug}.html"${u.slug === active ? ' aria-current="page"' : ''}>${esc(u.name)}${u.isNew ? '<b class="nw">new</b>' : ''}</a>`).join('')}
     </details>`).join('\n    ')}
     <p class="side-none" hidden>Nothing by that name.</p>
   </aside>`;
@@ -53,7 +53,7 @@ const shell = ({ key, title, desc, body, toc = [] }) => `<!doctype html>
 <link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@400;600&family=Silkscreen&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@400;500;600&family=Patrick+Hand&family=Silkscreen&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../site/site.css">
 <link rel="stylesheet" href="../site/docs.css">
 <link rel="stylesheet" href="../site/ui.css">
@@ -162,8 +162,8 @@ ${layCss(u0.demo)}
   if (u.events) toc.push(['events', 'Events']);
   if (u.methods) toc.push(['methods', 'Methods']);
   if (u.a11y) toc.push(['accessibility', 'Accessibility']);
-  const gpu = !['piix-stat', 'piix-marquee', 'piix-button', 'piix-toggle', 'piix-checkbox', 'piix-progress', 'piix-breakout', 'piix-rpg-box', 'piix-handheld', 'piix-chiptune', 'piix-sand', 'piix-quake', 'piix-liquid', 'piix-rewind', 'piix-scratch', 'piix-zipper', 'piix-receipt'].includes(u.tag);
-  const badges = `<div class="ui-badges"><code>&lt;${u.tag}&gt;</code><span class="b">${gpu ? 'WebGL' : 'DOM + canvas'}</span>${u.tag === 'piix-glow-button' || u.tag === 'piix-input' || u.tag === 'piix-button' || u.tag === 'piix-toggle' || u.tag === 'piix-checkbox' ? '<span class="b">Form-ready</span>' : ''}</div>`;
+  const gpu = !['piix-stat', 'piix-marquee', 'piix-button', 'piix-toggle', 'piix-checkbox', 'piix-progress', 'piix-breakout', 'piix-rpg-box', 'piix-handheld', 'piix-chiptune', 'piix-sand', 'piix-quake', 'piix-liquid', 'piix-rewind', 'piix-scratch', 'piix-zipper', 'piix-receipt'].includes(u.tag) && !/^piix-(holo|paper)-/.test(u.tag);
+  const badges = `<div class="ui-badges"><code>&lt;${u.tag}&gt;</code><span class="b">${gpu ? 'WebGL' : 'DOM + canvas'}</span>${u.tag === 'piix-glow-button' || u.tag === 'piix-input' || u.tag === 'piix-button' || u.tag === 'piix-toggle' || u.tag === 'piix-checkbox' || /^piix-(liquid-button|holo-button|paper-button|liquid-toggle|holo-input)$/.test(u.tag) ? '<span class="b">Form-ready</span>' : ''}${u.isNew ? '<span class="b nwb">New</span>' : ''}</div>`;
   const body = `${head([u.section, esc(u.name)], esc(u.name), u.brief, badges)}
 ${demoBox({ demo: u.demo, code: u.code, stage: u.stage, controls: u.controls, tag: u.tag, id: 'preview' })}
 <p class="ui-about">${u.about}</p>
@@ -239,7 +239,7 @@ ${bySection.map(([sec, list]) => `
 <div class="ui-grid">
 ${list.map(u => `  <a class="ui-card" href="${u.slug}.html">
     <div class="ui-thumb${lightThumb(u) ? ' light' : ''}" aria-hidden="true" inert>${thumb(u)}</div>
-    <h3>${esc(u.name)}</h3><p>${u.brief}</p>
+    <h3>${esc(u.name)}${u.isNew ? '<b class="nw">new</b>' : ''}</h3><p>${u.brief}</p>
   </a>`).join('\n')}
 </div>`).join('\n')}`;
 

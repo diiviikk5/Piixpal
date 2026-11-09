@@ -79,6 +79,16 @@
       ],
       "destination": "https://piixpal.dvkk.dev/:path*",
       "permanent": true
+    },
+    {
+      "source": "/styles",
+      "destination": "/ui/",
+      "permanent": false
+    },
+    {
+      "source": "/styles/",
+      "destination": "/ui/",
+      "permanent": false
     }
   ],
   "rewrites": [

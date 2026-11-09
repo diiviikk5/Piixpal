@@ -1,234 +1,245 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
-  <url><loc>https://piixpal.dvkk.dev/</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/faq</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/components/</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/components/3d</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/components/agents</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/components/builder</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/components/crowd</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/components/install</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/components/make</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/components/nomad</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/components/pals</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/components/powers</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/components/readme</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/components/sprites</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/components/type</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/components/visit</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/stage/</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/styles/</loc><lastmod>2026-11-09</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/visor/thumb.jpg</image:loc><image:title>Visor</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/bitcloud/thumb.jpg</image:loc><image:title>Bitcloud</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/afterglow/thumb.jpg</image:loc><image:title>Afterglow</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/flameblade/thumb.jpg</image:loc><image:title>Emberblade</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/vermilion/thumb.jpg</image:loc><image:title>Vermilion</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/relic/thumb.jpg</image:loc><image:title>Relic</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/starmind/thumb.jpg</image:loc><image:title>Starmind</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/sentinel/thumb.jpg</image:loc><image:title>Sentinel</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/savanna/thumb.jpg</image:loc><image:title>Savanna</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/signal/thumb.jpg</image:loc><image:title>Signal</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/fold/thumb.jpg</image:loc><image:title>Fold</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/furnace/thumb.jpg</image:loc><image:title>Furnace</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/currents/thumb.jpg</image:loc><image:title>Currents</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/ashborne/thumb.jpg</image:loc><image:title>Ashborne</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/ronin/thumb.jpg</image:loc><image:title>Ronin</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/respite/thumb.jpg</image:loc><image:title>Respite</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/vapor/thumb.jpg</image:loc><image:title>Vapor</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/orbit-ascii/thumb.jpg</image:loc><image:title>Orbit ASCII</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/halftone/thumb.jpg</image:loc><image:title>Halftone</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/cloudline/thumb.jpg</image:loc><image:title>Cloudline</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/seascape/thumb.jpg</image:loc><image:title>Seascape</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/event-horizon/thumb.jpg</image:loc><image:title>Event Horizon</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/prism-glass/thumb.jpg</image:loc><image:title>Prism Glass</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/orbit-globe/thumb.jpg</image:loc><image:title>Orbit</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/mercury/thumb.jpg</image:loc><image:title>Mercury</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/ash-king/thumb.jpg</image:loc><image:title>Ash King</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/pixel-sword/thumb.jpg</image:loc><image:title>Pixel Sword</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/smoke-dragon/thumb.jpg</image:loc><image:title>Smoke Dragon</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/ink-dragon/thumb.jpg</image:loc><image:title>Ink Dragon</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/desert-dragon/thumb.jpg</image:loc><image:title>Desert Dragon</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/red-dragon/thumb.jpg</image:loc><image:title>Red Dragon</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/ruins/thumb.jpg</image:loc><image:title>Ruins</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/glitch/thumb.jpg</image:loc><image:title>Glitch</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/ukiyo/thumb.jpg</image:loc><image:title>Ukiyo</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/pocket/thumb.jpg</image:loc><image:title>Pocket</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/meadow/thumb.jpg</image:loc><image:title>Meadow</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/grotto/thumb.jpg</image:loc><image:title>Grotto</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/stipple/thumb.jpg</image:loc><image:title>Stipple</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/aurora/thumb.jpg</image:loc><image:title>Aurora</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/sunset-ridge/thumb.jpg</image:loc><image:title>Sunset Ridge</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/twilight/thumb.jpg</image:loc><image:title>Twilight</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/evergreen/thumb.jpg</image:loc><image:title>Evergreen</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/riptide/thumb.jpg</image:loc><image:title>Riptide</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/sandstorm/thumb.jpg</image:loc><image:title>Sandstorm</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/tidewave/thumb.jpg</image:loc><image:title>Tidewave</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/static/thumb.jpg</image:loc><image:title>Static</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/fuji/thumb.jpg</image:loc><image:title>Fuji</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/canyon-blue/thumb.jpg</image:loc><image:title>Canyon Blue</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/canyon-magenta/thumb.jpg</image:loc><image:title>Canyon Magenta</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/canyon-violet/thumb.jpg</image:loc><image:title>Canyon Violet</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/thermal/thumb.jpg</image:loc><image:title>Thermal</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/spectrum/thumb.jpg</image:loc><image:title>Spectrum</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/stratosphere/thumb.jpg</image:loc><image:title>Stratosphere</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/silk/thumb.jpg</image:loc><image:title>Silk</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/redwood/thumb.jpg</image:loc><image:title>Redwood</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/reed-flame/thumb.jpg</image:loc><image:title>Reed Flame</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/reed-spectrum/thumb.jpg</image:loc><image:title>Reed Spectrum</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/reed-ember/thumb.jpg</image:loc><image:title>Reed Ember</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/reed-crimson/thumb.jpg</image:loc><image:title>Reed Crimson</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/reed-rose/thumb.jpg</image:loc><image:title>Reed Rose</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/fluted/thumb.jpg</image:loc><image:title>Fluted</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/beam/thumb.jpg</image:loc><image:title>Beam</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/solstice/thumb.jpg</image:loc><image:title>Solstice</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/aura/thumb.jpg</image:loc><image:title>Aura</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/dusk/thumb.jpg</image:loc><image:title>Dusk</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/abyss/thumb.jpg</image:loc><image:title>Abyss</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/daybreak/thumb.jpg</image:loc><image:title>Daybreak</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/nimbus/thumb.jpg</image:loc><image:title>Nimbus</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/prism/thumb.jpg</image:loc><image:title>Prism</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/bokeh/thumb.jpg</image:loc><image:title>Bokeh</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/ember/thumb.jpg</image:loc><image:title>Ember</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/eclipse/thumb.jpg</image:loc><image:title>Eclipse</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/ultraviolet/thumb.jpg</image:loc><image:title>Ultraviolet</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/aurora-horizon/thumb.jpg</image:loc><image:title>Aurora Horizon</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/alps</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/ascii-aurora</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/ascii-city</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/ascii-dunes</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/ascii-flow</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/ascii-galaxy</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/ascii-glow</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/ascii-ocean</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/ascii-planet</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/ascii-rain</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/ascii-storm</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/ascii-terrain</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/ascii-tunnel</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/aurora</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/breakout</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/button</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/castle</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/chart</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/checkbox</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/chiptune</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/counter</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/crystal</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/cursor</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/dialog</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/divider</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/dot-matrix</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/fade-into-page</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/fire</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/flap-board</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/fx-aura</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/fx-beam</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/fx-blob</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/fx-caustics</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/fx-clouds</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/fx-disc</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/fx-flame</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/fx-glass</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/fx-gradient</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/fx-ink</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/fx-morph</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/fx-orb</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/fx-podium</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/fx-reeded</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/fx-silk</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/fx-swarm</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/fx-terrain</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/fx-tunnel</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/fx-waves</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/galaxy</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/glitch-text</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/glow-button</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/glow-card</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/handheld</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/hero</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/hero-disc</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/hero-dots-cat</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/hero-dots-statue</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/hero-flame</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/hero-image-beam</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/hero-image-cat</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/hero-image-disc</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/hero-image-flame</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/hero-image-glass</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/hero-image-ink</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/hero-image-podium</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/hero-image-statue</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/hero-ink</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/hero-keycap</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/hero-laser</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/hero-orb</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/hero-podium</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/hero-portrait</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/horizon</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/horizon-band</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/image-alive</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/image-code</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/image-dots</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/image-frosted</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/image-liquid</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/image-morph</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/image-rgb</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/image-ripple</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/image-streak</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/image-zoom</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/input</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/installation</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/keycap</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/lake</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/liquid</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/liquid-metal</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/loader</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/looks</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/marquee</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/melt-text</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/mesh-gradient</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/nebula</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/palettes</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/pixel-image</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/poppies</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/progress</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/quake</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/receipt</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/reveal</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/reveal-text</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/rewind</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/riso-editorial</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/riso-rays</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/riso-vortex</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/rpg-box</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/sakura</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/sand</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/scan-text</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/scene-cards</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/scratch</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/shine-text</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/showcase</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/site/og/u-showcase.jpg</image:loc><image:title>Showcase: Websites Built with Pixel UI · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/slider</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/split-hero</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/tabs</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/toast</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/toggle</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/tooltip</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/topographic</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/train-window</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/vista</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/warp</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/wave-text</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/window</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/zipper</loc><lastmod>2026-11-07</lastmod></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/abyss/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/abyss/thumb.jpg</image:loc><image:title>Abyss: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/afterglow/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/afterglow/thumb.jpg</image:loc><image:title>Afterglow: Free GSAP Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/ash-king/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/ash-king/thumb.jpg</image:loc><image:title>Ash King: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/ashborne/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/ashborne/thumb.jpg</image:loc><image:title>Ashborne: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/aura/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/aura/thumb.jpg</image:loc><image:title>Aura: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/aurora-horizon/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/aurora-horizon/thumb.jpg</image:loc><image:title>Aurora Horizon: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/aurora/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/aurora/thumb.jpg</image:loc><image:title>Aurora: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/beam/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/beam/thumb.jpg</image:loc><image:title>Beam: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/bitcloud/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/bitcloud/thumb.jpg</image:loc><image:title>Bitcloud: Free Pixel Art Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/bokeh/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/bokeh/thumb.jpg</image:loc><image:title>Bokeh: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/canyon-blue/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/canyon-blue/thumb.jpg</image:loc><image:title>Canyon Blue: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/canyon-magenta/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/canyon-magenta/thumb.jpg</image:loc><image:title>Canyon Magenta: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/canyon-violet/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/canyon-violet/thumb.jpg</image:loc><image:title>Canyon Violet: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/cloudline/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/cloudline/thumb.jpg</image:loc><image:title>Cloudline: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/currents/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/currents/thumb.jpg</image:loc><image:title>Currents: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/daybreak/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/daybreak/thumb.jpg</image:loc><image:title>Daybreak: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/desert-dragon/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/desert-dragon/thumb.jpg</image:loc><image:title>Desert Dragon: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/dusk/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/dusk/thumb.jpg</image:loc><image:title>Dusk: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/eclipse/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/eclipse/thumb.jpg</image:loc><image:title>Eclipse: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/ember/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/ember/thumb.jpg</image:loc><image:title>Ember: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/event-horizon/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/event-horizon/thumb.jpg</image:loc><image:title>Event Horizon: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/evergreen/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/evergreen/thumb.jpg</image:loc><image:title>Evergreen: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/flameblade/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/flameblade/thumb.jpg</image:loc><image:title>Emberblade: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/fluted/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/fluted/thumb.jpg</image:loc><image:title>Fluted: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/fold/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/fold/thumb.jpg</image:loc><image:title>Fold: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/fuji/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/fuji/thumb.jpg</image:loc><image:title>Fuji: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/furnace/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/furnace/thumb.jpg</image:loc><image:title>Furnace: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/glitch/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/glitch/thumb.jpg</image:loc><image:title>Glitch: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/grotto/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/grotto/thumb.jpg</image:loc><image:title>Grotto: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/halftone/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/halftone/thumb.jpg</image:loc><image:title>Halftone: Free ASCII Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/ink-dragon/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/ink-dragon/thumb.jpg</image:loc><image:title>Ink Dragon: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/meadow/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/meadow/thumb.jpg</image:loc><image:title>Meadow: Free Pixel Art Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/mercury/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/mercury/thumb.jpg</image:loc><image:title>Mercury: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/nimbus/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/nimbus/thumb.jpg</image:loc><image:title>Nimbus: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/orbit-ascii/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/orbit-ascii/thumb.jpg</image:loc><image:title>Orbit ASCII: Free ASCII Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/orbit-globe/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/orbit-globe/thumb.jpg</image:loc><image:title>Orbit: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/pixel-sword/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/pixel-sword/thumb.jpg</image:loc><image:title>Pixel Sword: Free Pixel Art Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/pocket/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/pocket/thumb.jpg</image:loc><image:title>Pocket: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/prism-glass/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/prism-glass/thumb.jpg</image:loc><image:title>Prism Glass: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/prism/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/prism/thumb.jpg</image:loc><image:title>Prism: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/red-dragon/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/red-dragon/thumb.jpg</image:loc><image:title>Red Dragon: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/redwood/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/redwood/thumb.jpg</image:loc><image:title>Redwood: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/reed-crimson/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/reed-crimson/thumb.jpg</image:loc><image:title>Reed Crimson: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/reed-ember/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/reed-ember/thumb.jpg</image:loc><image:title>Reed Ember: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/reed-flame/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/reed-flame/thumb.jpg</image:loc><image:title>Reed Flame: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/reed-rose/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/reed-rose/thumb.jpg</image:loc><image:title>Reed Rose: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/reed-spectrum/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/reed-spectrum/thumb.jpg</image:loc><image:title>Reed Spectrum: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/relic/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/relic/thumb.jpg</image:loc><image:title>Relic: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/respite/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/respite/thumb.jpg</image:loc><image:title>Respite: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/riptide/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/riptide/thumb.jpg</image:loc><image:title>Riptide: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/ronin/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/ronin/thumb.jpg</image:loc><image:title>Ronin: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/ruins/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/ruins/thumb.jpg</image:loc><image:title>Ruins: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/sandstorm/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/sandstorm/thumb.jpg</image:loc><image:title>Sandstorm: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/savanna/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/savanna/thumb.jpg</image:loc><image:title>Savanna: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/seascape/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/seascape/thumb.jpg</image:loc><image:title>Seascape: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/sentinel/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/sentinel/thumb.jpg</image:loc><image:title>Sentinel: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/signal/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/signal/thumb.jpg</image:loc><image:title>Signal: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/silk/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/silk/thumb.jpg</image:loc><image:title>Silk: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/smoke-dragon/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/smoke-dragon/thumb.jpg</image:loc><image:title>Smoke Dragon: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/solstice/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/solstice/thumb.jpg</image:loc><image:title>Solstice: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/spectrum/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/spectrum/thumb.jpg</image:loc><image:title>Spectrum: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/starmind/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/starmind/thumb.jpg</image:loc><image:title>Starmind: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/static/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/static/thumb.jpg</image:loc><image:title>Static: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/stipple/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/stipple/thumb.jpg</image:loc><image:title>Stipple: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/stratosphere/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/stratosphere/thumb.jpg</image:loc><image:title>Stratosphere: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/sunset-ridge/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/sunset-ridge/thumb.jpg</image:loc><image:title>Sunset Ridge: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/thermal/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/thermal/thumb.jpg</image:loc><image:title>Thermal: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/tidewave/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/tidewave/thumb.jpg</image:loc><image:title>Tidewave: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/twilight/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/twilight/thumb.jpg</image:loc><image:title>Twilight: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/ukiyo/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/ukiyo/thumb.jpg</image:loc><image:title>Ukiyo: Free Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/ultraviolet/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/ultraviolet/thumb.jpg</image:loc><image:title>Ultraviolet: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/vapor/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/vapor/thumb.jpg</image:loc><image:title>Vapor: Free ASCII Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/vermilion/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/vermilion/thumb.jpg</image:loc><image:title>Vermilion: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/templates/visor/</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/visor/thumb.jpg</image:loc><image:title>Visor: Free GSAP Animated Hero Template · Piixpal</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/showcase/bloom</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/ui/showcase/bloom.jpg</image:loc><image:title>Bloom · a Pixel UI showcase</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/showcase/ember</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/ui/showcase/ember.jpg</image:loc><image:title>Ember Studio · a Pixel UI showcase</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/showcase/esc</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/ui/showcase/esc.jpg</image:loc><image:title>esc. · a Pixel UI showcase</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/showcase/keep</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/ui/showcase/keep.jpg</image:loc><image:title>Keep · a Pixel UI showcase</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/showcase/monolith</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/ui/showcase/monolith.jpg</image:loc><image:title>Monolith · a Pixel UI showcase</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/showcase/nova</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/ui/showcase/nova.jpg</image:loc><image:title>Nova · a Pixel UI showcase</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/showcase/riso</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/ui/showcase/riso.jpg</image:loc><image:title>Night Roads · a Pixel UI showcase</image:title></image:image></url>
-  <url><loc>https://piixpal.dvkk.dev/ui/showcase/summit</loc><lastmod>2026-11-07</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/ui/showcase/summit.jpg</image:loc><image:title>Summit · a Pixel UI showcase</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/faq</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/components/</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/components/3d</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/components/agents</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/components/builder</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/components/crowd</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/components/install</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/components/make</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/components/nomad</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/components/pals</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/components/powers</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/components/readme</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/components/sprites</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/components/type</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/components/visit</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/stage/</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/visor/thumb.jpg</image:loc><image:title>Visor</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/bitcloud/thumb.jpg</image:loc><image:title>Bitcloud</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/afterglow/thumb.jpg</image:loc><image:title>Afterglow</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/flameblade/thumb.jpg</image:loc><image:title>Emberblade</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/vermilion/thumb.jpg</image:loc><image:title>Vermilion</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/relic/thumb.jpg</image:loc><image:title>Relic</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/starmind/thumb.jpg</image:loc><image:title>Starmind</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/sentinel/thumb.jpg</image:loc><image:title>Sentinel</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/savanna/thumb.jpg</image:loc><image:title>Savanna</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/signal/thumb.jpg</image:loc><image:title>Signal</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/fold/thumb.jpg</image:loc><image:title>Fold</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/furnace/thumb.jpg</image:loc><image:title>Furnace</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/currents/thumb.jpg</image:loc><image:title>Currents</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/ashborne/thumb.jpg</image:loc><image:title>Ashborne</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/ronin/thumb.jpg</image:loc><image:title>Ronin</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/respite/thumb.jpg</image:loc><image:title>Respite</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/vapor/thumb.jpg</image:loc><image:title>Vapor</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/orbit-ascii/thumb.jpg</image:loc><image:title>Orbit ASCII</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/halftone/thumb.jpg</image:loc><image:title>Halftone</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/cloudline/thumb.jpg</image:loc><image:title>Cloudline</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/seascape/thumb.jpg</image:loc><image:title>Seascape</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/event-horizon/thumb.jpg</image:loc><image:title>Event Horizon</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/prism-glass/thumb.jpg</image:loc><image:title>Prism Glass</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/orbit-globe/thumb.jpg</image:loc><image:title>Orbit</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/mercury/thumb.jpg</image:loc><image:title>Mercury</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/ash-king/thumb.jpg</image:loc><image:title>Ash King</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/pixel-sword/thumb.jpg</image:loc><image:title>Pixel Sword</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/smoke-dragon/thumb.jpg</image:loc><image:title>Smoke Dragon</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/ink-dragon/thumb.jpg</image:loc><image:title>Ink Dragon</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/desert-dragon/thumb.jpg</image:loc><image:title>Desert Dragon</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/red-dragon/thumb.jpg</image:loc><image:title>Red Dragon</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/ruins/thumb.jpg</image:loc><image:title>Ruins</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/glitch/thumb.jpg</image:loc><image:title>Glitch</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/ukiyo/thumb.jpg</image:loc><image:title>Ukiyo</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/pocket/thumb.jpg</image:loc><image:title>Pocket</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/meadow/thumb.jpg</image:loc><image:title>Meadow</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/grotto/thumb.jpg</image:loc><image:title>Grotto</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/stipple/thumb.jpg</image:loc><image:title>Stipple</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/aurora/thumb.jpg</image:loc><image:title>Aurora</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/sunset-ridge/thumb.jpg</image:loc><image:title>Sunset Ridge</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/twilight/thumb.jpg</image:loc><image:title>Twilight</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/evergreen/thumb.jpg</image:loc><image:title>Evergreen</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/riptide/thumb.jpg</image:loc><image:title>Riptide</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/sandstorm/thumb.jpg</image:loc><image:title>Sandstorm</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/tidewave/thumb.jpg</image:loc><image:title>Tidewave</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/static/thumb.jpg</image:loc><image:title>Static</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/fuji/thumb.jpg</image:loc><image:title>Fuji</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/canyon-blue/thumb.jpg</image:loc><image:title>Canyon Blue</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/canyon-magenta/thumb.jpg</image:loc><image:title>Canyon Magenta</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/canyon-violet/thumb.jpg</image:loc><image:title>Canyon Violet</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/thermal/thumb.jpg</image:loc><image:title>Thermal</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/spectrum/thumb.jpg</image:loc><image:title>Spectrum</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/stratosphere/thumb.jpg</image:loc><image:title>Stratosphere</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/silk/thumb.jpg</image:loc><image:title>Silk</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/redwood/thumb.jpg</image:loc><image:title>Redwood</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/reed-flame/thumb.jpg</image:loc><image:title>Reed Flame</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/reed-spectrum/thumb.jpg</image:loc><image:title>Reed Spectrum</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/reed-ember/thumb.jpg</image:loc><image:title>Reed Ember</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/reed-crimson/thumb.jpg</image:loc><image:title>Reed Crimson</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/reed-rose/thumb.jpg</image:loc><image:title>Reed Rose</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/fluted/thumb.jpg</image:loc><image:title>Fluted</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/beam/thumb.jpg</image:loc><image:title>Beam</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/solstice/thumb.jpg</image:loc><image:title>Solstice</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/aura/thumb.jpg</image:loc><image:title>Aura</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/dusk/thumb.jpg</image:loc><image:title>Dusk</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/abyss/thumb.jpg</image:loc><image:title>Abyss</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/daybreak/thumb.jpg</image:loc><image:title>Daybreak</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/nimbus/thumb.jpg</image:loc><image:title>Nimbus</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/prism/thumb.jpg</image:loc><image:title>Prism</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/bokeh/thumb.jpg</image:loc><image:title>Bokeh</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/ember/thumb.jpg</image:loc><image:title>Ember</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/eclipse/thumb.jpg</image:loc><image:title>Eclipse</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/ultraviolet/thumb.jpg</image:loc><image:title>Ultraviolet</image:title></image:image><image:image><image:loc>https://piixpal.dvkk.dev/templates/aurora-horizon/thumb.jpg</image:loc><image:title>Aurora Horizon</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/alps</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/ascii-aurora</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/ascii-city</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/ascii-dunes</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/ascii-flow</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/ascii-galaxy</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/ascii-glow</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/ascii-ocean</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/ascii-planet</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/ascii-rain</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/ascii-storm</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/ascii-terrain</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/ascii-tunnel</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/aurora</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/breakout</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/button</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/castle</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/chart</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/checkbox</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/chiptune</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/counter</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/crystal</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/cursor</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/dialog</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/divider</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/dot-matrix</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/fade-into-page</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/fire</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/flap-board</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/fx-aura</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/fx-beam</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/fx-blob</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/fx-caustics</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/fx-clouds</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/fx-disc</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/fx-flame</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/fx-glass</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/fx-gradient</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/fx-ink</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/fx-morph</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/fx-orb</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/fx-podium</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/fx-reeded</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/fx-silk</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/fx-swarm</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/fx-terrain</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/fx-tunnel</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/fx-waves</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/galaxy</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/glitch-text</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/glow-button</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/glow-card</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/handheld</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/hero</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/hero-disc</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/hero-dots-cat</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/hero-dots-statue</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/hero-flame</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/hero-image-beam</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/hero-image-cat</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/hero-image-disc</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/hero-image-flame</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/hero-image-glass</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/hero-image-ink</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/hero-image-podium</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/hero-image-statue</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/hero-ink</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/hero-keycap</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/hero-laser</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/hero-orb</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/hero-podium</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/hero-portrait</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/holo-button</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/holo-card</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/holo-input</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/holo-text</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/horizon</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/horizon-band</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/image-alive</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/image-code</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/image-dots</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/image-frosted</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/image-liquid</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/image-morph</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/image-rgb</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/image-ripple</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/image-streak</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/image-zoom</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/input</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/installation</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/keycap</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/lake</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/liquid</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/liquid-button</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/liquid-card</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/liquid-metal</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/liquid-text</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/liquid-toggle</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/loader</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/looks</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/marquee</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/melt-text</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/mesh-gradient</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/nebula</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/palettes</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/paper-button</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/paper-card</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/paper-sticker</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/paper-text</loc><lastmod>2026-11-09</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/pixel-image</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/poppies</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/progress</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/quake</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/receipt</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/reveal</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/reveal-text</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/rewind</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/riso-editorial</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/riso-rays</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/riso-vortex</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/rpg-box</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/sakura</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/sand</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/scan-text</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/scene-cards</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/scratch</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/shine-text</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/showcase</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/site/og/u-showcase.jpg</image:loc><image:title>Showcase: Websites Built with Pixel UI · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/slider</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/split-hero</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/tabs</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/toast</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/toggle</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/tooltip</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/topographic</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/train-window</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/vista</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/warp</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/wave-text</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/window</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/zipper</loc><lastmod>2026-11-10</lastmod></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/abyss/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/abyss/thumb.jpg</image:loc><image:title>Abyss: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/afterglow/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/afterglow/thumb.jpg</image:loc><image:title>Afterglow: Free GSAP Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/ash-king/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/ash-king/thumb.jpg</image:loc><image:title>Ash King: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/ashborne/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/ashborne/thumb.jpg</image:loc><image:title>Ashborne: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/aura/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/aura/thumb.jpg</image:loc><image:title>Aura: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/aurora-horizon/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/aurora-horizon/thumb.jpg</image:loc><image:title>Aurora Horizon: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/aurora/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/aurora/thumb.jpg</image:loc><image:title>Aurora: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/beam/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/beam/thumb.jpg</image:loc><image:title>Beam: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/bitcloud/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/bitcloud/thumb.jpg</image:loc><image:title>Bitcloud: Free Pixel Art Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/bokeh/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/bokeh/thumb.jpg</image:loc><image:title>Bokeh: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/canyon-blue/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/canyon-blue/thumb.jpg</image:loc><image:title>Canyon Blue: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/canyon-magenta/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/canyon-magenta/thumb.jpg</image:loc><image:title>Canyon Magenta: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/canyon-violet/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/canyon-violet/thumb.jpg</image:loc><image:title>Canyon Violet: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/cloudline/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/cloudline/thumb.jpg</image:loc><image:title>Cloudline: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/currents/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/currents/thumb.jpg</image:loc><image:title>Currents: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/daybreak/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/daybreak/thumb.jpg</image:loc><image:title>Daybreak: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/desert-dragon/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/desert-dragon/thumb.jpg</image:loc><image:title>Desert Dragon: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/dusk/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/dusk/thumb.jpg</image:loc><image:title>Dusk: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/eclipse/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/eclipse/thumb.jpg</image:loc><image:title>Eclipse: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/ember/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/ember/thumb.jpg</image:loc><image:title>Ember: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/event-horizon/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/event-horizon/thumb.jpg</image:loc><image:title>Event Horizon: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/evergreen/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/evergreen/thumb.jpg</image:loc><image:title>Evergreen: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/flameblade/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/flameblade/thumb.jpg</image:loc><image:title>Emberblade: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/fluted/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/fluted/thumb.jpg</image:loc><image:title>Fluted: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/fold/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/fold/thumb.jpg</image:loc><image:title>Fold: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/fuji/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/fuji/thumb.jpg</image:loc><image:title>Fuji: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/furnace/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/furnace/thumb.jpg</image:loc><image:title>Furnace: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/glitch/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/glitch/thumb.jpg</image:loc><image:title>Glitch: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/grotto/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/grotto/thumb.jpg</image:loc><image:title>Grotto: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/halftone/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/halftone/thumb.jpg</image:loc><image:title>Halftone: Free ASCII Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/ink-dragon/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/ink-dragon/thumb.jpg</image:loc><image:title>Ink Dragon: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/meadow/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/meadow/thumb.jpg</image:loc><image:title>Meadow: Free Pixel Art Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/mercury/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/mercury/thumb.jpg</image:loc><image:title>Mercury: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/nimbus/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/nimbus/thumb.jpg</image:loc><image:title>Nimbus: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/orbit-ascii/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/orbit-ascii/thumb.jpg</image:loc><image:title>Orbit ASCII: Free ASCII Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/orbit-globe/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/orbit-globe/thumb.jpg</image:loc><image:title>Orbit: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/pixel-sword/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/pixel-sword/thumb.jpg</image:loc><image:title>Pixel Sword: Free Pixel Art Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/pocket/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/pocket/thumb.jpg</image:loc><image:title>Pocket: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/prism-glass/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/prism-glass/thumb.jpg</image:loc><image:title>Prism Glass: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/prism/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/prism/thumb.jpg</image:loc><image:title>Prism: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/red-dragon/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/red-dragon/thumb.jpg</image:loc><image:title>Red Dragon: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/redwood/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/redwood/thumb.jpg</image:loc><image:title>Redwood: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/reed-crimson/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/reed-crimson/thumb.jpg</image:loc><image:title>Reed Crimson: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/reed-ember/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/reed-ember/thumb.jpg</image:loc><image:title>Reed Ember: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/reed-flame/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/reed-flame/thumb.jpg</image:loc><image:title>Reed Flame: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/reed-rose/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/reed-rose/thumb.jpg</image:loc><image:title>Reed Rose: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/reed-spectrum/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/reed-spectrum/thumb.jpg</image:loc><image:title>Reed Spectrum: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/relic/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/relic/thumb.jpg</image:loc><image:title>Relic: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/respite/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/respite/thumb.jpg</image:loc><image:title>Respite: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/riptide/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/riptide/thumb.jpg</image:loc><image:title>Riptide: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/ronin/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/ronin/thumb.jpg</image:loc><image:title>Ronin: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/ruins/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/ruins/thumb.jpg</image:loc><image:title>Ruins: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/sandstorm/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/sandstorm/thumb.jpg</image:loc><image:title>Sandstorm: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/savanna/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/savanna/thumb.jpg</image:loc><image:title>Savanna: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/seascape/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/seascape/thumb.jpg</image:loc><image:title>Seascape: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/sentinel/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/sentinel/thumb.jpg</image:loc><image:title>Sentinel: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/signal/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/signal/thumb.jpg</image:loc><image:title>Signal: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/silk/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/silk/thumb.jpg</image:loc><image:title>Silk: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/smoke-dragon/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/smoke-dragon/thumb.jpg</image:loc><image:title>Smoke Dragon: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/solstice/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/solstice/thumb.jpg</image:loc><image:title>Solstice: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/spectrum/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/spectrum/thumb.jpg</image:loc><image:title>Spectrum: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/starmind/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/starmind/thumb.jpg</image:loc><image:title>Starmind: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/static/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/static/thumb.jpg</image:loc><image:title>Static: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/stipple/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/stipple/thumb.jpg</image:loc><image:title>Stipple: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/stratosphere/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/stratosphere/thumb.jpg</image:loc><image:title>Stratosphere: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/sunset-ridge/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/sunset-ridge/thumb.jpg</image:loc><image:title>Sunset Ridge: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/thermal/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/thermal/thumb.jpg</image:loc><image:title>Thermal: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/tidewave/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/tidewave/thumb.jpg</image:loc><image:title>Tidewave: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/twilight/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/twilight/thumb.jpg</image:loc><image:title>Twilight: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/ukiyo/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/ukiyo/thumb.jpg</image:loc><image:title>Ukiyo: Free Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/ultraviolet/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/ultraviolet/thumb.jpg</image:loc><image:title>Ultraviolet: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/vapor/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/vapor/thumb.jpg</image:loc><image:title>Vapor: Free ASCII Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/vermilion/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/vermilion/thumb.jpg</image:loc><image:title>Vermilion: Free WebGL Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/templates/visor/</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/templates/visor/thumb.jpg</image:loc><image:title>Visor: Free GSAP Animated Hero Template · Piixpal</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/showcase/bloom</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/ui/showcase/bloom.jpg</image:loc><image:title>Bloom · a Pixel UI showcase</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/showcase/ember</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/ui/showcase/ember.jpg</image:loc><image:title>Ember Studio · a Pixel UI showcase</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/showcase/esc</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/ui/showcase/esc.jpg</image:loc><image:title>esc. · a Pixel UI showcase</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/showcase/keep</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/ui/showcase/keep.jpg</image:loc><image:title>Keep · a Pixel UI showcase</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/showcase/monolith</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/ui/showcase/monolith.jpg</image:loc><image:title>Monolith · a Pixel UI showcase</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/showcase/nova</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/ui/showcase/nova.jpg</image:loc><image:title>Nova · a Pixel UI showcase</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/showcase/riso</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/ui/showcase/riso.jpg</image:loc><image:title>Night Roads · a Pixel UI showcase</image:title></image:image></url>
+  <url><loc>https://piixpal.dvkk.dev/ui/showcase/summit</loc><lastmod>2026-11-10</lastmod><image:image><image:loc>https://piixpal.dvkk.dev/ui/showcase/summit.jpg</image:loc><image:title>Summit · a Pixel UI showcase</image:title></image:image></url>
 </urlset>

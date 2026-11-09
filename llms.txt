@@ -17,7 +17,7 @@
 - Licence: MIT. No account, no key, free for commercial use.
 
 ## Docs
-- [UI components](https://piixpal.dvkk.dev/ui/): 125 animated components (backgrounds, heroes, shaders, buttons, text, forms…)
+- [UI components](https://piixpal.dvkk.dev/ui/): 137 animated components (backgrounds, heroes, shaders, buttons, text, forms…)
 - [Hero templates](https://piixpal.dvkk.dev/templates/): 74 full landing-page heroes
 - [Pixel characters](https://piixpal.dvkk.dev/components/): pals, sprites, superpowers, 3D
 - [Install](https://piixpal.dvkk.dev/components/install): every way to add Piixpal
@@ -25,7 +25,7 @@
 - [Full list for agents](https://piixpal.dvkk.dev/llms-full.txt)
 - [Source](https://github.com/diiviikk5/Piixpal)
 
-## UI components (125)
+## UI components (137)
 - [Sakura grove](https://piixpal.dvkk.dev/ui/sakura): A cherry tree in full bloom over a misty forest, with a lantern and a bench.
 - [Alpine hills](https://piixpal.dvkk.dev/ui/alps): Snow peaks behind rolling green hills, pines and valley mist.
 - [Sunset lake](https://piixpal.dvkk.dev/ui/lake): A flat-colour sunset over a lake, with a boat drifting across.
@@ -151,6 +151,18 @@
 - [Scratch card](https://piixpal.dvkk.dev/ui/scratch): A scratch-off card: pixel foil over your content. Scratch it away.
 - [Zipper](https://piixpal.dvkk.dev/ui/zipper): A zipped-up panel of pixel fabric over your content. Pull it open.
 - [Receipt printer](https://piixpal.dvkk.dev/ui/receipt): A little thermal printer that prints your content, line by line.
+- [Liquid button](https://piixpal.dvkk.dev/ui/liquid-button): A button made of liquid metal that reaches for your cursor.
+- [Holo button](https://piixpal.dvkk.dev/ui/holo-button): A translucent button projected as a hologram.
+- [Paper button](https://piixpal.dvkk.dev/ui/paper-button): Layers of cut paper, or a pen sketch that boils.
+- [Liquid card](https://piixpal.dvkk.dev/ui/liquid-card): A card whose face is liquid you can stir.
+- [Holo card](https://piixpal.dvkk.dev/ui/holo-card): A holographic trading card that tilts under your hand.
+- [Paper card](https://piixpal.dvkk.dev/ui/paper-card): A card topped with a cut-paper diorama, or framed in pen.
+- [Liquid text](https://piixpal.dvkk.dev/ui/liquid-text): Words made of liquid metal that melt into the next word.
+- [Holo text](https://piixpal.dvkk.dev/ui/holo-text): A headline projected as a hologram.
+- [Paper text](https://piixpal.dvkk.dev/ui/paper-text): A headline a pen draws, then fills with cut paper.
+- [Liquid toggle](https://piixpal.dvkk.dev/ui/liquid-toggle): A switch whose knob is a drop of liquid metal.
+- [Holo input](https://piixpal.dvkk.dev/ui/holo-input): A text field projected like a HUD.
+- [Paper sticker](https://piixpal.dvkk.dev/ui/paper-sticker): A die-cut sticker badge whose corner peels.
 
 ## Hero templates (74)
 - [Visor](https://piixpal.dvkk.dev/templates/visor/)

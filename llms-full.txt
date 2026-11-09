@@ -17,7 +17,7 @@
 - Licence: MIT. No account, no key, free for commercial use.
 
 ## Docs
-- [UI components](https://piixpal.dvkk.dev/ui/): 125 animated components (backgrounds, heroes, shaders, buttons, text, forms…)
+- [UI components](https://piixpal.dvkk.dev/ui/): 137 animated components (backgrounds, heroes, shaders, buttons, text, forms…)
 - [Hero templates](https://piixpal.dvkk.dev/templates/): 74 full landing-page heroes
 - [Pixel characters](https://piixpal.dvkk.dev/components/): pals, sprites, superpowers, 3D
 - [Install](https://piixpal.dvkk.dev/components/install): every way to add Piixpal
@@ -25,7 +25,7 @@
 - [Full list for agents](https://piixpal.dvkk.dev/llms-full.txt)
 - [Source](https://github.com/diiviikk5/Piixpal)
 
-## UI components (125), by section
+## UI components (137), by section
 
 ### Scenes
 - [Sakura grove](https://piixpal.dvkk.dev/ui/sakura): A cherry tree in full bloom over a misty forest, with a lantern and a bench. Tag: <piix-scene>. File: dist/c/scene.min.js
@@ -134,9 +134,15 @@
 ### Buttons
 - [Glow button](https://piixpal.dvkk.dev/ui/glow-button): A button with light chasing round its pixel border. Tag: <piix-glow-button>. File: dist/c/glow-button.min.js
 - [Pixel button](https://piixpal.dvkk.dev/ui/button): A chunky pixel button that presses down into its shadow, with a pal on top. Tag: <piix-button>. File: dist/c/button.min.js
+- [Liquid button](https://piixpal.dvkk.dev/ui/liquid-button): A button made of liquid metal that reaches for your cursor. Tag: <piix-liquid-button>. File: dist/c/liquid-button.min.js
+- [Holo button](https://piixpal.dvkk.dev/ui/holo-button): A translucent button projected as a hologram. Tag: <piix-holo-button>. File: dist/c/holo-button.min.js
+- [Paper button](https://piixpal.dvkk.dev/ui/paper-button): Layers of cut paper, or a pen sketch that boils. Tag: <piix-paper-button>. File: dist/c/paper-button.min.js
 
 ### Cards
 - [Glow card](https://piixpal.dvkk.dev/ui/glow-card): A card lit from inside, with light running round its border. Tag: <piix-glow-card>. File: dist/c/glow-card.min.js
+- [Liquid card](https://piixpal.dvkk.dev/ui/liquid-card): A card whose face is liquid you can stir. Tag: <piix-liquid-card>. File: dist/c/liquid-card.min.js
+- [Holo card](https://piixpal.dvkk.dev/ui/holo-card): A holographic trading card that tilts under your hand. Tag: <piix-holo-card>. File: dist/c/holo-card.min.js
+- [Paper card](https://piixpal.dvkk.dev/ui/paper-card): A card topped with a cut-paper diorama, or framed in pen. Tag: <piix-paper-card>. File: dist/c/paper-card.min.js
 
 ### Text
 - [Shine text](https://piixpal.dvkk.dev/ui/shine-text): A dithered band of colour that sweeps across the words. Tag: <piix-text>. File: dist/c/text.min.js
@@ -147,6 +153,9 @@
 - [Scan text](https://piixpal.dvkk.dev/ui/scan-text): A scanline that sweeps down, lighting the letters as it passes. Tag: <piix-text>. File: dist/c/text.min.js
 - [Counter](https://piixpal.dvkk.dev/ui/counter): A big number that counts up in pixel type when it scrolls into view. Tag: <piix-stat>. File: dist/c/stat.min.js
 - [Keycap](https://piixpal.dvkk.dev/ui/keycap): Pixel keycaps that press down when you press the real key. Tag: <piix-kbd>. File: dist/c/kbd.min.js
+- [Liquid text](https://piixpal.dvkk.dev/ui/liquid-text): Words made of liquid metal that melt into the next word. Tag: <piix-liquid-text>. File: dist/c/liquid-text.min.js
+- [Holo text](https://piixpal.dvkk.dev/ui/holo-text): A headline projected as a hologram. Tag: <piix-holo-text>. File: dist/c/holo-text.min.js
+- [Paper text](https://piixpal.dvkk.dev/ui/paper-text): A headline a pen draws, then fills with cut paper. Tag: <piix-paper-text>. File: dist/c/paper-text.min.js
 
 ### Media
 - [Pixel image](https://piixpal.dvkk.dev/ui/pixel-image): Any picture, dithered, mosaicked or halftoned on the GPU, with a lens. Tag: <piix-pixel-image>. File: dist/c/pixel-image.min.js
@@ -156,6 +165,8 @@
 - [Checkbox](https://piixpal.dvkk.dev/ui/checkbox): A pixel checkbox whose tick draws itself in, block by block. Tag: <piix-checkbox>. File: dist/c/checkbox.min.js
 - [Toggle](https://piixpal.dvkk.dev/ui/toggle): A pixel switch: a pal walks across to flip it. Tag: <piix-toggle>. File: dist/c/toggle.min.js
 - [Slider](https://piixpal.dvkk.dev/ui/slider): A range input whose track is lit on the GPU. Tag: <piix-slider>. File: dist/c/slider.min.js
+- [Liquid toggle](https://piixpal.dvkk.dev/ui/liquid-toggle): A switch whose knob is a drop of liquid metal. Tag: <piix-liquid-toggle>. File: dist/c/liquid-toggle.min.js
+- [Holo input](https://piixpal.dvkk.dev/ui/holo-input): A text field projected like a HUD. Tag: <piix-holo-input>. File: dist/c/holo-input.min.js
 
 ### Navigation
 - [Tabs](https://piixpal.dvkk.dev/ui/tabs): Tabs whose highlight slides across with a dithered pixel trail. Tag: <piix-tabs>. File: dist/c/tabs.min.js
@@ -193,6 +204,7 @@
 - [Scratch card](https://piixpal.dvkk.dev/ui/scratch): A scratch-off card: pixel foil over your content. Scratch it away. Tag: <piix-scratch>. File: dist/c/scratch.min.js
 - [Zipper](https://piixpal.dvkk.dev/ui/zipper): A zipped-up panel of pixel fabric over your content. Pull it open. Tag: <piix-zipper>. File: dist/c/zipper.min.js
 - [Receipt printer](https://piixpal.dvkk.dev/ui/receipt): A little thermal printer that prints your content, line by line. Tag: <piix-receipt>. File: dist/c/receipt.min.js
+- [Paper sticker](https://piixpal.dvkk.dev/ui/paper-sticker): A die-cut sticker badge whose corner peels. Tag: <piix-paper-sticker>. File: dist/c/paper-sticker.min.js
 
 ## Hero templates (74)
 - [Visor](https://piixpal.dvkk.dev/templates/visor/): image, scroll-driven, GSAP scroll, 3D hero. Background only: https://piixpal.dvkk.dev/templates/visor/bg.js

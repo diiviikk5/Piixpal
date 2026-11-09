@@ -28,7 +28,6 @@ const regCount = JSON.parse(readFileSync(join(root, 'r', 'registry.json'), 'utf8
 const jobs = [
   ['default', 'Free UI components', 'Animated UI, hero templates & pixel art', '300+ free components: shader backgrounds, heroes, ASCII, buttons and characters.', 'lime', 'gloop,robo,ufo'],
   ['templates', 'Hero templates', '74 hero sections that actually move', 'WebGL shaders, GSAP scroll scenes, fire, particles and ASCII. One HTML file each.', 'ink', 'dragon,planet,star'],
-  ['styles', 'New styles', 'Liquid, holo and paper components', 'Buttons, cards, text and inputs as liquid chrome, holographic foil and cut paper.', 'ink', 'gloop,crt,star'],
   ['stage', 'Stage', 'Make little plays with your pals', 'Puppeteer pixel characters, give them lines, play the scene on your site.', '', 'wizard,llama,mochi'],
   ['c-index', 'Characters', `${regCount} pixel characters for your website`, 'Pals that crawl, perch, nap and bounce on your page, plus 50 sprites.', 'lime', 'gloop,inky,mumu'],
   ['c-pals', 'Pals', 'Pixel characters that live on your page', 'They crawl on headings, perch on buttons and bounce on your footer.', '', 'fluff,loti,mochi'],

@@ -250,7 +250,6 @@ export const navBar = (key, pre = '', ui = '../ui/') => `<header class="nav" id=
     <nav class="links" aria-label="Site">
       <a href="${pre}./"${['index', 'sprites', 'pals', 'crowd', 'type', 'powers', 'studio', 'visit', 'agents', 'readme', 'nomad'].includes(key) ? ' aria-current="page"' : ''}>Components</a>
       <a href="${ui}"${key.startsWith('ui') ? ' aria-current="page"' : ''}>Pixel UI</a>
-      <a href="/styles/"${key === 'styles' ? ' aria-current="page"' : ''}>Styles<b class="new">new</b></a>
       <a href="/templates/"${key === 'templates' ? ' aria-current="page"' : ''}>Templates</a>
       <a href="${pre}install.html"${key === 'install' ? ' aria-current="page"' : ''}>Install</a>
       <a href="${pre}builder.html"${key === 'builder' || key === 'make' ? ' aria-current="page"' : ''}>Builder</a>

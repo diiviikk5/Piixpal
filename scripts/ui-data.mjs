@@ -377,3 +377,7 @@ SECTIONS.splice(SECTIONS.indexOf('Backgrounds') + 1, 0, 'ASCII');
 /* ---------- delight: small website moments ---------- */
 import { DELIGHT_PAGES } from './ui-delight.mjs';
 UI.push(...DELIGHT_PAGES);
+
+/* ---------- liquid, holo and paper: new looks for buttons, cards, text and forms ---------- */
+import { STYLE_PAGES } from './ui-styles.mjs';
+UI.push(...STYLE_PAGES);

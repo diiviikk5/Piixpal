@@ -159,3 +159,7 @@
 .ui-thumb .t-toast i{width:14px;height:14px;background:#9be15d}
 .ui-thumb .t-tip{padding:8px 11px;background:#f2eef8;color:#17121f;font:500 13px/1 "Bricolage Grotesque"}
 .ui-thumb > piix-fx,.ui-thumb > piix-image-fx{position:absolute;inset:0;width:100%}
+
+/* the new mark beside fresh components, in the sidebar, the overview and a page's badges */
+.nw{display:inline-block;margin-left:6px;padding:2px 5px 3px;border-radius:4px;background:var(--lime);color:#17121f;font:400 8px/1 var(--f-pix);letter-spacing:.05em;text-transform:uppercase;vertical-align:2px}
+.ui-badges .nwb{background:var(--lime);color:#17121f}
