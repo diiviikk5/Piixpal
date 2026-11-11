@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<!-- seo:start -->
+<meta name="description" content="Culture is a free landing-page hero template (WebGL, interactive). One HTML file, no build step: copy it, change the words and ship.">
+<link rel="canonical" href="https://piixpal.dvkk.dev/templates/culture/">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="Piixpal">
+<meta property="og:url" content="https://piixpal.dvkk.dev/templates/culture/">
+<meta property="og:title" content="Culture: Free WebGL Animated Hero Template · Piixpal">
+<meta property="og:description" content="Culture is a free landing-page hero template (WebGL, interactive). One HTML file, no build step: copy it, change the words and ship.">
+<meta property="og:image" content="https://piixpal.dvkk.dev/templates/culture/thumb.jpg">
+<meta property="og:image:width" content="768">
+<meta property="og:image:height" content="480">
+<meta property="og:image:alt" content="Culture: Free WebGL Animated Hero Template · Piixpal">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Culture: Free WebGL Animated Hero Template · Piixpal">
+<meta name="twitter:description" content="Culture is a free landing-page hero template (WebGL, interactive). One HTML file, no build step: copy it, change the words and ship.">
+<meta name="twitter:image" content="https://piixpal.dvkk.dev/templates/culture/thumb.jpg">
+<link rel="alternate" type="text/plain" title="Piixpal for AI agents" href="https://piixpal.dvkk.dev/llms.txt">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://piixpal.dvkk.dev/templates/culture/#page","url":"https://piixpal.dvkk.dev/templates/culture/","name":"Culture: Free WebGL Animated Hero Template · Piixpal","description":"Culture is a free landing-page hero template (WebGL, interactive). One HTML file, no build step: copy it, change the words and ship.","isPartOf":{"@id":"https://piixpal.dvkk.dev/#website"},"primaryImageOfPage":{"@type":"ImageObject","url":"https://piixpal.dvkk.dev/templates/culture/thumb.jpg"},"dateModified":"2026-11-11","inLanguage":"en"},{"@type":"SoftwareSourceCode","@id":"https://piixpal.dvkk.dev/templates/culture/#code","name":"Culture (hero section template)","description":"Culture is a free landing-page hero template (WebGL, interactive). One HTML file, no build step: copy it, change the words and ship.","url":"https://piixpal.dvkk.dev/templates/culture/","image":"https://piixpal.dvkk.dev/templates/culture/thumb.jpg","codeRepository":"https://github.com/diiviikk5/Piixpal","license":"https://opensource.org/licenses/MIT","programmingLanguage":["JavaScript","HTML","CSS"],"runtimePlatform":"Web browser","isAccessibleForFree":true,"isPartOf":{"@id":"https://piixpal.dvkk.dev/#library"},"author":{"@type":"Organization","name":"Piixpal","url":"https://piixpal.dvkk.dev/"},"genre":"Templates","keywords":"hero section template, templates, free, open source, web component, react, webgl, simulation, typography, interactive, light, editorial"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Piixpal","item":"https://piixpal.dvkk.dev/"},{"@type":"ListItem","position":2,"name":"Templates","item":"https://piixpal.dvkk.dev/templates/"},{"@type":"ListItem","position":3,"name":"Culture","item":"https://piixpal.dvkk.dev/templates/culture/"}]}]}</script>
+<!-- seo:end -->
+<title data-orig="Culture — hero">Culture: Free WebGL Animated Hero Template · Piixpal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root { --paper:#ecebe6; --ink:#0c0c0c; --accent:#ff4a1c; --muted:rgba(12,12,12,.58); --pad:clamp(18px,3.2vw,44px); }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { background:var(--paper); color:var(--ink); font-family:"Inter Tight","Helvetica Neue",Helvetica,Arial,sans-serif; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+  a { color:inherit; text-decoration:none; }
+  .sm { font-size:13px; line-height:1.35; font-weight:500; letter-spacing:-.005em; }
+
+  .hero { position:relative; height:100vh; height:100svh; min-height:680px; isolation:isolate; overflow:hidden; cursor:crosshair; }
+  [data-bg] { position:absolute; inset:0; width:100%; height:100%; z-index:-1; display:block; }
+
+  /* small type sits on its own slip of paper, so the culture can grow right up to it and never through it */
+  .slip { background:var(--paper); padding:5px 8px 6px; margin:-5px -8px -6px; }
+
+  nav { position:absolute; inset:0 0 auto; display:grid; grid-template-columns:repeat(12,1fr); column-gap:16px; align-items:start; padding:var(--pad) var(--pad) 0; }
+  .logo { grid-column:1/4; font-weight:700; font-size:19px; letter-spacing:-.03em; justify-self:start; }
+  .logo sup { font-size:.5em; font-weight:500; margin-left:2px; vertical-align:top; position:relative; top:.25em; }
+  nav .c1 { grid-column:7/9; } nav .c2 { grid-column:9/11; } nav .c3 { grid-column:11/13; justify-self:end; text-align:right; }
+  nav .col { display:grid; gap:2px; justify-items:start; }
+  nav .c3.col { justify-items:end; }
+  nav a.sm span { background-image:linear-gradient(currentColor,currentColor); background-size:0 1px; background-position:0 100%; background-repeat:no-repeat; transition:background-size .25s; }
+  nav a.sm:hover span { background-size:100% 1px; }
+  .dim { color:var(--muted); }
+
+  /* the headline: as big as the page allows, set tight, flush left */
+  h1 { position:absolute; left:var(--pad); top:50%; transform:translateY(-54%); font-weight:700; font-size:clamp(76px,17.2vw,300px); line-height:.82; letter-spacing:-.062em; margin-left:-.04em; }
+  /* a moat of bare paper round every letter keeps the headline clean while the culture crowds in */
+  h1 span { display:block; white-space:nowrap; -webkit-text-stroke:.05em var(--paper); paint-order:stroke fill; }
+  h1 .in { padding-left:1.02em; }
+  /* the one accent on the page besides what you plant */
+  .num { position:absolute; left:var(--pad); top:calc(50% - clamp(76px,17.2vw,300px) * .98); color:var(--accent); font-weight:700; }
+
+  .foot { position:absolute; left:var(--pad); right:var(--pad); bottom:var(--pad); display:grid; grid-template-columns:repeat(12,1fr); column-gap:16px; align-items:end; }
+  .fig { grid-column:1/5; justify-self:start; max-width:300px; }
+  .fig b { font-weight:600; }
+  .lede { grid-column:7/11; justify-self:start; max-width:400px; font-size:clamp(17px,1.5vw,22px); line-height:1.22; font-weight:500; letter-spacing:-.02em; padding:10px 12px 12px; margin:-10px -12px -12px; }
+  .cta { grid-column:11/13; justify-self:end; display:inline-flex; align-items:center; gap:14px; padding:16px 18px 16px 20px; background:var(--ink); color:var(--paper); font-weight:600; font-size:15px; letter-spacing:-.01em; transition:background .25s; }
+  .cta:hover { background:var(--accent); }
+  .cta svg { transition:transform .25s; } .cta:hover svg { transform:translate(3px,-3px); }
+
+  /* registration marks, the way a proof is trimmed */
+  .reg { position:absolute; width:11px; height:11px; opacity:.55; pointer-events:none; }
+  .reg::before, .reg::after { content:""; position:absolute; background:var(--ink); }
+  .reg::before { left:5px; top:0; width:1px; height:11px; } .reg::after { top:5px; left:0; height:1px; width:11px; }
+  .reg.a { left:calc(var(--pad) * .5 - 5px); top:50%; } .reg.b { right:calc(var(--pad) * .5 - 5px); top:50%; }
+
+  .rv { opacity:0; animation:show .9s cubic-bezier(.2,.7,.2,1) forwards; animation-delay:calc(var(--d,0) * 1ms); }
+  h1 span.rv { clip-path:inset(0 100% 0 0); opacity:1; animation-name:wipe; animation-duration:1.1s; }
+  @keyframes show { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+  @keyframes wipe { to { clip-path:inset(-10% -5% -10% -5%); } }
+  @media (prefers-reduced-motion:reduce){ .rv, h1 span.rv { animation:none; opacity:1; clip-path:none; } }
+  @media (max-width:900px){
+    nav .c1, nav .c2 { display:none; } .logo { grid-column:1/7; } nav .c3 { grid-column:7/13; }
+    h1 { font-size:clamp(64px,21vw,200px); transform:translateY(-70%); } h1 .in { padding-left:0; } .num { top:calc(50% - clamp(64px,21vw,200px) * 1.25); }
+    .fig { display:none; } .lede { grid-column:1/13; margin-bottom:18px; } .cta { grid-column:1/13; justify-self:start; }
+    .reg, .num { display:none; }
+  }
+</style>
+</head>
+<body>
+<section class="hero">
+  <canvas data-bg aria-hidden="true"></canvas>
+
+  <nav>
+    <a class="logo slip rv" href="#">Mycel<sup>®</sup></a>
+    <div class="col c1 rv" style="--d:80"><span class="sm dim slip">Index</span><a class="sm slip" href="#"><span>Materials</span></a><a class="sm slip" href="#"><span>Process</span></a></div>
+    <div class="col c2 rv" style="--d:140"><span class="sm dim slip">Studio</span><a class="sm slip" href="#"><span>Work</span></a><a class="sm slip" href="#"><span>Journal</span></a></div>
+    <div class="col c3 rv" style="--d:200"><span class="sm dim slip">Batch 26—11</span><a class="sm slip" href="#"><span>Request samples ↗</span></a></div>
+  </nav>
+
+  <span class="num sm slip rv" style="--d:300">(01)</span>
+  <h1><span class="rv" data-grow style="--d:250">Grown,</span><span class="rv in" data-grow style="--d:420">not made.</span></h1>
+
+  <div class="foot">
+    <p class="fig sm slip rv" style="--d:900"><b>Fig. 1</b> — A living culture, simulated as you watch. It feeds on the headline. <span class="dim">Drag anywhere to plant your own.</span></p>
+    <p class="lede slip rv" style="--d:700">Mycel grows leather, foam and packaging from mycelium in nine days, with no hide, no oil and nothing left over.</p>
+    <a class="cta rv" style="--d:820" href="#">See the materials <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 12 12 3M5 3h7v7"/></svg></a>
+  </div>
+
+  <i class="reg a"></i><i class="reg b"></i>
+</section>
+<script src="bg.js"></script>
+</body>
+</html>

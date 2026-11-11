@@ -1,6 +1,6 @@
 # Piixpal
 
-> 300+ free, open-source (MIT) animated UI components and templates for websites: pixel characters that live on the page, WebGL shader backgrounds, animated hero sections, 74 landing-page hero templates, ASCII animations, buttons, cards, text effects and form controls. Standard web components with zero dependencies: plain HTML, React, Next.js, Vue, Svelte, Astro, shadcn.
+> 300+ free, open-source (MIT) animated UI components and templates for websites: pixel characters that live on the page, WebGL shader backgrounds, animated hero sections, 76 landing-page hero templates, ASCII animations, buttons, cards, text effects and form controls. Standard web components with zero dependencies: plain HTML, React, Next.js, Vue, Svelte, Astro, shadcn.
 
 ## Install (pick one)
 - Script tag: <script src="https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js"></script>, then use any tag below anywhere.
@@ -18,7 +18,7 @@
 
 ## Docs
 - [UI components](https://piixpal.dvkk.dev/ui/): 137 animated components (backgrounds, heroes, shaders, buttons, text, forms…)
-- [Hero templates](https://piixpal.dvkk.dev/templates/): 74 full landing-page heroes
+- [Hero templates](https://piixpal.dvkk.dev/templates/): 76 full landing-page heroes
 - [Pixel characters](https://piixpal.dvkk.dev/components/): pals, sprites, superpowers, 3D
 - [Install](https://piixpal.dvkk.dev/components/install): every way to add Piixpal
 - [FAQ](https://piixpal.dvkk.dev/faq)
@@ -164,7 +164,9 @@
 - [Holo input](https://piixpal.dvkk.dev/ui/holo-input): A text field projected like a HUD.
 - [Paper sticker](https://piixpal.dvkk.dev/ui/paper-sticker): A die-cut sticker badge whose corner peels.
 
-## Hero templates (74)
+## Hero templates (76)
+- [Longshutter](https://piixpal.dvkk.dev/templates/longshutter/)
+- [Culture](https://piixpal.dvkk.dev/templates/culture/)
 - [Visor](https://piixpal.dvkk.dev/templates/visor/)
 - [Bitcloud](https://piixpal.dvkk.dev/templates/bitcloud/)
 - [Afterglow](https://piixpal.dvkk.dev/templates/afterglow/)

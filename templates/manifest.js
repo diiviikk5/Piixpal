@@ -1,6 +1,8 @@
 // Every template registers itself here. The gallery (templates/index.html) reads this list.
 // poster: CSS background shown before the live preview loads.
 window.TEMPLATES = [
+  { slug:'longshutter', name:'Longshutter', tags:['webgl','3d','space','particles','interactive','dark'], poster:'radial-gradient(60% 50% at 70% 55%,#16306e,#04060f 70%)' },
+  { slug:'culture', name:'Culture', tags:['webgl','simulation','typography','interactive','light','editorial'], poster:'#ecebe6' },
   { slug:'visor', name:'Visor', tags:['image','scroll','gsap','experience','3d','dark'], poster:'radial-gradient(30% 6% at 60% 46%,#ff3b30,transparent),#050304' },
   { slug:'bitcloud', name:'Bitcloud', tags:['pixel','dither','interactive','light','saas'], poster:'#1a1f3b' },
   { slug:'afterglow', name:'Afterglow', tags:['image','scroll','gsap','experience','fire','pixel'], poster:'url(afterglow/sunset.webp) center/cover' },
