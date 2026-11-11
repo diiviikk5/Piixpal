@@ -8,6 +8,8 @@ import { navBar } from './docs.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const V = createHash('md5').update(readFileSync(join(root, 'piixpal.js'))).digest('hex').slice(0, 8);
+/* the list and the gallery script are cached for an hour: a fingerprint on their URLs means a new template shows up at once */
+const MV = createHash('md5').update(readFileSync(join(root, 'templates', 'manifest.js'))).update(readFileSync(join(root, 'site', 'templates.js'))).digest('hex').slice(0, 8);
 const count = readdirSync(join(root, 'templates'), { withFileTypes: true }).filter(d => d.isDirectory() && existsSync(join(root, 'templates', d.name, 'index.html'))).length;
 
 writeFileSync(join(root, 'templates', 'index.html'), `<!doctype html>
@@ -58,8 +60,8 @@ ${navBar('templates', '../components/', '../ui/')}
     <div class="tg-step"><b>3</b><h3>Or own all of it</h3><p>Every template is plain HTML and one <code>bg.js</code> in the <a href="https://github.com/diiviikk5/Piixpal/tree/main/templates" target="_blank" rel="noopener">repo</a>. Pauses off-screen, respects reduced motion, falls back without WebGL.</p></div>
   </section>
 </main>
-<script src="manifest.js"></script>
-<script src="../site/templates.js"></script>
+<script src="manifest.js?v=${MV}"></script>
+<script src="../site/templates.js?v=${MV}"></script>
 <script src="../piixpal.js?v=${V}"></script>
 <script src="../site/site.js" defer></script>
 </body>
