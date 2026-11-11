@@ -1,7 +1,6 @@
 // Every template registers itself here. The gallery (templates/index.html) reads this list.
 // poster: CSS background shown before the live preview loads.
 window.TEMPLATES = [
-  { slug:'deadair', name:'Deadair', tags:['webgl','dither','glitch','pixel','interactive','dark'], poster:'radial-gradient(50% 60% at 72% 30%,#55575e,#1d1e22 55%,#08080a)' },
   { slug:'longshutter', name:'Longshutter', tags:['webgl','3d','space','particles','interactive','dark'], poster:'radial-gradient(60% 50% at 70% 55%,#16306e,#04060f 70%)' },
   { slug:'culture', name:'Culture', tags:['webgl','simulation','typography','interactive','light','editorial'], poster:'#ecebe6' },
   { slug:'visor', name:'Visor', tags:['image','scroll','gsap','experience','3d','dark'], poster:'radial-gradient(30% 6% at 60% 46%,#ff3b30,transparent),#050304' },

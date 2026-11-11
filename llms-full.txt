@@ -1,6 +1,6 @@
 # Piixpal
 
-> 300+ free, open-source (MIT) animated UI components and templates for websites: pixel characters that live on the page, WebGL shader backgrounds, animated hero sections, 77 landing-page hero templates, ASCII animations, buttons, cards, text effects and form controls. Standard web components with zero dependencies: plain HTML, React, Next.js, Vue, Svelte, Astro, shadcn.
+> 300+ free, open-source (MIT) animated UI components and templates for websites: pixel characters that live on the page, WebGL shader backgrounds, animated hero sections, 76 landing-page hero templates, ASCII animations, buttons, cards, text effects and form controls. Standard web components with zero dependencies: plain HTML, React, Next.js, Vue, Svelte, Astro, shadcn.
 
 ## Install (pick one)
 - Script tag: <script src="https://cdn.jsdelivr.net/npm/piixpal@0.4/piixpal.min.js"></script>, then use any tag below anywhere.
@@ -18,7 +18,7 @@
 
 ## Docs
 - [UI components](https://piixpal.dvkk.dev/ui/): 137 animated components (backgrounds, heroes, shaders, buttons, text, forms…)
-- [Hero templates](https://piixpal.dvkk.dev/templates/): 77 full landing-page heroes
+- [Hero templates](https://piixpal.dvkk.dev/templates/): 76 full landing-page heroes
 - [Pixel characters](https://piixpal.dvkk.dev/components/): pals, sprites, superpowers, 3D
 - [Install](https://piixpal.dvkk.dev/components/install): every way to add Piixpal
 - [FAQ](https://piixpal.dvkk.dev/faq)
@@ -206,8 +206,7 @@
 - [Receipt printer](https://piixpal.dvkk.dev/ui/receipt): A little thermal printer that prints your content, line by line. Tag: <piix-receipt>. File: dist/c/receipt.min.js
 - [Paper sticker](https://piixpal.dvkk.dev/ui/paper-sticker): A die-cut sticker badge whose corner peels. Tag: <piix-paper-sticker>. File: dist/c/paper-sticker.min.js
 
-## Hero templates (77)
-- [Deadair](https://piixpal.dvkk.dev/templates/deadair/): WebGL, dithered, pixel art, interactive hero. Background only: https://piixpal.dvkk.dev/templates/deadair/bg.js
+## Hero templates (76)
 - [Longshutter](https://piixpal.dvkk.dev/templates/longshutter/): WebGL, 3D, particles, interactive hero. Background only: https://piixpal.dvkk.dev/templates/longshutter/bg.js
 - [Culture](https://piixpal.dvkk.dev/templates/culture/): WebGL, interactive hero. Background only: https://piixpal.dvkk.dev/templates/culture/bg.js
 - [Visor](https://piixpal.dvkk.dev/templates/visor/): image, scroll-driven, GSAP scroll, 3D hero. Background only: https://piixpal.dvkk.dev/templates/visor/bg.js
@@ -410,7 +409,7 @@
 
 ## FAQ
 ### What is Piixpal?
-Piixpal is a free, open-source (MIT) library of 300+ animated UI components and templates for websites: pixel characters ("pals") that live on your page, WebGL shader backgrounds, animated hero sections, 77 landing-page hero templates, ASCII animations, buttons, cards, text effects and form controls. Every piece is a standard web component, so it works in plain HTML, React, Next.js, Vue, Svelte and Astro.
+Piixpal is a free, open-source (MIT) library of 300+ animated UI components and templates for websites: pixel characters ("pals") that live on your page, WebGL shader backgrounds, animated hero sections, 76 landing-page hero templates, ASCII animations, buttons, cards, text effects and form controls. Every piece is a standard web component, so it works in plain HTML, React, Next.js, Vue, Svelte and Astro.
 
 ### Is Piixpal free for commercial use?
 Yes. Everything is MIT-licensed: use it in personal, client and commercial projects, no attribution required, no account and no paid tier.
@@ -425,7 +424,7 @@ Yes. Import the wrappers (import { PiixPal } from "piixpal/react") or add compon
 Yes. Every component is in a shadcn registry: npx shadcn@latest add https://piixpal.dvkk.dev/r/NAME.json, then import it from @/components/piixpal/NAME. The full index is at https://piixpal.dvkk.dev/r/registry.json.
 
 ### Where can I find free animated hero section templates?
-Piixpal Templates has 77 free landing-page heroes that actually move: live WebGL shaders, GSAP scroll-driven scenes, fire, particles and ASCII worlds. Each one is a single HTML file with no build step: copy it, change the words and ship. Browse them at https://piixpal.dvkk.dev/templates/.
+Piixpal Templates has 76 free landing-page heroes that actually move: live WebGL shaders, GSAP scroll-driven scenes, fire, particles and ASCII worlds. Each one is a single HTML file with no build step: copy it, change the words and ship. Browse them at https://piixpal.dvkk.dev/templates/.
 
 ### How do I add an animated shader background to a landing page?
 Pick a background on https://piixpal.dvkk.dev/ui/ (aurora, silk, clouds, caustics, mesh gradients and more), add the script tag and place the element behind your content, for example <piix-fx kind="silk"></piix-fx>. Colours come from ten palettes or your own list of hex colours.
