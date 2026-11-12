@@ -8,6 +8,7 @@
  *   node pet.mjs                    watch whichever agent was active last
  *   node pet.mjs --pal kitty        pick a pet (node pet.mjs list shows them all)
  *   node pet.mjs --make AQ4M…       a pixel pal you made at piixpal.dvkk.dev/components/make
+ *   node pet.mjs --file my.pal.json a pal you made with the piixpal-pal skill (or --pal <name> once it is saved)
  *   node pet.mjs --agent codex      only watch Codex (or claude)
  *   node pet.mjs --scale 1|2        pixel size (default: fits the pane)
  *   node pet.mjs statusline         a one-line pet for Claude Code's status line
@@ -39,7 +40,11 @@ const loadPal = () => {
     if (/^A[g-v]/.test(code)) { console.error('That one is a smooth (drawn or photo) pal; the terminal pet draws pixel pals. Make one in the Pixel tab.'); process.exit(1); }
     try { const m = MAKER.decode(code); return { name: m.name, ...MAKER.sprite(m) }; } catch { console.error('That Pal Maker code looks broken.'); process.exit(1); }
   }
+  /* a pal file made with the piixpal-pal skill: --file ./mine.pal.json, or one saved in ~/.piixpal-pet/pals */
+  const file = flag('file', null);
+  if (file) { try { const j = JSON.parse(fs.readFileSync(file, 'utf8')); return { name: j.name || path.basename(file).replace(/\..*$/, ''), ...j }; } catch { console.error(`Cannot read the pal file ${file}`); process.exit(1); } }
   const name = (pick || SAVED.pal || 'bitbug').toLowerCase();
+  if (!PALS[name]) { try { return { name, ...JSON.parse(fs.readFileSync(path.join(STATE, 'pals', name + '.json'), 'utf8')) }; } catch { /* not one of yours either */ } }
   if (!PALS[name]) { console.error(`No pet called "${name}". Try: ${Object.keys(PALS).join(', ')}`); process.exit(1); }
   return { name, ...PALS[name] };
 };
@@ -88,7 +93,9 @@ if (cmd === 'statusline') {
   fs.writeFileSync(path.join(STATE, 'ping'), JSON.stringify({ kind: argv[1] || 'wait', at: Date.now() }));
   process.stdin.resume(); process.stdin.on('data', () => {}); setTimeout(() => process.exit(0), 50);
 } else if (cmd === 'list') {
-  for (const [name, p] of Object.entries(PALS)) {
+  const mine = {};
+  try { for (const f of fs.readdirSync(path.join(STATE, 'pals'))) if (f.endsWith('.json')) mine[f.slice(0, -5) + ' (yours)'] = JSON.parse(fs.readFileSync(path.join(STATE, 'pals', f), 'utf8')); } catch { /* none yet */ }
+  for (const [name, p] of Object.entries({ ...PALS, ...mine })) {
     const fr = p.frames[clipFor(p, 'idle')][0], pad = p.h - fr.length, rows = Array(Math.max(0, pad)).fill('').concat(fr);
     console.log(`\n  ${name}`);
     for (let y = 0; y < rows.length; y += 2) {
