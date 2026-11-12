@@ -137,6 +137,8 @@ function pageFor(f) {
       code: { name: t.name, noun: 'hero section template', section: 'Templates', keywords: t.tags }, crumbs: crumbs(['Templates', '/templates/'], [t.name, url]) };
   }
   if ((m = f.match(/^templates\/([\w-]+)\/bg\.html$/))) return { noindex: true, canonical: `/templates/${m[1]}/` };
+  if (f === 'skill/index.html') return { ...base, title: 'piixpal-pal: Agent Skill for Animated Pixel Characters · Piixpal',
+    desc: 'A free agent skill for Claude Code, Codex and Cursor: describe a pixel character, get it drawn and animated, then use it on your website or as a terminal pet.', crumbs: crumbs(['Skill', url]) };
   if (f === 'stage/index.html') return { ...base, title: 'Piixpal Stage: Animate Pixel Characters into Little Plays', desc: null, image: '/site/og/stage.jpg', crumbs: crumbs(['Stage', url]) };
   if (/^(lab|video|extension|film|desktop|pet)\//.test(f) || f === '404.html') return { noindex: true };
   return null;
