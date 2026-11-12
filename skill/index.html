@@ -4,8 +4,27 @@
 <script>(()=>{const d=document.documentElement;d.classList.add('js');let t;try{t=localStorage.getItem('piix-theme')}catch(e){}d.dataset.theme=t||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'white')})()</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>piixpal-pal: an agent skill that makes animated pixel pals</title>
-<meta name="description" content="A free agent skill for Claude Code, Codex and Cursor. Describe a pixel character, get it drawn and animated, then put it on your website or in your terminal.">
+<!-- seo:start -->
+<meta name="description" content="A free agent skill for Claude Code, Codex and Cursor: describe a pixel character, get it drawn and animated, then use it on your website or as a terminal pet.">
+<link rel="canonical" href="https://piixpal.dvkk.dev/skill/">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Piixpal">
+<meta property="og:url" content="https://piixpal.dvkk.dev/skill/">
+<meta property="og:title" content="piixpal-pal: Agent Skill for Animated Pixel Characters · Piixpal">
+<meta property="og:description" content="A free agent skill for Claude Code, Codex and Cursor: describe a pixel character, get it drawn and animated, then use it on your website or as a terminal pet.">
+<meta property="og:image" content="https://piixpal.dvkk.dev/site/og/default.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="piixpal-pal: Agent Skill for Animated Pixel Characters · Piixpal">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="piixpal-pal: Agent Skill for Animated Pixel Characters · Piixpal">
+<meta name="twitter:description" content="A free agent skill for Claude Code, Codex and Cursor: describe a pixel character, get it drawn and animated, then use it on your website or as a terminal pet.">
+<meta name="twitter:image" content="https://piixpal.dvkk.dev/site/og/default.jpg">
+<link rel="alternate" type="text/plain" title="Piixpal for AI agents" href="https://piixpal.dvkk.dev/llms.txt">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebPage","@id":"https://piixpal.dvkk.dev/skill/#page","url":"https://piixpal.dvkk.dev/skill/","name":"piixpal-pal: Agent Skill for Animated Pixel Characters · Piixpal","description":"A free agent skill for Claude Code, Codex and Cursor: describe a pixel character, get it drawn and animated, then use it on your website or as a terminal pet.","isPartOf":{"@id":"https://piixpal.dvkk.dev/#website"},"primaryImageOfPage":{"@type":"ImageObject","url":"https://piixpal.dvkk.dev/site/og/default.jpg"},"dateModified":"2026-11-12","inLanguage":"en"},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Piixpal","item":"https://piixpal.dvkk.dev/"},{"@type":"ListItem","position":2,"name":"Skill","item":"https://piixpal.dvkk.dev/skill/"}]}]}</script>
+<!-- seo:end -->
+<title data-orig="piixpal-pal: an agent skill that makes animated pixel pals">piixpal-pal: Agent Skill for Animated Pixel Characters · Piixpal</title>
 <meta name="theme-color" content="#f3eee3">
 <link rel="icon" href="../site/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -80,9 +99,9 @@
   </div>
 
   <h2 id="install">Install</h2>
-  <p class="lead">Claude Code:</p>
-  <div class="sk-code"><span class="sk-l">Terminal</span><pre>git clone https://github.com/diiviikk5/Piixpal /tmp/piixpal &amp;&amp; cp -r /tmp/piixpal/skills/piixpal-pal ~/.claude/skills/</pre><button class="copy" type="button" data-copy="git clone https://github.com/diiviikk5/Piixpal /tmp/piixpal &amp;&amp; cp -r /tmp/piixpal/skills/piixpal-pal ~/.claude/skills/">Copy</button></div>
-  <p class="lead">Codex, Cursor and other agents that read <code>SKILL.md</code> folders: copy <code>skills/piixpal-pal</code> into their skills directory. No agent? The tool works by hand (Node 18+, no dependencies).</p>
+  <p class="lead">One command. It finds Claude Code (<code>~/.claude/skills</code>), Codex and other agent skill folders on your machine, or use <code>--to &lt;folder&gt;</code>.</p>
+  <div class="sk-code"><span class="sk-l">Terminal</span><pre>npx piixpal-pal</pre><button class="copy" type="button" data-copy="npx piixpal-pal">Copy</button></div>
+  <p class="lead">Cursor and other agents that read <code>SKILL.md</code> folders: <code>npx piixpal-pal --to &lt;their skills folder&gt;</code>. No agent? The tool works by hand (Node 18+, no dependencies).</p>
   <div class="sk-code"><span class="sk-l">Then just ask</span><pre>Make me a pixel frog mascot for my site header</pre><button class="copy" type="button" data-copy="Make me a pixel frog mascot for my site header">Copy</button></div>
 
   <h2>How it works</h2>

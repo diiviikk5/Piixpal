@@ -1,0 +1,13 @@
+{
+  "name": "piixpal-pal",
+  "version": "1.0.0",
+  "description": "An agent skill for Claude Code, Codex and Cursor: describe a pixel character, get it drawn and animated, then use it on your website or as a terminal pet.",
+  "type": "module",
+  "bin": { "piixpal-pal": "bin/install.mjs" },
+  "files": ["bin", "SKILL.md", "README.md", "scripts", "references", "examples"],
+  "engines": { "node": ">=18" },
+  "keywords": ["claude-code", "codex", "agent-skill", "skill", "pixel-art", "sprite", "mascot", "piixpal"],
+  "homepage": "https://piixpal.dvkk.dev/skill",
+  "repository": { "type": "git", "url": "git+https://github.com/diiviikk5/Piixpal.git", "directory": "skills/piixpal-pal" },
+  "license": "MIT"
+}

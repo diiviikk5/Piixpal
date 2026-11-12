@@ -80,9 +80,9 @@ ${navBar('skill', '../components/', '../ui/')}
   </div>
 
   <h2 id="install">Install</h2>
-  <p class="lead">Claude Code:</p>
-  ${code('git clone https://github.com/diiviikk5/Piixpal /tmp/piixpal && cp -r /tmp/piixpal/skills/piixpal-pal ~/.claude/skills/', 'Terminal')}
-  <p class="lead">Codex, Cursor and other agents that read <code>SKILL.md</code> folders: copy <code>skills/piixpal-pal</code> into their skills directory. No agent? The tool works by hand (Node 18+, no dependencies).</p>
+  <p class="lead">One command. It finds Claude Code (<code>~/.claude/skills</code>), Codex and other agent skill folders on your machine, or use <code>--to &lt;folder&gt;</code>.</p>
+  ${code('npx piixpal-pal', 'Terminal')}
+  <p class="lead">Cursor and other agents that read <code>SKILL.md</code> folders: <code>npx piixpal-pal --to &lt;their skills folder&gt;</code>. No agent? The tool works by hand (Node 18+, no dependencies).</p>
   ${code('Make me a pixel frog mascot for my site header', 'Then just ask')}
 
   <h2>How it works</h2>
