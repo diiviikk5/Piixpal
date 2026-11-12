@@ -251,9 +251,11 @@ export const navBar = (key, pre = '', ui = '../ui/') => `<header class="nav" id=
       <a href="${pre}./"${['index', 'sprites', 'pals', 'crowd', 'type', 'powers', 'studio', 'visit', 'agents', 'readme', 'nomad'].includes(key) ? ' aria-current="page"' : ''}>Components</a>
       <a href="${ui}"${key.startsWith('ui') ? ' aria-current="page"' : ''}>Pixel UI</a>
       <a href="/templates/"${key === 'templates' ? ' aria-current="page"' : ''}>Templates</a>
+      <a href="/gitpal/"${key === 'gitpal' ? ' aria-current="page"' : ''}>Gitpal<b class="new">new</b></a>
       <a href="${pre}install.html"${key === 'install' ? ' aria-current="page"' : ''}>Install</a>
       <a href="${pre}builder.html"${key === 'builder' || key === 'make' ? ' aria-current="page"' : ''}>Builder</a>
-      <a href="/stage/">Stage<b class="new">new</b></a>
+      <a href="/skill/"${key === 'skill' ? ' aria-current="page"' : ''}>Skill<b class="new">new</b></a>
+      <a href="/stage/">Stage</a>
     </nav>
     <div class="theme" role="group" aria-label="Theme">
       <button type="button" data-theme-set="white" title="White" aria-label="White theme"><svg viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M3 0h2v1H3zM3 7h2v1H3zM0 3h1v2H0zM7 3h1v2H7zM2 2h4v4H2z"/></svg></button>
