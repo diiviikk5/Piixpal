@@ -1,50 +1,311 @@
 <!doctype html>
 <html lang="en">
 <head>
-<script>(()=>{const d=document.documentElement;d.classList.add('js');let t;try{t=localStorage.getItem('piix-theme')}catch(e){}d.dataset.theme=t||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'white')})()</script>
+<script>(()=>{const d=document.documentElement;d.classList.add('js')})()</script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- seo:start -->
 <meta name="robots" content="noindex, follow">
 <!-- seo:end -->
-<title>404 · Piixpal</title>
+<title>404 · The Case of the Missing Page · Piixpal</title>
 <meta name="robots" content="noindex">
-<link rel="icon" href="/Piixpal/site/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/site/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Silkscreen&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Silkscreen:wght@400;700&display=block" rel="stylesheet">
 <style>
-  :root{--paper:#f3eee3;--ink:#17121f;--lime:#c6f432;--muted:#6c6477;--piix-z:10}
-  *{box-sizing:border-box}
-  body{margin:0;min-height:100svh;display:grid;place-items:center;background:var(--paper);color:var(--ink);
-    font:400 18px/1.5 "Bricolage Grotesque",system-ui,sans-serif;text-align:center;padding:40px 20px;
-    background-image:radial-gradient(rgba(23,18,31,.2) 1.1px,transparent 1.4px);background-size:22px 22px}
-  main{width:min(720px,100%)}
-  .code{margin:0 auto 18px;max-width:560px}
-  h1{font:780 clamp(30px,5vw,46px)/1.05 "Bricolage Grotesque",sans-serif;letter-spacing:-.04em;margin:24px 0 10px}
-  p{color:var(--muted);margin:0 0 28px}
-  a.btn{display:inline-flex;align-items:center;height:50px;padding:0 22px;border:2px solid var(--ink);border-radius:12px;background:var(--lime);
-    color:var(--ink);font:650 16px/1 "Bricolage Grotesque",sans-serif;text-decoration:none;box-shadow:0 4px 0 var(--ink);transition:transform .2s,box-shadow .2s}
-  a.btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--ink)}
-  .tag{font:400 12px/1 "Silkscreen",monospace;text-transform:uppercase;color:var(--muted)}
+  :root{--lime:#c6f432;--paper:#f3eee3;--ink:#0b0814}
+  *{box-sizing:border-box;margin:0}
+  body{min-height:100svh;background:#07050e;color:var(--paper);font:400 17px/1.5 "Bricolage Grotesque",system-ui,sans-serif;display:grid;place-items:center;padding:24px 16px 32px;
+    background-image:radial-gradient(60% 50% at 50% 38%,#1a1233,transparent 70%)}
+  main{width:min(1120px,100%);display:grid;gap:22px}
+  .top{display:flex;justify-content:space-between;align-items:center;font:400 11px/1 Silkscreen,monospace;letter-spacing:.14em;text-transform:uppercase;color:#8d84a6}
+  .top b{color:var(--lime);font-weight:400}
+  /* the screen: a little CRT with a hard shadow */
+  .screen{position:relative;aspect-ratio:16/9;background:#000;border-radius:14px;overflow:hidden;box-shadow:0 0 0 4px #2a2140,0 0 0 7px #0b0814,10px 12px 0 7px #000,0 40px 80px -30px #6b3bff55}
+  canvas{display:block;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;cursor:pointer}
+  .screen::after{content:"";position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.16) 0 1px,transparent 1px 3px);mix-blend-mode:multiply}
+  .below{display:flex;flex-wrap:wrap;gap:18px 28px;align-items:center;justify-content:space-between}
+  h1{font:800 clamp(26px,4vw,40px)/1.05 "Bricolage Grotesque",sans-serif;letter-spacing:-.04em}
+  p{color:#a79fbd;margin-top:6px;max-width:46ch}
+  .acts{display:flex;gap:12px;flex-wrap:wrap}
+  a.btn,button.btn{display:inline-flex;align-items:center;gap:8px;height:50px;padding:0 22px;border:2px solid var(--paper);border-radius:12px;background:var(--lime);color:#0b0814;cursor:pointer;
+    font:700 16px/1 "Bricolage Grotesque",sans-serif;text-decoration:none;box-shadow:0 4px 0 var(--paper);transition:transform .18s,box-shadow .18s}
+  a.btn:hover,button.btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--paper)}
+  button.btn{background:transparent;color:var(--paper)}
+  .still{display:none}
+  noscript p{margin:30px}
+  @media (prefers-reduced-motion:reduce){.hint{display:none}}
+  @media (max-width:640px){.hint{display:none}}
 </style>
 <!-- Vercel Web Analytics: cookieless page views -->
 <script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};</script>
 <script defer src="/_vercel/insights/script.js"></script>
-<!-- Microsoft Clarity: heatmaps and session recordings -->
-<script>(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","z45d6i2fi1");</script>
 </head>
 <body>
 <main>
-  <span class="tag">error · page not found</span>
-  <div class="code"><piix-type id="four" text="404" rows="20" cell="16" shade="#c6f432" fit></piix-type></div>
-  <piix-pal pal="bitbug" on="#four" scale="4"></piix-pal>
-  <piix-pal pal="boing" on="#four" scale="4" at=".8"></piix-pal>
-  <h1 id="lost">This page wandered off.<piix-pal pal="moss" at="1"></piix-pal></h1>
-  <p>The pals looked everywhere. Nothing here but them.</p>
-  <a class="btn" href="/Piixpal/">Take me home</a>
-  <piix-pal pal="pip" on=".btn"></piix-pal>
+  <div class="top"><span>Piixpal pictures · <b>404</b></span><span class="hint">click the screen to skip a scene</span></div>
+  <div class="screen"><canvas id="c" width="640" height="360" aria-label="A short film starring pixel pals, 'The Case of the Missing Page': a detective bug, a cat, a chase, and a reveal that this page never existed." role="img"></canvas></div>
+  <div class="below">
+    <div><h1>This page wandered off.</h1><p>The pals looked everywhere. Turns out it was never here. Sorry about that.</p></div>
+    <div class="acts"><a class="btn" href="/">Take me home</a><button class="btn" id="again" type="button">Watch again</button></div>
+  </div>
+  <noscript><p>404: this page wandered off. <a href="/">Take me home</a>.</p></noscript>
 </main>
-<script src="/Piixpal/piixpal.min.js"></script>
+<script>
+(() => {
+const PALS = {"bitbug":{"w":16,"h":11,"palette":{"k":"#1b1226","g":"#b8f23a","G":"#efffc0","d":"#6a9c1c","s":"#3f6b10","h":"#3a2a55","w":"#ffffff","p":"#ff7aa8"},"frames":{"walk":[["...............k","...kkkkkk.....k.",".kkGGggggkk...k.","kGGggsggggdk.k..","kGgggggsggdkkkk.","kgsggggggddkhwwk","kdggggsggddkhwkk","kddddddddddkhhpk",".kkkkkkkkkkkkkk.","..k...k...k.....",".k...k...k......"],["..............k.","...kkkkkk.....k.",".kkGGggggkk..k..","kGGggsggggdk.k..","kGgggggsggdkkkk.","kgsggggggddkhwwk","kdggggsggddkhwkk","kddddddddddkhhpk",".kkkkkkkkkkkkkk.","..k...k...k.....","...k...k...k...."]],"idle":[["...............k","...kkkkkk.....k.",".kkGGggggkk...k.","kGGggsggggdk.k..","kGgggggsggdkkkk.","kgsggggggddkhwwk","kdggggsggddkhwkk","kddddddddddkhhpk",".kkkkkkkkkkkkkk.","..k...k...k.....","..k...k...k....."],["...............k","...kkkkkk.....k.",".kkGGggggkk...k.","kGGggsggggdk.k..","kGgggggsggdkkkk.","kgsggggggddkhwwk","kdggggsggddkhwkk","kddddddddddkhhpk",".kkkkkkkkkkkkkk.","..k...k...k.....","..k...k...k....."],["...............k","...kkkkkk.....k.",".kkGGggggkk...k.","kGGggsggggdk.k..","kGgggggsggdkkkk.","kgsggggggddkhhhk","kdggggsggddkhkkk","kddddddddddkhhpk",".kkkkkkkkkkkkkk.","..k...k...k.....","..k...k...k....."],["...............k","...kkkkkk.....k.",".kkGGggggkk...k.","kGGggsggggdk.k..","kGgggggsggdkkkk.","kgsggggggddkhwwk","kdggggsggddkhwkk","kddddddddddkhhpk",".kkkkkkkkkkkkkk.","..k...k...k.....","..k...k...k....."]],"look":[["...............k","...kkkkkk.....k.",".kkGGggggkk...k.","kGGggsggggdk.k..","kGgggggsggdkkkk.","kgsggggggddkhwkk","kdggggsggddkhwwk","kddddddddddkhhpk",".kkkkkkkkkkkkkk.","..k...k...k.....","..k...k...k....."],["..............k.","...kkkkkk.....k.",".kkGGggggkk..k..","kGGggsggggdk.k..","kGgggggsggdkkkk.","kgsggggggddkhwkk","kdggggsggddkhwwk","kddddddddddkhhpk",".kkkkkkkkkkkkkk.","..k...k...k.....","..k...k...k....."],["............k...","...kkkkkk....k..",".kkGGggggkk..k..","kGGggsggggdk.k..","kGgggggsggdkkkk.","kgsggggggddkhwwk","kdggggsggddkhkwk","kddddddddddkhhpk",".kkkkkkkkkkkkkk.","..k...k...k.....","..k...k...k....."],["............k...","...kkkkkk....k..",".kkGGggggkk..k..","kGGggsggggdk.k..","kGgggggsggdkkkk.","kgsggggggddkhwwk","kdggggsggddkhkwk","kddddddddddkhhpk",".kkkkkkkkkkkkkk.","..k...k...k.....","..k...k...k....."]],"sniff":[["................","...kkkkkk.......",".kkGGggggkk....k","kGGggsggggdk.kk.","kGgggggsggdkkkk.","kgsggggggddkhwwk","kdggggsggddkhwkk","kddddddddddkhhpk",".kkkkkkkkkkkkkk.","..k...k...k.....","..k...k...k....."],["................","...kkkkkk.......",".kkGGggggkk....k","kGGggsggggdk.kk.","kGgggggsggdkkkk.","kgsggggggddkhwwk","kdggggsggddkhwkk","kddddddddddkhhpk",".kkkkkkkkkkkkkk.","..k...k...k.....",".k...k...k......"],["................","...kkkkkk.......",".kkGGggggkk....k","kGGggsggggdk.kk.","kGgggggsggdkkkk.","kgsggggggddkhhhk","kdggggsggddkhkkk","kddddddddddkhhpk",".kkkkkkkkkkkkkk.","..k...k...k.....","..k...k...k....."],["..............k.","...kkkkkk.....k.",".kkGGggggkk..k..","kGGggsggggdk.k..","kGgggggsggdkkkk.","kgsggggggddkhwwk","kdggggsggddkhwkk","kddddddddddkhhpk",".kkkkkkkkkkkkkk.","..k...k...k.....","..k...k...k....."]],"alarm":[["...............k","...kkkkkk.....k.",".kkGGggggkk...k.","kGGggsggggdk.k..","kGgggggsggdkkkk.","kgsggggggddkwwkk","kdggggsggddkwwkk","kddddddddddkhhpk",".kkkkkkkkkkkkkk.","..k...k...k.....","..k...k...k....."],["..............k.","...kkkkkk.....k.",".kkGGggggkk..k..","kGGggsggggdk.k..","kGgggggsggdkkkk.","kgsggggggddkwwkk","kdggggsggddkwwkk","kddddddddddkhhpk",".kkkkkkkkkkkkkk.",".k.k.k.k.k......"]],"hop":[["...............k","...kkkkkk.....k.",".kkGGggggkk...k.","kGGggsggggdk.k..","kGgggggsggdkkkk.","kgsggggggddkwwkk","kdggggsggddkwwkk","kddddddddddkhhpk",".kkkkkkkkkkkkkk.",".k.k.k.k.k......"]],"flip":[[".k...k...k......","..k...k...k.....",".kkkkkkkkkkkkkk.","kddddddddddkhhpk","kdggggsggddkhkkk","kgsggggggddkhhhk","kGgggggsggdkkkk.","kGGggsggggdk....",".kkGGggggkk.....","...kkkkkk......."],["...k...k...k....","..k...k...k.....",".kkkkkkkkkkkkkk.","kddddddddddkhhpk","kdggggsggddkhkkk","kgsggggggddkhhhk","kGgggggsggdkkkk.","kGGggsggggdk....",".kkGGggggkk.....","...kkkkkk......."]]},"fps":{"walk":10,"idle":3,"look":2,"sniff":4,"alarm":12,"flip":12,"hop":1}},"kitty":{"w":18,"h":9,"palette":{"k":"#17121f","b":"#2b2436","w":"#c6f432","p":"#ff9cc2"},"frames":{"rest":[["..k.k.............",".kkkkk............","kbwbbwk...........","kbbpbbkkkkkkkkk...","kbbbbbbbbbbbbbbk..",".kbbbbbbbbbbbbbbkk",".kbbbbbbbbbbbbbbbk",".kkbbkkkkkkkkbbkk.","..kkk.......kkk..."],["..k.k.............",".kkkkk............","kbwbbwk...........","kbbpbbkkkkkkkkk...","kbbbbbbbbbbbbbbk..",".kbbbbbbbbbbbbbbkk",".kbbbbbbbbbbbbbbbk",".kkbbkkkkkkkkbbkk.","..kkk.......kkk..."],["..k.k.............",".kkkkk............","kbwbbwk...........","kbbpbbkkkkkkkkk..k","kbbbbbbbbbbbbbb.kk",".kbbbbbbbbbbbbbk..",".kbbbbbbbbbbbbbb..",".kkbbkkkkkkkkbbkk.","..kkk.......kkk..."],["..k.k.............",".kkkkk............","kbwbbwk...........","kbbpbbkkkkkkkkk...","kbbbbbbbbbbbbbbk..",".kbbbbbbbbbbbbbbkk",".kbbbbbbbbbbbbbbbk",".kkbbkkkkkkkkbbkk.","..kkk.......kkk..."]],"swat":[["..k.k.............",".kkkkk............","kbwbbwk...........","kbbpbbkkkkkkkkk...","kbbbbbbbbbbbbbbk..","kkbbbbbbbbbbbbbbkk","kbkbbbbbbbbbbbbbbk",".kkbbkkkkkkkkbbkk.","..kkk.......kkk..."],["..k.k.............",".kkkkk............","kbwbbwk...........","kbbpbbkkkkkkkkk...","kbbbbbbbbbbbbbbk..",".kbbbbbbbbbbbbbbkk",".kbbbbbbbbbbbbbbbk",".kkbbkkkkkkkkbbkk.","..kkk.......kkk..."]],"sleep":[["..k.k.............",".kkkkk............","kbkbbkb...........","kbbpbbkkkkkkkkk...","kbbbbbbbbbbbbbbk..",".kbbbbbbbbbbbbbbkk",".kbbbbbbbbbbbbbbbk",".kkbbkkkkkkkkbbkk.","..kkk.......kkk..."]],"purr":[["..k.k.............",".kkkkk............","kbkbbkb...........","kbppbbkkkkkkkkk...","kbbbbbbbbbbbbbbk..",".kbbbbbbbbbbbbbbkk",".kbbbbbbbbbbbbbbbk",".kkbbkkkkkkkkbbkk.","..kkk.......kkk..."]]},"fps":{"rest":3,"swat":7}},"pip":{"w":14,"h":13,"palette":{"k":"#1b1226","y":"#ffd23f","W":"#e89b12","w":"#ffffff","o":"#ff7a2f"},"frames":{"idle":[["......kkkk....",".....kyyyyk...","....kyyyyyyk..","....kyyyywkk..","...kyyyyyykkoo","..kyyyyyyyyoo.","kkyyWWWyyyyk..","kyyWWWWWyyyk..",".kyyWWWyyyyk..","..kyyyyyyyk...","...kkkkkkk....","....o..o......"],["......kkkk....",".....kyyyyk...","....kyyyyyyk..","....kyyyywkk..","...kyyyyyykkoo","..kyyyyyyyyoo.","kkyyWWWyyyyk..","kyyWWWWWyyyk..",".kyyWWWyyyyk..","..kyyyyyyyk...","...kkkkkkk....","....o..o......"],["......kkkk....",".....kyyyyk...","....kyyyyyyk..","....kyyyywkk..","...kyyyyyykkoo","..kyyyyyyyyoo.","kkyyWWWyyyyk..","kyyWWWWWyyyk..",".kyyWWWyyyyk..","..kyyyyyyyk...","...kkkkkkk....","....o..o......"],["......kkkk....",".....kyyyyk...","....kyyyyyyk..","....kyyyyykk..","...kyyyyyykkoo","..kyyyyyyyyoo.","kkyyWWWyyyyk..","kyyWWWWWyyyk..",".kyyWWWyyyyk..","..kyyyyyyyk...","...kkkkkkk....","....o..o......"],["......kkkk....",".....kyyyyk...","....kyyyyyyk..","....kyyyywkk..","...kyyyyyykkoo","..kyyyyyyyyoo.","kkyyWWWyyyyk..","kyyWWWWWyyyk..",".kyyWWWyyyyk..","..kyyyyyyyk...","...kkkkkkk....","....o..o......"],["......kkkk....",".....kyyyyk...","....kyyyyyyk..","....kyyyywkk..","...kyyyyyykkoo","..kyyyyyyyyoo.","kkyyWWWyyyyk..","kyyWWWWWyyyk..",".kyyWWWyyyyk..","..kyyyyyyyk...","...kkkkkkk....","....o..o......"]],"look":[["......kkkk....",".....kyyyyk...","....kyyyykyk..","....kyyywkkk..","...kyyyyyykkoo","..kyyyyyyyyoo.","kkyyWWWyyyyk..","kyyWWWWWyyyk..",".kyyWWWyyyyk..","..kyyyyyyyk...","...kkkkkkk....","....o..o......"],["......kkkk....",".....kyyyyk...","....kyyyykyk..","....kyyywkkk..","...kyyyyyykkoo","..kyyyyyyyyoo.","kkyyWWWyyyyk..","kyyWWWWWyyyk..",".kyyWWWyyyyk..","..kyyyyyyyk...","...kkkkkkk....","....o..o......"],["......kkkk....",".....kyyyyk...","....kyyyyyyk..","....kyyyywkk..","...kyyyyyykkoo","..kyyyyyyyyoo.","kkyyWWWyyyyk..","kyyWWWWWyyyk..",".kyyWWWyyyyk..","..kyyyyyyyk...","...kkkkkkk....","....o..o......"]],"peck":[["......kkkk....",".....kyyyyk...","....kyyyyyyk..","....kyyyywkk..","...kyyyyyykk..","..kyyyyyyyykoo","kkyyWWWyyyykoo","kyyWWWWWyyyk..",".kyyWWWyyyyk..","..kyyyyyyyk...","...kkkkkkk....","....o..o......"],["......kkkk....",".....kyyyyk...","....kyyyyyyk..","....kyyyywkk..","...kyyyyyykkoo","..kyyyyyyyyoo.","kkyyWWWyyyyk..","kyyWWWWWyyyk..",".kyyWWWyyyyk..","..kyyyyyyyk...","...kkkkkkk....","....o..o......"],["......kkkk....",".....kyyyyk...","....kyyyyyyk..","....kyyyywkk..","...kyyyyyykk..","..kyyyyyyyykoo","kkyyWWWyyyykoo","kyyWWWWWyyyk..",".kyyWWWyyyyk..","..kyyyyyyyk...","...kkkkkkk....","....o..o......"],["......kkkk....",".....kyyyyk...","....kyyyyyyk..","....kyyyywkk..","...kyyyyyykkoo","..kyyyyyyyyoo.","kkyyWWWyyyyk..","kyyWWWWWyyyk..",".kyyWWWyyyyk..","..kyyyyyyyk...","...kkkkkkk....","....o..o......"]],"fly":[["......kkkk....",".....kyyyyk...","...kk..yyyyk..","..kWWk.yywkk..","..kWWWkyyykkoo","...kWWkyyyyoo.","kkyyyyWyyyyk..","kyyyyyyyyyyk..",".kyyyyyyyyyk..","..kyyyyyyyk...","...kkkkkkk....",".............."],["......kkkk....",".....kyyyyk...","....kyyyyyyk..","....kyyyywkk..","...kyyyyyykkoo","..kyyyyyyyyoo.","kkyyyyWyyyyk..","kyyyyyyyyyyk..",".kyyyyyyyyyk..","..kkWWWkyyk...","...kkWkkkk....",".....k........"]]},"fps":{"idle":3,"look":2,"peck":8,"fly":12}},"frog":{"w":12,"h":9,"palette":{"k":"#17121f","g":"#7bd63a","G":"#c8f58a","w":"#ffffff","p":"#ff7aa8"},"frames":{"sit":[["..kk....kk..",".kwwk..kwwk.",".kwkkkkkwkk.","kggggggggggg","kgGgggggggGk","kgggkkkkgggk","kgggggggggk.",".kgg.kk.ggk.","kkgk....kgkk"],["..kk....kk..",".kwwk..kwwk.",".kwkkkkkwkk.","kggggggggggg","kgGgggggggGk","kgggkkkkgggk","kgggggggggk.",".kgg.kk.ggk.","kkgk....kgkk"],["..kk....kk..",".kwwk..kwwk.",".kwkkkkkwkk.","kggggggggggg","kgGgggggggGk","kgggkkkkgggk","kgggggggggk.",".kgg.kk.ggk.","kkgk....kgkk"],["..kk....kk..",".kkkk..kkkk.",".kwkkkkkwkk.","kggggggggggg","kgGgggggggGk","kgggkkkkgggk","kgggggggggk.",".kgg.kk.ggk.","kkgk....kgkk"]],"snap":[["..kk....kk..",".kwwk..kwwk.",".kwkkkkkwkk.","kggggggggggg","kgGgggggggGk","kgggkppkgggk","kgggggggggk.",".kgg.kk.ggk.","kkgk....kgkk"]],"jump":[["..kk....kk..",".kwwk..kwwk.",".kwkkkkkwkk.","kggggggggggg","kgGgggggggGk","kgggkkkkgggk","kgggggggggk.",".kgg.kk.ggk.",".kk......kk."]],"happy":[["..kk....kk..",".kkkk..kkkk.",".kwkkkkkwkk.","kggggggggggg","kgGgggggggGk","kgggkggkgggk","kgggggggggk.",".kgg.kk.ggk.","kkgk....kgkk"]]},"fps":{"sit":1.4}},"boing":{"w":14,"h":12,"palette":{"k":"#1b1226","c":"#ff6b4a","H":"#ffd4c4","d":"#cf3f22","p":"#ffb3a0","w":"#ffffff"},"frames":{"idle":[[".....kkkk.....","...kkcccckk...","..kcHHccccck..",".kcHHccccccck.",".kcHcccccccck.","kcccwkccwkccck","kccckkcckkccck","kcpcckcckcccpk","kdcccckkccccdk","kddccccccccddk",".kddddddddddk.","..kkkkkkkkkk.."],[".....kkkk.....","...kkcccckk...","..kcHHccccck..",".kcHHccccccck.",".kcHcccccccck.","kcccwkccwkccck","kccckkcckkccck","kcpcckcckcccpk","kdcccckkccccdk","kddccccccccddk",".kddddddddddk.","..kkkkkkkkkk.."],[".....kkkk.....","...kkcccckk...","..kcHHccccck..",".kcHHccccccck.",".kcHcccccccck.","kcccwkccwkccck","kccckkcckkccck","kcpcckcckcccpk","kdcccckkccccdk","kddccccccccddk",".kddddddddddk.","..kkkkkkkkkk.."],[".....kkkk.....","...kkcccckk...","..kcHHccccck..",".kcHHccccccck.",".kcHcccccccck.","kcccccccccccck","kccckkcckkccck","kcpcckcckcccpk","kdcccckkccccdk","kddccccccccddk",".kddddddddddk.","..kkkkkkkkkk.."]],"air":[[".....kkkk.....","...kkcccckk...","..kcHHccccck..",".kcHHccccccck.",".kcHcccccccck.","kcccwkccwkccck","kccckkcckkccck","kcpccckkccccpk","kdcccckkccccdk","kddccccccccddk",".kddddddddddk.","..kkkkkkkkkk.."]],"rise":[[".....kkkk.....","...kkcccckk...","..kcHHccccck..",".kcHHccccccck.",".kcHcccccccck.","kccckkcckkccck","kcccwkccwkccck","kcpcckcckcccpk","kdcccckkccccdk","kddccccccccddk",".kddddddddddk.","..kkkkkkkkkk.."]],"land":[[".....kkkk.....","...kkcccckk...","..kcHHccccck..",".kcHHccccccck.",".kcHcccccccck.","kccckkcckkccck","kcccccccccccck","kcpccckkccccpk","kdccccccccccdk","kddccccccccddk",".kddddddddddk.","..kkkkkkkkkk.."]],"held":[[".....kkkk.....","...kkcccckk...","..kcHHccccck..",".kcHHccccccck.",".kcHcccccccck.","kcccwkccwkccck","kccckkcckkccck","kcpccckckcccpk","kdccckckccccdk","kddccccccccddk",".kddddddddddk.","..kkkkkkkkkk.."],[".....kkkk.....","...kkcccckk...","..kcHHccccck..",".kcHHccccccck.",".kcHcccccccck.","kcccccccccccck","kccckkcckkccck","kcpccckckcccpk","kdccckckccccdk","kddccccccccddk",".kddddddddddk.","..kkkkkkkkkk.."]],"dizzy":[[".....kkkk.....","...kkcccckk...","..kcHHccccck..",".kcHHccccccck.",".kcHcccccccck.","kccckccckcccck","kcccckccckccck","kcpccckckcccpk","kdccckckccccdk","kddccccccccddk",".kddddddddddk.","..kkkkkkkkkk.."],[".....kkkk.....","...kkcccckk...","..kcHHccccck..",".kcHHccccccck.",".kcHcccccccck.","kccckccckcccck","kcccckccckccck","kcpccckkccccpk","kdccccccccccdk","kddccccccccddk",".kddddddddddk.","..kkkkkkkkkk.."]],"happy":[[".....kkkk.....","...kkcccckk...","..kcHHccccck..",".kcHHccccccck.",".kcHcccccccck.","kccckkcckkccck","kcccccccccccck","kcpcckcckcccpk","kdcccckkccccdk","kddccccccccddk",".kddddddddddk.","..kkkkkkkkkk.."]]},"fps":{"idle":3,"held":8,"dizzy":6}},"penguin":{"w":12,"h":11,"palette":{"k":"#17121f","b":"#2b3a55","w":"#ffffff","o":"#ff9a2f"},"frames":{"walk":[["...kkkk.....","..kbbbbk....",".kbwkbwk....",".kbbooobk...",".kbwwwwbk...","kbbwwwwbbk..","kbbwwwwbbk..","kbbwwwwbbk..",".kbwwwwbk...","..kkkkkk....","..oo..oo...."],["...kkkk.....","..kbbbbk....",".kbwkbwk....",".kbbooobk...",".kbwwwwbk...","kbbwwwwbbk..","kbbwwwwbbk..","kbbwwwwbbk..",".kbwwwwbk...","..kkkkkk....","...oo..oo..."]],"idle":[["...kkkk.....","..kbbbbk....",".kbwkbwk....",".kbbooobk...",".kbwwwwbk...","kbbwwwwbbk..","kbbwwwwbbk..","kbbwwwwbbk..",".kbwwwwbk...","..kkkkkk....","..oo..oo...."]],"slide":[["............","............","............","............","............","............",".....kkkkk..","kkkkkbbbbbk.","kwwwwwwbwbkk","kwwwwwwwbbko",".kkkkkkkkkk."]]},"fps":{"walk":6}},"moss":{"w":16,"h":16,"palette":{"k":"#1b1226","v":"#8a6bff","V":"#cbbcff","w":"#fffdf5","b":"#ffe6c4","R":"#25b89a","y":"#ffd23f"},"frames":{"read":[["....kkkkkkkk....","..kkvvvvvvvvkk..",".kvvVVvvvvwwvvk.","kvvVVvvvvvwwvvvk","kvwwvvvvvvvvvvvk","kvwwvvvvvwwvvvvk","kkkkkkkkkkkkkkkk","..kbbbbbbbbbbk..","..kbkkbbbbkkbk..",".kkkkkkkkkkkkkk.","bkRRRRRRRRRRRRkb","bkRyyyyyRRRRRRkb",".kRRRRRRRRRRRRk.",".kkkkkkkkkkkkkk.","...kbbbbbbbbk...","..kkkk....kkkk.."],["....kkkkkkkk....","..kkvvvvvvvvkk..",".kvvVVvvvvwwvvk.","kvvVVvvvvvwwvvvk","kvwwvvvvvvvvvvvk","kvwwvvvvvwwvvvvk","kkkkkkkkkkkkkkkk","..kbbbbbbbbbbk..","..kbkkbbbbkkbk..",".kkkkkkkkkkkkkk.","bkRRRRRRRRRRRRkb","bkRyyyyyRRRRRRkb",".kRRRRRRRRRRRRk.",".kkkkkkkkkkkkkk.","...kbbbbbbbbk...","..kkkk....kkkk.."],["....kkkkkkkk....","..kkvvvvvvvvkk..",".kvvVVvvvvwwvvk.","kvvVVvvvvvwwvvvk","kvwwvvvvvvvvvvvk","kvwwvvvvvwwvvvvk","kkkkkkkkkkkkkkkk","..kbbbbbbbbbbk..","..kbkkbbbbkkbk..",".kkkkkkkkkkkkkk.","bkRRRRRRRRRRRRkb","bkRyyyyyRRRRRRkb",".kRRRRRRRRRRRRk.",".kkkkkkkkkkkkkk.","...kbbbbbbbbk...","..kkkk....kkkk.."],["....kkkkkkkk....","..kkvvvvvvvvkk..",".kvvVVvvvvwwvvk.","kvvVVvvvvvwwvvvk","kvwwvvvvvvvvvvvk","kvwwvvvvvwwvvvvk","kkkkkkkkkkkkkkkk","..kbbbbbbbbbbk..","..kbkkbbbbkkbk..",".kkkkkkkkkkkkkk.","bkRRRRRRRRRRRRkb","bkRyyyyyRRRRRRkb",".kRRRRRRRRRRRRk.",".kkkkkkkkkkkkkk.","...kbbbbbbbbk...","..kkkk....kkkk.."],["....kkkkkkkk....","..kkvvvvvvvvkk..",".kvvVVvvvvwwvvk.","kvvVVvvvvvwwvvvk","kvwwvvvvvvvvvvvk","kvwwvvvvvwwvvvvk","kkkkkkkkkkkkkkkk","..kbbbbbbbbbbk..","..kbkkbbbbkkbk..",".kkkkkkkkkkkkkk.","bkRRRRRRRRRRRRkb","bkRyyyyyRRRRRRkb",".kRRRRRRRRRRRRk.",".kkkkkkkkkkkkkk.","...kbbbbbbbbk...","..kkkk....kkkk.."],["....kkkkkkkk....","..kkvvvvvvvvkk..",".kvvVVvvvvwwvvk.","kvvVVvvvvvwwvvvk","kvwwvvvvvvvvvvvk","kvwwvvvvvwwvvvvk","kkkkkkkkkkkkkkkk","..kbbbbbbbbbbk..","..kbkkbbbbkkbk..",".kkkkkkkkkkkkkk.","bkRRRRRRRRRRRRkb","bkRyyyyyRRRRRRkb",".kRRRRRRRRRRRRk.",".kkkkkkkkkkkkkk.","...kbbbbbbbbk...","..kkkk....kkkk.."]],"flip":[["....kkkkkkkk....","..kkvvvvvvvvkk..",".kvvVVvvvvwwvvk.","kvvVVvvvvvwwvvvk","kvwwvvvvvvvvvvvk","kvwwvvvvvwwvvvvk","kkkkkkkkkkkkkkkk","..kbbbbbbbbbbk..","..kbkkbwwbkkbk..",".kkkkkkkkkkkkkk.","bkRRRRRRRRRRRRkb","bkRyyyyyRRRRRRkb",".kRRRRRRRRRRRRk.",".kkkkkkkkkkkkkk.","...kbbbbbbbbk...","..kkkk....kkkk.."],["....kkkkkkkk....","..kkvvvvvvvvkk..",".kvvVVvvvvwwvvk.","kvvVVvvvvvwwvvvk","kvwwvvvvvvvvvvvk","kvwwvvvvvwwvvvvk","kkkkkkkkkkkkkkkk","..kbbbbbbbbbbk..","..kbkkbbwwkkbk..",".kkkkkkkkkkkkkk.","bkRRRRRRRRRRRRkb","bkRyyyyyRRRRRRkb",".kRRRRRRRRRRRRk.",".kkkkkkkkkkkkkk.","...kbbbbbbbbk...","..kkkk....kkkk.."],["....kkkkkkkk....","..kkvvvvvvvvkk..",".kvvVVvvvvwwvvk.","kvvVVvvvvvwwvvvk","kvwwvvvvvvvvvvvk","kvwwvvvvvwwvvvvk","kkkkkkkkkkkkkkkk","..kbbbbbbbbbbk..","..kbkkbbbbkkbk..",".kkkkkkkkkkkkkk.","bkRRRRRRRRRRRRkb","bkRyyyyyRRRRRRkb",".kRRRRRRRRRRRRk.",".kkkkkkkkkkkkkk.","...kbbbbbbbbk...","..kkkk....kkkk.."]],"look":[["....kkkkkkkk....","..kkvvvvvvvvkk..",".kvvVVvvvvwwvvk.","kvvVVvvvvvwwvvvk","kvwwvvvvvvvvvvvk","kvwwvvvvvwwvvvvk","kkkkkkkkkkkkkkkk","..kbbbbbbbbbbk..","..kbwkbbbbwkbk..","..kbbbbbbbbbbk..",".kkkkkkkkkkkkkk.","bkRRRRRRRRRRRRkb","bkRyyyyyRRRRRRkb",".kkkkkkkkkkkkkk.","...kbbbbbbbbk...","..kkkk....kkkk.."]],"doze":[["....kkkkkkkk....","..kkvvvvvvvvkk..",".kvvVVvvvvwwvvk.","kvvVVvvvvvwwvvvk","kvwwvvvvvvvvvvvk","kvwwvvvvvwwvvvvk","kkkkkkkkkkkkkkkk","..kbbbbbbbbbbk..","..kbbbbbbbbbbk..","..kbbbbbbbbbbk..",".kkkkkkkkkkkkkk.","bkRRRRRRRRRRRRkb","bkRyyyyyRRRRRRkb",".kkkkkkkkkkkkkk.","...kbbbbbbbbk...","..kkkk....kkkk.."]],"annoyed":[["....kkkkkkkk....","..kkvvvvvvvvkk..",".kvvVVvvvvwwvvk.","kvvVVvvvvvwwvvvk","kvwwvvvvvvvvvvvk","kvwwvvvvvwwvvvvk","kkkkkkkkkkkkkkkk","..kbkbbbbbbkbk..","..kbbkbbbbkbbk..","..kbbbbbbbbbbk..",".kkkkkkkkkkkkkk.","bkRRRRRRRRRRRRkb","bkRyyyyyRRRRRRkb",".kkkkkkkkkkkkkk.","...kbbbbbbbbk...","..kkkk....kkkk.."]],"back":[["....kkkkkkkk....","..kkvvvvvvvvkk..",".kvvVVvvvvwwvvk.","kvvVVvvvvvwwvvvk","kvwwvvvvvvvvvvvk","kvwwvvvvvwwvvvvk","kkkkkkkkkkkkkkkk","..kbbbbbbbbbbk..","..kbbbbbbbbbbk..","..kbbbbbbbbbbk..","..kbbbbbbbbbbk..",".bkbbbbbbbbbbkb.","..kbbbbbbbbbbk..","..kbbbbbbbbbbk..","...kbbbbbbbbk...","..kkkk....kkkk.."]]},"fps":{"read":1,"flip":7,"doze":1}},"gecko":{"w":14,"h":7,"palette":{"k":"#17121f","g":"#7bd63a","G":"#d2ff8a","w":"#ffffff"},"frames":{"walk":[["....k.....k...","....kk....kk..","..kkggGggggwk.","kkgggggggggggk","..kkggGggggwk.","...kk....kk...","...k.....k...."],["...k.....k....","...kk....kk...","..kkggGggggwk.","kkgggggggggggk","..kkggGggggwk.","....kk....kk..","....k.....k..."]],"idle":[["....k.....k...","....kk....kk..","..kkggGggggwk.","kkgggggggggggk","..kkggGggggwk.","...kk....kk...","...k.....k...."]],"wag":[["....k.....k...","....kk....kk..","..kkggGggggwk.","kkgggggggggggk","..kkggGggggwk.","...kk....kk...","...k.....k...."],["....k.....k...","....kk....kk..","k.kkggGggggwk.",".kgggggggggggk","k.kkggGggggwk.","...kk....kk...","...k.....k...."]]},"fps":{"walk":10,"wag":8}},"bumble":{"w":14,"h":15,"palette":{"k":"#17121f","y":"#ffd23f","Y":"#fff2a8","w":"#e4f6ff"},"frames":{"fly":[[".kk........kk.","kwwk......kwwk","kwwwk....kwwwk",".kwwkkkkkkwwk.","...kyyyyyyk...","..kyYyyyyyyk..","..kywwyywwyk..","..kywkyywkyk..","..kkkkkkkkkk..","..kyyyyyyyyk..","..kkkkkkkkkk..","...kyyyyyyk...","....kkkkkk....","......kk......"],["..............","..............",".kkk......kkk.","kwwwkkkkkkwwwk","...kyyyyyyk...","..kyYyyyyyyk..","..kywwyywwyk..","..kywkyywkyk..","..kkkkkkkkkk..","..kyyyyyyyyk..","..kkkkkkkkkk..","...kyyyyyyk...","....kkkkkk....","......kk......"]],"happy":[[".kk........kk.","kwwk......kwwk","kwwwk....kwwwk",".kwwkkkkkkwwk.","...kyyyyyyk...","..kyYyyyyyyk..","..kykkyykkyk..","..kkyykkyyk...","..kkkkkkkkkk..","..kyyyyyyyyk..","..kkkkkkkkkk..","...kyyyyyyk...","....kkkkkk....","......kk......"],["..............","..............",".kkk......kkk.","kwwwkkkkkkwwwk","...kyyyyyyk...","..kyYyyyyyyk..","..kykkyykkyk..","..kkyykkyyk...","..kkkkkkkkkk..","..kyyyyyyyyk..","..kkkkkkkkkk..","...kyyyyyyk...","....kkkkkk....","......kk......"]],"sleep":[["..............","..............",".kkk......kkk.","kwwwkkkkkkwwwk","...kyyyyyyk...","..kyYyyyyyyk..","..kyyyyyyyyk..","..kykkyykkyk..","..kkkkkkkkkk..","..kyyyyyyyyk..","..kkkkkkkkkk..","...kyyyyyyk...","....kkkkkk....","......kk......"]],"perch":[["..............","..............",".kkk......kkk.","kwwwkkkkkkwwwk","...kyyyyyyk...","..kyYyyyyyyk..","..kywwyywwyk..","..kywkyywkyk..","..kkkkkkkkkk..","..kyyyyyyyyk..","..kkkkkkkkkk..","...kyyyyyyk...","....kkkkkk....","......kk......"],["..............","..............",".kkk......kkk.","kwwwkkkkkkwwwk","...kyyyyyyk...","..kyYyyyyyyk..","..kywwyywwyk..","..kywkyywkyk..","..kkkkkkkkkk..","..kyyyyyyyyk..","..kkkkkkkkkk..","...kyyyyyyk...","....kkkkkk....","......kk......"],["..............","..............",".kkk......kkk.","kwwwkkkkkkwwwk","...kyyyyyyk...","..kyYyyyyyyk..","..kywwyywwyk..","..kywkyywkyk..","..kkkkkkkkkk..","..kyyyyyyyyk..","..kkkkkkkkkk..","...kyyyyyyk...","....kkkkkk....","......kk......"],["..............","..............",".kkk......kkk.","kwwwkkkkkkwwwk","...kyyyyyyk...","..kyYyyyyyyk..","..kyyyyyyyyk..","..kykkyykkyk..","..kkkkkkkkkk..","..kyyyyyyyyk..","..kkkkkkkkkk..","...kyyyyyyk...","....kkkkkk....","......kk......"]]},"fps":{"fly":20,"happy":22,"sleep":1,"perch":3}},"shel":{"w":16,"h":10,"palette":{"k":"#17121f","S":"#ffe2bd","s":"#ef9a4b","b":"#9fe3c9","p":"#ff9cc2"},"frames":{"walk":[["...kkkkkk.......","..kSSssssk...k.k",".kSskkkkssk..b.b",".kskSsssksk..b.b",".kskskksksk.kbbk",".kskssskssk.kbbk",".kskkkkkssk.kbpk","kbkkkkkkkkkkkbbk","kbbbbbbbbbbbbbbk",".kkkkkkkkkkkkkk."],["...kkkkkk.......","..kSSssssk...k.k",".kSskkkkssk..b.b",".kskSsssksk..b.b",".kskskksksk.kbbk",".kskssskssk.kbbk",".kskkkkkssk.kbpk","kbkkkkkkkkkkkbbk","kbbbbbbbbbbbbbbk",".kkkkkkkkkkkkkk."],["...kkkkkk.......","..kSSssssk...k.k",".kSskkkkssk..b.b",".kskSsssksk..b.b",".kskskksksk.kbbk",".kskssskssk.kbbk",".kskkkkkssk.kbpk","kbkkkkkkkkkkkbbk","kbbbbbbbbbbbbbk.",".kkkkkkkkkkkkk.."],["...kkkkkk.......","..kSSssssk...k.k",".kSskkkkssk..b.b",".kskSsssksk..b.b",".kskskksksk.kbbk",".kskssskssk.kbbk",".kskkkkkssk.kbpk","kbkkkkkkkkkkkbbk","kbbbbbbbbbbbbbk.",".kkkkkkkkkkkkk.."]],"idle":[["...kkkkkk.......","..kSSssssk...k.k",".kSskkkkssk..b.b",".kskSsssksk..b.b",".kskskksksk.kbbk",".kskssskssk.kbbk",".kskkkkkssk.kbpk","kbkkkkkkkkkkkbbk","kbbbbbbbbbbbbbbk",".kkkkkkkkkkkkkk."],["...kkkkkk.......","..kSSssssk...k.k",".kSskkkkssk..b.b",".kskSsssksk..b.b",".kskskksksk.kbbk",".kskssskssk.kbbk",".kskkkkkssk.kbpk","kbkkkkkkkkkkkbbk","kbbbbbbbbbbbbbbk",".kkkkkkkkkkkkkk."],["...kkkkkk.......","..kSSssssk...k.k",".kSskkkkssk..b.b",".kskSsssksk..b.b",".kskskksksk.kbbk",".kskssskssk.kbbk",".kskkkkkssk.kbpk","kbkkkkkkkkkkkbbk","kbbbbbbbbbbbbbbk",".kkkkkkkkkkkkkk."],["...kkkkkk.......","..kSSssssk...k.k",".kSskkkkssk..b.b",".kskSsssksk..b.b",".kskskksksk.kbbk",".kskssskssk.kbbk",".kskkkkkssk.kbpk","kbkkkkkkkkkkkbbk","kbbbbbbbbbbbbbbk",".kkkkkkkkkkkkkk."]],"hide":[["...kkkkkk.......","..kSSssssk......",".kSskkkkssk.....",".kskSsssksk.....",".kskskksksk.....",".kskssskssk.....",".kskkkkkssk.....",".kssssssssk.....","..kkkkkkkk......"]],"peek":[["...kkkkkk.......","..kSSssssk......",".kSskkkkssk.....",".kskSsssksk..k..",".kskskksksk.kbk.",".ksksssksskkbbk.",".kskkkkksskkbbk.",".ksssssssskkkkk.","..kkkkkkkk......"]]},"fps":{"walk":3,"idle":2}}};
+const W = 640, H = 360, BAR = 30, G = 262;
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v)), pr = (t, a, b) => clamp((t - a) / (b - a));
+const eo = k => 1 - Math.pow(1 - k, 3), ei = k => k * k, eio = k => k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+const h1 = n => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- the cast: real pal frames, baked to little canvases ---------- */
+const BAKED = {};
+for (const [name, p] of Object.entries(PALS)) {
+  const rgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)), out = {};
+  for (const clip in p.frames) out[clip] = p.frames[clip].map(rows => {
+    const c = document.createElement('canvas'); c.width = p.w; c.height = p.h; const g = c.getContext('2d'), img = g.createImageData(p.w, p.h);
+    rows.forEach((r, y) => [...r].forEach((ch, x) => { const col = p.palette[ch]; if (!col) return; const [R, G2, B] = rgb(col), i = (y * p.w + x) * 4; img.data[i] = R; img.data[i + 1] = G2; img.data[i + 2] = B; img.data[i + 3] = 255; }));
+    g.putImageData(img, 0, 0); return c; });
+  BAKED[name] = out;
+}
+/* foot point (x, y), s screen pixels per pal pixel */
+const pal = (name, clip, t, x, y, s = 3, o = {}) => {
+  const p = PALS[name], fr = BAKED[name][clip] || BAKED[name][Object.keys(BAKED[name])[0]]; if (!fr) return;
+  const f = Math.floor(Math.max(0, t) * (o.fps || p.fps[clip] || 6)) % fr.length;
+  ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.rotate((o.rot || 0) * Math.PI / 180); ctx.scale((o.flip ? -1 : 1) * s * (o.sx || 1), s * (o.sy || 1));
+  ctx.globalAlpha = o.op ?? 1; ctx.drawImage(fr[f], -p.w / 2, -p.h); ctx.restore();
+};
+const fedora = (x, y, s, flip, tip = 0) => {   /* the detective's hat: a few pixels in felt and a ribbon */
+  const d = flip ? -1 : 1; ctx.save(); ctx.translate(Math.round(x), Math.round(y - tip * s)); ctx.scale(d, 1);
+  ctx.fillStyle = '#17121f'; ctx.fillRect(-7 * s, 0, 14 * s, s); ctx.fillRect(-4 * s, -3 * s, 8 * s, 3 * s); ctx.fillRect(-3 * s, -4 * s, 6 * s, s);
+  ctx.fillStyle = '#c6f432'; ctx.fillRect(-4 * s, -1 * s, 8 * s, s); ctx.restore();
+};
+const glow = (x, y, r, rgb, a) => { for (let i = 4; i > 0; i--) { ctx.fillStyle = `rgba(${rgb},${a / 4})`; ctx.beginPath(); ctx.ellipse(x, y, r * i / 4 * 1.2, r * i / 4, 0, 0, 7); ctx.fill(); } };
+const rect = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };
+const text = (s, x, y, size, col, align = 'left', shadow) => {
+  ctx.font = `${size}px Silkscreen, monospace`; ctx.textAlign = align; ctx.textBaseline = 'alphabetic';
+  if (shadow) { ctx.fillStyle = shadow; ctx.fillText(s, Math.round(x) + 1, Math.round(y) + 1); }
+  ctx.fillStyle = col; ctx.fillText(s, Math.round(x), Math.round(y));
+};
+/* big pixel digits, so the 4, 0 and 4 can be props */
+const GLYPH = { 4: ['..##.', '.#.#.', '#..#.', '#####', '...#.', '...#.', '...#.'], 0: ['.###.', '#...#', '#..##', '#.#.#', '##..#', '#...#', '.###.'] };
+const digit = (d, x, y, s, col, rot = 0, bottom = true) => {   /* x,y: bottom centre */
+  ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.rotate(rot * Math.PI / 180);
+  const ox = -2.5 * s, oy = bottom ? -7 * s : -3.5 * s;
+  GLYPH[d].forEach((r, j) => [...r].forEach((c, i) => { if (c === '#') { ctx.fillStyle = 'rgba(0,0,0,.45)'; ctx.fillRect(ox + i * s + s * .6, oy + j * s + s * .7, s, s); } }));
+  GLYPH[d].forEach((r, j) => [...r].forEach((c, i) => { if (c === '#') { ctx.fillStyle = col; ctx.fillRect(ox + i * s, oy + j * s, s, s); ctx.fillStyle = 'rgba(255,255,255,.35)'; ctx.fillRect(ox + i * s, oy + j * s, s, Math.max(1, s * .22)); } }));
+  ctx.restore();
+};
+
+/* ---------- the city ---------- */
+const SKY = ['#08051a', '#140a30', '#25103f', '#3d1a4f', '#5c2556', '#7d3358'];
+const LAYERS = [
+  { col: '#1c1338', win: '#7a6aa8', sp: .12, seed: 11, n: 16, minw: 36, maxw: 78, minh: 110, maxh: 200, lit: .22 },
+  { col: '#130c2a', win: '#e6c46a', sp: .32, seed: 23, n: 14, minw: 40, maxw: 90, minh: 90, maxh: 190, lit: .32 },
+  { col: '#0a0618', win: '#ffdb86', sp: .7, seed: 37, n: 11, minw: 54, maxw: 120, minh: 80, maxh: 170, lit: .28 }
+].map(L => { let x = 0; L.b = Array.from({ length: L.n }, (_, i) => { const w = L.minw + h1(L.seed + i) * (L.maxw - L.minw), hh = L.minh + h1(L.seed * 3 + i) * (L.maxh - L.minh), b = { x, w, h: hh, id: L.seed * 100 + i }; x += w + 2 + h1(L.seed + i * 5) * 12; return b; }); L.rep = x; return L; });
+const sky = (t, topShade = 0) => {
+  const bandH = G / SKY.length;
+  SKY.forEach((c, i) => { rect(0, i * bandH, W, bandH + 1, c); if (i) for (let y = 0; y < 8; y += 2) for (let x = (y / 2) % 2 * 2; x < W; x += 4) rect(x, i * bandH + y - 4, 2, 2, SKY[i]); });
+  for (let i = 0; i < 70; i++) { const x = h1(i * 3.1) * W, y = h1(i * 7.7) * G * .6, tw = .5 + .5 * Math.sin(t * 2 + i * 9); if (tw > .35) rect(x, y, 1 + (i % 9 === 0), 1 + (i % 9 === 0), i % 4 ? '#c8c0e8' : '#fff4c8'); }
+  /* the moon, with a ring of haze and a few craters */
+  const mx = 505, my = 82;
+  for (let r = 54; r > 28; r -= 6) { ctx.fillStyle = `rgba(255,236,200,${.025 + (54 - r) * .0012})`; ctx.beginPath(); ctx.arc(mx, my, r, 0, 7); ctx.fill(); }
+  ctx.fillStyle = '#f4ecd0'; ctx.beginPath(); ctx.arc(mx, my, 26, 0, 7); ctx.fill();
+  ctx.fillStyle = '#d6c9a4'; [[-9, -6, 6], [8, 4, 7], [-2, 12, 4], [11, -11, 3]].forEach(([dx, dy, r]) => { ctx.beginPath(); ctx.arc(mx + dx, my + dy, r, 0, 7); ctx.fill(); });
+};
+const skyline = (cam, t, from = 0, to = 3, px = 0) => {
+  for (let li = from; li < to; li++) {
+    const L = LAYERS[li], off = -((cam * L.sp + px * L.sp * 14) % L.rep);
+    for (let rep = 0; rep < 3; rep++) L.b.forEach(b => {
+      const x = Math.round(b.x + off + rep * L.rep), base = G - (li === 2 ? 0 : (2 - li) * 6), y = base - b.h; if (x > W || x + b.w < 0) return;
+      rect(x, y, b.w, b.h, L.col); rect(x, y, b.w, 2, 'rgba(255,255,255,.06)');
+      for (let wy = y + 10; wy < base - 12; wy += 12) for (let wx = x + 6; wx < x + b.w - 8; wx += 9) {
+        const k = h1(b.id * 91 + wx * .37 + wy * .13), on = k < L.lit + .08 * Math.sin(t * .3 + k * 20);
+        if (on) rect(wx, wy, 4, 6, L.win); else rect(wx, wy, 4, 6, 'rgba(255,255,255,.03)'); }
+    });
+  }
+};
+const street = (cam, t, lamps = true) => {
+  rect(0, G, W, H - G, '#150f26'); rect(0, G, W, 3, '#2a2142'); rect(0, G + 3, W, 1, '#0c0818');
+  for (let x = -((cam * 1.2) % 80); x < W; x += 80) rect(x, G + 48, 36, 3, '#3a3156');           /* lane dashes */
+  for (let i = 0; i < 9; i++) { const px = (h1(i * 5.5) * W * 1.6 - cam * 1.2) % (W * 1.6); const wx = ((px % (W * 1.6)) + W * 1.6) % (W * 1.6) - 60; rect(wx, G + 14 + (i % 3) * 10, 28, 2, 'rgba(160,190,255,.18)'); }   /* puddles catching light */
+  if (lamps) for (let i = 0; i < 3; i++) {
+    const lx = ((i * 260 + 60 - cam * 1.1) % 780 + 780) % 780 - 70;
+    rect(lx, G - 96, 3, 96, '#2a2142'); rect(lx - 8, G - 98, 19, 4, '#2a2142');
+    ctx.fillStyle = 'rgba(255,226,140,.14)'; ctx.beginPath(); ctx.moveTo(lx - 4, G - 94); ctx.lineTo(lx + 8, G - 94); ctx.lineTo(lx + 46, G); ctx.lineTo(lx - 42, G); ctx.fill();
+    rect(lx - 5, G - 95, 12, 3, '#ffe28c'); }
+};
+const rain = (t, k = 1, wind = 2) => {
+  ctx.fillStyle = 'rgba(180,205,255,.42)';
+  for (let i = 0; i < 110 * k; i++) { const sp = 380 + h1(i) * 220, y = (h1(i * 2.3) * H + t * sp) % H, x = ((h1(i * 5.1) * (W + 80) - t * 40 * wind) % (W + 80) + W + 80) % (W + 80) - 40; ctx.fillRect(Math.round(x), Math.round(y), 1, 6); ctx.fillRect(Math.round(x) - 1, Math.round(y) + 6, 1, 2); }
+};
+const speech = (str, x, y, t0, t) => {
+  const k = eo(pr(t, t0, t0 + .18)); if (k <= 0) return;
+  ctx.font = '8px Silkscreen, monospace'; const w = ctx.measureText(str).width + 14, hh = 18; ctx.save(); ctx.translate(Math.round(x), Math.round(y)); ctx.scale(k, k);
+  rect(-w / 2 - 1, -hh - 1, w + 2, hh + 2, '#17121f'); rect(-w / 2, -hh, w, hh, '#f3eee3'); rect(-3, 1, 7, 4, '#17121f'); rect(-2, -1, 5, 3, '#f3eee3');
+  text(str, 0, -6, 8, '#17121f', 'center'); ctx.restore();
+};
+const dust = (x, y, t0, t, n = 9) => { const u = t - t0; if (u < 0 || u > .7) return; for (let i = 0; i < n; i++) { const a = (i / n) * Math.PI - Math.PI, d = u * 60 * (.6 + h1(i)); ctx.fillStyle = `rgba(200,190,220,${.6 * (1 - u / .7)})`; ctx.fillRect(Math.round(x + Math.cos(a) * d), Math.round(y + Math.sin(a) * d * .5 - u * 14), 3, 3); } };
+
+/* ---------- the scenes ---------- */
+const L_CARD = 3.2, L_CITY = 8.8, L_ALLEY = 9, L_CHASE = 10, L_REVEAL = 11.2, L_CRED = 9;
+const STARTS = [0, L_CARD, L_CARD + L_CITY, L_CARD + L_CITY + L_ALLEY, L_CARD + L_CITY + L_ALLEY + L_CHASE, L_CARD + L_CITY + L_ALLEY + L_CHASE + L_REVEAL];
+const TOTAL = STARTS[5] + L_CRED;
+const subs = [];   /* [absolute start, end, text] */
+const SUB = (scene, a, b, s) => subs.push([STARTS[scene] + a, STARTS[scene] + b, s]);
+SUB(1, .8, 3.6, 'It was a dark and stormy request.'); SUB(1, 4.6, 8.3, 'Somebody had stolen a page.');
+SUB(2, 4.6, 6.2, '...'); SUB(2, 6.5, 8.9, 'Kitty knew nothing.');
+SUB(3, .6, 3.4, 'A chase through the rainy streets.'); SUB(3, 4.2, 6.4, 'Pip had the zero.'); SUB(3, 7.4, 9.8, 'The penguin saw everything.');
+SUB(4, .5, 2.8, 'The truth was simple.'); SUB(4, 3.3, 6.2, 'There was never a page.'); SUB(4, 6.6, 10.6, 'Case closed.');
+let shake = 0;
+
+function card(t) {
+  rect(0, 0, W, H, '#000');
+  const a = Math.min(pr(t, .2, 1), 1 - pr(t, 2.5, 3.1));
+  ctx.globalAlpha = a;
+  /* the studio mark: the bug, then the name */
+  rect(W / 2 - 60, 120, 16, 16, '#17121f'); rect(W / 2 - 60, 120, 16, 16, '#c6f432'); rect(W / 2 - 58, 124, 3, 3, '#17121f'); rect(W / 2 - 52, 124, 3, 3, '#17121f'); rect(W / 2 - 57, 130, 6, 2, '#17121f');
+  text('PIIXPAL', W / 2 - 36, 135, 24, '#f3eee3', 'left');
+  text('PICTURES', W / 2, 168, 16, '#c6f432', 'center');
+  text('PRESENTS', W / 2, 200, 8, '#8d84a6', 'center'); ctx.globalAlpha = 1;
+  if (t > 3) rect(0, 0, W, H, '#000');
+}
+function city(t) {
+  const cam = t * 46, px = ptr.x;
+  sky(t); skyline(cam, t, 0, 3, px);
+  /* the neon sign that is missing a letter */
+  const sx = 456 - (cam * .12 + px * 2); rect(sx - 4, 196, 70, 20, '#0a0618'); const lit = h1(Math.floor(t * 7)) > .12;
+  [['P', 0, 1], ['A', 14, 0], ['G', 28, 1], ['E', 42, 1]].forEach(([c, dx, on]) => { const lit2 = on ? lit : h1(Math.floor(t * 9) + dx) > .75; ctx.globalAlpha = lit2 ? 1 : .12; text(c, sx + dx, 212, 16, '#ff5ea8', 'left'); if (lit2) { ctx.globalAlpha = .25; text(c, sx + dx - 1, 211, 16, '#ff5ea8'); text(c, sx + dx + 1, 213, 16, '#ff5ea8'); } ctx.globalAlpha = 1; });
+  street(cam, t); rain(t, 1);
+  const bx = -30 + eo(pr(t, 0, 5)) * 330 + Math.max(0, t - 5) * 12;
+  pal('bitbug', 'walk', t, bx, G + 26, 4, { fps: 6 }); fedora(bx + 11, G + 26 - 11 * 4 + 5, 4, false);
+  /* title, fading out */
+  const ta = Math.min(pr(t, .5, 1.1), 1 - pr(t, 4.2, 4.8)); if (ta > 0) { ctx.globalAlpha = ta; text('THE CASE OF', W / 2, 106, 16, '#f3eee3', 'center', '#ff5ea8'); text('THE MISSING PAGE', W / 2, 142, 24, '#c6f432', 'center', '#25103f'); ctx.globalAlpha = 1; }
+}
+function alley(t) {
+  rect(0, 0, W, H, '#1d1230');
+  for (let y = 0; y < G; y += 10) { rect(0, y, W, 1, '#150c26'); for (let x = (y / 10 % 2) * 14; x < W; x += 28) rect(x, y, 1, 10, '#150c26'); }
+  for (let i = 0; i < 160; i++) { rect(h1(i) * W, h1(i * 3) * G, 4, 2, i % 3 ? '#26173a' : '#2f1d44'); }   /* worn bricks */
+  /* the lamp, and its light on the wall */
+  ctx.fillStyle = 'rgba(255,226,140,.12)'; ctx.beginPath(); ctx.moveTo(244, 40); ctx.lineTo(262, 40); ctx.lineTo(380, G); ctx.lineTo(130, G); ctx.fill(); rect(252, 40, 3, G - 40, '#2a2142'); rect(236, 34, 30, 5, '#2a2142'); rect(240, 39, 22, 3, '#ffe28c');
+  rect(0, G, W, H - G, '#150f26'); rect(0, G, W, 3, '#2a2142');
+  /* the ledge: a fire escape with rails, kitty's spot */
+  rect(330, 168, 250, 5, '#4a4066'); rect(330, 173, 250, 2, '#251c3a'); for (let x = 336; x < 580; x += 18) rect(x, 150, 2, 18, '#3a3156'); rect(330, 150, 250, 2, '#3a3156'); rect(574, 150, 4, 24, '#3a3156'); rect(330, 175, 4, G - 175, '#2a2142');
+  /* a dumpster, steam from a grate */
+  rect(70, G - 44, 90, 44, '#1f4a3a'); rect(70, G - 48, 94, 6, '#2a6a52'); rect(80, G - 36, 70, 2, '#163528'); rect(80, G - 24, 70, 2, '#163528');
+  for (let i = 0; i < 5; i++) { const u = ((t * .55 + i * .2) % 1); ctx.fillStyle = `rgba(210,200,235,${.22 * (1 - u)})`; const sz = 6 + u * 16; ctx.fillRect(Math.round(560 + Math.sin(u * 6 + i) * 9 - sz / 2), Math.round(G - 4 - u * 70), Math.round(sz), Math.round(sz * .7)); }
+  rect(540, G - 3, 40, 3, '#3a3156');
+  rain(t, .5, 0);
+  const fall = pr(t, 5.1, 6.35), slide = eo(pr(t, 4.95, 5.4)), landed = t > 6.35;
+  /* the 4: shoved off the ledge, it falls and lands with a clunk */
+  const fx = 404 - slide * 62, fy = fall > 0 ? 168 + (G + 24 - 168) * ei(fall) : 168, rot = fall > 0 ? fall * -24 : 0;
+  if (!landed) digit(4, fx - fall * 40, fy, 5, '#c6f432', rot); else digit(4, 302 + Math.max(0, .3 - (t - 6.35)) * 20, G + 24, 5, '#c6f432', Math.sin((t - 6.35) * 14) * 6 * Math.max(0, 1 - (t - 6.35) * 2.2) - 4);
+  dust(300, G + 22, 6.35, t, 11);
+  if (t > 6.35 && t < 6.9) { ctx.globalAlpha = 1 - pr(t, 6.35, 6.9); text('CLUNK!', 300, G - 30 - pr(t, 6.35, 6.9) * 14, 16, '#ffdb86', 'center', '#17121f'); ctx.globalAlpha = 1; }
+  if (t > 6.3 && t < 6.7) shake = 4 * (1 - pr(t, 6.3, 6.7));
+  /* kitty, who did it */
+  const swat = t > 4.75 && t < 5.5;
+  glow(506, 150, 46, '255,226,140', .22); pal('kitty', swat ? 'swat' : t > 6.6 ? 'sleep' : 'rest', t, 506, 168, 4, { flip: true, fps: swat ? 8 : 4 });
+  if (t > 7.0) for (let i = 0; i < 3; i++) { const u = ((t - 7 + i * .5) * .6) % 1.5; if (u < 1) { ctx.globalAlpha = 1 - u; text('z', 478 - i * 3 + u * 14, 126 - u * 30, 8 + i * 4, '#c8c0e8'); ctx.globalAlpha = 1; } }
+  /* the detective walks in, stops, asks, jumps when it lands */
+  const bx = -20 + eo(pr(t, .2, 2.6)) * 270 - (t > 6.35 ? pr(t, 6.35, 6.7) * 0 : 0), walking = t < 2.7;
+  const clip = t > 6.35 && t < 7.4 ? 'alarm' : walking ? 'walk' : (Math.floor(t * 1.2) % 2 ? 'sniff' : 'look');
+  pal('bitbug', clip, t, bx, G + 26, 4, { fps: walking ? 6 : 4, sy: 1 - (t > 6.35 && t < 6.6 ? .1 : 0) }); fedora(bx + 11, G + 26 - 11 * 4 + 5, 4, false, t > 6.35 && t < 6.6 ? 2 : 0);
+  speech("WHERE'S THE PAGE?", bx + 6, G - 32, 2.8, t);
+}
+function chase(t) {
+  const slow = 1 - eio(pr(t, 8.2, 9.3)), cam = t * 300 * (.15 + .85 * slow) + (t < 8.2 ? 0 : 0);
+  sky(t); skyline(cam, t, 0, 3, ptr.x); street(cam, t); rain(t, 1.2, 5);
+  /* speed lines */
+  ctx.fillStyle = 'rgba(255,255,255,.08)'; for (let i = 0; i < 14; i++) { const y = 40 + h1(i * 4) * 210, x = ((h1(i * 9) * W - t * 900 * slow) % (W + 120) + W + 120) % (W + 120) - 60; ctx.fillRect(Math.round(x), Math.round(y), 40 + h1(i) * 50, 1); }
+  const hit = t > 7.1, drop = pr(t, 7.2, 7.8);
+  /* pip carries the zero until frog's tongue lands */
+  const pipX = 450 + Math.sin(t * 1.2) * 40 + (hit ? pr(t, 7.1, 8.5) * 60 : 0), pipY = 126 + Math.sin(t * 3) * 10 - (hit ? pr(t, 7.1, 7.9) * 50 : 0);
+  if (!hit) digit(0, pipX, pipY + 44, 4, '#ff5ea8', Math.sin(t * 3) * 8);
+  else { const gy = Math.min(G + 24, pipY + 44 + 260 * ei(drop)), roll = Math.max(0, pr(t, 7.9, 8.7)); const zx = pipX - roll * 70 * eo(roll) - 14; digit(0, zx, drop < 1 ? gy : G + 24, 4, '#ff5ea8', drop < 1 ? drop * 120 : 120 + roll * 380); if (roll > 0) dust(zx, G + 22, 7.9, t, 5); }
+  pal('pip', hit && t < 8.4 ? 'look' : 'fly', t, pipX, pipY, 4, { fps: 11, flip: false });
+  /* frog on the road: hops along, then the tongue */
+  const fp = (t * 1.5) % 1, fy = G + 22 - Math.sin(fp * Math.PI) * 26, snap = t > 6.9 && t < 7.4;
+  pal('frog', snap ? 'snap' : 'jump', t, 372, snap ? G + 24 : fy + 2, 4, { flip: false });
+  if (snap) { ctx.strokeStyle = '#ff5ea8'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(380, G + 6); ctx.lineTo(380 + (pipX - 380) * pr(t, 6.9, 7.1), G + 6 + (pipY + 40 - G - 6) * pr(t, 6.9, 7.1)); ctx.stroke(); }
+  /* boing and the detective, side by side, flat out */
+  const bo = Math.abs(Math.sin(t * 5)); pal('boing', bo > .1 ? 'air' : 'land', t, 286, G + 24 - bo * 50, 4);
+  pal('bitbug', 'walk', t, 170, G + 26, 4, { fps: 14 * (.2 + .8 * slow) + 3, sy: 1 }); fedora(181, G + 26 - 11 * 4 + 5, 4, false);
+  /* the penguin, belly sliding in from the right, to the rescue */
+  const pe = pr(t, 6.4, 8.5), px = 760 - eo(pe) * 330; if (pe > 0 && pe < 1.01) pal('penguin', 'slide', t, px, G + 26, 4, { flip: true });
+  else if (pe >= 1) pal('penguin', 'idle', t, 430, G + 26, 4, { flip: true });
+}
+function reveal(t) {
+  const zoom = 1 + pr(t, 0, 11) * .06;
+  ctx.save(); ctx.translate(W / 2, H / 2); ctx.scale(zoom, zoom); ctx.translate(-W / 2, -H / 2);
+  sky(t * .5); skyline(t * 8, t, 0, 2, 0); rect(0, G - 10, W, H, '#1a1230'); rect(0, G - 10, W, 3, '#3a3156');
+  /* the billboard: three empty slots with bulbs around them */
+  rect(96, 52, 448, 138, '#0f0a22'); rect(98, 54, 444, 134, '#1a1236');
+  for (let i = 0; i < 40; i++) { const bx2 = 104 + (i % 20) * 22.2, by = i < 20 ? 58 : 182, on = (Math.floor(t * 6) + i) % 4 < 2 || t > 4.8; rect(bx2, by, 4, 4, on ? '#ffdb86' : '#4a3a28'); }
+  rect(110, 188, 6, 80, '#2a2142'); rect(524, 188, 6, 80, '#2a2142');
+  const slots = [[190, '4', '#c6f432', 1.2], [320, '0', '#ff5ea8', 2.0], [450, '4', '#7ddcff', 3.6]];
+  glow(98, G - 6, 50, '255,226,140', .3);
+  slots.forEach(([x, d, col, t0], i) => {
+    rect(x - 36, 66, 72, 100, '#0c081a');
+    const k = pr(t, t0, t0 + .7); if (k <= 0) return;
+    const y = 160 - (1 - eo(k)) * 240 + (k < 1 ? 0 : Math.max(0, .35 - (t - t0 - .7)) * Math.sin((t - t0 - .7) * 28) * 14);
+    digit(d === '4' ? 4 : 0, x, y, 9, col); if (k >= 1 && t - t0 - .7 < .12) { dust(x, 162, t0 + .7, t, 7); shake = Math.max(shake, 2); }
+  });
+  /* the final 4 comes out of moss's book */
+  if (t > 3.0 && t < 3.6) { const u = pr(t, 3.0, 3.6); digit(4, 575 - u * 125, 190 - Math.sin(u * Math.PI) * 90 - u * 20, 3 + u * 6, '#7ddcff'); }
+  /* the neon, switching on */
+  if (t > 4.7) { const on = t < 5 ? h1(Math.floor(t * 20)) > .4 : 1; ctx.globalAlpha = on ? 1 : .2; ctx.fillStyle = 'rgba(255,94,168,.18)'; ctx.fillRect(96, 52, 448, 138); ctx.globalAlpha = 1; if (on) text('PAGE NOT FOUND', W / 2, 222, 16, '#ff5ea8', 'center', '#25103f'); }
+  /* the lineup, all of them: cheering once the case is closed */
+  const cheer = t > 6.4, hop = k => cheer ? Math.max(0, Math.sin((t * 3 + k * .7) * 2)) * 14 : 0;
+  pal('kitty', cheer && Math.floor(t * 3) % 2 ? 'swat' : 'rest', t, 98, G + 26, 3, { flip: false }); pal('penguin', 'idle', t, 168 - 0, G + 26 - hop(1) * .5, 3);
+  pal('bitbug', 'idle', t, 246, G + 26 - hop(2), 3); fedora(254, G + 26 - 11 * 3 + 4 - hop(2), 3, false, t > 7 && t < 7.7 ? 3 : 0);
+  pal('frog', cheer ? 'happy' : 'sit', t, 318, G + 26 - hop(3), 3); pal('boing', cheer ? 'happy' : 'idle', t, 380, G + 26 - hop(4) * 1.4, 3);
+  pal('pip', cheer ? 'peck' : 'idle', t, 444, G + 26 - hop(5), 3); pal('moss', t > 3 ? 'flip' : 'read', t, 548, G + 26, 3, { flip: true });
+  ctx.restore();
+}
+function credits(t) {
+  rect(0, 0, W, H, '#000');
+  const lines = [['STARRING', 8, '#8d84a6'], ['BITBUG  as  The Detective', 8, '#f3eee3'], ['KITTY  as  The Suspect', 8, '#f3eee3'], ['PIP  as  The Courier', 8, '#f3eee3'], ['FROG  BOING  PENGUIN  MOSS', 8, '#f3eee3'], ['', 8, 0], ['NO PAGES WERE HARMED', 8, '#c6f432'], ['PIIXPAL.DVKK.DEV', 8, '#ff5ea8']];
+  const y0 = H - 40 - t * 52; lines.forEach(([s, sz, col], i) => { if (s) text(s, W / 2, y0 + i * 34, i === 0 || i >= 6 ? 8 : 16, col, 'center'); });
+  const cast = [['kitty', 'rest'], ['penguin', 'idle'], ['bitbug', 'idle'], ['frog', 'sit'], ['boing', 'idle'], ['pip', 'idle'], ['moss', 'read']], cy = y0 + lines.length * 34 + 60;
+  glow(90, cy - 4, 40, '255,226,140', .25); cast.forEach(([n, c], i) => pal(n, c, t, 90 + i * 76, cy, 3, { flip: i === 6 }));
+  if (cy < H - 50) text('THE END', W / 2, cy + 40, 16, '#f3eee3', 'center');
+}
+
+/* ---------- the projector ---------- */
+const ptr = { x: 0 };
+addEventListener('pointermove', e => { ptr.x += ((e.clientX / innerWidth - .5) - ptr.x) * .15; }, { passive: true });
+let t0 = performance.now(), skip = 0, paused = false;
+const url = new URLSearchParams(location.search), freeze = url.get('t') != null ? +url.get('t') : (still ? STARTS[4] + 7.5 : null);
+cv.addEventListener('click', () => { const T = ((performance.now() - t0) / 1000 + skip) % TOTAL; const nxt = STARTS.concat(TOTAL).find(s => s > T + .2); skip += nxt - T; });
+document.getElementById('again').addEventListener('click', () => { t0 = performance.now(); skip = 0; });
+function frame() {
+  const T = freeze != null ? freeze : (((performance.now() - t0) / 1000 + skip) % TOTAL);
+  let sc = STARTS.findIndex((s, i) => T >= s && T < (STARTS[i + 1] ?? TOTAL)); if (sc < 0) sc = 0;
+  const lt = T - STARTS[sc]; shake = 0;
+  ctx.save(); ctx.imageSmoothingEnabled = false;
+  [card, city, alley, chase, reveal, credits][sc](lt);
+  ctx.restore();
+  /* the camera shakes on impact: copy the picture over itself, offset */
+  if (shake > .2) { const dx = Math.round((Math.random() - .5) * shake * 2), dy = Math.round((Math.random() - .5) * shake * 2); ctx.drawImage(cv, dx, dy); }
+  /* letterbox, subtitles, film grain, vignette, a fade at each cut */
+  if (sc !== 0 && sc !== 5) { rect(0, 0, W, BAR, '#000'); rect(0, H - BAR, W, BAR, '#000'); const s = subs.find(([a, b]) => T >= a && T < b); if (s) text(s[2], W / 2, H - 11, 8, '#f3eee3', 'center', '#000'); }
+  const cut = Math.min(pr(lt, 0, .3), 1 - pr(lt, (STARTS[sc + 1] ?? TOTAL) - STARTS[sc] - .3, (STARTS[sc + 1] ?? TOTAL) - STARTS[sc]));
+  if (cut < 1) rect(0, 0, W, H, `rgba(0,0,0,${1 - cut})`);
+  const fk = Math.floor(T * 14);
+  ctx.fillStyle = 'rgba(255,255,255,.16)'; for (let i = 0; i < 110; i++) ctx.fillRect(Math.floor(h1(fk * 1.7 + i) * W), Math.floor(h1(fk * 3.1 + i * 2.1) * H), 1, 1);
+  ctx.fillStyle = 'rgba(0,0,0,.28)'; for (let i = 0; i < 90; i++) ctx.fillRect(Math.floor(h1(fk * 2.3 + i * 1.3) * W), Math.floor(h1(fk * 4.7 + i) * H), 1, 1);
+  if (h1(fk * 9.1) > .93) rect(Math.floor(h1(fk) * W), 0, 1, H, 'rgba(255,255,255,.12)');
+  const g = ctx.createRadialGradient(W / 2, H / 2, H * .35, W / 2, H / 2, H * .95); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.5)'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  if (freeze == null) requestAnimationFrame(frame);
+}
+(document.fonts ? Promise.all([document.fonts.load('16px Silkscreen'), document.fonts.load('24px Silkscreen')]).catch(() => {}) : Promise.resolve()).then(() => { t0 = performance.now(); frame(); });
+})();
+</script>
 </body>
 </html>
