@@ -35,6 +35,7 @@
   button.btn{background:transparent;color:var(--paper)}
   .still{display:none}
   noscript p{margin:30px}
+  button.btn[aria-pressed=true]{background:var(--lime);color:#0b0814}
   @media (prefers-reduced-motion:reduce){.hint{display:none}}
   @media (max-width:640px){.hint{display:none}}
 </style>
@@ -48,7 +49,7 @@
   <div class="screen"><canvas id="c" width="640" height="360" aria-label="A short film starring pixel pals, 'The Case of the Missing Page': a detective bug, a cat, a chase, and a reveal that this page never existed." role="img"></canvas></div>
   <div class="below">
     <div><h1>This page wandered off.</h1><p>The pals looked everywhere. Turns out it was never here. Sorry about that.</p></div>
-    <div class="acts"><a class="btn" href="/">Take me home</a><button class="btn" id="again" type="button">Watch again</button></div>
+    <div class="acts"><a class="btn" href="/">Take me home</a><button class="btn" id="snd" type="button" aria-pressed="false">Sound: off</button><button class="btn" id="again" type="button">Watch again</button></div>
   </div>
   <noscript><p>404: this page wandered off. <a href="/">Take me home</a>.</p></noscript>
 </main>
@@ -184,6 +185,7 @@ function city(t) {
   street(cam, t); rain(t, 1);
   const bx = -30 + eo(pr(t, 0, 5)) * 330 + Math.max(0, t - 5) * 12;
   pal('bitbug', 'walk', t, bx, G + 26, 4, { fps: 6 }); fedora(bx + 11, G + 26 - 11 * 4 + 5, 4, false);
+  if ((t > 4.5 && t < 4.58) || (t > 4.72 && t < 4.8)) rect(0, 0, W, H, 'rgba(255,255,255,.55)');
   /* title, fading out */
   const ta = Math.min(pr(t, .5, 1.1), 1 - pr(t, 4.2, 4.8)); if (ta > 0) { ctx.globalAlpha = ta; text('THE CASE OF', W / 2, 106, 16, '#f3eee3', 'center', '#ff5ea8'); text('THE MISSING PAGE', W / 2, 142, 24, '#c6f432', 'center', '#25103f'); ctx.globalAlpha = 1; }
 }
@@ -277,6 +279,67 @@ function credits(t) {
   if (cy < H - 50) text('THE END', W / 2, cy + 40, 16, '#f3eee3', 'center');
 }
 
+
+/* ---------- the sound: all of it made live with Web Audio, no files ---------- */
+const A = { ctx: null, on: false, last: 0, beat: -1 };
+function audioInit() {
+  const c = A.ctx = new (window.AudioContext || window.webkitAudioContext)();
+  const comp = c.createDynamicsCompressor(); A.out = c.createGain(); A.out.gain.value = .7; A.out.connect(comp); comp.connect(c.destination);
+  const nb = c.createBuffer(1, c.sampleRate * 2, c.sampleRate), d = nb.getChannelData(0); let b0 = 0; for (let i = 0; i < d.length; i++) { b0 = b0 * .97 + (Math.random() * 2 - 1) * .3; d[i] = b0 + (Math.random() * 2 - 1) * .25; } A.nb = nb;
+  /* rain: a looping hiss, opened up outdoors and muffled indoors */
+  const r = c.createBufferSource(); r.buffer = nb; r.loop = true; const f = c.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = 3200; f.Q.value = .5; A.rain = c.createGain(); A.rain.gain.value = 0; r.connect(f).connect(A.rain).connect(A.out); r.start();
+}
+const tone = (f, d, type = 'square', v = .12, slide = 0, when = 0) => { const c = A.ctx, t = c.currentTime + when, o = c.createOscillator(), g = c.createGain(); o.type = type; o.frequency.setValueAtTime(f, t); if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(20, slide), t + d); g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.0001, t + d); o.connect(g).connect(A.out); o.start(t); o.stop(t + d + .03); };
+const hiss = (d, f = 1000, v = .2, type = 'bandpass', slide = 0, when = 0) => { const c = A.ctx, t = c.currentTime + when, s = c.createBufferSource(), fl = c.createBiquadFilter(), g = c.createGain(); s.buffer = A.nb; fl.type = type; fl.frequency.setValueAtTime(f, t); if (slide) fl.frequency.exponentialRampToValueAtTime(Math.max(40, slide), t + d); g.gain.setValueAtTime(v, t); g.gain.exponentialRampToValueAtTime(.0001, t + d); s.connect(fl).connect(g).connect(A.out); s.start(t, Math.random() * 1.2, d + .05); };
+const CUES = [], cue = (scene, lt, fn) => CUES.push([STARTS[scene] + lt, fn]);
+const step = (v = .09) => hiss(.045, 420, v, 'lowpass');
+const thud = (v = .35) => { tone(85, .28, 'sine', v, 40); hiss(.16, 380, v * .8, 'lowpass'); };
+cue(0, 1.0, () => { tone(988, .9, 'sine', .1); tone(1319, .9, 'sine', .07, 0, .09); });
+for (let x = .3; x < 5; x += .34) cue(1, x, () => step(.07));
+cue(1, .8, () => hiss(.12, 4200, .12, 'highpass')); cue(1, 2.2, () => hiss(.1, 4500, .1, 'highpass'));
+cue(1, 4.5, () => { hiss(1.7, 220, .5, 'lowpass', 70); tone(58, 1.3, 'sawtooth', .16, 28); }); cue(1, 4.72, () => hiss(.6, 160, .3, 'lowpass', 60));
+for (let x = .3; x < 2.6; x += .36) cue(2, x, () => step(.08));
+cue(2, 2.8, () => tone(660, .08, 'square', .09)); cue(2, 4.72, () => tone(820, .28, 'triangle', .14, 520));
+cue(2, 4.95, () => hiss(.5, 800, .13, 'bandpass', 300)); cue(2, 5.1, () => tone(950, 1.2, 'sine', .07, 180));
+cue(2, 6.35, () => { thud(.5); hiss(.4, 2800, .16, 'highpass'); tone(190, .25, 'square', .05, 90); }); cue(2, 6.45, () => { tone(1200, .08, 'square', .09); tone(1200, .08, 'square', .09, 0, .12); });
+cue(2, 7.1, () => tone(300, 1.4, 'sine', .035, 240));
+for (let x = .3; x < 6.4; x += .17) cue(3, x, () => step(.07));
+cue(3, 6.4, () => hiss(2.1, 700, .1, 'bandpass', 220)); cue(3, 6.9, () => { hiss(.1, 3200, .25, 'highpass'); tone(1500, .1, 'sine', .15, 260); });
+cue(3, 7.15, () => tone(1100, .24, 'square', .1, 560)); cue(3, 7.8, () => thud(.3)); cue(3, 8.1, () => thud(.2)); cue(3, 8.32, () => thud(.12));
+cue(3, 8.2, () => tone(1800, .32, 'sawtooth', .05, 380));
+[[1.9, 523], [2.7, 659], [4.3, 784]].forEach(([x, f]) => cue(4, x, () => { thud(.4); tone(f, .7, 'sine', .08); tone(f * 2, .5, 'sine', .04, 0, .03); }));
+cue(4, 3.0, () => hiss(.28, 5200, .1, 'highpass'));
+cue(4, 4.7, () => { hiss(.15, 3500, .2, 'highpass'); [0, .09, .18].forEach(w => tone(120, .06, 'sawtooth', .06, 0, w)); tone(120, 3, 'sawtooth', .015, 0, .3); });
+cue(4, 6.4, () => { [523, 659, 784, 1047].forEach((f, i) => tone(f, .35, 'triangle', .13, 0, i * .09)); tone(1047, .9, 'sine', .08, 0, .4); }); cue(4, 7.0, () => tone(1500, .05, 'square', .08));
+cue(5, .3, () => [220, 262, 330].forEach(f => tone(f, 3.2, 'sine', .05))); cue(5, 7.8, () => { tone(1319, 1.4, 'sine', .1); tone(1760, 1.4, 'sine', .05, 0, .06); });
+const ROOTS = [110, 87.31, 98, 82.41];
+function audioTick(T, sc, lt) {
+  if (!A.on || !A.ctx) return;
+  const dt = T - A.last; A.last = T;
+  if (dt > 0 && dt < .3) for (const [t, fn] of CUES) if (t > T - dt && t <= T) fn();
+  const bpm = sc === 3 ? 132 : 84, beat = Math.floor(T * bpm / 60);
+  if (beat !== A.beat) {
+    if (dt > 0 && dt < .3 && A.beat >= 0 && sc !== 0) {
+      const root = ROOTS[Math.floor(beat / 4) % 4], n = beat % 4;
+      if (n % 2 === 0 && sc !== 5) tone(root, sc === 3 ? .25 : .6, 'triangle', .13);
+      if (n === 2 && sc !== 5) tone(root * (Math.floor(beat / 4) % 2 ? 2.4 : 3), .3, 'sine', .045);
+      if (sc === 3 || (sc === 4 && lt > 6.4)) { tone(130, .12, 'sine', .22, 45); hiss(.03, 7500, .07, 'highpass', 0, 30 / bpm); }
+    }
+    A.beat = beat;
+  }
+  const tgt = sc === 1 ? .05 : sc === 2 ? .035 : sc === 3 ? .06 : sc === 4 ? .015 : 0;
+  A.rain.gain.setTargetAtTime(tgt, A.ctx.currentTime, .3);
+}
+const sndBtn = document.getElementById('snd');
+function setSound(on) {
+  if (on && !A.ctx) audioInit();
+  A.on = on; if (A.ctx) on ? A.ctx.resume() : A.ctx.suspend();
+  sndBtn.textContent = on ? 'Sound: on' : 'Sound: off'; sndBtn.setAttribute('aria-pressed', on);
+  try { localStorage.setItem('piix-404-sound', on ? '1' : '0'); } catch (e) {}
+}
+sndBtn.addEventListener('click', () => setSound(!A.on));
+document.addEventListener('visibilitychange', () => { if (A.ctx && A.on) document.hidden ? A.ctx.suspend() : A.ctx.resume(); });
+
 /* ---------- the projector ---------- */
 const ptr = { x: 0 };
 addEventListener('pointermove', e => { ptr.x += ((e.clientX / innerWidth - .5) - ptr.x) * .15; }, { passive: true });
@@ -288,6 +351,7 @@ function frame() {
   const T = freeze != null ? freeze : (((performance.now() - t0) / 1000 + skip) % TOTAL);
   let sc = STARTS.findIndex((s, i) => T >= s && T < (STARTS[i + 1] ?? TOTAL)); if (sc < 0) sc = 0;
   const lt = T - STARTS[sc]; shake = 0;
+  audioTick(T, sc, lt);
   ctx.save(); ctx.imageSmoothingEnabled = false;
   [card, city, alley, chase, reveal, credits][sc](lt);
   ctx.restore();
