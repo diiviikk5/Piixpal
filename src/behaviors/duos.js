@@ -53,7 +53,7 @@ defineBehavior('popper', (a, [el], host) => {
         if (timer <= 0) {
           /* POP: aim for a spot on the element, high enough to open the chute */
           const tx = clamp(rnd(s.r.l + 30 * S, s.r.r - 30 * S), s.r.l + b.w, s.r.r - b.w);
-          bx = a.x; by = a.y - a.h * .5; vy = -560 * S; vx = (tx - bx) / 2.2;
+          bx = a.x; by = a.y - a.h * .5; vy = -430 * S; vx = (tx - bx) / 2.2;
           st = 'up'; duoShow(b, true); b.play('scared'); a.say('!', 500);
         }
       } else if (st === 'up') {
@@ -366,7 +366,7 @@ defineBehavior('luna', (a, [el], host) => {
       const s = duoSpot(el, at), r = s.r;
       rise = reduced() ? 1 : Math.min(1, rise + dt / 2.4);
       const e = 1 - Math.pow(1 - rise, 3);
-      a.x = s.x; a.y = s.y - (22 + 48 * e) * S + Math.sin(t / 900) * 5 * S;
+      a.x = s.x; a.y = s.y - (8 + 36 * e) * S + Math.sin(t / 900) * 5 * S;
       a.node.style.opacity = String(.25 + .75 * e);
       pup.x = Math.max(r.l + pup.w / 2, s.x - Math.max(120 * S, r.w * .4)); pup.y = s.y; pup.face = 1;
       if (reduced()) { a.play('idle'); pup.play('idle'); return; }

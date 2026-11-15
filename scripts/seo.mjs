@@ -105,6 +105,11 @@ function pageFor(f) {
     desc: `${ROUND}+ free UI components: animated pixel characters, WebGL shader backgrounds, ${TEMPLATES.length} hero templates, ASCII and text effects. HTML, React, Vue, shadcn.`, home: true };
   if (f === 'faq.html') return { ...base, title: 'Piixpal FAQ: Free Animated UI Components, Answered', desc: 'How to install Piixpal, use it with React, Next.js and shadcn, find free animated hero templates and shader backgrounds, and keep it fast and accessible.', faq: true, crumbs: crumbs(['FAQ', url]) };
   let m;
+  if (f === 'components/duos.html') return { ...base, title: 'Duos: Pairs of Animated Pals That Interact · Piixpal', desc: 'Pairs of animated characters that live a little story together on your website: a toaster and his toast, a candle and a moth, a knight and a dragon. One tag each.', crumbs: crumbs(['Characters', '/components/'], ['Duos', url]) };
+  if ((m = f.match(/^components\/duo-([\w-]+)\.html$/))) {
+    const h = read(f), t = (h.match(/<h1>([^<]*)<\/h1>/) || [])[1] || m[1], d = (h.match(/<div class="crumbs">[\s\S]*?<\/header>/) || [''])[0].match(/<p>([^<]*)<\/p>/);
+    return { ...base, title: `${unesc(t)}: Animated Pals for Your Website · Piixpal`, desc: d ? unesc(d[1]) : null, crumbs: crumbs(['Characters', '/components/'], ['Duos', '/components/duos'], [unesc(t), url]) };
+  }
   if ((m = f.match(/^components\/([\w-]+)\.html$/)) && COMP[m[1]]) {
     const [t, d, c] = COMP[m[1]];
     return { ...base, title: `${t} · Piixpal`, desc: d, image: `/site/og/c-${m[1]}.jpg`, crumbs: m[1] === 'index' ? crumbs(['Characters', url]) : crumbs(['Characters', '/components/'], [c, url]),

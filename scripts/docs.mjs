@@ -226,7 +226,7 @@ export const LOGO = `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" aria-
 const sidebar = active => {
   const link = (href, label, key) => `<a href="${href}"${key === active ? ' aria-current="page"' : ''}>${label}</a>`;
   const item = (href, name, accent) => `<a href="${href}" style="--dot:${accent}"><i></i>${title(name)}</a>`;
-  const group = (key, label, href, count, subs) => `<details class="sg"${key === active ? ' open' : ''}>
+  const group = (key, label, href, count, subs) => `<details class="sg"${key === active || (key === 'duos' && String(active).startsWith('duo-')) ? ' open' : ''}>
       <summary><a href="${href}"${key === active ? ' aria-current="page"' : ''}>${label}</a><span class="n">${count}</span></summary>
       ${subs.filter(([, list]) => list.length).map(([h, list]) => `<h5>${h}</h5>${list.join('')}`).join('\n      ')}
     </details>`;
@@ -235,6 +235,7 @@ const sidebar = active => {
     <nav class="side-start">${link('./', 'Overview', 'index')}${link('install.html', 'Install', 'install')}${link('make.html', 'Pal Maker', 'make')}${link('builder.html', 'Builder', 'builder')}${link('visit.html', 'Pals anywhere', 'visit')}${link('agents.html', 'Agent pets', 'agents')}${link('readme.html', 'GitHub README', 'readme')}</nav>
     ${group('sprites', 'Sprites', 'sprites.html', sprites.length, [['Big 3D', bigs.map(x => item('sprites.html#s-' + x.name, x.name, x.accent))], ['Small', smalls.map(x => item('sprites.html#s-' + x.name, x.name, x.accent))]])}
     ${group('pals', 'Pals', 'pals.html', PALS.length, [['Characters', kinds.pal.map(p => item('pals.html#' + p.id, p.id, p.accent))], ['Interactions', kinds.play.map(p => item('pals.html#' + p.id, p.id, p.accent))], ['Toys', kinds.toy.map(p => item('pals.html#' + p.id, p.id, p.accent))], ['Groups', kinds.group.map(p => item('pals.html#' + p.id, p.id, p.accent))]])}
+    ${group('duos', 'Duos', 'duos.html', DUOS.length, [['Pairs', DUOS.map(d => `<a href="duo-${d.id}.html" style="--dot:${d.accent}"${'duo-' + d.id === active ? ' aria-current="page"' : ''}><i></i>${esc(d.name)}</a>`)]])}
     ${group('powers', 'Superpowers', 'powers.html', POWERS.length, FAMILIES.map(([id, name]) => [name, POWERS.filter(p => p.fam === id).map(p => item('powers.html#' + p.id, p.id, p.accent))]))}
     ${group('studio', '3D', '3d.html', STUDIO.length, [['Pals in 3D', STUDIO.map(x => item('3d.html#' + x.id, x.id, x.accent))]])}
     <nav class="side-start">${link('crowd.html', 'Crowd', 'crowd')}${link('type.html', 'Pixel type', 'type')}</nav>
@@ -248,7 +249,7 @@ export const navBar = (key, pre = '', ui = '../ui/') => `<header class="nav" id=
     <a class="logo" href="../" aria-label="Piixpal home">${LOGO}<span>p<span class="i">ı</span><span class="i">ı</span>xpal</span></a>
     <a class="btn btn-sm btn-heart nav-sponsor" href="https://checkout.dodopayments.com/buy/pdt_0Nqn3w3rmEdaceOHhh7xT?quantity=1" target="_blank" rel="noopener" title="Sponsor Piixpal"><svg viewBox="0 0 8 7" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M1 0h2v1h2V0h2v1h1v2H7v1H6v1H5v1H3V5H2V4H1V3H0V1h1z"/></svg><span>Sponsor</span></a>
     <nav class="links" aria-label="Site">
-      <a href="${pre}./"${['index', 'sprites', 'pals', 'crowd', 'type', 'powers', 'studio', 'visit', 'agents', 'readme', 'nomad'].includes(key) ? ' aria-current="page"' : ''}>Components</a>
+      <a href="${pre}./"${(['index', 'sprites', 'pals', 'crowd', 'type', 'powers', 'studio', 'visit', 'agents', 'readme', 'nomad', 'duos'].includes(key) || String(key).startsWith('duo-')) ? ' aria-current="page"' : ''}>Components</a>
       <a href="${ui}"${key.startsWith('ui') ? ' aria-current="page"' : ''}>Pixel UI</a>
       <a href="/templates/"${key === 'templates' ? ' aria-current="page"' : ''}>Templates</a>
       <a href="/gitpal/"${key === 'gitpal' ? ' aria-current="page"' : ''}>Gitpal<b class="new">new</b></a>
@@ -514,6 +515,77 @@ ${family('play', 'Interactions', kinds.play, palSection)}
 ${family('toys', 'Toys', kinds.toy, palSection)}
 ${family('groups', 'Groups', kinds.group, palSection)}`;
 
+/* ---------- duos: pairs of pals that live a little story together (src/pals/duos.js, src/behaviors/duos.js) ---------- */
+export const DUOS = [
+  { id: 'popper', name: 'Popper & Butter', accent: 'var(--sun)', line: 'A toaster who launches his best friend into the sky.',
+    story: ['Butter waits in the slot while Popper hums.', 'Pop: she flies up, spinning.', 'At the top a parachute opens and she drifts down, swaying.', 'She lands, walks back and hops in. Again.'],
+    poke: [['Popper', 'pops her out now'], ['Butter', 'hearts']], attrs: [['at', 'where Popper stands, 0–1']] },
+  { id: 'wick', name: 'Wick & Dusty', accent: 'var(--coral)', line: 'A shy candle and the moth who loves her a little too much.',
+    story: ['Dusty circles her flame, a little closer every lap.', 'Wick blushes and her flame flickers.', 'Too close: he blows her out, and sulks beside her.', 'She lights up again, and he starts over.'],
+    poke: [['Wick', 'blushes, and draws him in'], ['Dusty', 'flutters back out']], attrs: [['at', 'where Wick stands, 0–1']] },
+  { id: 'earl', name: 'Earl & Sip', accent: 'var(--mint)', line: 'A fussy teapot and a tiny cup who always wants more.',
+    story: ['Earl hums, tilts and pours a real stream of tea.', 'Sip fills up and steams.', 'Full cups hiccup.', 'Sip slowly drinks it all, and Earl pours again.'],
+    poke: [['Earl', 'pours now'], ['Sip', 'hearts']], attrs: [['at', 'where Earl stands, 0–1']] },
+  { id: 'dent', name: 'Sir Dent & Soot', accent: 'var(--sky)', line: 'A very small knight, and a dragon who only wants a hug.',
+    story: ['Sir Dent charges, sword up.', 'Soot hugs him.', 'Then sneezes fire.', 'Sir Dent runs home, regroups, and charges again.'],
+    poke: [['Sir Dent', 'charges now'], ['Soot', 'sneezes']], attrs: [['at', 'where the knight starts, 0–1']] },
+  { id: 'volt', name: 'Volt & the bolts', accent: 'var(--violet)', line: 'A robot with a magnet for a head. The bolts cannot resist.',
+    story: ['Volt strolls along your element.', 'Any bolt he passes flies up and stacks on his head.', 'With all of them on, he shakes them off.', 'They scatter, and he starts collecting again.'],
+    poke: [['Volt', 'shakes them off'], ['a bolt', 'jumps']], attrs: [['bolts', 'how many bolts, 1–6 (3)']] },
+  { id: 'spike', name: 'Spike & Tumble', accent: 'var(--lime)', line: 'A cactus cowboy and the tumbleweed he will never quite catch.',
+    story: ['A tumbleweed rolls by.', 'Spike lassos it.', 'It drags him off his pot and across the element.', 'He cheers anyway, walks home, and waits for the next one.'],
+    poke: [['Spike', 'yee-haws'], ['Tumble', 'squeaks']], attrs: [['at', 'where Spike stands, 0–1']] },
+  { id: 'morel', name: 'Morel & Ribb', accent: 'var(--violet)', line: 'A mushroom wizard practising spells on a frog who did not volunteer.',
+    story: ['Morel waves his staff and a sparkle arcs across.', 'Ribb turns tiny, giant, upside-down, ghostly, spinning or pink.', 'Ribb is furious.', 'It wears off. Morel tries again.'],
+    poke: [['Morel', 'casts now'], ['Ribb', 'complains']], attrs: [['at', 'where Morel stands, 0–1']] },
+  { id: 'luna', name: 'Luna & Pup', accent: 'var(--sun)', line: 'The moon rises over your element, and a wolf pup sings to her.',
+    story: ['The moon rises softly above the element.', 'Pup looks up and howls.', 'Luna blushes and floats a little higher.', 'She smiles when your cursor comes near.'],
+    poke: [['Luna', 'blushes'], ['Pup', 'howls']], attrs: [['at', 'where the moon hangs, 0–1']] },
+  { id: 'parcel', name: 'Parcel & the mailbox', accent: 'var(--coral)', line: 'A snail who delivers, at snail speed, to a very hungry mailbox.',
+    story: ['Parcel crawls a letter all the way across.', 'It flies into the mailbox.', 'The mailbox eats it and burps a heart.', 'Parcel crawls home for another.'],
+    poke: [['Parcel', 'hurries (briefly)'], ['the mailbox', 'eeps']], attrs: [] },
+  { id: 'wink', name: 'Wink & the shadow', accent: 'var(--coral)', line: 'A fox whose shadow has a mind of its own.',
+    story: ['The shadow leans after your cursor.', 'Then it wanders off without Wink.', 'Wink notices, chases it and fetches it back.', 'Both walk home together.'],
+    poke: [['Wink', 'hearts'], ['the shadow', 'runs back']], attrs: [['at', 'where Wink sits, 0–1']] }
+];
+const duoHab = d => `<div class="duo-ledge" id="d-${d.id}"><span>${esc(d.name)}</span></div><piix-pal pal="${d.id}" on="#d-${d.id}"></piix-pal>`;
+const DUO_CSS = `<style>
+.duo-ledge{position:absolute;left:7%;right:7%;bottom:34px;height:46px;display:flex;align-items:center;padding:0 16px;border:2px solid var(--ink);border-radius:12px;background:var(--card);box-shadow:0 3px 0 var(--ink);font:400 11px/1 var(--f-pix);text-transform:uppercase;color:var(--muted)}
+.duo-steps{margin:0 0 14px;padding-left:20px;display:grid;gap:6px;color:var(--ink-2)}
+.duo-pager{display:flex;justify-content:space-between;gap:12px;margin-top:18px}
+.duo-pager a{font-weight:700}
+.ov .duo-art{position:relative;height:170px;border-radius:12px;background:color-mix(in oklab,var(--accent) 22%,var(--paper));border:1.5px solid color-mix(in oklab,var(--accent) 50%,var(--ink));overflow:hidden}
+.ov .duo-art .duo-ledge{left:6%;right:6%;bottom:14px;height:24px;box-shadow:none;font-size:9px}
+</style>`;
+const duoPage = (d, i) => {
+  const prev = DUOS[(i + DUOS.length - 1) % DUOS.length], next = DUOS[(i + 1) % DUOS.length];
+  return `${DUO_CSS}<header class="doc-head">
+  <div class="crumbs"><a href="./">Components</a><span>/</span><a href="duos.html">Duos</a><span>/</span><span>${esc(d.name)}</span></div>
+  <h1>${esc(d.name)}</h1>
+  <p>${esc(d.line)} One tag brings both of them.</p>
+</header>
+<section class="cmp" id="${d.id}" style="--accent:${d.accent}">
+  <div class="cmp-body pal-doc">
+    <div class="habitat tall">${boxed(duoHab(d))}</div>
+    <div class="cmp-code">${installTabs(d.id, 'pal', `<h2>\n  …\n  <piix-pal pal="${d.id}"></piix-pal>\n</h2>`, 'h2')}${options([...d.attrs, ...d.poke.map(([w, r]) => ['poke ' + w, r])])}</div>
+  </div>
+</section>
+<section class="doc-sec" aria-labelledby="st-h">
+  <h2 id="st-h">How it plays</h2>
+  <ol class="duo-steps">${d.story.map(x => `<li>${esc(x)}</li>`).join('')}</ol>
+  <p>It loops with a little randomness, never blocks a click, and stands still for people who prefer less motion. Put the tag inside the element they should live on, or point at one with <code>on="selector"</code>.</p>
+  <div class="duo-pager"><a href="duo-${prev.id}.html">← ${esc(prev.name)}</a><a href="duo-${next.id}.html">${esc(next.name)} →</a></div>
+</section>`;
+};
+const duosBody = `${DUO_CSS}<header class="doc-head">
+  <div class="crumbs"><a href="./">Components</a><span>/</span><span>Duos</span></div>
+  <h1>Duos</h1>
+  <p>Pairs of pals that share a spot on your page and live a little story together, over and over: a toaster and his toast, a candle and a moth, a knight and a dragon. One tag brings both.</p>
+</header>
+<section class="doc-sec" aria-label="Duos">
+  <div class="ov">${DUOS.map(d => `<a href="duo-${d.id}.html" style="--accent:${d.accent}"><div class="duo-art">${duoHab(d)}</div><h3>${esc(d.name)}</h3><p>${esc(d.line)}</p></a>`).join('')}</div>
+</section>`;
+
 /* ---------- superpowers ---------- */
 const powerSection = p => cmpSection({
   id: p.id, accent: p.accent, tall: p.tall, tag: p.kind === 'element' ? `<${p.tag}>` : `pal="${p.id}"`, desc: p.desc, hab: p.hab,
@@ -669,12 +741,14 @@ const indexBody = `<header class="doc-head">
     <a href="pals.html" style="--accent:var(--coral)"><div class="ov-art" id="ov-pals"><span style="font:780 30px var(--f-sans);letter-spacing:-.03em" id="ov-word">live here</span></div><h3>Pals <span>${PALS.length}</span></h3><p>Characters that live on your page: they crawl on headings, bounce on footers, peek over cards, perch on buttons.</p></a>
     <a href="crowd.html" style="--accent:var(--sky)"><div class="ov-art"><piix-crowd mode="crowd" count="26" height="140" scale="2" style="width:100%"></piix-crowd></div><h3>Crowd <span>3</span></h3><p>Hundreds of tiny agents on one stage. They wander and high-five, swarm your cursor, or spell a word.</p></a>
     <a href="pals.html#toys" style="--accent:var(--sun)"><div class="ov-art"><span style="font:780 30px var(--f-sans);letter-spacing:-.03em" id="ov-toys">toy box</span></div><h3>Toys + groups <span>${kinds.toy.length + kinds.group.length}</span></h3><p>Throwable toys that land on your page, and whole crews in one tag: ducks, ants, fish, a choir, fireflies.</p></a>
+    <a href="duos.html" style="--accent:var(--sun)"><div class="ov-art" id="ov-duos"><span style="font:780 30px var(--f-sans);letter-spacing:-.03em">two of a kind</span></div><h3>Duos <span>${DUOS.length}</span></h3><p>Pairs of pals that live a little story together: a toaster and his toast, a candle and a moth, a knight and a dragon.</p></a>
     <a href="powers.html" style="--accent:var(--coral)"><div class="ov-art"><span style="font:780 30px var(--f-sans);letter-spacing:-.03em" id="ov-powers">superpowers</span></div><h3>Superpowers <span>${POWERS.length}</span></h3><p>Pals that step out of the page, do real interface jobs, or turn your site into a game.</p></a>
     <a href="3d.html" style="--accent:var(--sky)"><div class="ov-art"><piix-voxel pal="bitbug" size="120" spin="10"></piix-voxel><piix-voxel pal="frog" look="toon" size="120" spin="10"></piix-voxel></div><h3>3D <span>${STUDIO.length}</span></h3><p>Pals as real 3D models: spin them, collect them as holo cards, put them on a planet or in a snow globe.</p></a>
     <a href="type.html" style="--accent:var(--violet)"><div class="ov-art"><div style="width:80%"><piix-type text="abc" rows="14" cell="6" shade="#c6f432" fit intro="none"></piix-type></div></div><h3>Pixel type <span>1</span></h3><p>Any font as chunky extruded blocks that rain in, lift around the cursor and ripple. Pals can walk on it.</p></a>
   </div>
   <piix-pal pal="bitbug" on="#ov-word" scale="3"></piix-pal>
   <piix-pal pal="dice" on="#ov-toys"></piix-pal>
+  <piix-pal pal="earl" on="#ov-duos" at=".3"></piix-pal>
   <piix-pal pal="pix" on="#ov-powers" coins="0"></piix-pal>
 </section>
 <section class="doc-sec" aria-labelledby="ins-h">
@@ -913,6 +987,8 @@ const pages = [
   ['index.html', { key: 'index', title: 'Components', desc: 'Every Piixpal component: sprites, pals and pixel type.', body: indexBody }],
   ['sprites.html', { key: 'sprites', title: 'Sprites', desc: `${sprites.length} inline pixel sprites with cursor-following eyes. Copy a tag, paste it anywhere.`, body: spritesBody }],
   ['pals.html', { key: 'pals', title: 'Pals', desc: 'Pixel characters that live on your page: crawl, bounce, peek, perch, hang, follow, creep.', body: palsBody }],
+  ['duos.html', { key: 'duos', title: 'Duos', desc: 'Pairs of pals that live a little story together on your page: a toaster and his toast, a candle and a moth, a knight and a dragon. One tag brings both.', body: duosBody }],
+  ...DUOS.map((d, i) => ['duo-' + d.id + '.html', { key: 'duo-' + d.id, title: d.name, desc: d.line + ' A pair of animated pals that live on your page, one tag.', body: duoPage(d, i) }]),
   ['powers.html', { key: 'powers', title: 'Superpowers', desc: 'Pals that step out of the page, do real interface jobs, or turn your site into a game.', body: powersBody }],
   ['3d.html', { key: 'studio', title: '3D', desc: 'Pals as real 3D models: spinning toys, holo trading cards, a voxel planet, a snow globe, a hologram and voxel dioramas.', body: studioBody }],
   ['install.html', { key: 'install', title: 'Install', desc: 'Every way to add Piixpal to a site: one tag, single files, no-markup, JS, React, Vue, Svelte, bookmarklet.', body: installBody }],
