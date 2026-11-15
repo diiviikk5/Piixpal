@@ -289,6 +289,8 @@ document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click'
         redirect_url: HOME
       });
       f.querySelector('[type=submit]').classList.add('busy');
+      /* tell the owner, even if they never finish paying. sendBeacon survives the page change */
+      try { navigator.sendBeacon('/api/sponsor', new Blob([JSON.stringify(v)], { type: 'application/json' })); } catch {}
       location.href = `https://checkout.dodopayments.com/buy/${PRODUCT}?${q}`;
     });
   };
