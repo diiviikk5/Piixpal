@@ -203,12 +203,14 @@ document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click'
    (email pre-filled, the rest as metadata_* on the payment), so every order arrives
    with the brand it belongs to. Nothing is stored here except a draft in this browser. */
 (() => {
-  const PRODUCT = 'pdt_0Nqn3w3rmEdaceOHhh7xT', PRICE = '$49.99';
+  const PRODUCT = 'pdt_0Nqn3w3rmEdaceOHhh7xT';
   const HOME = 'https://piixpal.dvkk.dev/?sponsor=thanks';
   const KEY = 'piix-sponsor-draft';
   const FIELDS = ['product', 'link', 'desc', 'email'];
   /* our own pal: the face from the Piixpal logo */
   const catSvg = '<svg viewBox="2 3 12 10" shape-rendering="crispEdges" aria-hidden="true"><path fill="#c6f432" d="M4 4h8v1h1v6h-1v1H4v-1H3V5h1z"/><path fill="#17121f" d="M5 6h2v2H5zM9 6h2v2H9zM6 9h4v1H6z"/><path fill="#fff" d="M5 6h1v1H5zM9 6h1v1H9z"/></svg>';
+  const PERK_PAL = '<svg viewBox="0 0 9 9" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M2 1h5v1h1v5H7v1H2V7H1V2h1z"/><path fill="var(--card)" d="M3 3h1v2H3zM5 3h1v2H5zM3 6h3v1H3z"/></svg>';
+  const PERK_SLOT = '<svg viewBox="0 0 9 9" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M4 0h1v2h1v1h2v1H7v1h1v3H7V7H6V6H5v2H4V6H3v1H2v1H1V5h1V4H1V3h2V2h1z"/></svg>';
   const HEART = '<svg viewBox="0 0 8 7" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M1 0h2v1h2V0h2v1h1v2H7v1H6v1H5v1H3V5H2V4H1V3H0V1h1z"/></svg>';
   const params = new URLSearchParams(location.search);
   let dlg;
@@ -221,7 +223,7 @@ document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click'
     dlg.innerHTML = `<form novalidate>
   <button class="spf-x" type="button" aria-label="Close">×</button>
   <div class="spf-top"><span class="spf-cat">${catSvg}</span><div>
-    <h2 id="spf-h">Become a Sponsor <span>${PRICE}</span></h2>
+    <h2 id="spf-h">Become a Sponsor</h2>
     <p>Tell us about your brand, then pay on the next page. You'll be featured in the Sponsor section soon.</p></div></div>
   <div class="spf-grid">
     <label class="spf-f"><span>Product</span><input name="product" maxlength="40" autocomplete="organization"></label>
@@ -229,7 +231,17 @@ document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click'
     <label class="spf-f spf-wide"><span>Description <i class="spf-n">0 / 200</i></span><textarea name="desc" maxlength="200" rows="3"></textarea></label>
     <label class="spf-f spf-wide"><span>Email <i>where we reach you</i></span><input name="email" type="email" maxlength="120" autocomplete="email"></label>
   </div>
-  <div class="spf-prev" aria-hidden="true"><small>How you'll appear</small><div class="spf-card"><b class="spf-p"></b><span class="spf-d"></span><em class="spf-l"></em></div></div>
+  <div class="spf-prev"><small>How you'll appear</small>
+    <div class="spf-slot" aria-hidden="true">
+      <span class="spf-tag">Sponsor</span>
+      <div class="spf-pal"><span class="spf-mark">${catSvg}</span><i>your pal</i></div>
+      <div class="spf-card"><b class="spf-p"></b><span class="spf-d"></span><em class="spf-l"></em></div>
+    </div>
+    <ul class="spf-perks">
+      <li><span class="spf-ic">${PERK_PAL}</span><div><b>A custom brand pal</b><span>We draw an animated pal in your brand's colours. It lives on your slot.</span></div></li>
+      <li><span class="spf-ic">${PERK_SLOT}</span><div><b>A visible slot</b><span>Your product, line and link in the Sponsor section, seen by every visitor.</span></div></li>
+    </ul>
+  </div>
   <p class="spf-err" role="alert"></p>
   <div class="spf-go"><button class="btn btn-heart" type="submit">${HEART}Continue to payment</button><small>Secure checkout by Dodo Payments</small></div>
 </form>`;
@@ -237,7 +249,6 @@ document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click'
     const f = dlg.querySelector('form'), el = n => f.elements[n];
     const paint = () => {
       const v = n => el(n).value.trim();
-      dlg.querySelector('.spf-prev').hidden = !FIELDS.slice(0, 3).some(n => v(n));
       dlg.querySelector('.spf-p').textContent = v('product');
       dlg.querySelector('.spf-d').textContent = v('desc');
       dlg.querySelector('.spf-l').textContent = host(v('link')) ? host(v('link')) + ' ↗' : '';
