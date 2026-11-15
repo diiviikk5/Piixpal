@@ -197,3 +197,113 @@ document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click'
   if (!at) return;
   addEventListener('load', () => { const el = document.getElementById(at); if (el) { document.documentElement.style.scrollBehavior = 'auto'; el.scrollIntoView(); } });
 })();
+
+/* ---------- sponsor: a short form before checkout ----------
+   The Sponsor buttons open it (plain one-off Support links still go straight to checkout). The answers ride along to Dodo checkout
+   (email pre-filled, the rest as metadata_* on the payment), so every order arrives
+   with the brand it belongs to. Nothing is stored here except a draft in this browser. */
+(() => {
+  const PRODUCT = 'pdt_0Nqn3w3rmEdaceOHhh7xT', PRICE = '$49.99';
+  const HOME = 'https://piixpal.dvkk.dev/?sponsor=thanks';
+  const KEY = 'piix-sponsor-draft';
+  const FIELDS = ['product', 'link', 'desc', 'email'];
+  const CAT = ['.k.......k.', '.kk.....kk.', '.kkkkkkkkk.', 'kkkkkkkkkkk', 'kkLkkkkkLkk', 'kkkkkpkkkkk', 'kkkkkkkkkkk', '.kkkkkkkkk.', '..kk...kk..'];
+  const pix = (rows, cols) => `<svg viewBox="0 0 ${rows[0].length} ${rows.length}" shape-rendering="crispEdges" aria-hidden="true">${rows.map((r, y) => [...r].map((c, x) => cols[c] ? `<rect x="${x}" y="${y}" width="1" height="1" fill="${cols[c]}"/>` : '').join('')).join('')}</svg>`;
+  const catSvg = pix(CAT, { k: 'currentColor', L: 'var(--lime)', p: '#ff5c8a' });
+  const HEART = '<svg viewBox="0 0 8 7" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M1 0h2v1h2V0h2v1h1v2H7v1H6v1H5v1H3V5H2V4H1V3H0V1h1z"/></svg>';
+  const params = new URLSearchParams(location.search);
+  let dlg;
+  const draft = () => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (_) { return {}; } };
+  const host = s => String(s || '').trim().replace(/^https?:\/\//i, '').replace(/\/.*$/, '');
+  const build = () => {
+    dlg = document.createElement('dialog');
+    dlg.className = 'spf';
+    dlg.setAttribute('aria-labelledby', 'spf-h');
+    dlg.innerHTML = `<form novalidate>
+  <button class="spf-x" type="button" aria-label="Close">×</button>
+  <div class="spf-top"><span class="spf-cat">${catSvg}</span><div>
+    <h2 id="spf-h">Become a Sponsor <span>${PRICE}</span></h2>
+    <p>Tell us about your brand, then pay on the next page. You'll be featured in the Sponsor section soon.</p></div></div>
+  <div class="spf-grid">
+    <label class="spf-f"><span>Product</span><input name="product" maxlength="40" placeholder="e.g. Acme Studio" autocomplete="organization"></label>
+    <label class="spf-f"><span>Link <i>where it points</i></span><input name="link" maxlength="120" placeholder="example.com" inputmode="url" autocomplete="url"></label>
+    <label class="spf-f spf-wide"><span>Description <i class="spf-n">0 / 200</i></span><textarea name="desc" maxlength="200" rows="3" placeholder="One or two lines about what you make"></textarea></label>
+    <label class="spf-f spf-wide"><span>Email <i>where we reach you</i></span><input name="email" type="email" maxlength="120" placeholder="you@example.com" autocomplete="email"></label>
+  </div>
+  <div class="spf-prev" aria-hidden="true"><small>How you'll appear</small><div class="spf-card"><b class="spf-p"></b><span class="spf-d"></span><em class="spf-l"></em></div></div>
+  <p class="spf-err" role="alert"></p>
+  <div class="spf-go"><button class="btn btn-heart" type="submit">${HEART}Continue to payment</button><small>Secure checkout by Dodo Payments</small></div>
+</form>`;
+    document.body.append(dlg);
+    const f = dlg.querySelector('form'), el = n => f.elements[n];
+    const paint = () => {
+      const v = n => el(n).value.trim();
+      dlg.querySelector('.spf-p').textContent = v('product') || 'Acme Studio';
+      dlg.querySelector('.spf-d').textContent = v('desc') || 'One or two lines about what you make';
+      dlg.querySelector('.spf-l').textContent = (host(v('link')) || 'example.com') + ' ↗';
+      dlg.querySelector('.spf-n').textContent = el('desc').value.length + ' / 200';
+    };
+    const d = draft();
+    FIELDS.forEach(n => { if (d[n]) el(n).value = d[n]; });
+    paint();
+    f.addEventListener('input', e => {
+      e.target.removeAttribute('aria-invalid');
+      paint();
+      try { localStorage.setItem(KEY, JSON.stringify(Object.fromEntries(new FormData(f)))); } catch (_) { /* private mode */ }
+    });
+    dlg.querySelector('.spf-x').addEventListener('click', () => dlg.close());
+    dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+    f.addEventListener('submit', e => {
+      e.preventDefault();
+      const v = Object.fromEntries(FIELDS.map(n => [n, el(n).value.trim()]));
+      const bad = [];
+      if (!v.product) bad.push(['product', 'Add your product name.']);
+      if (!/^[^\s/]+\.[^\s.]{2,}(\/\S*)?$/.test(v.link.replace(/^https?:\/\//i, ''))) bad.push(['link', 'Add a link, like example.com.']);
+      if (!v.desc) bad.push(['desc', 'Add a short description.']);
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.email)) bad.push(['email', 'Add an email we can reach you at.']);
+      f.querySelectorAll('[aria-invalid]').forEach(x => x.removeAttribute('aria-invalid'));
+      const err = dlg.querySelector('.spf-err');
+      if (bad.length) {
+        bad.forEach(([n]) => el(n).setAttribute('aria-invalid', 'true'));
+        err.textContent = bad[0][1];
+        el(bad[0][0]).focus();
+        return;
+      }
+      err.textContent = '';
+      const q = new URLSearchParams({
+        quantity: 1, email: v.email,
+        metadata_product: v.product,
+        metadata_link: /^https?:/i.test(v.link) ? v.link : 'https://' + v.link,
+        metadata_description: v.desc,
+        redirect_url: HOME
+      });
+      f.querySelector('[type=submit]').classList.add('busy');
+      location.href = `https://checkout.dodopayments.com/buy/${PRODUCT}?${q}`;
+    });
+  };
+  const open = () => {
+    if (!dlg) build();
+    dlg.querySelector('.spf-err').textContent = '';
+    dlg.querySelector('[type=submit]').classList.remove('busy');
+    dlg.showModal();
+    const f = dlg.querySelector('form');
+    (FIELDS.map(n => f.elements[n]).find(x => !x.value) || f.elements.product).focus();
+  };
+  document.addEventListener('click', e => {
+    const a = e.target.closest(`.nav-sponsor,[data-sponsor],a[href*="${PRODUCT}"]`);
+    if (!a || (a.matches(`a[href*="${PRODUCT}"]:not(.nav-sponsor,[data-sponsor])`) && !/sponsor/i.test(a.textContent + (a.title || ''))) || e.metaKey || e.ctrlKey || e.shiftKey || e.button > 0 || typeof HTMLDialogElement !== 'function') return;
+    e.preventDefault();
+    open();
+  });
+  if (params.get('sponsor') === 'open') addEventListener('load', open);
+  /* back from checkout */
+  if (params.get('sponsor') === 'thanks' && /^(succeeded|active)$/.test(params.get('status') || 'succeeded')) {
+    try { localStorage.removeItem(KEY); } catch (_) { /* fine */ }
+    const t = document.createElement('div');
+    t.className = 'spf-toast'; t.setAttribute('role', 'status');
+    t.innerHTML = `<span class="spf-cat">${catSvg}</span><div><b>Thank you, sponsor!</b><span>You'll be in the Sponsor section soon. We'll email you if we need anything.</span></div>`;
+    document.body.append(t);
+    setTimeout(() => t.classList.add('out'), 7000);
+    setTimeout(() => t.remove(), 7600);
+  }
+})();
