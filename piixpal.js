@@ -3454,6 +3454,74 @@ defineBehavior('count', (a, [el], host) => {
   };
 });
 
+/* ---- behaviors/cozy.js ---- */
+/* cozy: sits on top of an element and is simply content. Blinks, sways to a tune nobody
+ * else hears, dozes off when left alone. Bring the cursor close and she blushes and looks
+ * at you; poke her and she beams, arms up, and a little heart floats off. Poke while she
+ * naps and she wakes with a start. at="0..1" picks where along the top edge she sits. */
+defineBehavior('cozy', (a, [el], host) => {
+  const S = a.s / 3;
+  const at = host.getAttribute('at') != null ? clamp(+host.getAttribute('at'), 0, 1) : .8;
+  let state = 'idle', timer = rnd(3, 6), calm = 0, near = 0;
+  const go = (s, t, clip) => { state = s; timer = t; a.play(clip || s, { reset: true }); };
+  const cache = {};
+  /* where to sit: on the letters if the element has text, else its top edge */
+  const spot = r => {
+    if (typeof el.piixSurface === 'function') { const x = r.l + a.w / 2 + (r.w - a.w) * at; return { x, y: el.piixSurface(x) ?? r.t }; }
+    const tp = host.getAttribute('edge') !== 'box' && textProfile(el, cache);
+    if (tp) {
+      const x = tp.l + a.w / 2 + Math.max(0, tp.r - tp.l - a.w) * at, half = a.w * .3;
+      const under = tp.segs.filter(g => g.r > x - half && g.l < x + half);
+      return { x, y: under.length ? Math.min(...under.map(g => g.t)) : tp.t };
+    }
+    return { x: r.l + a.w / 2 + Math.max(0, r.w - a.w) * at, y: r.t };
+  };
+
+  return {
+    tick(dt) {
+      const r = rectOf(el);
+      const p = spot(r);
+      a.x = p.x; a.y = p.y;
+      a.sx = lerp(a.sx, 1, .18); a.sy = lerp(a.sy, 1, .18);
+      if (reduced()) { a.play('idle'); return; }
+
+      timer -= dt;
+      const close = ptr.seen && ptrDist(a.x, a.y - a.h / 2) < 120 * S;
+      near = close ? near + dt : 0;
+      calm = close ? 0 : calm + dt;
+
+      switch (state) {
+        case 'idle':
+          if (near > .5) { a.face = ptr.x < a.x ? -1 : 1; go('blush', 2.2); a.say('heart', 1200); }
+          else if (calm > 22) { go('sleep', rnd(8, 14)); a.say('zz', 0); }
+          else if (timer <= 0) chance(.55) ? go('sway', rnd(3, 5)) : go('look', 1.4);
+          break;
+        case 'sway': case 'look':
+          if (near > .5) { go('blush', 2.2); a.say('heart', 1200); }
+          else if (timer <= 0) go('idle', rnd(3, 7));
+          break;
+        case 'blush':
+          if (timer <= 0) close ? (timer = 1.2) : go('idle', rnd(3, 6));
+          break;
+        case 'happy':
+          if (timer <= 0) go('idle', rnd(3, 6));
+          break;
+        case 'sleep':
+          if (near > 1.2 || timer <= 0) { a.hush(); calm = 0; go('idle', rnd(3, 6), 'look'); setTimeout(() => state === 'idle' && a.play('idle'), 900); }
+          break;
+      }
+    },
+    poke() {
+      a.hush();
+      calm = 0;
+      if (state === 'sleep') { a.say('!?', 900); a.sy = 1.2; a.sx = .88; go('happy', 1, 'scared'); return; }
+      a.sy = .84; a.sx = 1.14;
+      a.say(pick(['heart', 'star', 'note']), 1100);
+      go('happy', 1.6);
+    }
+  };
+});
+
 /* ---- behaviors/crawl.js ---- */
 /* crawl: walk along the top of an element's text, hop over gaps and letter steps,
  * stop to sniff and look around, scurry away from the cursor, flip over when poked.
@@ -6090,6 +6158,92 @@ defineBehavior('wire', (a, [el], host) => {
       back: [capy('chill', true)]
     },
     fps: { read: 1, flip: 4, doze: 1 }
+  });
+})();
+
+/* ---- pals/daisy.js ---- */
+/* DAISY: a round capybara in a cosy blue sweater, with a crown of daisies. Very soft.
+ * Job: sits on top of your element and is content. Blinks slowly, sways a little, dozes.
+ * Bring your cursor close and she blushes; poke her and she beams and a petal floats off. */
+(() => {
+  const W = 32, H = 29;
+  const EYES = {
+    open: ['.kk.', 'kkwk', 'kkkk', '.kk.'],
+    look: ['.kk.', 'kwkk', 'kkkk', '.kk.'],
+    blink: ['____', '____', 'kkkk', '____'],
+    shut: ['____', '____', '.kk.', 'k__k'],
+    happy: ['____', '.kk.', 'k__k', '____'],
+    wide: ['.kk.', 'kwwk', 'kwwk', '.kk.']
+  };
+  const DAISY = ['.ewe.', 'ewwwe', 'wwyww', 'ewwwe', '.ewe.'].map(s => s.replace(/\./g, '_'));
+  const BUD = ['_w_', 'wyw', '_w_'];
+  /* one capybara, in a mood: eyes, cheeks, arms (down | up), sway (-1, 0, 1) */
+  const capy = ({ eyes = 'open', blush = false, arms = 'down', mouth = 'smile', petals = 3 } = {}) => {
+    let rows = art.paint(W, H, (x, y) => {
+      const fur = art.ellipse(x, y, 16, 16.6, 13.2, 11.2);
+      /* arms in sleeves: a dark rim, the sleeve, then a paw */
+      const ay = arms === 'up' ? 15.6 : 20.6, ax = arms === 'up' ? 3.4 : 7.4, lean = arms === 'up' ? -.75 : .35;
+      for (const [cx, sg] of [[ax, 1], [W - ax, -1]]) {
+        const dx = x + .5 - cx, dy = y + .5 - ay, u = dx * Math.cos(lean * sg) + dy * Math.sin(lean * sg), v = -dx * Math.sin(lean * sg) + dy * Math.cos(lean * sg);
+        const inE = (rx, ry) => (u / rx) ** 2 + (v / ry) ** 2 <= 1;
+        const px = cx + sg * (arms === 'up' ? -1.4 : 2.2), py = ay + (arms === 'up' ? -3.2 : 1.6);
+        if (art.ellipse(x, y, px, py, 1.7, 1.5)) return art.ellipse(x, y, px, py, 1.0, .9) ? 'b' : 'd';
+        if (inE(2.3, 3.6)) return 'S';
+        if (inE(3.2, 4.4)) return 'T';
+      }
+      if (fur) {
+        if (y >= 17 && y <= 24) return y === 17 || y >= 23 ? 'T' : (x <= 4 || x >= 27 ? 'T' : 'S');   /* the sweater */
+        return 'b';
+      }
+      if (art.ellipse(x, y, 6, 6, 2.8, 2.7) || art.ellipse(x, y, 26, 6, 2.8, 2.7)) return art.ellipse(x, y, 6.1, 6.1, 1.4, 1.4) || art.ellipse(x, y, 25.9, 6.1, 1.4, 1.4) ? 'd' : 'b';   /* ears */
+      if (art.ellipse(x, y, 10, 27.4, 3, 1.6) || art.ellipse(x, y, 22, 27.4, 3, 1.6)) return 'b';      /* feet */
+      return null;
+    });
+    rows = art.volume(rows, 'b', 'd', 'B');
+    /* snout: a soft lighter muzzle with a brown rim */
+    rows = rows.map((r, y) => [...r].map((c, x) => {
+      if (c !== 'b' && c !== 'B' && c !== 'd') return c;
+      if (art.rrect(x, y, 12, 10, 19, 16, 2.4)) return art.rrect(x, y, 13, 11, 18, 15, 1.6) ? 'l' : 'd';
+      return c;
+    }).join(''));
+    rows = art.outline(rows);
+    /* feet toes */
+    rows = art.compose(rows, [9, 28, ['d.d']], [21, 28, ['d.d']]);
+    /* face */
+    const e = EYES[eyes];
+    rows = art.compose(rows, [6, 10, e], [22, 10, e],
+      [14, 12, ['nnnn', '.nn.']],
+      [15, 14, ['n']],
+      mouth === 'open' ? [14, 15, ['.pp.']] : [14, 15, ['n..n']]);
+    if (eyes === 'look') rows = art.compose(rows, [22, 10, ['.kk.', 'kwkk', 'kkkk', '.kk.']]);
+    rows = art.compose(rows, blush ? [4, 14, ['ppp', '.p.']] : [5, 14, ['pp']], blush ? [25, 14, ['ppp', '.p.']] : [25, 14, ['pp']]);
+    /* a heart knitted on the sweater */
+    rows = art.put(rows, 15, 19, ['r_r', 'rrr', '_r_']);
+    /* the crown: three daisies and a few leaves */
+    rows = art.compose(rows, [9, 5, ['gg']], [21, 5, ['gg']], [13, 5, ['g']], [18, 5, ['g']]);
+    rows = art.compose(rows, [9, 3, BUD], [20, 3, BUD]);
+    for (const [x, y] of [[10, 1], [16, 0], [22, 1]].slice(0, petals)) rows = art.put(rows, x - 2, y, DAISY);
+    return rows;
+  };
+  const sway = (rows, n) => n ? art.shift(rows, n).map(r => n > 0 ? r : r + '.'.repeat(-n)) : rows;
+
+  defineSprite('daisy', {
+    w: W + 1, h: H, scale: 3, does: 'cozy',
+    palette: {
+      k: '#4a2a1c', n: '#3b2118', b: '#e9b884', B: '#f6d3a6', d: '#c48c5c', l: '#f8dcb6',
+      S: '#2f4fe0', T: '#1f35a8', p: '#ff9aa8', r: '#ff5c8a', w: '#ffffff', e: '#d9d2e6', y: '#ffd23f', g: '#5cbf5a'
+    },
+    frames: {
+      idle: [capy(), capy(), capy(), capy(), capy({ eyes: 'blink' }), capy()],
+      sway: [sway(capy(), 0), sway(capy({ eyes: 'happy' }), 1), sway(capy(), 0), sway(capy({ eyes: 'happy' }), -1)],
+      look: [capy({ eyes: 'look' })],
+      blush: [capy({ eyes: 'happy', blush: true }), capy({ eyes: 'happy', blush: true, mouth: 'open' })],
+      happy: [capy({ eyes: 'happy', blush: true, arms: 'up', mouth: 'open' }), capy({ eyes: 'happy', blush: true })],
+      sleep: [capy({ eyes: 'shut' }), sway(capy({ eyes: 'shut' }), 1)],
+      scared: [capy({ eyes: 'wide', arms: 'up' })],
+      hop: [capy({ eyes: 'happy', arms: 'up' })]
+    },
+    fps: { idle: 2, sway: 2, blush: 3, happy: 4, sleep: .8, look: 1 }
   });
 })();
 
