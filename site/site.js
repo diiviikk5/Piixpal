@@ -225,10 +225,10 @@ document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click'
     <h2 id="spf-h">Become a Sponsor <span>${PRICE}</span></h2>
     <p>Tell us about your brand, then pay on the next page. You'll be featured in the Sponsor section soon.</p></div></div>
   <div class="spf-grid">
-    <label class="spf-f"><span>Product</span><input name="product" maxlength="40" placeholder="e.g. Acme Studio" autocomplete="organization"></label>
-    <label class="spf-f"><span>Link <i>where it points</i></span><input name="link" maxlength="120" placeholder="example.com" inputmode="url" autocomplete="url"></label>
-    <label class="spf-f spf-wide"><span>Description <i class="spf-n">0 / 200</i></span><textarea name="desc" maxlength="200" rows="3" placeholder="One or two lines about what you make"></textarea></label>
-    <label class="spf-f spf-wide"><span>Email <i>where we reach you</i></span><input name="email" type="email" maxlength="120" placeholder="you@example.com" autocomplete="email"></label>
+    <label class="spf-f"><span>Product</span><input name="product" maxlength="40" autocomplete="organization"></label>
+    <label class="spf-f"><span>Link <i>where it points</i></span><input name="link" maxlength="120" inputmode="url" autocomplete="url"></label>
+    <label class="spf-f spf-wide"><span>Description <i class="spf-n">0 / 200</i></span><textarea name="desc" maxlength="200" rows="3"></textarea></label>
+    <label class="spf-f spf-wide"><span>Email <i>where we reach you</i></span><input name="email" type="email" maxlength="120" autocomplete="email"></label>
   </div>
   <div class="spf-prev" aria-hidden="true"><small>How you'll appear</small><div class="spf-card"><b class="spf-p"></b><span class="spf-d"></span><em class="spf-l"></em></div></div>
   <p class="spf-err" role="alert"></p>
@@ -238,9 +238,10 @@ document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click'
     const f = dlg.querySelector('form'), el = n => f.elements[n];
     const paint = () => {
       const v = n => el(n).value.trim();
-      dlg.querySelector('.spf-p').textContent = v('product') || 'Acme Studio';
-      dlg.querySelector('.spf-d').textContent = v('desc') || 'One or two lines about what you make';
-      dlg.querySelector('.spf-l').textContent = (host(v('link')) || 'example.com') + ' ↗';
+      dlg.querySelector('.spf-prev').hidden = !FIELDS.slice(0, 3).some(n => v(n));
+      dlg.querySelector('.spf-p').textContent = v('product');
+      dlg.querySelector('.spf-d').textContent = v('desc');
+      dlg.querySelector('.spf-l').textContent = host(v('link')) ? host(v('link')) + ' ↗' : '';
       dlg.querySelector('.spf-n').textContent = el('desc').value.length + ' / 200';
     };
     const d = draft();

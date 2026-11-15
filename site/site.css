@@ -436,6 +436,8 @@ code,kbd,pre{font-family:var(--f-mono)}
 .spf-f input:focus,.spf-f textarea:focus{outline:none;background:var(--card);box-shadow:0 0 0 3px var(--lime),0 3px 0 0 var(--ink)}
 .spf-f [aria-invalid=true]{border-color:var(--coral);box-shadow:0 0 0 3px color-mix(in oklab,var(--coral) 35%,transparent)}
 .spf-prev{margin-top:18px;padding:14px;border:2px dashed var(--line-2);border-radius:14px;background:var(--paper-2)}
+.spf-prev[hidden]{display:none}
+.spf-card :empty{display:none}
 .spf-prev small{display:block;margin-bottom:9px;font:400 10px/1 var(--f-pix);text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
 .spf-card{display:grid;gap:4px;padding:13px 15px;border:2px solid var(--ink);border-radius:12px;background:var(--card);box-shadow:0 3px 0 var(--ink)}
 .spf-card b{font:750 17px/1.2 var(--f-sans);letter-spacing:-.02em;overflow-wrap:anywhere}
