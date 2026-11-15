@@ -236,7 +236,7 @@ const sidebar = active => {
     </details>`;
   return `<aside class="side" aria-label="Components">
     <input class="side-find" type="search" placeholder="Find a component…" aria-label="Find a component">
-    <nav class="side-start">${link('./', 'Overview', 'index')}${link('install.html', 'Install', 'install')}${link('make.html', 'Pal Maker', 'make')}${link('builder.html', 'Builder', 'builder')}${link('visit.html', 'Pals anywhere', 'visit')}${link('agents.html', 'Agent pets', 'agents')}${link('readme.html', 'GitHub README', 'readme')}</nav>
+    <nav class="side-start">${link('./', 'Overview', 'index')}${link('install.html', 'Install', 'install')}${link('make.html', 'Pal Maker', 'make')}${link('genetics.html', 'Genetics <b class="nw">new</b>', 'genetics')}${link('builder.html', 'Builder', 'builder')}${link('visit.html', 'Pals anywhere', 'visit')}${link('agents.html', 'Agent pets', 'agents')}${link('readme.html', 'GitHub README', 'readme')}</nav>
     ${group('sprites', 'Sprites', 'sprites.html', sprites.length, [['Big 3D', bigs.map(x => item('sprites.html#s-' + x.name, x.name, x.accent))], ['Small', smalls.map(x => item('sprites.html#s-' + x.name, x.name, x.accent))]])}
     ${group('pals', 'Pals', 'pals.html', PALS.length, [['Characters', kinds.pal.map(p => item('pals.html#' + p.id, p.id, p.accent))], ['Interactions', kinds.play.map(p => item('pals.html#' + p.id, p.id, p.accent))], ['Toys', kinds.toy.map(p => item('pals.html#' + p.id, p.id, p.accent))], ['Groups', kinds.group.map(p => item('pals.html#' + p.id, p.id, p.accent))]])}
     ${group('duos', 'Duos', 'duos.html', DUOS.length, [['Pairs', DUOS.map(d => `<a href="duo-${d.id}.html" style="--dot:${d.accent}"${'duo-' + d.id === active ? ' aria-current="page"' : ''}><i></i>${esc(d.name)}</a>`)]])}
@@ -863,6 +863,24 @@ const builderBody = builderTabs('builder') + `<header class="doc-head">
 <script>window.PIIX_BUILDER = ${JSON.stringify(PALS.map(p => ({ id: p.id, kind: p.kind || 'pal', does: p.does })).concat(sprites.map(s => ({ id: s.name, kind: 'sprite', big: s.big }))))};</script>`;
 
 /* ---------- the Pal Maker: markup in scripts/maker-page.mjs, behaviour in site/maker*.js ---------- */
+const GX_V = (await import('node:crypto')).createHash('md5').update(['genetics.js', 'genetics.css'].map(f => readFileSync(join(root, 'site', f), 'utf8')).join('')).digest('hex').slice(0, 8);
+const genesBody = `<header class="doc-head">
+  <div class="crumbs"><a href="./">Components</a><span>/</span><span>Genetics</span></div>
+  <h1>Pal Genetics</h1>
+  <p>Breed two pals into a brand new one. The child blends its parents' shapes, takes colours from each, and inherits eyes, mouth, legs, wings and behaviour, with the odd mutation. Keep the ones you love and breed them again, generation after generation. Every child is a real pal: one tag puts it on your site.</p>
+</header>
+<div class="gx" id="gx"><noscript>Genetics needs JavaScript.</noscript></div>
+<section class="doc-sec" aria-labelledby="gx-how">
+  <h2 id="gx-how">How inheritance works</h2>
+  <ul class="duo-steps">
+    <li><b>Shape</b> is a blend of both silhouettes, leaning a little more towards one parent each time.</li>
+    <li><b>Colour</b> comes in patches: part of the body from one parent, part from the other.</li>
+    <li><b>Traits</b> (eyes, mouth, legs, wings, cheeks, outline, and what the pal does on your page) each come from one parent.</li>
+    <li><b>Mutations</b> happen about once in every few children: a new shape, a hue shift, or a trait neither parent had.</li>
+    <li><b>Generations:</b> keep a child in your nursery (it stays in this browser), make it a parent, and keep going.</li>
+  </ul>
+  <p>To use a child, copy its tag. It works anywhere Piixpal is loaded, and opens in the <a href="make.html">Pal Maker</a> if you want to touch it up.</p>
+</section>`;
 const MAKER_V = (await import('node:crypto')).createHash('md5').update(['maker.js', 'maker-smooth.js', 'maker-pixel.js'].map(f => readFileSync(join(root, 'site', f), 'utf8')).join('')).digest('hex').slice(0, 8);
 
 /* ---------- pals for GitHub READMEs: a live image, made by api/readme.js ---------- */
@@ -997,6 +1015,7 @@ const pages = [
   ['3d.html', { key: 'studio', title: '3D', desc: 'Pals as real 3D models: spinning toys, holo trading cards, a voxel planet, a snow globe, a hologram and voxel dioramas.', body: studioBody }],
   ['install.html', { key: 'install', title: 'Install', desc: 'Every way to add Piixpal to a site: one tag, single files, no-markup, JS, React, Vue, Svelte, bookmarklet.', body: installBody }],
   ['builder.html', { key: 'builder', title: 'Builder', desc: 'Pick pals, choose where they live, copy one line.', body: builderBody }],
+  ['genetics.html', { key: 'genetics', title: 'Pal Genetics', desc: 'Breed two pals into a new one. Shape, colours, eyes, legs, wings and behaviour are inherited, with the odd mutation. Every child is a real pal you can put on your site.', body: genesBody, extra: `<link rel="stylesheet" href="../site/genetics.css?v=${GX_V}">\n<script src="../site/genetics.js?v=${GX_V}" defer></script>` }],
   ['make.html', { key: 'make', title: 'Pal Maker', desc: 'Turn anything into a pal: doodle one, drop in a photo, a logo or an emoji, or draw pixel art. Share it as a link or one tag.', body: builderTabs('make') + makerBody, extra: ['maker', 'maker-smooth', 'maker-pixel'].map(f => `<script src="../site/${f}.js?v=${MAKER_V}" defer></script>`).join(String.fromCharCode(10)) }],
   ['visit.html', { key: 'visit', title: 'Pals on any website', desc: 'A browser extension and a bookmarklet: a pixel pet on every site you visit, and one click to throw a party, make it snow or let a dragon loose on any page.', body: visitBody(BOOKMARKLET, esc) }],
   ['agents.html', { key: 'agents', title: 'Pets for coding agents', desc: 'A pixel pet in your terminal that watches Claude Code or Codex work and reacts: thinking, reading, editing, failing, done. No setup.', body: agentsBody(esc, ['bitbug', 'pip', 'boing', 'moss', 'kitty', 'penguin', 'gecko', 'tri', 'bumble', 'shibe', 'capy', 'frog', 'duckling', 'shel', 'roomba', 'hiss', 'termi', 'beep']) }],

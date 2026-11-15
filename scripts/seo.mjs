@@ -81,6 +81,7 @@ const COMP = {
   'install': ['Install Piixpal: Script Tag, npm, React, Vue, shadcn', null, 'Install'],
   'builder': ['Pal Builder: Add Pixel Characters in One Line', null, 'Builder'],
   'make': ['Pal Maker: Turn Any Image into a Pixel Character', null, 'Pal Maker'],
+  'genetics': ['Pal Genetics: Breed Two Pixel Characters into a New One', null, 'Genetics'],
   '3d': ['3D Pixel Characters: Voxel Toys, Holo Cards, Snow Globe', null, '3D'],
   'agents': ['Pixel Pets for Claude Code & Codex in Your Terminal', null, 'Agent pets'],
   'crowd': ['Crowd: Hundreds of Tiny Pixel Agents on One Canvas', null, 'Crowd'],
