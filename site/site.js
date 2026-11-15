@@ -207,9 +207,8 @@ document.querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click'
   const HOME = 'https://piixpal.dvkk.dev/?sponsor=thanks';
   const KEY = 'piix-sponsor-draft';
   const FIELDS = ['product', 'link', 'desc', 'email'];
-  const CAT = ['.k.......k.', '.kk.....kk.', '.kkkkkkkkk.', 'kkkkkkkkkkk', 'kkLkkkkkLkk', 'kkkkkpkkkkk', 'kkkkkkkkkkk', '.kkkkkkkkk.', '..kk...kk..'];
-  const pix = (rows, cols) => `<svg viewBox="0 0 ${rows[0].length} ${rows.length}" shape-rendering="crispEdges" aria-hidden="true">${rows.map((r, y) => [...r].map((c, x) => cols[c] ? `<rect x="${x}" y="${y}" width="1" height="1" fill="${cols[c]}"/>` : '').join('')).join('')}</svg>`;
-  const catSvg = pix(CAT, { k: 'currentColor', L: 'var(--lime)', p: '#ff5c8a' });
+  /* our own pal: the face from the Piixpal logo */
+  const catSvg = '<svg viewBox="2 3 12 10" shape-rendering="crispEdges" aria-hidden="true"><path fill="#c6f432" d="M4 4h8v1h1v6h-1v1H4v-1H3V5h1z"/><path fill="#17121f" d="M5 6h2v2H5zM9 6h2v2H9zM6 9h4v1H6z"/><path fill="#fff" d="M5 6h1v1H5zM9 6h1v1H9z"/></svg>';
   const HEART = '<svg viewBox="0 0 8 7" shape-rendering="crispEdges" aria-hidden="true"><path fill="currentColor" d="M1 0h2v1h2V0h2v1h1v2H7v1H6v1H5v1H3V5H2V4H1V3H0V1h1z"/></svg>';
   const params = new URLSearchParams(location.search);
   let dlg;
