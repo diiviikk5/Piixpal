@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en" data-theme="white">
+<head>
+<meta charset="utf-8">
+<title>Had · lab</title>
+<link rel="stylesheet" href="../site/site.css">
+<style>
+  body{padding:40px;font-family:var(--f-sans)}
+  .frames{display:flex;flex-wrap:wrap;gap:18px;margin-bottom:60px}
+  .frames figure{margin:0;display:grid;gap:6px;justify-items:center;font:400 10px var(--f-pix);text-transform:uppercase;color:var(--muted)}
+  .frames canvas{image-rendering:pixelated;background:#f3eee3;border-radius:10px}
+  .stage{display:grid;gap:120px;padding-top:140px}
+  .stage h2{font:800 44px/1 var(--f-sans);margin:0;letter-spacing:-.03em}
+  .stage .card{width:340px;padding:24px;border:2px solid var(--ink);border-radius:16px;background:var(--card);box-shadow:0 4px 0 var(--ink)}
+</style>
+</head>
+<body>
+<div class="frames" id="frames"></div>
+<div class="stage">
+  <h2 id="h">Had is chilling here.<piix-pal pal="had"></piix-pal></h2>
+  <div class="card" id="c">A card he hangs out on.<piix-pal pal="had" at=".3" edge="box"></piix-pal></div>
+</div>
+<script src="../piixpal.js"></script>
+<script>
+(async () => {
+  const src = await (await fetch('../src/pals/had.js')).text();
+  let spec;
+  new Function('defineSprite', 'art', src)((n, s) => { spec = s; }, Piixpal.art);
+  const box = document.getElementById('frames'), Z = 6;
+  for (const [clip, frames] of Object.entries(spec.frames)) frames.forEach((rows, i) => {
+    const w = Math.max(...rows.map(r => r.length)), h = rows.length;
+    const cv = Object.assign(document.createElement('canvas'), { width: w * Z, height: h * Z });
+    const g = cv.getContext('2d');
+    rows.forEach((r, y) => [...r].forEach((c, x) => { if (spec.palette[c]) { g.fillStyle = spec.palette[c]; g.fillRect(x * Z, y * Z, Z, Z); } }));
+    const f = document.createElement('figure'); f.append(cv, Object.assign(document.createElement('figcaption'), { textContent: clip + ' ' + i }));
+    box.append(f);
+  });
+  document.body.dataset.ready = 1;
+})();
+</script>
+</body>
+</html>
